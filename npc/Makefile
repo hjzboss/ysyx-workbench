@@ -34,7 +34,6 @@ b: $(SIM_CSRC) $(VSRC)
 sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	@rm -rf $(SIM_OBJ_DIR)
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
 fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
