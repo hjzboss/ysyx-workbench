@@ -11,9 +11,9 @@ VERILATOR_SIMFLAG = --cc --exe --build -Wall --trace --Mdir $(SIM_OBJ_DIR) --top
 VERILATOR_FPGAFLAG = --exe -Wall --cc -MMD --build --Mdir $(FPGA_OBJ_DIR) --top-module $(TOPNAME)
 
 INC_PATH ?= 
-INCFLAGS = $(addprefix -I, $(INC_PATH))
-CFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
-LDFLAGS += -lSDL2 -lSDL2_image
+# INCFLAGS = $(addprefix -I, $(INC_PATH))
+# CFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+# LDFLAGS += -lSDL2 -lSDL2_image
 
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 
@@ -21,6 +21,15 @@ BUILD_DIR = ./build
 SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 FPGA_OBJ_DIR = $(BUILD_DIR)/fpga/obj_dir
 WAVE = wave.vcd
+
+#传递给preproject连接器的信息，添加SDL2库信息
+LDFLAGS += -lSDL2 -lSDL2_image
+
+#包含文件路径，加前缀-I传递给g++，INC_PATH在nvbroad.mk中定义
+INCFLAGS = $(addprefix -I, $(INC_PATH))
+
+#传递给g++的编译参数，包括包含路径和TOP_NAME的定义
+CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 
 all:
 	@echo "Write this Makefile by your self."
@@ -48,6 +57,7 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
 $(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
+
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 include ../Makefile
 
