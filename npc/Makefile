@@ -47,10 +47,11 @@ fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
+$(shell mkdir -p $(BUILD_DIR))
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 include ../Makefile
 
 .PHONY: clean
 
 clean:
-	rm -r $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR)
+	rm -r $(BUILD_DIR)
