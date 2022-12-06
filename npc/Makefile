@@ -53,4 +53,4 @@ include ../Makefile
 .PHONY: clean
 
 clean:
-	rm -r obj_dir
+	rm -r $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR)
