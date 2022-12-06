@@ -25,7 +25,9 @@ WAVE = wave.vcd
 all:
 	@echo "Write this Makefile by your self."
 
-build: $(SIM_CSRC) $(VSRC)
+b: $(SIM_CSRC) $(VSRC)
+	@echo "build"
+	@rm -rf $(SIM_OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V$(TOPNAME)
 
@@ -35,7 +37,7 @@ sim:
 	@rm -rf $(SIM_OBJ_DIR)
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
-run: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
+fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
 	$(call git_commit, "sim RTL")
 	@echo "run nvboard"
 	@rm -rf $(FPGA_OBJ_DIR)
