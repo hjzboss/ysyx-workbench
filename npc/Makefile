@@ -1,7 +1,7 @@
 TOPNAME = top
 NXDC_FILES = constr/top.nxdc
 
-VSRC = $(shell find $(abspath ./vsrc) -name "*.v")
+VSRC = $(shell find $(abspath ./vsrc) -name "top*.v")
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
 SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
