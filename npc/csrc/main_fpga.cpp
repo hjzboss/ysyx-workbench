@@ -30,6 +30,7 @@ int main(int argc, char** argv, char** env) {
 	//reset(10);
 
 	while (1) {
+		dut.eval();
 		nvboard_update();
 		//single_cycle();
 	}
