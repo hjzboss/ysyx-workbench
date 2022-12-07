@@ -52,7 +52,7 @@ fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
 	@rm -rf $(FPGA_OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
 		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--top-module $(TOPNAME) $^
+		-top $(TOPNAME)
 
 # 将引脚映射转为cpp
 $(SRC_AUTO_BIND): $(NXDC_FILES)
