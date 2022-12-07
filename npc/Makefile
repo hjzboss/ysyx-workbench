@@ -9,7 +9,7 @@ SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
 VERILATOR = verilator
 VERILATOR_SIMFLAG = --cc --exe --build -Wall --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
 VERILATOR_FPGAFLAG = --exe -Wall --cc \
-										 -MMD --build --Mdir $(FPGA_OBJ_DIR) --top-module $(TOPNAME)
+										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
 INC_PATH ?= 
 # INCFLAGS = $(addprefix -I, $(INC_PATH))
@@ -51,7 +51,8 @@ fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
 	@echo "run nvboard"
 	@rm -rf $(FPGA_OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
-		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS))
+		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
+		--top-module $(TOPNAME) $^
 
 # 将引脚映射转为cpp
 $(SRC_AUTO_BIND): $(NXDC_FILES)
