@@ -5,7 +5,6 @@
 #include <assert.h>
 #include "verilated_vcd_c.h" // 波形仿真
 
-
 int main(int argc, char** argv, char** env) {
 	VerilatedContext* contextp = new VerilatedContext;
 	contextp->commandArgs(argc, argv);
@@ -14,7 +13,7 @@ int main(int argc, char** argv, char** env) {
 	VerilatedVcdC* tfp = new VerilatedVcdC;
 	contextp->traceEverOn(true);
 	top->trace(tfp, 0);
-	tfp->open("./obj_dir/wave.vcd");
+	tfp->open("./build/sim/obj_dir/wave.vcd");
 
 	while (!contextp->gotFinish()) {
 		int a = rand() & 1;
