@@ -11,7 +11,7 @@ VERILATOR_SIMFLAG = --cc --exe --build -Wall --trace --Mdir $(SIM_OBJ_DIR) --top
 VERILATOR_FPGAFLAG = --exe -Wall --cc \
 										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
-INC_PATH ?= 
+# INC_PATH ?= 
 # INCFLAGS = $(addprefix -I, $(INC_PATH))
 # CFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 # LDFLAGS += -lSDL2 -lSDL2_image
@@ -51,8 +51,9 @@ fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
 	@echo "run nvboard"
 	@rm -rf $(FPGA_OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
-		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		-top $(TOPNAME)
+		$(addprefix -CFLAGS , $(CFLAGS)) \
+	 	$(addprefix -LDFLAGS , $(LDFLAGS)) \
+		-top $(TOPNAME) $^
 
 # 将引脚映射转为cpp
 $(SRC_AUTO_BIND): $(NXDC_FILES)
