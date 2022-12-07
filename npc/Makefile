@@ -28,6 +28,7 @@ INCFLAGS = $(addprefix -I, $(INC_PATH))
 #传递给g++的编译参数，包括包含路径和TOP_NAME的定义
 CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 
+include $(NVBOARD_HOME)/scripts/nvboard.mk
 all:
 	@echo "Write this Makefile by your self."
 
@@ -46,7 +47,7 @@ sim:
 	@echo $(NVBOARD_ARCHIVE)
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
-$(BIN): $(NVBOARD_HOME)/build/nvboard.a $(FPGA_CSRC) $(VSRC) 
+$(BIN): $(NVBOARD_ARCHIVE) $(FPGA_CSRC) $(VSRC) 
 	$(call git_commit, "sim RTL")
 	@echo "run nvboard"
 	@rm -rf $(FPGA_OBJ_DIR)
@@ -62,7 +63,6 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 
 $(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
 
-include $(NVBOARD_HOME)/scripts/nvboard.mk
 include ../Makefile
 
 .PHONY: default all clean run
