@@ -7,6 +7,7 @@ static TOP_NAME dut;
 
 void nvboard_bind_all_pins(Vtop* top); 
 
+/*
 static void single_cycle() {
 	dut.clk = 0;
 	dut.eval();
@@ -20,6 +21,7 @@ static void reset(int n) {
 		single_cycle();
 	dut.rst = 0;
 }
+*/
 
 int main(int argc, char** argv, char** env) {
 	nvboard_bind_all_pins(&dut);
