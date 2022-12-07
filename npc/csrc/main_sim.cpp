@@ -15,12 +15,18 @@ int main(int argc, char** argv, char** env) {
 	tfp->open("./build/sim/obj_dir/wave.vcd");
 
 	while (!contextp->gotFinish()) {
-		int x = rand() & 0xf;
+		int x0 = rand() & 0x3;
+		int x1 = rand() & 0x3;
+		int x2 = rand() & 0x3;
+		int x3 = rand() & 0x3;
 		int y = rand() & 0x3;
-		top->x = x;
+		top->x0 = x0;
+		top->x1 = x1;
+		top->x2 = x2;
+		top->x3 = x3;
 		top->y = y;
 		top->eval();
-		printf("x = %o, y = %o, f = %o\n", x, y, top->f);
+		printf("x0 = %o, x1 = %o, x2 = %o, x3 = %o, y = %o, f = %o\n", x0, x1, x2, x3, y, top->f);
 		// 推进仿真时间
 		tfp->dump(contextp->time());
 		contextp->timeInc(1);
