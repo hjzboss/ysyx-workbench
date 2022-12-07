@@ -36,7 +36,6 @@ run: $(BIN)
 	$@^
 
 b: $(SIM_CSRC) $(VSRC)
-	@echo "build"
 	@rm -rf $(SIM_OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V$(TOPNAME)
@@ -44,6 +43,7 @@ b: $(SIM_CSRC) $(VSRC)
 sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
+	@echo $(INC_PATH)
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
 $(BIN): $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
