@@ -29,12 +29,14 @@ INCFLAGS = $(addprefix -I, $(INC_PATH))
 CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 
 include $(NVBOARD_HOME)/scripts/nvboard.mk
+include ../Makefile
+
 all:
 	@echo "Write this Makefile by your self."
 
 run: $(BIN)
 	@echo $(INC_PATH)
-	$@^
+	@$^
 
 b: $(SIM_CSRC) $(VSRC)
 	@rm -rf $(SIM_OBJ_DIR)
