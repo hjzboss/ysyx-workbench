@@ -8,7 +8,7 @@ SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
 
 VERILATOR = verilator
 VERILATOR_SIMFLAG = --cc --exe --build -Wall --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
-VERILATOR_FPGAFLAG = --exe -Wall --cc \
+VERILATOR_FPGAFLAG = -Wall --cc \
 										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
@@ -16,6 +16,7 @@ SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 BUILD_DIR = ./build
 SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 FPGA_OBJ_DIR = $(BUILD_DIR)/fpga/obj_dir
+BIN = $(FPGA_OBJ_DIR)/$(TOPNAME)
 WAVE = wave.vcd
 
 #传递给preproject连接器的信息，添加SDL2库信息
@@ -30,6 +31,9 @@ CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 all:
 	@echo "Write this Makefile by your self."
 
+run: $(BIN)
+	$@^
+
 b: $(SIM_CSRC) $(VSRC)
 	@echo "build"
 	@rm -rf $(SIM_OBJ_DIR)
@@ -41,14 +45,15 @@ sim:
 	@echo "Write this Makefile by your self."
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
-fpga: $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
+$(BIN): $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
 	$(call git_commit, "sim RTL")
 	@echo "run nvboard"
 	@rm -rf $(FPGA_OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
 		$(addprefix -CFLAGS , $(CFLAGS)) \
 	 	$(addprefix -LDFLAGS , $(LDFLAGS)) \
-		-top $(TOPNAME)
+		-top $(TOPNAME) \
+		--exe -o $(abspath $(BIN))
 
 # 将引脚映射转为cpp
 $(SRC_AUTO_BIND): $(NXDC_FILES)
