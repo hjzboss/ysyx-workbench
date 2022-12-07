@@ -32,6 +32,7 @@ all:
 	@echo "Write this Makefile by your self."
 
 run: $(BIN)
+	@echo $(INC_PATH)
 	$@^
 
 b: $(SIM_CSRC) $(VSRC)
