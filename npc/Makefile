@@ -31,7 +31,7 @@ CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 include ../Makefile
 
-all:
+all: 
 	@echo "Write this Makefile by your self."
 
 run: $(BIN)
