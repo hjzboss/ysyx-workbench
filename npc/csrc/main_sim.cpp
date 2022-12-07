@@ -2,7 +2,6 @@
 #include "verilated.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "verilated_vcd_c.h" // 波形仿真
 
 int main(int argc, char** argv, char** env) {
@@ -12,21 +11,19 @@ int main(int argc, char** argv, char** env) {
 	// 生成波形
 	VerilatedVcdC* tfp = new VerilatedVcdC;
 	contextp->traceEverOn(true);
-	top->trace(tfp, 0);
+	top->trace(tfp, 99);
 	tfp->open("./build/sim/obj_dir/wave.vcd");
 
 	while (!contextp->gotFinish()) {
-		int a = rand() & 1;
-		int b = rand() & 1;
-		top->a = a;
-		top->b = b;
+		int x = rand() & 0xf;
+		int y = rand() & 0x3;
+		top->x = x;
+		top->y = y;
 		top->eval();
-		printf("a = %d, b = %d, f = %d\n", a, b, top->f);
-
+		printf("x = %o, y = %o, f = %o\n", x, y, top->f);
+		// 推进仿真时间
 		tfp->dump(contextp->time());
 		contextp->timeInc(1);
-
-		assert(top->f == (a ^ b));
 	}
 	delete top;
 	tfp->close();

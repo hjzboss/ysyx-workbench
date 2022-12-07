@@ -1,26 +1,20 @@
 module top(
-	input clk,
-	input rst,
-	output reg [15:0] led
+	input [1:0] y,
+	input [3:0] x,
+
+	output f
 );
 
-reg [31:0] count;
+assign f = x[y];
 
-always @(posedge clk) begin
-	if (rst)
-		count <= 0;
-	else if (count == 5000000)
-		count <= 0;
-	else
-		count <= count + 1;
+/*
+always @(*) begin
+	case (y)
+		2'b00: f = x[0];
+		2'b01: f = x[1];
+		2'b10: f = x[2];
+		2'b11: f = x[3];
+	endcase
 end
-
-always @(posedge clk) begin
-	if (rst)
-		led <= 1;
-	else if (count == 5000000)
-		led <= (led == 16'h8000) ? 16'd1 : led << 1;
-	else
-		led <= led;	
-end
+*/
 endmodule
