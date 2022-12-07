@@ -65,8 +65,6 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 
 $(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
 
-include ../Makefile
-
 .PHONY: default all clean run
 
 clean:
