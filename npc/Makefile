@@ -64,7 +64,7 @@ $(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 include ../Makefile
 
-.PHONY: clean
+.PHONY: default all clean run
 
 clean:
 	rm -r $(BUILD_DIR)
