@@ -46,7 +46,7 @@ sim:
 	@echo $(INC_PATH)
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
-$(BIN): $(FPGA_CSRC) $(VSRC) $(NVBOARD_ARCHIVE)
+$(BIN): $(NVBOARD_ARCHIVE) $(FPGA_CSRC) $(VSRC) 
 	$(call git_commit, "sim RTL")
 	@echo "run nvboard"
 	@rm -rf $(FPGA_OBJ_DIR)
