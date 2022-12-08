@@ -15,7 +15,7 @@ reg [6:0] tmp;
 
 assign led = en ? sw : 0;
 assign seg0 = en ? tmp : ZERO;
-assign valid = sw != 8'd0;
+assign valid = (sw != 8'd0) & en;
 
 always @(*) begin	
 	casez (sw)
