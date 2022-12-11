@@ -1,4 +1,4 @@
-module Alu(
+module top(
   input        clock,
   input        reset,
   input  [3:0] io_srcA,
