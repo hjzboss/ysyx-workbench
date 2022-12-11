@@ -10,14 +10,14 @@ void nvboard_bind_all_pins(Vtop* top);
 static void single_cycle() {
 	dut.clock = 0;
 	dut.eval();
-	int n = 100000;
-	for (int i = n; i > 0; --i) {
-		for (int j = n; j > 0; --j) {}
+	unsigned long n = 1844674407370955161;
+	for (unsigned long i = n; i > 0; --i) {
+		for (unsigned long j = n; j > 0; --j) {}
 	}
 	dut.clock = 1;
 	dut.eval();
-	for (int i = n; i > 0; --i) {
-		for (int j = n; j > 0; --j) {}
+	for (unsigned long i = n; i > 0; --i) {
+		for (unsigned long j = n; j > 0; --j) {}
 	}
 }
 
