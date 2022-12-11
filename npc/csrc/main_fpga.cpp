@@ -5,33 +5,43 @@
 
 static TOP_NAME dut;
 
-void nvboard_bind_all_pins(Vtop* top); 
-
-/*
-static void single_cycle() {
+void single_cycle() {
 	dut.clock = 0;
 	dut.eval();
+	unsigned long n = 4294967295
+	for (unsigned long i = n; i > 0; --i) {
+		for (unsigned long j = n; j > 0; --j) {
+			for (unsigned long k = n; k > 0; --k) {}
+		}
+	}
 	dut.clock = 1;
-	dut.eval();
+	dut.eval();	
+	for (unsigned long i = n; i > 0; --i) {
+		for (unsigned long j = n; j > 0; --j) {
+			for (unsigned long k = n; k > 0; --k) {}
+		}
+	}
 }
 
-static void reset(int n) {
+void reset(int n) {
 	dut.reset = 1;
-	single_cycle();
+	while (n--) {
+		single_cycle();
+	}
 	dut.reset = 0;
 }
-*/
+
+void nvboard_bind_all_pins(Vtop* top); 
 
 int main(int argc, char** argv, char** env) {
 	nvboard_bind_all_pins(&dut);
 	nvboard_init();
-	
-	//reset(10);
+
+	reset(10);
 
 	while (1) {
-		dut.eval();
+		single_cycle();
 		nvboard_update();
-		//single_cycle();
 	}
 
 	nvboard_quit();

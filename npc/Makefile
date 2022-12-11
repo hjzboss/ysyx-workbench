@@ -1,7 +1,7 @@
 TOPNAME = top
 NXDC_FILES = constr/top.nxdc
 
-VSRC = $(shell find $(abspath ./vsrc) -name "top*.v")
+VSRC = $(shell find $(abspath ./vsrc) -name "*.v")
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
 SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
@@ -31,10 +31,11 @@ CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 include ../Makefile
 
-all: 
+all:
 	@echo "Write this Makefile by your self."
 
 run: $(BIN)
+	@echo $(INC_PATH)
 	@$^
 
 b: $(SIM_CSRC) $(VSRC)
