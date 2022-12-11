@@ -1,6 +1,4 @@
 module top(
-  input        clock,
-  input        reset,
   input  [3:0] io_srcA,
   input  [3:0] io_srcB,
   input  [2:0] io_sel,
