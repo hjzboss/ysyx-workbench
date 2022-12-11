@@ -12,12 +12,20 @@ static void single_cycle() {
 	dut.eval();
 	unsigned long n = 1844674407370955161;
 	for (unsigned long i = n; i > 0; --i) {
-		for (unsigned long j = n; j > 0; --j) {}
+		for (unsigned long j = n; j > 0; --j) {
+			for (unsigned long k = n; k > 0; --k) {
+				for (unsigned long w = n; w > 0; --w) {}
+			}
+		}
 	}
 	dut.clock = 1;
 	dut.eval();
 	for (unsigned long i = n; i > 0; --i) {
-		for (unsigned long j = n; j > 0; --j) {}
+		for (unsigned long j = n; j > 0; --j) {
+			for (unsigned long k = n; k > 0; --k) {
+				for (unsigned long w = n; w > 0; --w) {}
+			}
+		}
 	}
 }
 
