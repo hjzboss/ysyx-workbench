@@ -1,4 +1,4 @@
-module Top(
+module top(
   input        clock,
   input        reset,
   output [7:0] io_led
