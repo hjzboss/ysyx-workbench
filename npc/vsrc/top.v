@@ -1,4 +1,4 @@
-module Memory(
+module top(
   input        clock,
   input        reset,
   input  [2:0] io_addr,
