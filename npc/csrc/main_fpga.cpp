@@ -22,14 +22,14 @@ void single_cycle() {
 		}
 	}
 }
-
+/*
 void reset(int n) {
 	dut.reset = 1;
 	while (n--) {
 		single_cycle();
 	}
 	dut.reset = 0;
-}
+}*/
 
 void nvboard_bind_all_pins(Vtop* top); 
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv, char** env) {
 	nvboard_bind_all_pins(&dut);
 	nvboard_init();
 
-	reset(10);
+	//reset(10);
 
 	while (1) {
 		single_cycle();
