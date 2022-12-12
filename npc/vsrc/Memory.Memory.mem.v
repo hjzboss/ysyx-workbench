@@ -14,4 +14,4 @@ initial begin
 end
                       endmodule
 
-bind Memory BindsTo_0_Memory BindsTo_0_Memory_Inst(.*);
+bind top BindsTo_0_Memory BindsTo_0_Memory_Inst(.*);
