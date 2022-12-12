@@ -1,6 +1,6 @@
 MODULE ?=
 SRC = ./generated/$(MODULE)/*.v
-OBJ = ../vsrc/
+OBJ = ../vsrc/top.v
 
 run:
 	sbt run 

@@ -24,20 +24,20 @@ module top(
   reg [9:0] buffer; // @[Ps2.scala 56:23]
   reg [3:0] count; // @[Ps2.scala 58:22]
   reg [2:0] ps2ClkSync; // @[Ps2.scala 60:27]
-  reg [3:0] one; // @[Ps2.scala 64:20]
-  reg [3:0] ten; // @[Ps2.scala 65:20]
-  wire [3:0] _ps2ClkSync_T = {ps2ClkSync, 1'h0}; // @[Ps2.scala 67:29]
-  wire [3:0] _GEN_196 = {{3'd0}, io_ps2Clk}; // @[Ps2.scala 67:37]
-  wire [3:0] _ps2ClkSync_T_1 = _ps2ClkSync_T | _GEN_196; // @[Ps2.scala 67:37]
-  wire  sampling = ps2ClkSync[2] & ~ps2ClkSync[1]; // @[Ps2.scala 68:29]
-  reg [7:0] current0T; // @[Ps2.scala 70:26]
-  reg [7:0] current1T; // @[Ps2.scala 71:26]
-  reg [7:0] asc0T; // @[Ps2.scala 72:22]
-  reg [7:0] asc1T; // @[Ps2.scala 73:22]
-  wire  _T_1 = count == 4'ha; // @[Ps2.scala 79:17]
-  wire  _T_9 = ~buffer[0] & io_ps2Data & ^buffer[9:1]; // @[Ps2.scala 80:57]
-  wire  _T_12 = ~reset; // @[Ps2.scala 81:15]
-  wire  _T_14 = buffer[8:1] != 8'hf0; // @[Ps2.scala 82:28]
+  reg [3:0] one; // @[Ps2.scala 63:20]
+  reg [3:0] ten; // @[Ps2.scala 64:20]
+  wire [3:0] _ps2ClkSync_T = {ps2ClkSync, 1'h0}; // @[Ps2.scala 66:29]
+  wire [3:0] _GEN_196 = {{3'd0}, io_ps2Clk}; // @[Ps2.scala 66:37]
+  wire [3:0] _ps2ClkSync_T_1 = _ps2ClkSync_T | _GEN_196; // @[Ps2.scala 66:37]
+  wire  sampling = ps2ClkSync[2] & ~ps2ClkSync[1]; // @[Ps2.scala 67:29]
+  reg [7:0] current0T; // @[Ps2.scala 69:26]
+  reg [7:0] current1T; // @[Ps2.scala 70:26]
+  reg [7:0] asc0T; // @[Ps2.scala 71:22]
+  reg [7:0] asc1T; // @[Ps2.scala 72:22]
+  wire  _T_1 = count == 4'ha; // @[Ps2.scala 80:17]
+  wire  _T_9 = ~buffer[0] & io_ps2Data & ^buffer[9:1]; // @[Ps2.scala 81:57]
+  wire  _T_12 = ~reset; // @[Ps2.scala 82:15]
+  wire  _T_14 = buffer[8:1] != 8'hf0; // @[Ps2.scala 83:28]
   wire [7:0] _GEN_64 = 4'hf == buffer[4:1] ? 8'h8e : 8'hc0; // @[Ps2.scala 23:16 39:23]
   wire [7:0] _GEN_65 = 4'he == buffer[4:1] ? 8'h86 : _GEN_64; // @[Ps2.scala 23:16 38:23]
   wire [7:0] _GEN_66 = 4'hd == buffer[4:1] ? 8'ha1 : _GEN_65; // @[Ps2.scala 23:16 37:23]
@@ -70,10 +70,10 @@ module top(
   wire [7:0] _GEN_93 = 4'h2 == buffer[8:5] ? 8'ha4 : _GEN_92; // @[Ps2.scala 23:16 26:22]
   wire [7:0] _GEN_94 = 4'h1 == buffer[8:5] ? 8'hf9 : _GEN_93; // @[Ps2.scala 23:16 25:22]
   wire [7:0] current1T_seg_1 = 4'h0 == buffer[8:5] ? 8'hc0 : _GEN_94; // @[Ps2.scala 23:16 24:22]
-  wire [7:0] _GEN_96 = 8'h2d == buffer[8:1] ? 8'h52 : 8'h0; // @[Ps2.scala 46:15 50:26]
-  wire [7:0] _GEN_97 = 8'h24 == buffer[8:1] ? 8'h45 : _GEN_96; // @[Ps2.scala 46:15 49:26]
-  wire [7:0] _GEN_98 = 8'h1d == buffer[8:1] ? 8'h57 : _GEN_97; // @[Ps2.scala 46:15 48:26]
-  wire [7:0] asc0T_seg_1 = 8'h15 == buffer[8:1] ? 8'h51 : _GEN_98; // @[Ps2.scala 46:15 47:26]
+  wire [7:0] _GEN_96 = 8'h2d == buffer[8:1] ? 8'h72 : 8'h0; // @[Ps2.scala 46:15 50:26]
+  wire [7:0] _GEN_97 = 8'h24 == buffer[8:1] ? 8'h65 : _GEN_96; // @[Ps2.scala 46:15 49:26]
+  wire [7:0] _GEN_98 = 8'h1d == buffer[8:1] ? 8'h77 : _GEN_97; // @[Ps2.scala 46:15 48:26]
+  wire [7:0] asc0T_seg_1 = 8'h15 == buffer[8:1] ? 8'h71 : _GEN_98; // @[Ps2.scala 46:15 47:26]
   wire [7:0] _GEN_100 = 4'hf == asc0T_seg_1[3:0] ? 8'h8e : 8'hc0; // @[Ps2.scala 23:16 39:23]
   wire [7:0] _GEN_101 = 4'he == asc0T_seg_1[3:0] ? 8'h86 : _GEN_100; // @[Ps2.scala 23:16 38:23]
   wire [7:0] _GEN_102 = 4'hd == asc0T_seg_1[3:0] ? 8'ha1 : _GEN_101; // @[Ps2.scala 23:16 37:23]
@@ -106,26 +106,26 @@ module top(
   wire [7:0] _GEN_133 = 4'h2 == asc0T_seg_1[7:4] ? 8'ha4 : _GEN_132; // @[Ps2.scala 23:16 26:22]
   wire [7:0] _GEN_134 = 4'h1 == asc0T_seg_1[7:4] ? 8'hf9 : _GEN_133; // @[Ps2.scala 23:16 25:22]
   wire [7:0] asc1T_seg_2 = 4'h0 == asc0T_seg_1[7:4] ? 8'hc0 : _GEN_134; // @[Ps2.scala 23:16 24:22]
-  wire  _one_T = one == 4'h9; // @[Ps2.scala 88:26]
-  wire [3:0] _one_T_2 = one + 4'h1; // @[Ps2.scala 88:44]
-  wire [3:0] _one_T_3 = one == 4'h9 ? 4'h0 : _one_T_2; // @[Ps2.scala 88:21]
-  wire [3:0] _ten_T_2 = ten + 4'h1; // @[Ps2.scala 89:39]
-  wire [3:0] _ten_T_3 = _one_T ? _ten_T_2 : ten; // @[Ps2.scala 89:21]
-  wire [7:0] _GEN_136 = buffer[8:1] != 8'hf0 ? current0T_seg_1 : current0T; // @[Ps2.scala 82:41 83:21 70:26]
-  wire [7:0] _GEN_137 = buffer[8:1] != 8'hf0 ? current1T_seg_1 : current1T; // @[Ps2.scala 82:41 84:21 71:26]
-  wire [7:0] _GEN_138 = buffer[8:1] != 8'hf0 ? asc0T_seg_2 : asc0T; // @[Ps2.scala 82:41 86:17 72:22]
-  wire [7:0] _GEN_139 = buffer[8:1] != 8'hf0 ? asc1T_seg_2 : asc1T; // @[Ps2.scala 82:41 87:17 73:22]
-  wire [3:0] _GEN_140 = buffer[8:1] != 8'hf0 ? _one_T_3 : one; // @[Ps2.scala 82:41 88:15 64:20]
-  wire [3:0] _GEN_141 = buffer[8:1] != 8'hf0 ? _ten_T_3 : ten; // @[Ps2.scala 82:41 89:15 65:20]
-  wire [15:0] _GEN_0 = {{15'd0}, io_ps2Data}; // @[Ps2.scala 95:54]
-  wire [15:0] _buffer_T = _GEN_0 << count; // @[Ps2.scala 95:54]
-  wire [15:0] _buffer_T_2 = ~_buffer_T; // @[Ps2.scala 95:28]
-  wire [15:0] _GEN_197 = {{6'd0}, buffer}; // @[Ps2.scala 95:25]
-  wire [15:0] _buffer_T_3 = _GEN_197 & _buffer_T_2; // @[Ps2.scala 95:25]
-  wire [15:0] _buffer_T_5 = _buffer_T_3 | _buffer_T; // @[Ps2.scala 95:67]
-  wire [3:0] _count_T_1 = count + 4'h1; // @[Ps2.scala 96:22]
-  wire [15:0] _GEN_154 = count == 4'ha ? 16'h0 : _buffer_T_5; // @[Ps2.scala 79:27 92:14 95:14]
-  wire [15:0] _GEN_162 = sampling ? _GEN_154 : {{6'd0}, buffer}; // @[Ps2.scala 56:23 78:27]
+  wire  _one_T = one == 4'h9; // @[Ps2.scala 89:26]
+  wire [3:0] _one_T_2 = one + 4'h1; // @[Ps2.scala 89:44]
+  wire [3:0] _one_T_3 = one == 4'h9 ? 4'h0 : _one_T_2; // @[Ps2.scala 89:21]
+  wire [3:0] _ten_T_2 = ten + 4'h1; // @[Ps2.scala 90:39]
+  wire [3:0] _ten_T_3 = _one_T ? _ten_T_2 : ten; // @[Ps2.scala 90:21]
+  wire [7:0] _GEN_136 = buffer[8:1] != 8'hf0 ? current0T_seg_1 : current0T; // @[Ps2.scala 83:41 84:21 69:26]
+  wire [7:0] _GEN_137 = buffer[8:1] != 8'hf0 ? current1T_seg_1 : current1T; // @[Ps2.scala 83:41 85:21 70:26]
+  wire [7:0] _GEN_138 = buffer[8:1] != 8'hf0 ? asc0T_seg_2 : asc0T; // @[Ps2.scala 83:41 87:17 71:22]
+  wire [7:0] _GEN_139 = buffer[8:1] != 8'hf0 ? asc1T_seg_2 : asc1T; // @[Ps2.scala 83:41 88:17 72:22]
+  wire [3:0] _GEN_140 = buffer[8:1] != 8'hf0 ? _one_T_3 : one; // @[Ps2.scala 83:41 89:15 63:20]
+  wire [3:0] _GEN_141 = buffer[8:1] != 8'hf0 ? _ten_T_3 : ten; // @[Ps2.scala 83:41 90:15 64:20]
+  wire [15:0] _GEN_0 = {{15'd0}, io_ps2Data}; // @[Ps2.scala 96:54]
+  wire [15:0] _buffer_T = _GEN_0 << count; // @[Ps2.scala 96:54]
+  wire [15:0] _buffer_T_2 = ~_buffer_T; // @[Ps2.scala 96:28]
+  wire [15:0] _GEN_197 = {{6'd0}, buffer}; // @[Ps2.scala 96:25]
+  wire [15:0] _buffer_T_3 = _GEN_197 & _buffer_T_2; // @[Ps2.scala 96:25]
+  wire [15:0] _buffer_T_5 = _buffer_T_3 | _buffer_T; // @[Ps2.scala 96:67]
+  wire [3:0] _count_T_1 = count + 4'h1; // @[Ps2.scala 97:22]
+  wire [15:0] _GEN_154 = count == 4'ha ? 16'h0 : _buffer_T_5; // @[Ps2.scala 80:27 93:14 96:14]
+  wire [15:0] _GEN_162 = sampling ? _GEN_154 : {{6'd0}, buffer}; // @[Ps2.scala 56:23 79:27]
   wire [7:0] _GEN_164 = 4'hf == one ? 8'h8e : 8'hc0; // @[Ps2.scala 23:16 39:23]
   wire [7:0] _GEN_165 = 4'he == one ? 8'h86 : _GEN_164; // @[Ps2.scala 23:16 38:23]
   wire [7:0] _GEN_166 = 4'hd == one ? 8'ha1 : _GEN_165; // @[Ps2.scala 23:16 37:23]
@@ -157,8 +157,8 @@ module top(
   wire [7:0] _GEN_193 = 4'h2 == ten ? 8'ha4 : _GEN_192; // @[Ps2.scala 23:16 26:22]
   wire [7:0] _GEN_194 = 4'h1 == ten ? 8'hf9 : _GEN_193; // @[Ps2.scala 23:16 25:22]
   wire [15:0] _GEN_198 = reset ? 16'h0 : _GEN_162; // @[Ps2.scala 56:{23,23}]
-  wire [3:0] _GEN_199 = reset ? 4'h0 : _ps2ClkSync_T_1; // @[Ps2.scala 60:{27,27} 67:14]
-  wire  _GEN_201 = sampling & _T_1 & _T_9; // @[Ps2.scala 81:15]
+  wire [3:0] _GEN_199 = reset ? 4'h0 : _ps2ClkSync_T_1; // @[Ps2.scala 60:{27,27} 66:14]
+  wire  _GEN_201 = sampling & _T_1 & _T_9; // @[Ps2.scala 82:15]
   assign io_current0 = current0T; // @[Ps2.scala 74:15]
   assign io_current1 = current1T; // @[Ps2.scala 75:15]
   assign io_asc0 = asc0T; // @[Ps2.scala 76:11]
@@ -169,64 +169,64 @@ module top(
     buffer <= _GEN_198[9:0]; // @[Ps2.scala 56:{23,23}]
     if (reset) begin // @[Ps2.scala 58:22]
       count <= 4'h0; // @[Ps2.scala 58:22]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        count <= 4'h0; // @[Ps2.scala 93:13]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        count <= 4'h0; // @[Ps2.scala 94:13]
       end else begin
-        count <= _count_T_1; // @[Ps2.scala 96:13]
+        count <= _count_T_1; // @[Ps2.scala 97:13]
       end
     end
-    ps2ClkSync <= _GEN_199[2:0]; // @[Ps2.scala 60:{27,27} 67:14]
-    if (reset) begin // @[Ps2.scala 64:20]
-      one <= 4'h0; // @[Ps2.scala 64:20]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 80:89]
+    ps2ClkSync <= _GEN_199[2:0]; // @[Ps2.scala 60:{27,27} 66:14]
+    if (reset) begin // @[Ps2.scala 63:20]
+      one <= 4'h0; // @[Ps2.scala 63:20]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 81:89]
           one <= _GEN_140;
         end
       end
     end
-    if (reset) begin // @[Ps2.scala 65:20]
-      ten <= 4'h0; // @[Ps2.scala 65:20]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 80:89]
+    if (reset) begin // @[Ps2.scala 64:20]
+      ten <= 4'h0; // @[Ps2.scala 64:20]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 81:89]
           ten <= _GEN_141;
         end
       end
     end
-    if (reset) begin // @[Ps2.scala 70:26]
-      current0T <= 8'hc0; // @[Ps2.scala 70:26]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 80:89]
+    if (reset) begin // @[Ps2.scala 69:26]
+      current0T <= 8'hc0; // @[Ps2.scala 69:26]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 81:89]
           current0T <= _GEN_136;
         end
       end
     end
-    if (reset) begin // @[Ps2.scala 71:26]
-      current1T <= 8'hc0; // @[Ps2.scala 71:26]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 80:89]
+    if (reset) begin // @[Ps2.scala 70:26]
+      current1T <= 8'hc0; // @[Ps2.scala 70:26]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 81:89]
           current1T <= _GEN_137;
         end
       end
     end
-    if (reset) begin // @[Ps2.scala 72:22]
-      asc0T <= 8'hc0; // @[Ps2.scala 72:22]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 80:89]
+    if (reset) begin // @[Ps2.scala 71:22]
+      asc0T <= 8'hc0; // @[Ps2.scala 71:22]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 81:89]
           asc0T <= _GEN_138;
         end
       end
     end
-    if (reset) begin // @[Ps2.scala 73:22]
-      asc1T <= 8'hc0; // @[Ps2.scala 73:22]
-    end else if (sampling) begin // @[Ps2.scala 78:27]
-      if (count == 4'ha) begin // @[Ps2.scala 79:27]
-        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 80:89]
+    if (reset) begin // @[Ps2.scala 72:22]
+      asc1T <= 8'hc0; // @[Ps2.scala 72:22]
+    end else if (sampling) begin // @[Ps2.scala 79:27]
+      if (count == 4'ha) begin // @[Ps2.scala 80:27]
+        if (~buffer[0] & io_ps2Data & ^buffer[9:1]) begin // @[Ps2.scala 81:89]
           asc1T <= _GEN_139;
         end
       end
@@ -236,7 +236,7 @@ module top(
       if (`PRINTF_COND) begin
     `endif
         if (sampling & _T_1 & _T_9 & ~reset) begin
-          $fwrite(32'h80000002,"buffer=%x\n",buffer[8:1]); // @[Ps2.scala 81:15]
+          $fwrite(32'h80000002,"buffer=%x\n",buffer[8:1]); // @[Ps2.scala 82:15]
         end
     `ifdef PRINTF_COND
       end
@@ -247,7 +247,7 @@ module top(
       if (`PRINTF_COND) begin
     `endif
         if (_GEN_201 & _T_14 & _T_12) begin
-          $fwrite(32'h80000002,"current=%x%x\n",io_current1,io_current0); // @[Ps2.scala 85:17]
+          $fwrite(32'h80000002,"current=%x%x\n",io_current1,io_current0); // @[Ps2.scala 86:17]
         end
     `ifdef PRINTF_COND
       end
