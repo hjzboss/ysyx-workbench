@@ -10,7 +10,7 @@ module BindsTo_0_Memory(
 
   
 initial begin
-  $readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/mem.hex", Memory.mem);
+  $readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/mem.hex", top.mem);
 end
                       endmodule
 
