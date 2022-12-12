@@ -1,6 +1,5 @@
 module top(
   input        clock,
-  input        reset,
   input  [2:0] io_addr,
   input        io_wen,
   input        io_ren,
@@ -11,14 +10,12 @@ module top(
   reg [31:0] _RAND_0;
 `endif // RANDOMIZE_MEM_INIT
   reg [7:0] mem [0:7]; // @[Memory.scala 17:16]
-  wire  mem_io_rData_MPORT_en; // @[Memory.scala 17:16]
   wire [2:0] mem_io_rData_MPORT_addr; // @[Memory.scala 17:16]
   wire [7:0] mem_io_rData_MPORT_data; // @[Memory.scala 17:16]
   wire [7:0] mem_MPORT_data; // @[Memory.scala 17:16]
   wire [2:0] mem_MPORT_addr; // @[Memory.scala 17:16]
   wire  mem_MPORT_mask; // @[Memory.scala 17:16]
   wire  mem_MPORT_en; // @[Memory.scala 17:16]
-  assign mem_io_rData_MPORT_en = io_ren;
   assign mem_io_rData_MPORT_addr = io_addr;
   assign mem_io_rData_MPORT_data = mem[mem_io_rData_MPORT_addr]; // @[Memory.scala 17:16]
   assign mem_MPORT_data = io_wData;
