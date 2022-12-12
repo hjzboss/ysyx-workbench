@@ -24,7 +24,7 @@ module top(
   assign mem_MPORT_en = io_wen;
   assign io_rData = io_ren ? mem_io_rData_MPORT_data : 8'h0; // @[Memory.scala 21:{16,27} 22:25]
 	initial begin
-	 $readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/m    em.hex", mem);
+	 $readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/mem.hex", mem);
 	end
   always @(posedge clock) begin
     if (mem_MPORT_en & mem_MPORT_mask) begin
