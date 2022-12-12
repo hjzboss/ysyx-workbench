@@ -1,4 +1,4 @@
-module top(
+module Ps2(
   input        clock,
   input        reset,
   input        io_ps2Clk,
