@@ -1,4 +1,4 @@
-module top(
+module Memory(
   input        clock,
   input        reset,
   input  [2:0] io_addr,
@@ -10,9 +10,6 @@ module top(
 `ifdef RANDOMIZE_MEM_INIT
   reg [31:0] _RAND_0;
 `endif // RANDOMIZE_MEM_INIT
-  initial begin
-		$readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/mem.hex", mem)
-	end
   reg [7:0] mem [0:7]; // @[Memory.scala 17:16]
   wire  mem_io_rData_MPORT_en; // @[Memory.scala 17:16]
   wire [2:0] mem_io_rData_MPORT_addr; // @[Memory.scala 17:16]
