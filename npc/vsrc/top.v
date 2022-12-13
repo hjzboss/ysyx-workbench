@@ -2,7 +2,7 @@ module top(
 	input clk,
 	input rst,
 	output VGA_CLK,
-	output VGA_HSYNC，
+	output VGA_HSYNC,
 	output VGA_VSYNC,
 	output VGA_BLANK_N,
 	output [7:0] VGA_R,
