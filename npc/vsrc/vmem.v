@@ -10,5 +10,5 @@ initial begin
 	$readmemh("/home/hjz/ysyx-workbench/nvboard/example/resource/picture.hex", vga_mem);
 end
 
-assign vga_data = vga_mem[{h_addr, v_addr}]
+assign vga_data = vga_mem[{h_addr, v_addr}];
 endmodule
