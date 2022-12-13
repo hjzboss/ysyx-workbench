@@ -1,6 +1,6 @@
 module top(
-	input clk,
-	input rst,
+	input clock,
+	input reset,
 	output VGA_CLK,
 	output VGA_HSYNC,
 	output VGA_VSYNC,
@@ -15,8 +15,8 @@ wire [9:0] h_addr;
 wire [9:0] v_addr;
 
 vga u_vga (
-	.pclk(clk),
-	.reset(rst),
+	.pclk(clock),
+	.reset(reset),
 	.vga_data(vga_data),
 	.h_addr(h_addr),
 	.v_addr(v_addr),
