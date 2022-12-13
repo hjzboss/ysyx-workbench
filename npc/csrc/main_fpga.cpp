@@ -44,7 +44,7 @@ int main(int argc, char** argv, char** env) {
 
 	while (1) {
 		//single_cycle();
-		dut.eval()
+		dut.eval();
 		nvboard_update();
 	}
 
