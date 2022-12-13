@@ -17,7 +17,7 @@ wire [9:0] v_addr;
 vga u_vga (
 	.pclk(clock),
 	.reset(reset),
-	.vga_data(24’hFF0000),
+	.vga_data(24'hFF0000),
 	.h_addr(h_addr),
 	.v_addr(v_addr),
 	.hsync(VGA_HSYNC),
