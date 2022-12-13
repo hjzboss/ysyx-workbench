@@ -12,8 +12,7 @@ module top(
 
 wire [23:0] vga_data;
 wire [9:0] h_addr;
-wire [8:0] v_addr;
-
+wire [9:0] v_addr;
 
 vga u_vga (
 	.pclk(clk),
@@ -31,7 +30,7 @@ vga u_vga (
 
 vmem u_vmem (
 	.h_addr(h_addr),
-	.v_addr(v_addr),
+	.v_addr(v_addr[8:0]),
 	.vga_data(vga_data)
 );
 endmodule
