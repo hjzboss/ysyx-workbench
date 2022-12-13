@@ -10,7 +10,7 @@ module top(
 	output [7:0] VGA_B	
 );
 
-//wire [23:0] vga_data;
+wire [23:0] vga_data;
 wire [9:0] h_addr;
 wire [9:0] v_addr;
 
