@@ -40,11 +40,10 @@ int main(int argc, char** argv, char** env) {
 	nvboard_bind_all_pins(&dut);
 	nvboard_init();
 
-	//reset(10);
+	reset(10);
 
 	while (1) {
-		//single_cycle();
-		dut.eval();
+		single_cycle();
 		nvboard_update();
 	}
 
