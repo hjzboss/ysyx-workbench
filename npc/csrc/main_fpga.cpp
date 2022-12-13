@@ -8,20 +8,21 @@ static TOP_NAME dut;
 void single_cycle() {
 	dut.clock = 0;
 	dut.eval();
+	/*
 	unsigned long n = 4294967295;
 	for (unsigned long i = n; i > 0; --i) {
 		for (unsigned long j = n; j > 0; --j) {
 			for (unsigned long k = n; k > 0; --k) {}
 		}
-	}
+	}*/
 	dut.clock = 1;
 	dut.eval();	
-	
+	/*
 	for (unsigned long i = n; i > 0; --i) {
 		for (unsigned long j = n; j > 0; --j) {
 			for (unsigned long k = n; k > 0; --k) {}
 		}
-	}
+	}*/
 	
 }
 
