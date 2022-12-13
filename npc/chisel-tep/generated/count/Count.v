@@ -1,4 +1,4 @@
-module top(
+module Count(
   input        clock,
   input        reset,
   output [6:0] io_seg0,
