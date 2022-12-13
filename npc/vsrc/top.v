@@ -11,7 +11,7 @@ module top(
   reg [31:0] _RAND_0;
 `endif // RANDOMIZE_MEM_INIT
   initial begin
-		$readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/mem.hex", mem)
+		$readmemh("/home/hjz/ysyx-workbench/npc/chisel-tep/src/main/scala/memory/mem.hex", mem);
 	end
   reg [7:0] mem [0:7]; // @[Memory.scala 17:16]
   wire  mem_io_rData_MPORT_en; // @[Memory.scala 17:16]
