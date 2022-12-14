@@ -41,9 +41,10 @@ module vga(
 	//wire [9:0]	v_addr;
 
   always @(posedge pclk) //行像素计数
-      if (reset == 1'b1)
+			if (reset == 1'b1) begin
         x_cnt <= 1;
 				sum_x <= 1;
+			end
       else
       begin
         if (x_cnt == h_total)
