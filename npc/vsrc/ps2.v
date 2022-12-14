@@ -3,7 +3,7 @@ module ps2(
 	input reset,
 	input ps2_clk,
 	input ps2_data,
-	output [7:0] key_data,
+	output reg [7:0] key_data,
 	output reg valid
 );
 
@@ -22,8 +22,41 @@ module ps2(
 		//wire key_in = sampling & (count == 4'd10) & (buffer[0] == 0) & (ps2_data) & (^buffer[9:1]);	
     wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1];
 		
-		assign key_data = current_data;
+		//assign key_data = current_data;
 		
+		always @(*) begin
+			case (current_data)
+				8'h15: key_data = 8'h71;
+				8'h1d: key_data = 8'h77;
+				8'h24: key_data = 8'h65;
+				8'h2d: key_data = 8'h72;
+				8'h2c: key_data = 8'h74;
+				8'h35: key_data = 8'h79;
+				8'h3c: key_data = 8'h75;
+				8'h43: key_data = 8'h6c;
+				8'h44: key_data = 8'h6f;
+				8'h4d: key_data = 8'h70;
+				8'h1c: key_data = 8'h61;
+				8'h1b: key_data = 8'h73;
+				8'h23: key_data = 8'h64;
+				8'h2b: key_data = 8'h66;
+				8'h34: key_data = 8'h67;
+				8'h33: key_data = 8'h68;
+				8'h3b: key_data = 8'h6a;
+				8'h42: key_data = 8'h6b;
+				8'h4b: key_data = 8'h6c;
+				8'h1a: key_data = 8'h7a;
+				8'h22: key_data = 8'h78;
+				8'h21: key_data = 8'h63;
+				8'h2a: key_data = 8'h76;
+				8'h32: key_data = 8'h62;
+				8'h31: key_data = 8'h6e;
+				8'h3a: key_data = 8'h6d;
+				8'h5a: key_data = 8'h0d;//换行键
+				default: key_data = 8'd0;
+			endcase
+		end
+
 		/*
 		always @(*) begin
 				case (state)
@@ -67,7 +100,7 @@ module ps2(
 											IDLE: begin 
 													state <= START;
 													current_data <= buffer[8:1];
-													$display("receive %x", buffer[8:1]);
+													$display("receive=%x, ascii=%x", buffer[8:1], key_data);
 													valid <= 1;
 												end
 											START: begin 
