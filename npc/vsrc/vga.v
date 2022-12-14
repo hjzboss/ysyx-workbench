@@ -76,9 +76,11 @@ module vga(
 	//x轴
 	always @(posedge pclk) begin
 			if (reset == 1'b1)
+					tmp_x <= 0;	
+			else if (x_cnt == h_total)
 					tmp_x <= 0;
 			else if (sum_x == 9)
-					tmp_x <= (x_cnt == h_total) ? 0 : tmp_x + 1; 
+					tmp_x <= tmp_x + 1; 
 			else
 					tmp_x <= tmp_x;
 	end
