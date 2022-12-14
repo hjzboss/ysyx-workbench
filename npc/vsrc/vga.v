@@ -106,10 +106,10 @@ module vga(
 	assign x = h_valid ? tmp_x : 7'd0; 
 	assign y = v_valid ? tmp_y : 5'd0;
   //设置输出的颜色值
-  //assign vga_r = rom_data ? 8'hff : 8'd0;
-  //assign vga_g = rom_data ? 8'hff : 8'd0;
-  //assign vga_b = rom_data ? 8'hff : 8'd0;
-	assign vga_r = 8'hff;
-	assign vga_g = 8'hff;
-	assign vga_b = 8'hff;
+  assign vga_r = rom_data ? 8'hff : 8'd0;
+  assign vga_g = rom_data ? 8'hff : 8'd0;
+  assign vga_b = rom_data ? 8'hff : 8'd0;
+	assign vga_r = 8'hfe;
+	assign vga_g = 8'hfe;
+	assign vga_b = 8'hfe;
 endmodule
