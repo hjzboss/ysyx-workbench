@@ -34,7 +34,7 @@ module vga(
 	reg [3:0]		 sum_x;
 	reg [4:0]		 sum_y;	
 
-	reg [3:0]		tmp_x;
+	reg [6:0]		tmp_x;
 	reg [4:0]		tmp_y;
 
 	//wire [9:0]	h_addr;
