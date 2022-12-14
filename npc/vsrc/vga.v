@@ -63,9 +63,10 @@ module vga(
 			end
       else
       begin
-        if (y_cnt == v_total & x_cnt == h_total)
+				if (y_cnt == v_total & x_cnt == h_total) begin
             y_cnt <= 1;
 						sum_y <= 1;
+				end
 				else if (x_cnt == h_total) begin
             y_cnt <= y_cnt + 10'd1;
 						sum_y <= (sum_y == 16) ? 1 : (sum_y + 1);
