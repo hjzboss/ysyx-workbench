@@ -5,8 +5,8 @@ module vga(
     input						rom_data, //rom提供的像素信息：黑或白
 		output [9:0]    h_addr,   //提供给rom进行寻址的行列信息
     output [9:0]    v_addr,
-		output reg [6:0]x,				//显存的横坐标，用于寻址当前所在像素点所在字符的ascii码
-		output reg [4:0]y,				//显存的纵坐标
+		output [6:0]		x,				//显存的横坐标，用于寻址当前所在像素点所在字符的ascii码
+		output [4:0]		y,				//显存的纵坐标
     output          hsync,    //行同步和列同步信号
     output          vsync,
     output          valid,    //消隐信号
@@ -80,7 +80,7 @@ module vga(
 			else if (sum_x == 9)
 					tmp_x <= (x_cnt == h_total) ? 0 : tmp_x + 1; 
 			else
-					x <= x;
+					tmp_x <= tmp_x;
 	end
 
 	//y轴
