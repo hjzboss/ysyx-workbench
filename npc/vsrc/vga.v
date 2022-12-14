@@ -53,7 +53,7 @@ module vga(
 				end
         else
             x_cnt <= x_cnt + 10'd1;
-						sum_x <= ((sum_x == 9) || (x_cnt < 10'd145)) ? 1 : (sum_x + 1);  
+						sum_x <= ((sum_x == 9) || (x_cnt < 10'd145) || (x >= h_backporch)) ? 1 : (sum_x + 1);  
       end
 	
   always @(posedge pclk)  //列像素计数
@@ -69,7 +69,7 @@ module vga(
 				end
 				else if (x_cnt == h_total) begin
             y_cnt <= y_cnt + 10'd1;
-						sum_y <= (sum_y == 16) ? 1 : (sum_y + 1);
+						sum_y <=((sum_y == 16) || (y_cnt <= v_active) || (y_cnt >= v_backporch)) ? 1 : (sum_y + 1);
 				end
 			end
 
