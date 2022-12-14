@@ -15,7 +15,7 @@ module vmem (
 	output [3:0]		col
 );
 //回车键ascii码
-parameter ENTER = 13;
+parameter ENTER = 13, BACK = 8;
 //reg [23:0] vga_mem [524287:0];
 reg [7:0] vga_mem [0:4095];
 wire [9:0] tmp_row;
@@ -56,7 +56,7 @@ always @(posedge clk) begin
 			vga_mem[i] = 8'd0;
 		end
 	end
-	else if (p_valid) begin
+	else if (p_valid && key_in != ENTER && key_in != BACK) begin
 		vga_mem[{x_ptr, y_ptr}] <= key_in;
 		$display("key_in=%x", key_in);
 	end

@@ -53,6 +53,7 @@ module ps2(
 				8'h31: key_data = 8'h6e;
 				8'h3a: key_data = 8'h6d;
 				8'h5a: key_data = 8'h0d;//换行键
+				8'h66: key_data = 8'h08;
 				default: key_data = 8'd0;
 			endcase
 		end
