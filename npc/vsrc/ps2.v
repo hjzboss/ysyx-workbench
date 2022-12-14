@@ -50,7 +50,7 @@ module ps2(
 		end
 
     always @(posedge clk) begin
-        if (!reset) begin // reset
+        if (reset) begin // reset
             count <= 0;
 						buffer <= 0;
         end
@@ -63,7 +63,6 @@ module ps2(
                     $display("receive %x", buffer[8:1]);
 										current_data <= buffer[8:1];
                 end
-								else
                 count <= 0;     // for next
               end else begin
                 buffer[count] <= ps2_data;  // store ps2_data
