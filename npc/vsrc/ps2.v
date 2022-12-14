@@ -33,7 +33,7 @@ module ps2(
 				8'h2c: key_data = 8'h74;
 				8'h35: key_data = 8'h79;
 				8'h3c: key_data = 8'h75;
-				8'h43: key_data = 8'h6c;
+				8'h43: key_data = 8'h69;
 				8'h44: key_data = 8'h6f;
 				8'h4d: key_data = 8'h70;
 				8'h1c: key_data = 8'h61;
