@@ -13,9 +13,8 @@ initial begin
 	$readmemh("/home/hjz/ysyx-workbench/npc/resource/vga_font.txt", mem);
 end
 
-assign col_addr = 4'd11 - col;
 assign row_addr = {4'd0, ascii_in} << 4 + {8'd0, row};
-assign data = mem[row_addr][col_addr];
+assign data = mem[row_addr][col];
 
 wire [11:0] tmp = mem[row_addr];
 
