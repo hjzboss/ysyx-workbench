@@ -15,7 +15,7 @@ module vmem (
 	output [3:0]		col
 );
 //回车键ascii码
-parameter ENTER = 10;
+parameter ENTER = 13;
 //reg [23:0] vga_mem [524287:0];
 reg [7:0] vga_mem [0:4095];
 wire [9:0] tmp_row;
