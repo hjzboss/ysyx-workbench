@@ -20,6 +20,7 @@ wire [4:0] y;
 wire p_valid;
 wire [7:0] ascii_out;
 wire [3:0] row;
+wire [3:0] col;
 wire rom_data;
 wire [7:0] key_in;
 
@@ -46,15 +47,17 @@ vmem u_vmem (
 	.p_valid(p_valid),
 	.x(x),
 	.y(y),
+	.h_addr(h_addr),
 	.v_addr(v_addr),
 	.ascii_out(ascii_out),
-	.row(row)
+	.row(row),
+	.col(col)
 );
 
 rom u_rom(
 	.ascii_in(ascii_out),
-	.h_addr(h_addr),
 	.row(row),
+	.col(col),
 	.data(rom_data)
 );
 

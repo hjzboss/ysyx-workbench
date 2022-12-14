@@ -8,15 +8,18 @@ module vmem (
 	input [6:0]			x,
 	input [4:0]			y,
 	input [9:0]			v_addr,
+	input [9:0]			h_addr,
 	//rom
 	output [7:0]		ascii_out,
-	output [3:0]		row
+	output [3:0]		row,
+	output [3:0]		col
 );
 //回车键ascii码
 parameter ENTER = 10;
 //reg [23:0] vga_mem [524287:0];
 reg [7:0] vga_mem [0:4095];
-wire [9:0] tmp;
+wire [9:0] tmp_row;
+wire [9:0] tmp_col;
 
 //输入字符的行指针和列指针
 reg [6:0] x_ptr;
@@ -60,6 +63,8 @@ always @(posedge clk) begin
 end
 
 assign ascii_out = vga_mem[{x, y}];
-assign tmp = v_addr - ({5'd0,y} << 4);
-assign row = tmp[3:0];
+assign tmp_row = v_addr - ({5'd0,y} << 4);
+assign tmp_col = h_addr - ({5'd0,x} << 3 + {5'd0,x});
+assign row = tmp_row[3:0];
+assign col = tmp_col[3:0];
 endmodule
