@@ -13,13 +13,13 @@ initial begin
 	$readmemh("/home/hjz/ysyx-workbench/npc/resource/vga_font.txt", mem);
 end
 
-assign row_addr = {4'd0, ascii_in} << 4 + {8'd0, row};
+assign row_addr = tmp + {8'd0, row} + 12'd1;
 assign data = mem[row_addr][col];
 
 wire [11:0] tmp = {4'd0, ascii_in} << 4;
 
 always @(row_addr) begin
-	$display("tmp=%d, ascii=%d, row=%d", tmp, ascii_in, row);
+	$display("row_addr=%d, ascii=%d, row=%d", row_addr, ascii_in, row);
 end
 
 endmodule
