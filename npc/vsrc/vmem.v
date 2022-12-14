@@ -59,5 +59,5 @@ always @(posedge clk) begin
 end
 
 assign ascii_out = vga_mem[{x, y}];
-assign row = v_addr - ({5'd0,y} << 4);
+assign row = (v_addr - ({5'd0,y} << 4))[3:0];
 endmodule
