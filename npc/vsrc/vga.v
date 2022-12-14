@@ -89,8 +89,10 @@ module vga(
 	always @(posedge pclk) begin
 			if (reset == 1'b1)
 					tmp_y <= 0;
+			else if (y_cnt == v_total && x_cnt == h_total)
+					tmp_y <= 0;
 			else if (sum_y == 16 && x_cnt == h_total)
-					tmp_y <= (y_cnt == v_total && x_cnt == h_total) ? 0 : tmp_y + 1;
+					tmp_y <= tmp_y + 1;
 			else
 					tmp_y <= tmp_y;
 	end
