@@ -103,8 +103,8 @@ module vga(
   assign h_addr = h_valid ? (x_cnt - 10'd145) : {10{1'b0}};
   assign v_addr = v_valid ? (y_cnt - 10'd36) : {10{1'b0}};
 
-	assign x = h_valid ? tmp_x : 4'd0; 
-	assign y = v_valid ? tmp_y : 4'd0;
+	assign x = h_valid ? tmp_x : 7'd0; 
+	assign y = v_valid ? tmp_y : 7'd0;
   //设置输出的颜色值
   assign vga_r = rom_data ? 8'hff : 8'd0;
   assign vga_g = rom_data ? 8'hff : 8'd0;
