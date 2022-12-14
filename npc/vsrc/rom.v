@@ -16,10 +16,8 @@ end
 assign row_addr = {4'd0, ascii_in} << 4 + {8'd0, row};
 assign data = mem[row_addr][col];
 
-wire [11:0] tmp = mem[row_addr];
-
-always @(tmp) begin
-	$display("%x", tmp);
+always @(row_addr) begin
+	$display("%x", row_addr);
 end
 
 endmodule
