@@ -21,6 +21,7 @@ wire p_valid;
 wire [7:0] ascii_out;
 wire [3:0] row;
 wire rom_data;
+wire [7:0] key_in;
 
 vga u_vga (
 	.pclk(clock),
