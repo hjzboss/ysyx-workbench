@@ -71,4 +71,8 @@ module ps2(
             end
         end
     end
+	
+		always @(valid) begin
+				$display("%d", valid);
+		end
 endmodule

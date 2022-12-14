@@ -18,8 +18,9 @@ assign data = mem[row_addr][col];
 
 wire [11:0] tmp = {4'd0, ascii_in} << 4;
 
+/*
 always @(row_addr) begin
 	$display("row_addr=%d, ascii=%d, row=%d", row_addr, ascii_in, row);
 end
-
+*/
 endmodule
