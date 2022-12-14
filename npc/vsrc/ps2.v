@@ -27,7 +27,7 @@ module ps2_keyboard(
 		always @(*) begin
 				case (state)
 					ILDE: next_state = key_in ? START : IDLE;
-					START: next_state = (key_in && buffer[8:1] == 8'hf0) END : START;
+					START: next_state = (key_in && buffer[8:1] == 8'hf0) ? END : START;
 					END: next_state = IDLE;
 					default: next_state = IDLE;
 				endcase

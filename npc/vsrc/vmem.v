@@ -10,7 +10,7 @@ module vmem (
 	input [9:0]			v_addr,
 	//rom
 	output [7:0]		ascii_out,
-	output [3:0]		row,
+	output [3:0]		row
 );
 //回车键ascii码
 parameter ENTER = 10;
