@@ -34,7 +34,10 @@ always @(posedge clk) begin
 	end
 	else if (p_valid) begin
 		// 当指针指向行末或者输入为换行符时
-		if (x_ptr == 7'd69 || key_in == ENTER) begin
+		if (key_in == BACK) begin
+			x_ptr <= x_ptr - 1;
+		end
+		else if (x_ptr == 7'd69 || key_in == ENTER) begin
 			x_ptr <= 7'd0;
 			y_ptr <= y_ptr + 1;
 		end
