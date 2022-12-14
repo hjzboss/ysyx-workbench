@@ -47,9 +47,10 @@ module vga(
 			end
       else
       begin
-        if (x_cnt == h_total)
+				if (x_cnt == h_total) begin
             x_cnt <= 1;
 						sum_x <= 4'd1;
+				end
         else
             x_cnt <= x_cnt + 10'd1;
 						sum_x <= ((sum_x == 9) || (x_cnt < 10'd145)) ? 1 : (sum_x + 1);  
@@ -65,9 +66,10 @@ module vga(
         if (y_cnt == v_total & x_cnt == h_total)
             y_cnt <= 1;
 						sum_y <= 1;
-        else if (x_cnt == h_total)
+				else if (x_cnt == h_total) begin
             y_cnt <= y_cnt + 10'd1;
 						sum_y <= (sum_y == 16) ? 1 : (sum_y + 1);
+				end
 			end
 
 	//x轴
