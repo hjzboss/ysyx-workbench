@@ -27,7 +27,7 @@ wire [7:0] key_in;
 vga u_vga (
 	.pclk(clock),
 	.reset(reset),
-	.rom_data(1'b1),
+	.rom_data(rom_data),
 	.h_addr(h_addr),
 	.v_addr(v_addr),
 	.x(x),
@@ -55,7 +55,7 @@ vmem u_vmem (
 );
 
 rom u_rom(
-	.ascii_in(ascii_out),
+	.ascii_in(8'd65),
 	.row(row),
 	.col(col),
 	.data(rom_data)
