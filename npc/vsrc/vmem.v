@@ -16,6 +16,7 @@ module vmem (
 parameter ENTER = 10;
 //reg [23:0] vga_mem [524287:0];
 reg [7:0] vga_mem [0:4095];
+wire [9:0] tmp;
 
 //输入字符的行指针和列指针
 reg [6:0] x_ptr;
@@ -59,5 +60,6 @@ always @(posedge clk) begin
 end
 
 assign ascii_out = vga_mem[{x, y}];
-assign row = (v_addr - ({5'd0,y} << 4))[3:0];
+assign tmp = v_addr - ({5'd0,y} << 4);
+assign row = tmp[3:0]
 endmodule
