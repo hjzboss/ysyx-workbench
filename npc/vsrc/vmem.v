@@ -58,7 +58,7 @@ always @(posedge clk) begin
 	end
 	else if (p_valid) begin
 		vga_mem[{x_ptr, y_ptr}] <= key_in;
-		$display("%d", key_in);
+		$display("%x", key_in);
 	end
 	else
 		vga_mem[{x_ptr, y_ptr}] <= vga_mem[{x_ptr, y_ptr}];
