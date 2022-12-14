@@ -9,8 +9,7 @@ SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
 VERILATOR = verilator
 VERILATOR_SIMFLAG = --cc --exe --build -Wall --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
 VERILATOR_FPGAFLAG = --cc \
-										 -MMD --build --Mdir $(FPGA_OBJ_DIR) \
-										 --unroll-count 4096
+										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 #VERILATOR_FPGAFLAG += -Wall
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 

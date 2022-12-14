@@ -53,7 +53,7 @@ end
 always @(posedge clk) begin
 	if (reset) begin
 		for (i=0; i<4096; i=i+1) begin
-			vga_mem[i] <= 8'd0;
+			vga_mem[i] = 8'd0;
 		end
 	end
 	else if (p_valid)
