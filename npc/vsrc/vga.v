@@ -111,6 +111,6 @@ module vga(
   assign vga_b = rom_data ? 8'hff : 8'd0;
 	
 	always @(tmp_x) begin
-		$dislplay("%d", tmp_x);
+		$display("%d", tmp_x);
 	end
 endmodule
