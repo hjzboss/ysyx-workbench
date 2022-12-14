@@ -55,7 +55,7 @@ vmem u_vmem (
 );
 
 rom u_rom(
-	.ascii_in(8'd60),
+	.ascii_in(8'd97),
 	.row(row),
 	.col(col),
 	.data(rom_data)
