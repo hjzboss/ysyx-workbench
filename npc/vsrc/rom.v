@@ -12,6 +12,6 @@ initial begin
 	$readmemh("./resource/vga_font.txt", mem);
 end
 
-assign addr = ascii_in << 4 + row;
+assign addr = {4'd0, ascii_in} << 4 + {8'd0, row};
 assign data = mem[addr][h_addr];
 endmodule
