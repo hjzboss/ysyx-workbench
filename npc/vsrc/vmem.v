@@ -70,8 +70,8 @@ assign tmp_col = h_addr - ({3'd0,x} << 3 + {3'd0,x});
 assign row = tmp_row[3:0];
 assign col = tmp_col[3:0];
 
-always @(tmp_row) begin
-	$display("%d", tmp_row);
+always @(x) begin
+	$display("%d", x);
 end
 
 endmodule
