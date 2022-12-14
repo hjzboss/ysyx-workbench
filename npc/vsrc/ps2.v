@@ -12,18 +12,19 @@ module ps2(
     reg [9:0] buffer;        // ps2_data bits
     reg [3:0] count;  // count ps2_data bits
     reg [2:0] ps2_clk_sync;
-		reg [1:0] state, next_state;
+		reg [1:0] state;// next_state;
 		reg [7:0] current_data;
 
     always @(posedge clk) begin
         ps2_clk_sync <=  {ps2_clk_sync[1:0],ps2_clk};
     end
 		
-		wire key_in = sampling & (count == 4'd10) & (buffer[0] == 0) & (ps2_data) & (^buffer[9:1]);	
+		//wire key_in = sampling & (count == 4'd10) & (buffer[0] == 0) & (ps2_data) & (^buffer[9:1]);	
     wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1];
 		
 		assign key_data = current_data;
-
+		
+		/*
 		always @(*) begin
 				case (state)
 					IDLE: next_state = key_in ? START : IDLE;
@@ -47,12 +48,14 @@ module ps2(
 						state <= IDLE;
 				else
 						state <= next_state;
-		end
+		end*/
 
     always @(posedge clk) begin
         if (reset) begin // reset
             count <= 0;
 						buffer <= 0;
+						state <= IDLE;
+						valid <= 0;
         end
         else begin
             if (sampling) begin
@@ -60,19 +63,52 @@ module ps2(
                 if ((buffer[0] == 0) &&  // start bit
                     (ps2_data)       &&  // stop bit
                     (^buffer[9:1])) begin      // odd  parity
-                    $display("receive %x", buffer[8:1]);
-										current_data <= buffer[8:1];
+										case (state)
+											IDLE: begin 
+													state <= START;
+													current_data <= buffer[8:1];
+													$display("receive %x", buffer[8:1]);
+													valid <= 1;
+												end
+											START: begin 
+													if (buffer[8:1] == 8'hf0) begin
+															state <= END;
+															valid <= 0;
+													end
+													else begin
+															state <= START;
+															current_data <= buffer[8:1];
+															$display("receive %x", buffer[8:1]);
+															valid <= 1;
+													end
+												end
+											END: begin
+													state <= IDLE;
+													valid <= 0;
+												end
+											default: begin 
+													state <= IDLE;
+													valid <= 0;
+												end
+										endcase
                 end
+								else begin
+										valid <= 0;
+								end
                 count <= 0;     // for next
               end else begin
-                buffer[count] <= ps2_data;  // store ps2_data
-                count <= count + 3'b1;
+									buffer[count] <= ps2_data;  // store ps2_data
+									count <= count + 3'b1;
+									valid <= 0;
               end
             end
+						else begin
+								valid <= 0;
+						end
         end
     end
-	
+		/*
 		always @(valid) begin
 				$display("%d", valid);
-		end
+		end*/
 endmodule
