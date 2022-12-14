@@ -70,7 +70,7 @@ assign tmp_col = h_addr - ({3'd0,x} << 3 + {3'd0,x});
 assign row = tmp_row[3:0];
 assign col = tmp_col[3:0];
 
-wire [9:0] tmp = {3'd0, x} << 3
+wire [9:0] tmp = {3'd0, x} << 3;
 
 always @(tmp) begin
 	$display("%d", tmp);
