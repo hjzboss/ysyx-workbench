@@ -109,7 +109,7 @@ module vga(
   assign vga_r = rom_data ? 8'hff : 8'd0;
   assign vga_g = rom_data ? 8'hff : 8'd0;
   assign vga_b = rom_data ? 8'hff : 8'd0;
-	assign vga_r = 8'h00;
-	assign vga_g = 8'h00;
+	assign vga_r = 8'hff;
+	assign vga_g = 8'hff;
 	assign vga_b = 8'h00;
 endmodule
