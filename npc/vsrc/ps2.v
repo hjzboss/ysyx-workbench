@@ -1,4 +1,4 @@
-module ps2_keyboard(
+module ps2(
 	input clk,
 	input reset,
 	input ps2_clk,
