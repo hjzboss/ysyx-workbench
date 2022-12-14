@@ -109,4 +109,8 @@ module vga(
   assign vga_r = rom_data ? 8'hff : 8'd0;
   assign vga_g = rom_data ? 8'hff : 8'd0;
   assign vga_b = rom_data ? 8'hff : 8'd0;
+	
+	always @(tmp_x) begin
+		$dislpay("%d", tmp_x);
+	end
 endmodule
