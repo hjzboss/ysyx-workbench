@@ -50,7 +50,7 @@ module ps2(
 		end
 
     always @(posedge clk) begin
-        if (reset) begin // reset
+        if (!reset) begin // reset
             count <= 0;
 						buffer <= 0;
         end
