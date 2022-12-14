@@ -72,8 +72,8 @@ assign col = tmp_col[3:0];
 
 wire [9:0] tmp = ({3'd0, x} << 3) + {3'd0,x};
 
-always @(tmp) begin
-	$display("%d", tmp);
+always @(h_addr) begin
+	$display("%d", h_addr);
 end
 
 endmodule
