@@ -61,5 +61,5 @@ end
 
 assign ascii_out = vga_mem[{x, y}];
 assign tmp = v_addr - ({5'd0,y} << 4);
-assign row = tmp[3:0]
+assign row = tmp[3:0];
 endmodule
