@@ -42,6 +42,37 @@ static char* rl_gets() {
   return line_read;
 }
 
+
+static int cmd_si(char *args) {
+	return 0;
+}
+
+
+static int cmd_info(char *args) {
+	return 0;
+}
+
+
+static int cmd_x(char *args) {
+	return 0;
+}
+
+
+static int cmd_p(char *args) {
+	return 0;
+}
+
+
+static int cmd_w(char *args) {
+	return 0;
+}
+
+
+static int cmd_d(char *args) {
+	return 0;
+}
+
+
 static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
@@ -64,7 +95,12 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
+	{ "si", "Step into", cmd_si},
+	{ "info", "Print register status, print monitor information", cmd_info },
+	{ "x", "Scan memory", cmd_x},
+	{ "p", "Expression evaluation", cmd_p},
+	{ "w", "Set up watchpoints", cmd_w},
+	{ "d", "Delete a watchpoints", cmd_d}
   /* TODO: Add more commands */
 
 };
