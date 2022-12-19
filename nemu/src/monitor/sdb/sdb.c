@@ -93,7 +93,7 @@ static int cmd_x(char *args) {
 
 	char *n = strtok(args, " ");
 	char *expr = strtok(NULL, " ");
-	//0x000000008000000c
+
 	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
 	paddr_t addr = (paddr_t)strtol(expr, &expr_other, 16);
 	
