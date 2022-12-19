@@ -44,6 +44,17 @@ static char* rl_gets() {
 
 
 static int cmd_si(char *args) {
+	char *other = NULL;
+	int iter_num = 1;
+	if (args != NULL) {
+		// convert string to integer
+		iter_num = (int)strtol(args, &other, 10);
+		if (other == args) {
+			printf("The parameter must be an integer!");
+			return 0;
+		} 
+	}
+	cpu_exec(iter_num);
 	return 0;
 }
 
