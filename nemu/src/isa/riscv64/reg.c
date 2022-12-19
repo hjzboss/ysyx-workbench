@@ -24,7 +24,6 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-	//todo: print all regs
 	int i;
 	printf("------------------------------\n");
 	printf("reg \tvalue\n");

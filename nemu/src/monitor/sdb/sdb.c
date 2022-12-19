@@ -45,10 +45,10 @@ static char* rl_gets() {
 
 static int cmd_si(char *args) {
 	char *other = NULL;
-	int iter_num = 1;
+	uint64_t iter_num = 1;
 	if (args != NULL) {
 		// convert string to integer
-		iter_num = (int)strtol(args, &other, 10);
+		iter_num = (uint64_t)strtol(args, &other, 10);
 		if (other == args) {
 			printf("The parameter must be an integer!\n");
 			return 0;
@@ -82,6 +82,12 @@ static int cmd_info(char *args) {
 
 
 static int cmd_x(char *args) {
+	if (args == NULL) {
+		printf("Input parameters are required!\n");
+		return 0;
+	}
+	//char *N = strtok(args, " ");
+	
 	return 0;
 }
 
