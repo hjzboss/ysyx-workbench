@@ -28,6 +28,7 @@ void isa_reg_display() {
 	int i;
 	printf("------------------------------\n");
 	printf("reg:\tvalue\n");
+	printf("------------------------------\n");
 	for (i=0; i<32; ++i) {
 		printf("%s:\t%lu\n", regs[i], cpu.gpr[i]);
 	}
