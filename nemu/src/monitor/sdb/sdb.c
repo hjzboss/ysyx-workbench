@@ -50,7 +50,7 @@ static int cmd_si(char *args) {
 		// convert string to integer
 		iter_num = (int)strtol(args, &other, 10);
 		if (other == args) {
-			printf("The parameter must be an integer!");
+			printf("The parameter must be an integer!\n");
 			return 0;
 		} 
 	}
