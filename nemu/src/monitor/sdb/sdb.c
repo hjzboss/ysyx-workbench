@@ -60,6 +60,23 @@ static int cmd_si(char *args) {
 
 
 static int cmd_info(char *args) {
+	if (args == NULL) {
+		printf("Input parameters are required!\n");
+		return 0;
+	}
+	char arg = args[0];
+	switch (arg) {
+		case 'r':
+			printf("Print register status:\n");
+			isa_reg_display();
+			break;
+		case 'w':
+			printf("Print watch information:\n");
+			//todo
+			break;
+		default:
+			printf("Unknown parameter: %s\n", args);
+	}
 	return 0;
 }
 
