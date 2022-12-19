@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+// my change
 #include <memory/paddr.h>
 
 static int is_batch_mode = false;
@@ -104,8 +105,11 @@ static int cmd_x(char *args) {
 	for (paddr_t i=0; i<N; ++i) {
 		paddr_t tmp = addr+4*i;
 		printf("0x%x:\t", tmp);
-		word_t data = paddr_read(tmp, 4);
-		printf("0x%x:\t0x%lx\n", tmp, data);
+		for (paddr_t j=0; j<4; ++j) {
+			word_t data = paddr_read(tmp+j, 1);
+			printf("%lx ", data);
+		}
+		printf("\n");
 	}
 	return 0;
 }
