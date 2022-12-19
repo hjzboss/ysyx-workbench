@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
@@ -86,8 +87,26 @@ static int cmd_x(char *args) {
 		printf("Input parameters are required!\n");
 		return 0;
 	}
-	//char *N = strtok(args, " ");
+	char *n_other = NULL;
+	char *expr_other = NULL;
+
+	char *n = strtok(args, " ");
+	char *expr = strtok(NULL, " ");
+	//0x000000008000000c
+	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
+	paddr_t addr = (paddr_t)strtol(expr, &expr_other, 16);
 	
+	if ((n == n_other) || (expr == expr_other)) {
+		printf("The parameter is wrong, please enter the correct parameter!\n");
+		return 0;
+	}
+
+	for (paddr_t i=0; i<N; ++i) {
+		paddr_t tmp = addr+4*i;
+		printf("0x%x:\t", tmp);
+		word_t data = paddr_read(tmp, 4);
+		printf("0x%x:\t0x%lx\n", tmp, data);
+	}
 	return 0;
 }
 
