@@ -113,7 +113,7 @@ static int cmd_x(char *args) {
 		//printf("0x%016"PRIx64);
 		for (paddr_t j=0; j<4; ++j) {
 			word_t data = paddr_read(tmp+j, 1);
-			printf("%lx ", data);
+			printf("%02lx ", data);
 		}
 		printf("\n");
 	}
