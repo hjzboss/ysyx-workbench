@@ -84,7 +84,6 @@ static int cmd_info(char *args) {
 
 
 static int cmd_x(char *args) {
-	// todo: 内存格式调整和段错误处理，原因是参数输入不足
 	if (args == NULL) {
 		printf("Input parameters are required!\n");
 		return 0;
@@ -110,7 +109,6 @@ static int cmd_x(char *args) {
 	for (paddr_t i=0; i<N; ++i) {
 		paddr_t tmp = addr+4*i;
 		printf("0x%016x:\t", tmp);
-		//printf("0x%016"PRIx64);
 		for (paddr_t j=0; j<4; ++j) {
 			word_t data = paddr_read(tmp+j, 1);
 			printf("%02lx ", data);
