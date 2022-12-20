@@ -110,6 +110,7 @@ static int cmd_x(char *args) {
 	for (paddr_t i=0; i<N; ++i) {
 		paddr_t tmp = addr+4*i;
 		printf("0x%x:\t", tmp);
+		//printf("0x%016"PRIx64);
 		for (paddr_t j=0; j<4; ++j) {
 			word_t data = paddr_read(tmp+j, 1);
 			printf("%lx ", data);
