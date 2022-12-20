@@ -84,6 +84,7 @@ static int cmd_info(char *args) {
 
 
 static int cmd_x(char *args) {
+	// todo: 内存格式调整和段错误处理，原因是参数输入不足
 	if (args == NULL) {
 		printf("Input parameters are required!\n");
 		return 0;
@@ -93,15 +94,19 @@ static int cmd_x(char *args) {
 
 	char *n = strtok(args, " ");
 	char *expr = strtok(NULL, " ");
+	if (expr == NULL) {
+		printf("Missing parameters!\n");
+		return 0;
+	}
 
 	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
 	paddr_t addr = (paddr_t)strtol(expr, &expr_other, 16);
-	
 	if ((n == n_other) || (expr == expr_other)) {
 		printf("The parameter is wrong, please enter the correct parameter!\n");
 		return 0;
 	}
-
+	
+	// Print the data from the corresponding address
 	for (paddr_t i=0; i<N; ++i) {
 		paddr_t tmp = addr+4*i;
 		printf("0x%x:\t", tmp);
