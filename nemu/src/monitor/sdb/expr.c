@@ -102,7 +102,7 @@ static bool make_token(char *e) {
 
         switch (rules[i].token_type) {
 					case '+': case TK_EQ: case MINUS: case TIMES: case DIVIDE: 
-					case L_PARENTHESIS: case R_PARENTHESIS:
+					//case L_PARENTHESIS: case R_PARENTHESIS:
 						tokens[nr_token].type = rules[i].token_type;
 						break;		
 					case INTEGER:
