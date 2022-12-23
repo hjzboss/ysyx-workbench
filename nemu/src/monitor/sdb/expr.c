@@ -108,9 +108,11 @@ static bool make_token(char *e) {
 						break;		
 					case INTEGER:
 						// TODO: 去掉多余的0
-						if (substr_len >= 32) {
-							// TODO		
-						} else {
+						if (substr_len >= 32) {      
+							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
+							return false;
+						} 
+						else {
 							tokens[nr_token].type = rules[i].token_type;
 							strncpy(tokens[nr_token].str, substr_start, substr_len);
 							tokens[nr_token].str[substr_len] = '\0';
