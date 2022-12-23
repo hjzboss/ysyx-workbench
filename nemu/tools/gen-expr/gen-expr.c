@@ -31,8 +31,40 @@ static char *code_format =
 "  return 0; "
 "}";
 
+static int index = 0;
+
 static void gen_rand_expr() {
-  buf[0] = '\0';
+  //buf[0] = '\0';
+	switch (choose(3)) {
+		case 0:
+			int a = rand();
+			char *num = NULL;
+			sprintf(num, "%d", a);
+			strcpy(buf + index, num);
+			index += strlen(num);
+			break;
+		case 1:
+			buf[index] = '(';
+			++index;
+			gen_rand_expr();
+			buf[index] = ')';
+			++index;
+			buf[index] = '\0';
+			break;
+		default:
+			gen_rand_expr();
+			int type = rand() % 4;
+			switch (type) {
+				case 0: buf[index] = '+'; break;
+				case 1: buf[index] = '-'; break;
+				case 2: buf[index] = '*'; break;
+				case 3: buf[index] = '/'; break;
+				default: buf[index] = '+';
+			}
+			++index;
+			gen_rand_expr();
+			break;
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -44,6 +76,8 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+		index = 0; // my change
+
     gen_rand_expr();
 
     sprintf(code_buf, code_format, buf);
