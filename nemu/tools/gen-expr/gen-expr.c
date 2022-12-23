@@ -35,7 +35,6 @@ static int index = 0;
 
 static void gen_rand_expr() {
   //buf[0] = '\0';
-	a
 	switch (choose(3)) {
 		case 0:
 			int a = rand();
