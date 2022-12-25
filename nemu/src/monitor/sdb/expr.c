@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER,
 
   /* TODO: Add more token types */
 
@@ -34,11 +34,17 @@ static struct rule {
 
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
-   */
+   )*/
 
-  {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ},        // equal
+  {" +", TK_NOTYPE},						// spaces
+  {"\\+", PLUS},								// plus
+  {"==", TK_EQ},								// equal
+	{"^[1-9]\\d*|0$", INTEGER},		// integer
+	{"-", MINUS},									// minus
+	{"\\*", TIMES},								// times
+	{"/", DIVIDE},								// divide
+	{"\\(", L_PARENTHESIS},				// left parenthesis
+	{"\\)", R_PARENTHESIS},				// right parenthesis
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -95,9 +101,28 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+					case '+': case TK_EQ: case MINUS: case TIMES: case DIVIDE: 
+					case L_PARENTHESIS: case R_PARENTHESIS:
+						tokens[nr_token].type = rules[i].token_type;
+						tokens[nr_token].str[0] = '\0';
+						break;		
+					case INTEGER:
+						// TODO: 去掉多余的0
+						if (substr_len >= 32) {      
+							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
+							return false;
+						} 
+						else {
+							tokens[nr_token].type = rules[i].token_type;
+							strncpy(tokens[nr_token].str, substr_start, substr_len);
+							tokens[nr_token].str[substr_len] = '\0';
+						}
+						break;
+          default: 
+						//TODO();
         }
 
+				nr_token += 1;
         break;
       }
     }
@@ -111,6 +136,76 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_parentheses(int p, int q) {
+	bool flag = true;
+	if (tokens[p].type != L_PARENTHESIS || tokens[q].type != R_PARENTHESIS)
+		flag = false;
+
+	int top = -1;
+	int index = p;
+	while(index <= q) {
+		int type = tokens[index].type;
+		if (type == L_PARENTHESIS)
+			++top;
+		else if (type == R_PARENTHESIS) {
+			if (top == -1)
+				assert(0);
+			else if(--top == -1 && index < q)
+				flag = false;
+		}
+		index += 1;
+	}
+	
+	if (top != -1) assert(0);
+	return flag;
+}
+
+word_t eval(int p, int q) {
+	if (p > q)
+		assert(0);
+	else if (p == q) {
+		char *tmp = NULL;
+		return strtol(tokens[p].str, &tmp, 10);
+	} 
+	else if (check_parentheses(p, q) == true) {
+		return eval(p + 1, q - 1);
+	}
+	else {
+		int op = -1;
+		int op_type = -1;
+		bool flag = false;
+		for (int i = p; i <= q; i ++) {
+			int type = tokens[i].type;
+			if (type == L_PARENTHESIS)
+				flag = true;
+			else if (type == R_PARENTHESIS)
+				flag = false;
+			else if (flag || type == INTEGER)
+				// Operators inside parentheses are ignored
+				continue;
+			else {
+				if (op == -1 || type <= op_type 
+						|| (op_type == PLUS && type == MINUS)
+						|| (op_type == TIMES && type == DIVIDE)) {
+					op = i;
+					op_type = type;
+				}
+			}
+		}
+
+		if (op == -1) assert(0);
+		word_t val1 = eval(p, op - 1);
+		word_t val2 = eval(op + 1, q);
+
+		switch (op_type) {
+			case PLUS: return val1 + val2; break;
+			case MINUS: return val1 - val2; break;
+			case TIMES: return val1 * val2; break;
+			case DIVIDE: return val1 / val2; break;
+			default: assert(0);
+		}
+	}
+}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -119,7 +214,5 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
-
-  return 0;
+	return eval(0, nr_token);
 }
