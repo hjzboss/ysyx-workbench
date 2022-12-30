@@ -43,8 +43,9 @@ int main(int argc, char *argv[]) {
 		fgetc(fp);
 		if(fgets(buf, 65535, fp) == NULL)
 			break;
-		printf("len=%lu\n", strlen(buf));
-		printf("%c\n", buf[strlen(buf)-1]);
+		char *nu = strchr(buf, '\n');
+		if (nu)
+			*nu = '\0';
 		result = expr(buf, &success);
 		printf("res=%lu, result=%lu\n", res, result);
 		if (res == result) {
