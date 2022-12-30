@@ -157,7 +157,7 @@ bool check_parentheses(int p, int q) {
 		index += 1;
 	}
 	
-	if (top != -1) assert(0);
+	assert(top == -1);
 	return flag;
 }
 
@@ -217,5 +217,5 @@ word_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
 	word_t res = eval(0, nr_token);
 	*success = true;
-	return eval(0, res);
+	return res;
 }
