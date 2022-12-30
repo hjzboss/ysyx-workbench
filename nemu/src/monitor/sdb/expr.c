@@ -39,7 +39,7 @@ static struct rule {
   {" +", TK_NOTYPE},						// spaces
   {"\\+", PLUS},								// plus
   {"==", TK_EQ},								// equal
-	{"[1-9]\\d*|0", INTEGER},		// integer
+	{"[1-9]\\d*|0", INTEGER},			// integer
 	{"-", MINUS},									// minus
 	{"\\*", TIMES},								// times
 	{"/", DIVIDE},								// divide
@@ -179,6 +179,7 @@ word_t eval(int p, int q) {
 		for (int i = p; i <= q; i ++) {
 			int type = tokens[i].type;
 			printf("%d\n", type);
+			printf("%s\n", tokens[i].str);
 			if (type == L_PARENTHESIS)
 				flag = true;
 			else if (type == R_PARENTHESIS)
