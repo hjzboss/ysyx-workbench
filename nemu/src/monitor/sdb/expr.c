@@ -205,7 +205,7 @@ word_t eval(int p, int q) {
 			case MINUS: return val1 - val2; break;
 			case TIMES: return val1 * val2; break;
 			case DIVIDE: return val1 / val2; break;
-			default: assert(0);
+			default: printf("type=%d\n", op_type); assert(0);
 		}
 	}
 }
