@@ -39,7 +39,7 @@ static struct rule {
   {" +", TK_NOTYPE},						// spaces
   {"\\+", PLUS},								// plus
   {"==", TK_EQ},								// equal
-	{"^[1-9]\\d*|0$", INTEGER},		// integer
+	{"[1-9]\\d*|0", INTEGER},		// integer
 	{"-", MINUS},									// minus
 	{"\\*", TIMES},								// times
 	{"/", DIVIDE},								// divide
