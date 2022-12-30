@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
 	while (true) {
 		if(fscanf(fp, "%lu", &res) == EOF)
 			break;
+		fgetc(fp);
 		if(fgets(buf, 65535, fp) == NULL)
 			break;
 		result = expr(buf, &success);
