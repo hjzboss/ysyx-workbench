@@ -191,6 +191,7 @@ word_t eval(int p, int q) {
 						|| (op_type == PLUS && type == MINUS)
 						|| (op_type == TIMES && type == DIVIDE)) {
 					op = i;
+					assert(type!=0);
 					op_type = type;
 				}
 			}
@@ -199,7 +200,7 @@ word_t eval(int p, int q) {
 		assert(op != -1);
 		word_t val1 = eval(p, op - 1);
 		word_t val2 = eval(op + 1, q);
-
+		
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
 			case MINUS: return val1 - val2; break;
