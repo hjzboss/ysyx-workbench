@@ -105,7 +105,7 @@ static bool make_token(char *e) {
 					case PLUS: case TK_EQ: case MINUS: case TIMES: case DIVIDE: 
 					case L_PARENTHESIS: case R_PARENTHESIS:
 						tokens[nr_token].type = rules[i].token_type;
-						printf("token_type=%d, rules_type=%d\n", tokens[nr_token].type, rules[i].token_type);
+						//printf("token_type=%d, rules_type=%d\n", tokens[nr_token].type, rules[i].token_type);
 						tokens[nr_token].str[0] = '\0';
 						break;		
 					case INTEGER:
@@ -158,6 +158,7 @@ bool check_parentheses(int p, int q) {
 		index += 1;
 	}
 	
+	printf("top=%d\n", top);
 	assert(top == -1);
 	return flag;
 }
