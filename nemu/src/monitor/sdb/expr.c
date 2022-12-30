@@ -178,6 +178,7 @@ word_t eval(int p, int q) {
 		bool flag = false;
 		for (int i = p; i <= q; i ++) {
 			int type = tokens[i].type;
+			printf("%d\n", type);
 			if (type == L_PARENTHESIS)
 				flag = true;
 			else if (type == R_PARENTHESIS)
