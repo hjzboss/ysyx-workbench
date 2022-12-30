@@ -42,7 +42,11 @@ int main(int argc, char *argv[]) {
 		if(fgets(buf, 65535, fp) == NULL)
 			break;
 		result = expr(buf, &success);
-		assert(res == result);
+		if (res == result) {
+			printf("通过!\n");
+		} else {
+			printf("未通过!\n");
+		}
 	}
 	fclose(fp);
 
