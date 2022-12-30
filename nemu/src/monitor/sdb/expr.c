@@ -162,7 +162,7 @@ bool check_parentheses(int p, int q) {
 }
 
 word_t eval(int p, int q) {
-	printf("进入\n");
+	printf("p=%d, q=%d, eval\n", p, q);
 	if (p > q)
 		assert(0);
 	else if (p == q) {
