@@ -162,6 +162,7 @@ bool check_parentheses(int p, int q) {
 }
 
 word_t eval(int p, int q) {
+	printf("进入\n");
 	if (p > q)
 		assert(0);
 	else if (p == q) {
@@ -215,7 +216,6 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-	printf("%d\n", nr_token);
 	word_t res = eval(0, nr_token);
 	*success = true;
 	return res;
