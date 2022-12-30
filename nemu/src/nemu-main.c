@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
 		if(fgets(buf, 65535, fp) == NULL)
 			break;
 		result = expr(buf, &success);
+		printf("res=%lu, result=%lu\n", res, result);
 		if (res == result) {
 			printf("通过!\n");
 		} else {
