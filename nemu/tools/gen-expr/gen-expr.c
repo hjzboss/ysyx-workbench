@@ -31,37 +31,48 @@ static char *code_format =
 "  return 0; "
 "}";
 
-static int index = 0;
+static int sub = 0; // The current buf subscript
+
+uint32_t choose(uint32_t n) {
+	return rand() % n;
+}
+
+void insertNull() {
+	if (choose(10) > 4)
+		buf[sub++] = ' ';
+}
 
 static void gen_rand_expr() {
   //buf[0] = '\0';
 	switch (choose(3)) {
 		case 0:
-			int a = rand();
-			char *num = NULL;
+			//insertNull();
+			int a = rand() % 10000;
+			char num[32];
 			sprintf(num, "%d", a);
-			strcpy(buf + index, num);
-			index += strlen(num);
+			strcpy(buf + sub, num);
+			sub += strlen(num);
+			//insertNull();
 			break;
 		case 1:
-			buf[index] = '(';
-			++index;
+			buf[sub] = '(';
+			++sub;
 			gen_rand_expr();
-			buf[index] = ')';
-			++index;
-			buf[index] = '\0';
+			buf[sub] = ')';
+			++sub;
+			buf[sub] = '\0';
 			break;
 		default:
 			gen_rand_expr();
-			int type = rand() % 4;
+			uint32_t type = choose(4);
 			switch (type) {
-				case 0: buf[index] = '+'; break;
-				case 1: buf[index] = '-'; break;
-				case 2: buf[index] = '*'; break;
-				case 3: buf[index] = '/'; break;
-				default: buf[index] = '+';
+				case 0: buf[sub] = '+'; break;
+				case 1: buf[sub] = '-'; break;
+				case 2: buf[sub] = '*'; break;
+				case 3: buf[sub] = '/'; break;
+				default: buf[sub] = '+';
 			}
-			++index;
+			++sub;
 			gen_rand_expr();
 			break;
 	}
@@ -72,11 +83,13 @@ int main(int argc, char *argv[]) {
   srand(seed);
   int loop = 1;
   if (argc > 1) {
+		// my change
     sscanf(argv[1], "%d", &loop);
+		//assert(tmp == 1);
   }
   int i;
   for (i = 0; i < loop; i ++) {
-		index = 0; // my change
+		sub = 0; // my change
 
     gen_rand_expr();
 
@@ -94,8 +107,12 @@ int main(int argc, char *argv[]) {
     assert(fp != NULL);
 
     int result;
-    fscanf(fp, "%d", &result);
-    pclose(fp);
+
+    int tmp = fscanf(fp, "%d", &result);
+    //assert(tmp == 1);
+		if (tmp == 1) {}
+
+		pclose(fp);
 
     printf("%u %s\n", result, buf);
   }
