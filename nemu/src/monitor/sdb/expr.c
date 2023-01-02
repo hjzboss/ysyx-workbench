@@ -109,7 +109,6 @@ static bool make_token(char *e) {
 						tokens[nr_token].str[0] = '\0';
 						break;		
 					case INTEGER:
-						// TODO: 去掉多余的0
 						if (substr_len >= 32) {      
 							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
 							return false;
@@ -121,7 +120,6 @@ static bool make_token(char *e) {
 						}
 						break;
           default: 
-						//TODO();
         }
 
 				nr_token += 1;
@@ -147,13 +145,10 @@ bool check_parentheses(int p, int q) {
 	int index = p;
 	while(index <= q) {
 		int type = tokens[index].type;
-		//printf("type=%d\n", type);
 		if (type == L_PARENTHESIS) {
-			//printf("push\n");
 			++top;
 		}
 		else if (type == R_PARENTHESIS) {
-			//printf("pop\n");
 			if (top == -1)
 				assert(0);
 			else if(--top == -1 && index < q)
@@ -162,13 +157,11 @@ bool check_parentheses(int p, int q) {
 		index += 1;
 	}
 	
-	//printf("top=%d\n", top);
 	assert(top == -1);
 	return flag;
 }
 
 word_t eval(int p, int q) {
-	//printf("p=%d, q=%d, eval\n", p, q);
 	if (p > q)
 		assert(0);
 	else if (p == q) {
@@ -184,7 +177,6 @@ word_t eval(int p, int q) {
 		int cnt = 0;
 		for (int i = p; i <= q; i ++) {
 			int type = tokens[i].type;
-			//printf("type=%d, value=%s\n", type, tokens[i].str);
 			if (type == L_PARENTHESIS)
 				cnt ++;
 			else if (type == R_PARENTHESIS)
@@ -206,7 +198,6 @@ word_t eval(int p, int q) {
 		assert(op != -1);
 		word_t val1 = eval(p, op - 1);
 		word_t val2 = eval(op + 1, q);
-		//printf("op_type=%d, val1=%lu, val2=%lu\n", op_type, val1, val2);
 
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
