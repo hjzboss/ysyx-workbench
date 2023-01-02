@@ -162,13 +162,13 @@ bool check_parentheses(int p, int q) {
 		index += 1;
 	}
 	
-	printf("top=%d\n", top);
+	//printf("top=%d\n", top);
 	assert(top == -1);
 	return flag;
 }
 
 word_t eval(int p, int q) {
-	printf("p=%d, q=%d, eval\n", p, q);
+	//printf("p=%d, q=%d, eval\n", p, q);
 	if (p > q)
 		assert(0);
 	else if (p == q) {
@@ -209,9 +209,9 @@ word_t eval(int p, int q) {
 		//printf("op_type=%d, val1=%lu, val2=%lu\n", op_type, val1, val2);
 
 		switch (op_type) {
-			case PLUS: printf("%lu + %lu = %lu\n", val1, val2, val1+val2); return val1 + val2; break;
-			case MINUS: printf("%lu - %lu = %lu\n", val1, val2, val1-val2); return val1 - val2; break;
-			case TIMES: printf("%lu * %lu = %lu\n", val1, val2, val1*val2); return val1 * val2; break;
+			case PLUS: return val1 + val2; break;
+			case MINUS: return val1 - val2; break;
+			case TIMES: return val1 * val2; break;
 			case DIVIDE: if (!val2) { printf("divide zero! error evaluation!\n"); assert(0); } else return val1 / val2; break;
 			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
 		}
