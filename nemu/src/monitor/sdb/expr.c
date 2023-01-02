@@ -149,9 +149,12 @@ bool check_parentheses(int p, int q) {
 		if (q == 512)
 			printf("index=%d\n", index);
 		int type = tokens[index].type;
-		if (type == L_PARENTHESIS)
+		if (type == L_PARENTHESIS) {
+			printf("push\n");
 			++top;
+		}
 		else if (type == R_PARENTHESIS) {
+			printf("pop\n");
 			if (top == -1)
 				assert(0);
 			else if(--top == -1 && index < q)
