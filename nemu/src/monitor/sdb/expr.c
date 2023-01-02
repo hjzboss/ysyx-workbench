@@ -209,10 +209,10 @@ word_t eval(int p, int q) {
 		printf("op_type=%d, val1=%lu, val2=%lu\n", op_type, val1, val2);
 
 		switch (op_type) {
-			case PLUS: return val1 + val2; break;
-			case MINUS: return val1 - val2; break;
-			case TIMES: return val1 * val2; break;
-			case DIVIDE: return val1 / val2; break;
+			case PLUS: printf("%lu + %lu = %lu\n", val1, val2, val1+val2); return val1 + val2; break;
+			case MINUS: printf("%lu - %lu = %lu\n", val1, val2, val1-val2); return val1 - val2; break;
+			case TIMES: printf("%lu * %lu = %lu\n", val1, val2, val1*val2); return val1 * val2; break;
+			case DIVIDE: printf("%lu / %lu = %lu\n", val1, val2, val1/val2); return val1 / val2; break;
 			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
 		}
 	}
