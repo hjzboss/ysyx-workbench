@@ -199,13 +199,14 @@ word_t eval(int p, int q) {
 						|| (op_type == PLUS && type == MINUS)
 						|| (op_type == TIMES && type == DIVIDE)) {
 					op = i;
-					assert(type!=0);
+					assert(type != 0);
 					op_type = type;
 				}
 			}
 		}
 
 		assert(op != -1);
+		printf("----------------------------val1, op=%d, op_type=%d---------------------------------\n", op, op_type);
 		word_t val1 = eval(p, op - 1);
 		word_t val2 = eval(op + 1, q);
 		

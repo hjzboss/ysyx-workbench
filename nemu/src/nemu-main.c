@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
 		char *nu = strchr(buf, '\n');
 		if (nu)
 			*nu = '\0';
-		printf("start\n");
 		result = expr(buf, &success);
 		printf("res=%lu, result=%lu\n", res, result);
 		if (res == result) {
