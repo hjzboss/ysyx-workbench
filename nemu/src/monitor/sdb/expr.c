@@ -146,6 +146,8 @@ bool check_parentheses(int p, int q) {
 	int top = -1;
 	int index = p;
 	while(index <= q) {
+		if (q == 512)
+			printf("index=%d\n", index);
 		int type = tokens[index].type;
 		if (type == L_PARENTHESIS)
 			++top;
