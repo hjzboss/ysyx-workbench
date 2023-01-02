@@ -47,7 +47,7 @@ static void gen_rand_expr() {
 	switch (choose(3)) {
 		case 0:
 			//insertNull();
-			int a = rand() % 10000;
+			int a = rand() % 100;
 			char num[32];
 			sprintf(num, "%d", a);
 			strcpy(buf + sub, num);
