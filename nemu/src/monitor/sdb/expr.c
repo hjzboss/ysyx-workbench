@@ -183,15 +183,15 @@ word_t eval(int p, int q) {
 	else {
 		int op = -1;
 		int op_type = -1;
-		bool flag = false;
+		int cnt = 0;
 		for (int i = p; i <= q; i ++) {
 			int type = tokens[i].type;
 			printf("type=%d, value=%s\n", type, tokens[i].str);
 			if (type == L_PARENTHESIS)
-				flag = true;
+				cnt ++;
 			else if (type == R_PARENTHESIS)
-				flag = false;
-			else if (flag || type == INTEGER)
+				cnt --;
+			else if (cnt || type == INTEGER)
 				// Operators inside parentheses are ignored
 				continue;
 			else {
@@ -199,14 +199,13 @@ word_t eval(int p, int q) {
 						|| (op_type == PLUS && type == MINUS)
 						|| (op_type == TIMES && type == DIVIDE)) {
 					op = i;
-					assert(type != 0);
+					assert(type!=0);
 					op_type = type;
 				}
 			}
 		}
 
 		assert(op != -1);
-		printf("----------------------------val1, op=%d, op_type=%d---------------------------------\n", op, op_type);
 		word_t val1 = eval(p, op - 1);
 		word_t val2 = eval(op + 1, q);
 		
