@@ -206,7 +206,7 @@ word_t eval(int p, int q) {
 		assert(op != -1);
 		word_t val1 = eval(p, op - 1);
 		word_t val2 = eval(op + 1, q);
-		printf("val1=%lu, val2=%lu\n", val1, val2);
+		printf("op_type=%d, val1=%lu, val2=%lu\n", op_type, val1, val2);
 
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
