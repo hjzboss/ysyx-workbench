@@ -146,16 +146,14 @@ bool check_parentheses(int p, int q) {
 	int top = -1;
 	int index = p;
 	while(index <= q) {
-		if (q == 512)
-			printf("index=%d ", index);
 		int type = tokens[index].type;
-		printf("type=%d\n", type);
+		//printf("type=%d\n", type);
 		if (type == L_PARENTHESIS) {
-			printf("push\n");
+			//printf("push\n");
 			++top;
 		}
 		else if (type == R_PARENTHESIS) {
-			printf("pop\n");
+			//printf("pop\n");
 			if (top == -1)
 				assert(0);
 			else if(--top == -1 && index < q)
@@ -208,7 +206,8 @@ word_t eval(int p, int q) {
 		assert(op != -1);
 		word_t val1 = eval(p, op - 1);
 		word_t val2 = eval(op + 1, q);
-		
+		printf("val1=%lu, val2=%lu\n", val1, val2);
+
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
 			case MINUS: return val1 - val2; break;
