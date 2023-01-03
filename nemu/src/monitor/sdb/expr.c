@@ -39,12 +39,14 @@ static struct rule {
   {" +", TK_NOTYPE},						// spaces
   {"\\+", PLUS},								// plus
   {"==", TK_EQ},								// equal
-	{"[1-9][0-9]*|0", INTEGER},			// integer
+	{"[0-9]+", INTEGER},					// integer
 	{"-", MINUS},									// minus
 	{"\\*", TIMES},								// times
 	{"/", DIVIDE},								// divide
 	{"\\(", L_PARENTHESIS},				// left parenthesis
 	{"\\)", R_PARENTHESIS},				// right parenthesis
+//	{"!=", NOT_EQ},								// not equal
+//	{"&&", AND},									// 
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -105,18 +107,39 @@ static bool make_token(char *e) {
 					case PLUS: case TK_EQ: case MINUS: case TIMES: case DIVIDE: 
 					case L_PARENTHESIS: case R_PARENTHESIS:
 						tokens[nr_token].type = rules[i].token_type;
-						//printf("token_type=%d, rules_type=%d\n", tokens[nr_token].type, rules[i].token_type);
 						tokens[nr_token].str[0] = '\0';
 						break;		
 					case INTEGER:
-						if (substr_len >= 32) {      
+						if (substr_len >= 65535) {      
 							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
 							return false;
 						} 
 						else {
+							int index = 0;
+							int len = 0;
+							// Eliminate the extra 0s at the beginning of the string
+							while (index <= substr_len - 1) {
+								if (*(substr_start + index) == '0') {
+									if (index == substr_len - 1) {
+										len = 1;
+										break;
+									}
+									++ index;
+								}
+								else {
+									if (substr_len - index >= 32) {
+										printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
+										return false;
+									}
+									len = substr_len - index;
+									break;
+								}
+							}
+							// Copy positive integers into tokens array
+							char *s = substr_start + index;
 							tokens[nr_token].type = rules[i].token_type;
-							strncpy(tokens[nr_token].str, substr_start, substr_len);
-							tokens[nr_token].str[substr_len] = '\0';
+							strncpy(tokens[nr_token].str, s, len);
+							tokens[nr_token].str[len] = '\0';
 						}
 						break;
           default: 
