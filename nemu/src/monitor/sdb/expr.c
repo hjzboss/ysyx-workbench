@@ -36,18 +36,18 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    )*/
 
-  {"(123) +", TK_NOTYPE},																						// spaces
-  {"(?<=[\\d\\(\\)]( )*)\\+(?=( )*[\\d\\(\\)])", PLUS},					// plus
+  {" +", TK_NOTYPE},																						// spaces
+  {"\\+)", PLUS},																								// plus
   {"==", TK_EQ},																								// equal
 	{"[0-9]+", INTEGER},																					// integer
-	{"(?<=[\\d\\(\\)]( )*)-(?=( )*[\\d\\(\\)])", MINUS},					// minus
-	{"(?<=[\\d\\(\\)]( )*)\\*(?=( )*[\\d\\(\\)])", TIMES},				// times
-	{"(?<=[\\d\\(\\)]( )*)/(?=( )*[\\d\\(\\)])", DIVIDE},					// divide
+	{"-", MINUS},																									// minus
+	{"\\*", TIMES},																								// times
+	{"/", DIVIDE},																								// divide
 	{"\\(", L_PARENTHESIS},																				// left parenthesis
 	{"\\)", R_PARENTHESIS},																				// right parenthesis
 	{"!=", NOT_EQ},																								// not equal
 	{"&&", AND},																									// and
-	{"(?<!\\d)\\*(?=\\d)", POINT},																// pointer dereference
+	{" ", POINT},																									// pointer dereference
 };
 
 #define NR_REGEX ARRLEN(rules)
