@@ -37,7 +37,7 @@ static struct rule {
    )*/
 
   {" +", TK_NOTYPE},																						// spaces
-  {"(?<=[\\d\\(\\)]( )*)\\+(?=( )*[\\d\\(\\)])", PLUS},					// plus
+  {"(?<=[\\d\\(\\)] *)\\+(?= *[\\d\\(\\)])", PLUS},					// plus
   {"==", TK_EQ},																								// equal
 	{"[0-9]+", INTEGER},																					// integer
 	{"(?<=[\\d\\(\\)]( )*)-(?=( )*[\\d\\(\\)])", MINUS},					// minus
