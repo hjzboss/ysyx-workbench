@@ -140,6 +140,7 @@ static bool make_token(char *e) {
 							tokens[nr_token].type = rules[i].token_type;
 							strncpy(tokens[nr_token].str, s, len);
 							tokens[nr_token].str[len] = '\0';
+							printf("integer=%s\n", tokens[nr_token].str);
 						}
 						break;
           default: 
