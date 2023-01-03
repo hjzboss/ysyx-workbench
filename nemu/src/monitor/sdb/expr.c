@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, AND, NOT_EQ, POINT,
+  TK_NOTYPE = 256, UNDET, TK_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, AND, NOT_EQ, POINT, REG, HEX,
 
   /* TODO: Add more token types */
 
@@ -39,15 +39,16 @@ static struct rule {
   {" +", TK_NOTYPE},																						// spaces
   {"\\+", PLUS},																								// plus
   {"==", TK_EQ},																								// equal
+	{"0x[0-9]+", HEX},																						// hex
+	{"\\$(0|ra|gp|t[p0-6]|s[p0-11]|a[0-7])", REG},								// reg
 	{"[0-9]+", INTEGER},																					// integer
 	{"-", MINUS},																									// minus
-	{"\\*", TIMES},																								// times
+	{"\\*", UNDET},																								// times and pointer dereference
 	{"/", DIVIDE},																								// divide
 	{"\\(", L_PARENTHESIS},																				// left parenthesis
 	{"\\)", R_PARENTHESIS},																				// right parenthesis
 	{"!=", NOT_EQ},																								// not equal
 	{"&&", AND},																									// and
-	{" ", POINT},																									// pointer dereference
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -105,11 +106,24 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-					case PLUS: case TK_EQ: case MINUS: case TIMES: case DIVIDE: 
+					case PLUS: case TK_EQ: case MINUS: case DIVIDE: 
 					case L_PARENTHESIS: case R_PARENTHESIS:
 						tokens[nr_token].type = rules[i].token_type;
 						tokens[nr_token].str[0] = '\0';
 						break;		
+					case UNDET:
+						// Distinguish between pointer dereference symbols and multiplication symbols
+						if (nr_token == 0) {
+							tokens[nr_token].type = POINT;
+						}
+						else {
+							int nr_tmp = nr_token - 1;
+							if (tokens[nr_tmp].type == INTEGER || tokens[nr_tmp].type == R_PARENTHESIS)
+								tokens[nr_token].type = TIMES;
+							else
+								tokens[nr_token].type = POINT;
+						}
+						tokens[nr_token].str[0] = '\0';
 					case INTEGER:
 						if (substr_len >= 65535) {      
 							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
@@ -209,7 +223,7 @@ word_t eval(int p, int q) {
 				// Operators inside parentheses are ignored
 				continue;
 			else {
-				if (op == -1 || type <= op_type 
+				if (op == -1 || type <= op_type
 						|| (op_type == PLUS && type == MINUS)
 						|| (op_type == TIMES && type == DIVIDE)) {
 					op = i;
