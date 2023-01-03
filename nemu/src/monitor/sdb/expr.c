@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER,
+  TK_NOTYPE = 256, TK_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, AND, NOT_EQ, POINT,
 
   /* TODO: Add more token types */
 
@@ -36,17 +36,18 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    )*/
 
-  {" +", TK_NOTYPE},						// spaces
-  {"\\+", PLUS},								// plus
-  {"==", TK_EQ},								// equal
-	{"[0-9]+", INTEGER},					// integer
-	{"-", MINUS},									// minus
-	{"\\*", TIMES},								// times
-	{"/", DIVIDE},								// divide
-	{"\\(", L_PARENTHESIS},				// left parenthesis
-	{"\\)", R_PARENTHESIS},				// right parenthesis
-//	{"!=", NOT_EQ},								// not equal
-//	{"&&", AND},									// 
+  {" +", TK_NOTYPE},																						// spaces
+  {"(?<=[\\d\\(\\)]( )*)\\+(?=( )*[\\d\\(\\)])", PLUS},					// plus
+  {"==", TK_EQ},																								// equal
+	{"[0-9]+", INTEGER},																					// integer
+	{"(?<=[\\d\\(\\)]( )*)-(?=( )*[\\d\\(\\)])", MINUS},					// minus
+	{"(?<=[\\d\\(\\)]( )*)\\*(?=( )*[\\d\\(\\)])", TIMES},				// times
+	{"(?<=[\\d\\(\\)]( )*)/(?=( )*[\\d\\(\\)])", DIVIDE},					// divide
+	{"\\(", L_PARENTHESIS},																				// left parenthesis
+	{"\\)", R_PARENTHESIS},																				// right parenthesis
+	{"!=", NOT_EQ},																								// not equal
+	{"&&", AND},																									// and
+	{"(?<!\\d)\\*(?=\\d)", POINT},																// pointer dereference
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -140,7 +141,6 @@ static bool make_token(char *e) {
 							tokens[nr_token].type = rules[i].token_type;
 							strncpy(tokens[nr_token].str, s, len);
 							tokens[nr_token].str[len] = '\0';
-							printf("integer=%s\n", tokens[nr_token].str);
 						}
 						break;
           default: 
