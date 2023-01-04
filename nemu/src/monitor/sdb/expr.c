@@ -115,6 +115,7 @@ static bool make_token(char *e) {
 						tokens[nr_token].type = rules[i].token_type;
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].str[substr_len] = '\0';
+						break;
 					case UNDET:
 						// Distinguish between pointer dereference symbols and multiplication symbols
 						if (nr_token == 0) {
@@ -128,6 +129,7 @@ static bool make_token(char *e) {
 								tokens[nr_token].type = POINT;
 						}
 						tokens[nr_token].str[0] = '\0';
+						break;
 					case INTEGER:
 						if (substr_len >= 65535) {      
 							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
@@ -266,7 +268,7 @@ word_t eval(int p, int q) {
 			case AND: return val1 && val2; break;
 			case TK_EQ: return val1 == val2; break;
 			case NOT_EQ: return val1 != val2; break;
-			case POINT: return 0; break;
+			case POINT: return 0; break;// todo
 			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
 		}
 	}
