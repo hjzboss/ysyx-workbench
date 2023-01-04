@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, UNDET, TK_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, AND, NOT_EQ, POINT, REG, HEX,
+  TK_NOTYPE = 256, UNDET, AND, TK_EQ, NOT_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, POINT, REG, HEX,
 
   /* TODO: Add more token types */
 
@@ -110,7 +110,11 @@ static bool make_token(char *e) {
 					case L_PARENTHESIS: case R_PARENTHESIS:
 						tokens[nr_token].type = rules[i].token_type;
 						tokens[nr_token].str[0] = '\0';
-						break;		
+						break;
+					case REG:
+						tokens[nr_token].type = rules[i].token_type;
+						strncpy(tokens[nr_token].str, substr_start, substr_len);
+						tokens[nr_token].str[substr_len] = '\0';
 					case UNDET:
 						// Distinguish between pointer dereference symbols and multiplication symbols
 						if (nr_token == 0) {
@@ -203,8 +207,24 @@ word_t eval(int p, int q) {
 	if (p > q)
 		assert(0);
 	else if (p == q) {
-		char *tmp = NULL;
-		return strtol(tokens[p].str, &tmp, 10);
+		if (tokens[p].type == REG) {	
+			bool success;
+			word_t reg = isa_reg_str2val(tokens[p].str, &success);
+			assert(success);
+			return reg;
+		}
+		else if (tokens[p].type == INTEGER) {
+			char *tmp = NULL;
+			return strtol(tokens[p].str, &tmp, 10);
+		}
+		else if (tokens[p].type == HEX) {
+			char *tmp = NULL;
+			return strtol(tokens[p].str, &tmp, 16);
+		}
+		else {
+			printf("Error type!\n");
+			assert(0);
+		}
 	} 
 	else if (check_parentheses(p, q) == true) {
 		return eval(p + 1, q - 1);
@@ -219,15 +239,16 @@ word_t eval(int p, int q) {
 				cnt ++;
 			else if (type == R_PARENTHESIS)
 				cnt --;
-			else if (cnt || type == INTEGER)
+			else if (cnt || type == INTEGER || type == REG || type == HEX)
 				// Operators inside parentheses are ignored
 				continue;
 			else {
 				if (op == -1 || type <= op_type
+						|| (op_type == TK_EQ && type == NOT_EQ)
 						|| (op_type == PLUS && type == MINUS)
 						|| (op_type == TIMES && type == DIVIDE)) {
 					op = i;
-					assert(type!=0);
+					assert(type != 0);
 					op_type = type;
 				}
 			}
@@ -242,6 +263,10 @@ word_t eval(int p, int q) {
 			case MINUS: return val1 - val2; break;
 			case TIMES: return val1 * val2; break;
 			case DIVIDE: if (!val2) { printf("divide zero! error evaluation!\n"); assert(0); } else return val1 / val2; break;
+			case AND: return val1 && val2; break;
+			case TK_EQ: return val1 == val2; break;
+			case NOT_EQ: return val1 != val2; break;
+			case POINT: return 0; break;
 			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
 		}
 	}
