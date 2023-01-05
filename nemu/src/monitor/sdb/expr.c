@@ -176,8 +176,8 @@ static bool make_token(char *e) {
 								strncpy(tokens[nr_token].str, s, len);
 								tokens[nr_token].str[len] = '\0';
 							}
+							nr_token ++;
 						}
-						nr_token ++;
 						break;
           default: 
         }
