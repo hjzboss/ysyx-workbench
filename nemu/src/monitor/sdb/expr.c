@@ -156,15 +156,23 @@ static bool make_token(char *e) {
 										printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
 										return false;
 									}
-									len += substr_len - index;
+									len = substr_len - index;
 									break;
 								}
 							}
 							// Copy positive integers into tokens array
 							char *s = substr_start + index;
 							tokens[nr_token].type = rules[i].token_type;
-							strncpy(tokens[nr_token].str, s, len);
-							tokens[nr_token].str[len] = '\0';
+							if (type == HEX) {
+								tokens[nr_token].str[0] = '0';
+								tokens[nr_token].str[1] = 'x';
+								strncpy(tokens[nr_token].str + 2, s, len);
+								tokens[nr_token].str[len + 2] = '\0';
+							}
+							else {
+								strncpy(tokens[nr_token].str, s, len);
+								tokens[nr_token].str[len] = '\0';
+							}
 						}
 						break;
           default: 
