@@ -273,8 +273,12 @@ word_t eval(int p, int q) {
 		
 		printf("op=%d\n", op);
 		assert(op != -1);
-		word_t val1 = eval(p, op - 1);
-		word_t val2 = eval(op + 1, q);
+		word_t val1, val2;
+		if (op != POINT)
+			val1 = eval(p, op - 1);
+		else
+			val1 = 0;
+		val2 = eval(op + 1, q);
 
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
