@@ -225,10 +225,10 @@ word_t eval(int p, int q) {
 		assert(0);
 	else if (p == q) {
 		if (tokens[p].type == REG) {	
-			bool success;
+			bool reg_success;
 			printf("reg=%s\n", tokens[p].str);
-			word_t reg = isa_reg_str2val(tokens[p].str, &success);
-			//assert(success);
+			word_t reg = isa_reg_str2val(tokens[p].str, &reg_success);
+			assert(reg_success);
 			//printf("reg=%lu\n", reg);
 			return reg;
 		}
@@ -281,8 +281,8 @@ word_t eval(int p, int q) {
 		else
 			val1 = 0;
 		val2 = eval(op + 1, q);
-		if (op_type == POINT)
-			printf("val2=%lu\n", val2);
+		//if (op_type == POINT)
+		//	printf("val2=%lu\n", val2);
 
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
