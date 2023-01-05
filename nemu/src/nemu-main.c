@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 #else
   init_monitor(argc, argv);
 #endif
-	
+	/*
 	// test eval
 	char *src = "/home/hjz/ysyx-workbench/nemu/tools/gen-expr/input";
 	FILE *fp = fopen(src, "r");
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	fclose(fp);
-
+*/
   /* Start engine. */
   engine_start();
 
