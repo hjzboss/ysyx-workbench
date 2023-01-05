@@ -112,11 +112,13 @@ static bool make_token(char *e) {
 					case L_PARENTHESIS: case R_PARENTHESIS:
 						tokens[nr_token].type = rules[i].token_type;
 						tokens[nr_token].str[0] = '\0';
+						nr_token ++;
 						break;
 					case REG:
 						tokens[nr_token].type = rules[i].token_type;
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].str[substr_len] = '\0';
+						nr_token ++;
 						break;
 					case UNDET:
 						// Distinguish between pointer dereference symbols and multiplication symbols
@@ -131,6 +133,7 @@ static bool make_token(char *e) {
 								tokens[nr_token].type = POINT;
 						}
 						tokens[nr_token].str[0] = '\0';
+						nr_token ++;
 						break;
 					case HEX:
 					case INTEGER:
@@ -174,11 +177,10 @@ static bool make_token(char *e) {
 								tokens[nr_token].str[len] = '\0';
 							}
 						}
+						nr_token ++;
 						break;
           default: 
         }
-
-				nr_token += 1;
         break;
       }
     }
