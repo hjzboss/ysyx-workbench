@@ -220,7 +220,7 @@ bool check_parentheses(int p, int q) {
 }
 
 word_t eval(int p, int q) {
-	printf("p=%d, q=%d\n", p, q);
+	//printf("p=%d, q=%d\n", p, q);
 	if (p > q)
 		assert(0);
 	else if (p == q) {
@@ -229,6 +229,7 @@ word_t eval(int p, int q) {
 			printf("reg=%s\n", tokens[p].str);
 			word_t reg = isa_reg_str2val(tokens[p].str, &success);
 			//assert(success);
+			printf("reg=%lu\n", reg);
 			return reg;
 		}
 		else if (tokens[p].type == INTEGER) {
@@ -272,7 +273,7 @@ word_t eval(int p, int q) {
 			}
 		}
 		
-		printf("op=%d\n", op);
+		//printf("op=%d\n", op);
 		assert(op != -1);
 		word_t val1, val2;
 		if (op_type != POINT)
