@@ -274,7 +274,7 @@ word_t eval(int p, int q) {
 		printf("op=%d\n", op);
 		assert(op != -1);
 		word_t val1, val2;
-		if (op != POINT)
+		if (op_type != POINT)
 			val1 = eval(p, op - 1);
 		else
 			val1 = 0;
