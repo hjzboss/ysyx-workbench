@@ -226,10 +226,8 @@ word_t eval(int p, int q) {
 	else if (p == q) {
 		if (tokens[p].type == REG) {	
 			bool reg_success;
-			printf("reg=%s\n", tokens[p].str);
 			word_t reg = isa_reg_str2val(tokens[p].str + 1, &reg_success);
 			assert(reg_success);
-			//printf("reg=%lu\n", reg);
 			return reg;
 		}
 		else if (tokens[p].type == INTEGER) {

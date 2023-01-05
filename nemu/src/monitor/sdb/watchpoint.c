@@ -41,3 +41,67 @@ void init_wp_pool() {
 
 /* TODO: Implement the functionality of watchpoint */
 
+WP* new_wp() {
+	if (free_ == NULL) {
+		printf("There are no idle watchpoints to assign!\n");
+		assert(0);
+	}
+	WP *w = free_;
+	free_ = free_->next;
+	w->next = head;
+	head = w;
+	return w;
+}
+
+void insert_free(WP *wp) {
+	if (free_ == NULL) {
+		free_ = wp;
+		wp->next = NULL;
+	}
+	else if (free_->next == NULL) {
+		if (wp->NO > free_->NO) {
+			free_->next = wp;
+			wp->next = NULL;
+		}
+		else {
+			wp->next = free_;
+			free_ = wp;
+		}
+	}
+	else {
+		WP *p = free_;
+		while (p->next && p->next->NO < wp->NO) { p = p->next; }
+		wp->next = p->next;
+		p->next = wp;	
+	}
+}
+
+void free_wp(WP *wp) {
+	if (head == NULL || (head->next == NULL && head != wp)) {
+		printf("There are no watchpoints that can be released!\n");
+		assert(0);
+	}
+	else if (head == wp) {
+		insert_free(wp);
+		head = head->next;
+	}
+	else {
+		WP *pre = head;
+		WP *cur = head->next;
+		bool flag = false;
+		while (cur) {
+			if (cur == wp) {
+				insert_free(wp);
+				pre->next = cur->next;
+				flag = true;
+			}
+			cur = cur->next;
+			pre = pre->next;
+		}
+		if (!flag) {
+			printf("No target watchpoint found!\n");
+			assert(0);
+		}
+	}
+}
+
