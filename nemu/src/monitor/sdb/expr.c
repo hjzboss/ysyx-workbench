@@ -132,29 +132,31 @@ static bool make_token(char *e) {
 						}
 						tokens[nr_token].str[0] = '\0';
 						break;
+					case HEX:
 					case INTEGER:
+						int type = rules[i].token_type;
 						if (substr_len >= 65535) {      
 							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
 							return false;
 						} 
 						else {
-							int index = 0;
-							int len = 0;
+							int index = type == INTEGER ? 0 : 2;
+							int len = type == INTEGER ? 0 : 2;
 							// Eliminate the extra 0s at the beginning of the string
 							while (index <= substr_len - 1) {
 								if (*(substr_start + index) == '0') {
 									if (index == substr_len - 1) {
-										len = 1;
+										len += 1;
 										break;
 									}
 									++ index;
 								}
 								else {
-									if (substr_len - index >= 32) {
+									if (len + substr_len - index >= 32) {
 										printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
 										return false;
 									}
-									len = substr_len - index;
+									len += substr_len - index;
 									break;
 								}
 							}
