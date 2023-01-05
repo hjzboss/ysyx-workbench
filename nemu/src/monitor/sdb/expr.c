@@ -19,6 +19,8 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+// my change
+#include<memory/paddr.h>
 
 enum {
   TK_NOTYPE = 256, UNDET, AND, TK_EQ, NOT_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, POINT, REG, HEX,
@@ -268,7 +270,7 @@ word_t eval(int p, int q) {
 			case AND: return val1 && val2; break;
 			case TK_EQ: return val1 == val2; break;
 			case NOT_EQ: return val1 != val2; break;
-			case POINT: return 0; break;// todo
+			case POINT: return paddr_read(val2, 4); break;
 			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
 		}
 	}
