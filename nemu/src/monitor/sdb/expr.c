@@ -41,7 +41,7 @@ static struct rule {
   {" +", TK_NOTYPE},																						// spaces
   {"\\+", PLUS},																								// plus
   {"==", TK_EQ},																								// equal
-	{"0x[0-9a-f]+", HEX},																						// hex
+	{"0x[0-9a-f]+", HEX},																					// hex
 	{"\\$(0|ra|gp|t[p0-6]|s[p0-11]|a[0-7])", REG},								// reg
 	{"[0-9]+", INTEGER},																					// integer
 	{"-", MINUS},																									// minus
@@ -271,16 +271,14 @@ word_t eval(int p, int q) {
 			}
 		}
 		
-		//printf("op=%d\n", op);
 		assert(op != -1);
 		word_t val1, val2;
+
 		if (op_type != POINT)
 			val1 = eval(p, op - 1);
 		else
 			val1 = 0;
 		val2 = eval(op + 1, q);
-		//if (op_type == POINT)
-		//	printf("val2=%lu\n", val2);
 
 		switch (op_type) {
 			case PLUS: return val1 + val2; break;
