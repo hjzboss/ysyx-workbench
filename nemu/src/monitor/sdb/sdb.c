@@ -25,6 +25,8 @@ static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
+void watchpoint_display();
+void free_wp(int);
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -74,7 +76,7 @@ static int cmd_info(char *args) {
 			break;
 		case 'w':
 			printf("Print watch information:\n");
-			//todo
+			watchpoint_display();
 			break;
 		default:
 			printf("Unknown parameter: %s\n", args);
@@ -100,7 +102,7 @@ static int cmd_x(char *args) {
 
 	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
 	paddr_t addr = (paddr_t)strtol(expr, &expr_other, 16);
-	if ((n == n_other) || (expr == expr_other)) {
+	if (n == n_other || expr == expr_other) {
 		printf("The parameter is wrong, please enter the correct parameter!\n");
 		return 0;
 	}
@@ -120,16 +122,58 @@ static int cmd_x(char *args) {
 
 
 static int cmd_p(char *args) {
+	if (args == NULL) {
+		printf("Missing parameters!\n");
+		return 0;
+	}
+	bool success;
+	word_t res = expr(args, &success);
+	if (!success) {
+		printf("The expression is malformed!\n");
+	}
+	else {
+		printf("%s=%lu\n", args, res);
+	}
 	return 0;
 }
 
 
 static int cmd_w(char *args) {
+	if (args == NULL) {
+		printf("Missing parameters!\n");
+		return 0;
+	}
+#ifdef CONFIG_WATCHPOINT
+	bool success;
+	word_t res = expr(args, &success);
+	if (!success) {
+		printf("The expression is malformed!\n");
+		return 0;
+	}
+	WP* wp = new_wp();
+	if (wp != NULL) {
+		wp->expr = args;
+		wp->value = res;
+		printf("Hardware watchpoint %d: %s\n", wp->NO, args);
+	}
+#endif
 	return 0;
 }
 
 
 static int cmd_d(char *args) {
+	if (args == NULL) {
+		printf("Missing the number of the watchpoint!\n");
+		return 0;
+	}
+	char *other = NULL;
+	int no = (int)strtol(args, &other, 10);
+	if (other != NULL) {
+		printf("Parameter error!\n");
+	}
+	else {
+		free_wp(no);
+	}
 	return 0;
 }
 

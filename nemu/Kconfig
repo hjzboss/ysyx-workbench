@@ -26,7 +26,6 @@ config ISA64
   bool
   default y
 
-
 choice
   prompt "NEMU execution engine"
   default ENGINE_INTERPRETER
@@ -125,6 +124,10 @@ menu "Testing and Debugging"
 config TRACE
   bool "Enable tracer"
   default y
+
+config CONFIG_WATCHPOINT
+	bool "Enable watchpoint"
+	default y
 
 config TRACE_START
   depends on TRACE
