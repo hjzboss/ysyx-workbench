@@ -141,6 +141,7 @@ void watchpoint_display() {
 	WP *cur = head;
 	while (cur) {
 		printf("%d\t\t%s\t\t%lu\n", cur->NO, cur->expr, cur->value);
+		cur = cur->next;
 	}
 	printf("\n");
 }
