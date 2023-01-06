@@ -137,7 +137,7 @@ void scan_watchpoint() {
 }
 
 void watchpoint_display() {
-	printf("NO\t\tWhat\t\tValue");
+	printf("NO\t\tWhat\t\tValue\n");
 	WP *cur = head;
 	while (cur) {
 		printf("%d\t\t%s\t\t%lu\n", cur->NO, cur->expr, cur->value);
