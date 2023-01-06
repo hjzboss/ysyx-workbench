@@ -120,6 +120,7 @@ void scan_watchpoint() {
 	bool flag = false;
 	while (cur) {
 		bool success;
+		printf("debug: %d, %s, %lu\n", cur->NO, cur->expr, cur->value);
 		word_t n_val = expr(cur->expr, &success);
 		assert(success);
 		if (n_val != cur->value) {
