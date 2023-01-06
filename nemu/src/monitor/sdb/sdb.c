@@ -158,7 +158,7 @@ static int cmd_d(char *args) {
 	}
 	char *other = NULL;
 	int no = (int)strtol(args, &other, 10);
-	if (other != NULL) {
+	if (other == args) {
 		printf("Parameter error!\n");
 	}
 	else {
