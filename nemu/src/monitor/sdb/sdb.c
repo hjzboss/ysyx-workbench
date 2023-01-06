@@ -144,6 +144,7 @@ static int cmd_w(char *args) {
 		return 0;
 	}
 #ifdef CONFIG_WATCHPOINT
+	printf("fuck!\n");
 	bool success;
 	word_t res = expr(args, &success);
 	if (!success) {
