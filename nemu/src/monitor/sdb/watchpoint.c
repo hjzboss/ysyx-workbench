@@ -58,6 +58,7 @@ void new_wp(char *e) {
 		w->expr = e;
 		w->value = res;
 		head = w;
+		printf("args=%s, w->expr=%s\n", e, w->expr);
 		printf("Hardware watchpoint %d: %s\n", w->NO, w->expr);
 	}
 }
