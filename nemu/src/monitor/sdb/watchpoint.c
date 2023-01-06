@@ -44,16 +44,22 @@ void init_wp_pool() {
 
 /* TODO: Implement the functionality of watchpoint */
 
-WP* new_wp() {
+void new_wp(char *e) {
 	if (free_ == NULL) {
 		printf("There are no idle watchpoints to assign!\n");
-		return NULL;
+		return;
 	}
-	WP *w = free_;
-	free_ = free_->next;
-	w->next = head;
-	head = w;
-	return w;
+	bool success;
+	word_t res = expr(e, &success);
+	if (success) {
+		WP *w = free_;
+		free_ = free_->next;
+		w->next = head;
+		w->expr = e;
+		w->value = res;
+		head = w;
+		printf("Hardware watchpoint %d: %s\n", w->NO, e);
+	}
 }
 
 void insert_free(WP *wp) {

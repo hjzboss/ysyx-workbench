@@ -27,6 +27,7 @@ void init_regex();
 void init_wp_pool();
 void watchpoint_display();
 void free_wp(int);
+void new_wp(char*);
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -144,19 +145,7 @@ static int cmd_w(char *args) {
 		return 0;
 	}
 #ifdef CONFIG_WATCHPOINT
-	printf("fuck!\n");
-	bool success;
-	word_t res = expr(args, &success);
-	if (!success) {
-		printf("The expression is malformed!\n");
-		return 0;
-	}
-	WP* wp = new_wp();
-	if (wp != NULL) {
-		wp->expr = args;
-		wp->value = res;
-		printf("Hardware watchpoint %d: %s\n", wp->NO, args);
-	}
+	new_wp(args);
 #endif
 	return 0;
 }
