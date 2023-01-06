@@ -144,7 +144,6 @@ static int cmd_w(char *args) {
 		printf("Missing parameters!\n");
 		return 0;
 	}
-	printf("%s\n", args);
 #ifdef CONFIG_WATCHPOINT
 	new_wp(args);
 #endif
