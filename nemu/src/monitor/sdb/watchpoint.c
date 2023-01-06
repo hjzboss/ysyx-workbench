@@ -129,7 +129,9 @@ void scan_watchpoint() {
 			flag = true;
 			cur->value = n_val;
 		}
+		cur = cur->next;
 	}
+
 	
 	if (flag) {
 		nemu_state.state = NEMU_STOP;
