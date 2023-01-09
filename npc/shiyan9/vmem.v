@@ -61,7 +61,6 @@ always @(posedge clk) begin
 	end
 	else if (p_valid && key_in != ENTER && key_in != BACK) begin
 		vga_mem[{x_ptr, y_ptr}] <= key_in;
-		$display("key_in=%x", key_in);
 	end
 	else
 		vga_mem[{x_ptr, y_ptr}] <= vga_mem[{x_ptr, y_ptr}];
