@@ -100,6 +100,7 @@ static int cmd_x(char *args) {
 		return 0;
 	}
 
+	printf("%s\n", e);
 	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
 	if (n == n_other) {
 		printf("The parameter is wrong, please enter the correct parameter!\n");
