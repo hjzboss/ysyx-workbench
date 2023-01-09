@@ -109,6 +109,7 @@ static int cmd_x(char *args) {
 
 	bool success;
 	paddr_t addr = expr(e, &success);
+	printf("%u\n", addr);
 	if (!success) {
 		printf("The expression is malformed!\n");
 		return 0;
