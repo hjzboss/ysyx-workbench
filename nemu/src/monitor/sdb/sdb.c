@@ -91,14 +91,10 @@ static int cmd_x(char *args) {
 		printf("Input parameters are required!\n");
 		return 0;
 	}
+
 	char *n_other = NULL;
-	//char *expr_other = NULL;
-	//char *n = strtok(args, " ");
-	//char *e = strtok(NULL, " ");
-	
 	char n[65535];
 	sscanf(args, "%s", n);
-
 	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
 	if (n == n_other) {
 		printf("The parameter is wrong, please enter the correct parameter!\n");
@@ -106,6 +102,7 @@ static int cmd_x(char *args) {
 	}
 
 	int len = strlen(n);
+	printf("%d\n", len);
 	char *e = args + len;
 
 	bool success;
