@@ -127,7 +127,8 @@ static bool make_token(char *e) {
 						}
 						else {
 							int nr_tmp = nr_token - 1;
-							if (tokens[nr_tmp].type == INTEGER || tokens[nr_tmp].type == R_PARENTHESIS)
+							if (tokens[nr_tmp].type == INTEGER || tokens[nr_tmp].type == R_PARENTHESIS
+									|| tokens[nr_tmp].type == HEX || tokens[nr_tmp].type == REG)
 								tokens[nr_token].type = TIMES;
 							else
 								tokens[nr_token].type = POINT;

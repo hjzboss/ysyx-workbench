@@ -95,7 +95,6 @@ static int cmd_x(char *args) {
 	//char *expr_other = NULL;
 	char *n = strtok(args, " ");
 	char *e = strtok(NULL, " ");
-	printf("%s\n", e);
 	if (e == NULL) {
 		printf("Missing parameters!\n");
 		return 0;
@@ -109,7 +108,6 @@ static int cmd_x(char *args) {
 
 	bool success;
 	paddr_t addr = expr(e, &success);
-	printf("%u\n", addr);
 	if (!success) {
 		printf("The expression is malformed!\n");
 		return 0;
