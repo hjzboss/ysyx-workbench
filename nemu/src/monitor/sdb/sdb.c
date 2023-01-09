@@ -91,22 +91,19 @@ static int cmd_x(char *args) {
 		printf("Input parameters are required!\n");
 		return 0;
 	}
-	char *n_other = NULL;
+	//char *n_other = NULL;
 	//char *expr_other = NULL;
-	char *n = strtok(args, " ");
-	char *e = strtok(NULL, " ");
-	printf("args=%s\n", args);
-	if (e == NULL) {
-		printf("Missing parameters!\n");
-		return 0;
-	}
+	//char *n = strtok(args, " ");
+	//char *e = strtok(NULL, " ");
+	word_t n;
+	char e[65535];
+	sscanf(args, "%lu %s", &n, e);
 
-	printf("%s\n", e);
-	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
+	/* paddr_t N = (paddr_t)strtol(n, &n_other, 10);
 	if (n == n_other) {
 		printf("The parameter is wrong, please enter the correct parameter!\n");
 		return 0;
-	}
+	}*/
 
 	bool success;
 	paddr_t addr = expr(e, &success);
@@ -116,7 +113,7 @@ static int cmd_x(char *args) {
 	}
 
 	// Print the data from the corresponding address
-	for (paddr_t i = 0; i < N; ++ i) {
+	for (paddr_t i = 0; i < n; ++ i) {
 		paddr_t tmp = addr + 4 * i;
 		printf("0x%016x:\t", tmp);
 		for (paddr_t j = 0; j < 4; ++ j) {
