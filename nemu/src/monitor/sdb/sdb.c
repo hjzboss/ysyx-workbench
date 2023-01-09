@@ -95,6 +95,7 @@ static int cmd_x(char *args) {
 	//char *expr_other = NULL;
 	char *n = strtok(args, " ");
 	char *e = strtok(NULL, " ");
+	printf("%s\n", e);
 	if (e == NULL) {
 		printf("Missing parameters!\n");
 		return 0;
