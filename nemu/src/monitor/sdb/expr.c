@@ -29,8 +29,8 @@ enum {
 
 };
 
-static char *integer_max = "00000000000018446744073709551615";
-static char *hex_max = "0000000000000000ffffffffffffffff";
+static char *integer_max = "18446744073709551615";
+static char *hex_max = "0xffffffffffffffff";
 
 static struct rule {
   const char *regex;
