@@ -12,8 +12,10 @@
 *
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
-
+#include <assert.h>
 #include <common.h>
+
+word_t expr(char*, _Bool*);
 
 void init_monitor(int, char *[]);
 void am_init_monitor();
@@ -27,7 +29,33 @@ int main(int argc, char *argv[]) {
 #else
   init_monitor(argc, argv);
 #endif
-
+	/*
+	// test eval
+	char *src = "/home/hjz/ysyx-workbench/nemu/tools/gen-expr/input";
+	FILE *fp = fopen(src, "r");
+	assert(fp != NULL);
+	_Bool success;
+	char buf[65535] = {};
+	word_t res, result;
+	while (true) {
+		if(fscanf(fp, "%lu", &res) == EOF)
+			break;
+		fgetc(fp);
+		if(fgets(buf, 65535, fp) == NULL)
+			break;
+		char *nu = strchr(buf, '\n');
+		if (nu)
+			*nu = '\0';
+		result = expr(buf, &success);
+		printf("res=%lu, result=%lu\n", res, result);
+		if (res == result) {
+			printf("通过!\n");
+		} else {
+			printf("未通过!\n");
+		}
+	}
+	fclose(fp);
+*/
   /* Start engine. */
   engine_start();
 

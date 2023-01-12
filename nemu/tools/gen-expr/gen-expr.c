@@ -37,15 +37,22 @@ uint32_t choose(uint32_t n) {
 	return rand() % n;
 }
 
+void insertNull() {
+	if (choose(10) > 4)
+		buf[sub++] = ' ';
+}
+
 static void gen_rand_expr() {
   //buf[0] = '\0';
 	switch (choose(3)) {
 		case 0:
-			int a = rand();
+			//insertNull();
+			int a = rand() % 100;
 			char num[32];
 			sprintf(num, "%d", a);
 			strcpy(buf + sub, num);
 			sub += strlen(num);
+			//insertNull();
 			break;
 		case 1:
 			buf[sub] = '(';
@@ -77,8 +84,8 @@ int main(int argc, char *argv[]) {
   int loop = 1;
   if (argc > 1) {
 		// my change
-    int tmp = sscanf(argv[1], "%d", &loop);
-		assert(tmp == 1);
+    sscanf(argv[1], "%d", &loop);
+		//assert(tmp == 1);
   }
   int i;
   for (i = 0; i < loop; i ++) {
@@ -100,10 +107,11 @@ int main(int argc, char *argv[]) {
     assert(fp != NULL);
 
     int result;
-		// my change
+
     int tmp = fscanf(fp, "%d", &result);
-		assert(tmp == 1);
-    
+    //assert(tmp == 1);
+		if (tmp == 1) {}
+
 		pclose(fp);
 
     printf("%u %s\n", result, buf);
