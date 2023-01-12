@@ -29,6 +29,9 @@ enum {
 
 };
 
+static char *integer_max = "00000000000018446744073709551615";
+static char *hex_max = "0000000000000000ffffffffffffffff";
+
 static struct rule {
   const char *regex;
   int token_type;
@@ -220,6 +223,52 @@ bool check_parentheses(int p, int q) {
 	return flag;
 }
 
+static word_t is_overflow(word_t val1, word_t val2, int op) {
+	word_t result;
+	switch(op) {
+		case PLUS:
+			result = val1 + val2;
+			if (result < val1 || result < val2) {
+				printf("An overflow occurs during addition: %lu+%lu\n", val1, val2);
+				assert(0);
+			}
+			break;
+		case MINUS:
+			result = val1 - val2;
+			if (result > val1) {
+				printf("An overflow occurs during subtraction: %lu-%lu\n", val1, val2);
+				assert(0);
+			}
+			break;
+		case TIMES:
+			result = val1 * val2;
+			if (val1 && result / val1 != val2) {
+				printf("An overflow occurs during multiplication: %lu*%lu\n", val1, val2);
+				assert(0);
+			}
+			break;
+		case DIVIDE:
+			if (!val2) {
+				printf("divide zero! error evaluation: %lu / %lu\n", val1, val2);
+				assert(0);
+			}
+			result = val1 / val2;
+			break;
+		case POINT:
+			if (val2 > 4294967295) {
+				printf("An overflow occurs during pointer dereference: *%lu\n", val2);
+				assert(0);				
+			}
+			result = paddr_read(val2, 4);
+			break;
+		default:
+			printf("Unknown operator!\n");
+			assert(0);
+	}
+
+	return result;
+}
+
 word_t eval(int p, int q) {
 	//printf("p=%d, q=%d\n", p, q);
 	if (p > q)
@@ -233,10 +282,19 @@ word_t eval(int p, int q) {
 		}
 		else if (tokens[p].type == INTEGER) {
 			char *tmp = NULL;
+			// Check for integer overflow
+			if (strcmp(tokens[p].str, integer_max)) {
+				printf("Integer overflow: %s\n", tokens[p].str);
+				assert(0);
+			};
 			return strtol(tokens[p].str, &tmp, 10);
 		}
 		else if (tokens[p].type == HEX) {
 			char *tmp = NULL;
+			if (strcmp(tokens[p].str, hex_max)) {
+				printf("Integer overflow: %s\n", tokens[p].str);
+				assert(0);					
+			}
 			return strtol(tokens[p].str, &tmp, 16);
 		}
 		else {
@@ -282,14 +340,14 @@ word_t eval(int p, int q) {
 		val2 = eval(op + 1, q);
 
 		switch (op_type) {
-			case PLUS: return val1 + val2; break;
-			case MINUS: return val1 - val2; break;
-			case TIMES: return val1 * val2; break;
-			case DIVIDE: if (!val2) { printf("divide zero! error evaluation!\n"); assert(0); } else return val1 / val2; break;
+			case PLUS: return is_overflow(val1, val2, PLUS); break;
+			case MINUS: return is_overflow(val1, val2, MINUS); break;
+			case TIMES: return is_overflow(val1, val2, TIMES); break;
+			case DIVIDE: return is_overflow(val1, val2, DIVIDE); break;
 			case AND: return val1 && val2; break;
 			case TK_EQ: return val1 == val2; break;
 			case NOT_EQ: return val1 != val2; break;
-			case POINT: return paddr_read(val2, 4); break;
+			case POINT: return is_overflow(val1, val2, POINT); break;
 			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
 		}
 	}

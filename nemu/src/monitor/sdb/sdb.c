@@ -102,7 +102,6 @@ static int cmd_x(char *args) {
 	}
 
 	int len = strlen(n);
-	printf("%d\n", len);
 	char *e = args + len;
 
 	bool success;
