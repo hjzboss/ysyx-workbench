@@ -291,7 +291,7 @@ word_t eval(int p, int q) {
 		}
 		else if (tokens[p].type == HEX) {
 			char *tmp = NULL;
-			if (strcmp(tokens[p].str, hex_max)) {
+			if (strcmp(tokens[p].str, hex_max) > 0) {
 				printf("Integer overflow: %s\n", tokens[p].str);
 				assert(0);					
 			}
