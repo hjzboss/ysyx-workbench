@@ -259,7 +259,7 @@ static word_t is_overflow(word_t val1, word_t val2, int op) {
 				printf("An overflow occurs during pointer dereference: *%lu\n", val2);
 				assert(0);				
 			}
-			result = paddr_read(val2, 4);
+			result = paddr_read(val2, 8);
 			break;
 		default:
 			printf("Unknown operator!\n");
