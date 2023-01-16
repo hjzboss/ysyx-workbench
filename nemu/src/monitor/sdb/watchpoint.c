@@ -115,7 +115,7 @@ void free_wp(int no) {
 }
 
 // Scans all non-idle watchpoints and returns true if the result of the expression changes
-void scan_watchpoint(Decode *_this) {
+void scan_watchpoint() {
 	WP *cur = head;
 	bool flag = false;
 	while (cur) {
@@ -134,7 +134,6 @@ void scan_watchpoint(Decode *_this) {
 
 	
 	if (flag) {
-		log_write("%s\n", _this->logbuf);
 		nemu_state.state = NEMU_STOP;
 	}
 }
