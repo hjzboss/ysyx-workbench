@@ -45,7 +45,7 @@ static struct rule {
   {"\\+", PLUS},																								// plus
   {"==", TK_EQ},																								// equal
 	{"0x[0-9a-f]+", HEX},																					// hex
-	{"\\$(0|ra|gp|t[p0-6]|s[p0-11]|a[0-7])", REG},								// reg
+	{"\\$(0|ra|gp|t[p0-6]|s10|s11|s[p0-9]|a[0-7])", REG},								// reg
 	{"[0-9]+", INTEGER},																					// integer
 	{"-", MINUS},																									// minus
 	{"\\*", UNDET},																								// times and pointer dereference
@@ -259,7 +259,7 @@ static word_t is_overflow(word_t val1, word_t val2, int op) {
 				printf("An overflow occurs during pointer dereference: *%lu\n", val2);
 				assert(0);				
 			}
-			result = paddr_read(val2, 4);
+			result = paddr_read(val2, 8);
 			break;
 		default:
 			printf("Unknown operator!\n");
