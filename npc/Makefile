@@ -3,7 +3,7 @@ BUILD_DIR = ./build
 TOPNAME = GCD
 NXDC_FILES = constr/top.nxdc
 
-VSRC = $(shell find $(abspath ${BUILD_DIR}/vsrc) -name "*.v")
+VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
 SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
