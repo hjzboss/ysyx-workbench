@@ -1,4 +1,3 @@
-/*
 import circt.stage._
 
 object Elaborate extends App {
@@ -11,4 +10,3 @@ object Elaborate extends App {
     (new chisel3.stage.ChiselStage).execute(args, generator)
   }
 }
-*/
