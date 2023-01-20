@@ -23,5 +23,7 @@ class IFU extends Module with HasResetVector{
   npc := snpc
   pc := npc
 
+  io.pc       := pc
   io.fetch.pc := pc
+  io.fetch.inst := io.inst
 }
