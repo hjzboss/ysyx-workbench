@@ -1,6 +1,6 @@
 BUILD_DIR = ./build
 
-TOPNAME = GCD
+TOPNAME = JzCore
 NXDC_FILES = constr/top.nxdc
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
