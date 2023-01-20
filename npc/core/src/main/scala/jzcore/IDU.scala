@@ -29,7 +29,8 @@ class IDU extends Module with HasOpDecode with HasSrcDecode with AluCtrlDecode w
     ItypeJ  -> SignExt(inst(31, 20), 64),
     Stype   -> SignExt(Cat(inst(31, 25), inst(11, 7)), 64),
     Btype   -> SignExt(Cat(inst(31), inst(7), inst(30, 25), inst(11, 8), 0.U(1.W)), 64),
-    Utype   -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),//fixed
+    UtypeL  -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
+    UtypeU  -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
     Jtype   -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
@@ -40,11 +41,11 @@ class IDU extends Module with HasOpDecode with HasSrcDecode with AluCtrlDecode w
   val aluOp = Add
 
   // registerfile
-  rf.read.rs1     := rs1
-  rf.read.rs2     := rs2
-  rf.read.ren1    := Mux(op === UtypeL || op === UtypeU, false.B, true.B)
-  rf.read.ren2    := Mux(op === Rtype, true.B, false.B)
-  rf.write        := io.regWrite
+  rf.io.read.rs1     := rs1
+  rf.io.read.rs2     := rs2
+  rf.io.read.ren1    := Mux(op === UtypeL || op === UtypeU, false.B, true.B)
+  rf.io.read.ren2    := Mux(op === Rtype, true.B, false.B)
+  rf.io.write        := io.regWrite
 
   io.datasrc.pc       := io.fetch.pc
   io.datasrc.src1     := rf.src1
