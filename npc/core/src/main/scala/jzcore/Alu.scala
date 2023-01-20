@@ -12,9 +12,9 @@ class Alu extends Module with AluCtrlDecode {
     val aluOut  = Output(UInt(64.W))
   })
 
-  val opA = in.opA
-  val opB = in.opB
-  val aluOut = LookupTree(in.aluOp, List(
+  val opA = io.opA
+  val opB = io.opB
+  val aluOut = LookupTree(io.aluOp, List(
     Add       -> (opA + opB),
     Sub       -> (opA - opB),
     And       -> (opA & opB),
