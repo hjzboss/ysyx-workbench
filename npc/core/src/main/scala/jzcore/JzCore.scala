@@ -14,7 +14,7 @@ class JzCore extends Module {
   val exu = Module(new EXU)
 
   io.pc := ifu.io.pc
-  ifu.inst := io.inst
+  ifu.io.inst := io.inst
 
   ifu.io <> idu.io
   idu.io <> exu.io
