@@ -22,9 +22,9 @@ class EXU extends Module with HasSrcDecode {
   val opA = opAPre
   val opB = opBPre 
 
-  alu.opA           := opA
-  alu.opB           := opB
-  alu.aluOp         := io.aluCtrl.aluOp
+  alu.io.opA           := opA
+  alu.io.opB           := opB
+  alu.io.aluOp         := io.aluCtrl.aluOp
 
   io.regWrite.rd    := io.ctrl.rd
   io.regWrite.wen   := io.ctrl.regWen
