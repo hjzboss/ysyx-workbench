@@ -3,7 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 
-class EXU extends Module {
+class EXU extends Module with HasSrcDecode {
   val io = IO(new Bundle {
     val datasrc   = Flipped(new DataSrcIO)
     val aluCtrl   = Flipped(new AluIO)
