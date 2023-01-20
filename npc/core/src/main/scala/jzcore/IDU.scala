@@ -1,6 +1,7 @@
 package jzcore
 
 import chisel3._
+import chisel3.util._
 import utils._
 
 class IDU extends Module with HasOpDecode with HasSrcDecode with AluCtrlDecode with HasResetVector {
