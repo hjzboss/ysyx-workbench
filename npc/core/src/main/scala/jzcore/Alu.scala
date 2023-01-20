@@ -14,21 +14,23 @@ class Alu extends Module with AluCtrlDecode {
 
   val opA = io.opA
   val opB = io.opB
-  val aluOut = LookupTree(io.aluOp, List(
+  val aluOp = io.aluOp
+  val aluOutpre = LookupTree(io.aluOp, List(
     Add       -> (opA + opB),
     Sub       -> (opA - opB),
     And       -> (opA & opB),
     Or        -> (opA | opB),
     Xor       -> (opA ^ opB),
-    LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
+    //LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
     LessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
     MoveLeft  -> (opA << opB),
     LogicMovR -> (opA >> opB),
-    ArithMovR -> (opA.asSInt() >> opB),
+    //ArithMovR -> (opA.asSInt() >> opB),
     // todo
     Div       -> (opA / opB),
     Times     -> (opA * opB)
   ))
-
+  
+  val aluOut = Mux(aluOp === LessThan, Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)), Mux(aluOp === ArithMovR, opA.asSInt() >> opB, aluOutpre))
   io.aluOut := aluOut
 }
