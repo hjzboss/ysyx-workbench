@@ -15,6 +15,8 @@ class Alu extends Module with AluCtrlDecode {
   val opA = io.opA
   val opB = io.opB
   val aluOp = io.aluOp
+
+  // 需要将有符号数和无符号数分开，否则报错
   val aluOut = LookupTree(io.aluOp, List(
     Add       -> (opA + opB),
     Sub       -> (opA - opB),
@@ -23,8 +25,8 @@ class Alu extends Module with AluCtrlDecode {
     Xor       -> (opA ^ opB),
     //LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
     LessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
-    MoveLeft  -> (opA << opB),
-    LogicMovR -> (opA >> opB),
+    MoveLeft  -> (opA << opB(5, 0)),
+    LogicMovR -> (opA >> opB(5, 0)),
     //ArithMovR -> (opA.asSInt() >> opB),
     // todo
     Div       -> (opA / opB),
