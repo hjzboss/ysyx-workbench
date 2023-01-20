@@ -1,4 +1,4 @@
-package jzcore
+import jzcore._
 import circt.stage._
 
 object Elaborate extends App {
