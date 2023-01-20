@@ -21,7 +21,7 @@ class Alu extends Module with AluCtrlDecode {
     And       -> (opA & opB),
     Or        -> (opA | opB),
     Xor       -> (opA ^ opB),
-    LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
+    //LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
     LessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
     MoveLeft  -> (opA << opB),
     LogicMovR -> (opA >> opB),
