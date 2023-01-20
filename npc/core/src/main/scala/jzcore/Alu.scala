@@ -25,7 +25,7 @@ class Alu extends Module with AluCtrlDecode {
     LessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
     MoveLeft  -> (opA << opB),
     LogicMovR -> (opA >> opB),
-    ArithMovR -> (opA.asSInt() >> opB).asUInt(),
+    //ArithMovR -> (opA.asSInt() >> opB),
     // todo
     Div       -> (opA / opB),
     Times     -> (opA * opB)
