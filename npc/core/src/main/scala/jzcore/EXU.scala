@@ -30,5 +30,5 @@ class EXU extends Module with HasSrcDecode {
   io.regWrite.wen   := io.ctrl.regWen
 
   // todo, mem
-  io.regWrite.value := alu.aluOut
+  io.regWrite.value := alu.io.aluOut
 }
