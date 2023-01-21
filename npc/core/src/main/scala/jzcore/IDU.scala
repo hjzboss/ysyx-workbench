@@ -37,6 +37,7 @@ class IDU extends Module with HasOpDecode with HasSrcDecode with AluCtrlDecode w
   // 确定alu源操作数的类型
   val aluSrc1 = Mux(op === ItypeJ || op === Jtype || op === UtypeU, SrcPc, Mux(op === UtypeL, SrcNull, SrcReg))
   val aluSrc2 = Mux(op === Rtype || op === RtypeW || op === Btype, SrcReg, Mux(op === ItypeJ || op === Jtype, SrcPlus4, SrcImm))
+  
   //todo
   val aluOp = Add
 
