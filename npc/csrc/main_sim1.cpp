@@ -28,7 +28,7 @@ static uint32_t pmem_read(uint64_t pc) {
 }
 
 
-#define MAX_SIM_TIME 100 //max simulation time
+#define MAX_SIM_TIME 10 //max simulation time
 
 int main(int argc, char** argv, char** env) {
   // This is a more complicated example, please also see the simpler examples/hello_world_c.
@@ -61,8 +61,9 @@ int main(int argc, char** argv, char** env) {
 
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
+    //uint64_t pc = jzcore->pc;
 
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
+    jzcore->io_inst = pmem_read(jzcore->io_pc);
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 1000){
