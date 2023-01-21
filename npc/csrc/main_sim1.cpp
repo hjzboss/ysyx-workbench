@@ -28,7 +28,7 @@ static uint32_t pmem_read(uint64_t pc) {
 }
 
 
-#define MAX_SIM_TIME 100000 //max simulation time
+#define MAX_SIM_TIME 100 //max simulation time
 
 int main(int argc, char** argv, char** env) {
   // This is a more complicated example, please also see the simpler examples/hello_world_c.
