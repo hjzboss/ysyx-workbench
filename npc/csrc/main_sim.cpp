@@ -13,6 +13,12 @@ static void single_cycle() {
   top->clock = 1; top->eval();
 }
 
+static void reset(int n) {
+  top->reset = 1;
+  while (n -- > 0) single_cycle();
+  top->reset = 0;
+}
+
 static void init_cache() {
   instr_cache[0] = 0x00138393;
   instr_cache[4] = 0x00238393;
@@ -35,6 +41,9 @@ int main(int argc, char** argv, char** env) {
   tfp->open("./build/sim/obj_dir/wave.vcd");
   
   init_cache();
+
+  reset(10);
+
   while (contextp->time() < 3 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
     single_cycle();
