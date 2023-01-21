@@ -59,17 +59,15 @@ int main(int argc, char** argv, char** env) {
 
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 8){
       jzcore->reset = 0;
     }
-    if ((main_time % 10) == 1) { // 1 cycle is 10 ns
-      jzcore->io_inst = pmem_read(jzcore->io_pc);
+    if ((main_time % 10) == 0) { // 1 cycle is 10 ns
       jzcore->clock = 1;
     }
-    if ((main_time % 10) == 6) {
+    if ((main_time % 10) == 5) {
       jzcore->clock = 0;
     }
     //jzcore->io_inst = pmem_read(jzcore->io_pc);
