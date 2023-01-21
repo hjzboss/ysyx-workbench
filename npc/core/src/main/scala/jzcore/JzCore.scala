@@ -8,7 +8,12 @@ class JzCore extends Module {
     val pc    = Output(UInt(64.W))
     val inst  = Input(UInt(32.W))
 
-    val fuck  = new JzCoreBundle
+    val datasrc = new DataSrcIO
+    val aluCtrl = new AluIO
+    val ctrl    = new Ctrl
+
+    val regWrite = new RFWriteIO
+    val branch   = new BranchCtrl
   })
 
   val ifu = Module(new IFU)
@@ -17,15 +22,17 @@ class JzCore extends Module {
 
   io.pc           := ifu.io.pc
   ifu.io.inst     := io.inst
-  ifu.io.branch   := exu.io.out.branch
+  ifu.io.branch   := exu.io.branch
 
+  io.fetch        := ifu.io.fetch
+  io.regWrite     := exu.io.regWrite
   idu.io.fetch    := ifu.io.fetch
-  idu.io.regWrite := exu.io.out.regWrite
+  idu.io.regWrite := exu.io.regWrite
 
-  exu.io.datasrc  := idu.io.out.datasrc
-  exu.io.aluCtrl  := idu.io.out.aluCtrl
-  exu.io.ctrl     := idu.io.out.ctrl
-
-  io.fuck.iduout  := idu.io.out
-  io.fuck.exuout  := exu.io.out
+  io.datasrc      := idu.io.datasrc
+  io.aluCtrl      := idu.io.aluCtrl
+  io.ctrl         := idu.io.ctrl
+  exu.io.datasrc  := idu.io.datasrc
+  exu.io.aluCtrl  := idu.io.aluCtrl
+  exu.io.ctrl     := idu.io.ctrl
 }

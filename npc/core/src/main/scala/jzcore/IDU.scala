@@ -9,10 +9,9 @@ class IDU extends Module with HasOpDecode with HasSrcDecode with AluCtrlDecode w
     val fetch     = Flipped(new InstrFetch)
     val regWrite  = Flipped(new RFWriteIO)
 
-    val out       = new IDUOut
-    //val datasrc   = new DataSrcIO
-    //val aluCtrl   = new AluIO
-    //val ctrl      = new Ctrl
+    val datasrc   = new DataSrcIO
+    val aluCtrl   = new AluIO
+    val ctrl      = new Ctrl
   })
 
   val rf      = Module(new RF)
@@ -49,17 +48,17 @@ class IDU extends Module with HasOpDecode with HasSrcDecode with AluCtrlDecode w
   rf.io.read.ren2    := Mux(op === Rtype, true.B, false.B)
   rf.io.write        := io.regWrite
 
-  io.out.datasrc.pc       := io.fetch.pc
-  io.out.datasrc.src1     := rf.io.src1
-  io.out.datasrc.src2     := rf.io.src2
-  io.out.datasrc.imm      := imm
+  io.datasrc.pc       := io.fetch.pc
+  io.datasrc.src1     := rf.io.src1
+  io.datasrc.src2     := rf.io.src2
+  io.datasrc.imm      := imm
 
-  io.out.ctrl.rd          := rd
-  io.out.ctrl.br          := Mux(op === ItypeJ || op === Jtype || op === Btype, true.B, false.B)
-  io.out.ctrl.regWen      := Mux(op === Btype || op === Stype, false.B, true.B)
+  io.ctrl.rd          := rd
+  io.ctrl.br          := Mux(op === ItypeJ || op === Jtype || op === Btype, true.B, false.B)
+  io.ctrl.regWen      := Mux(op === Btype || op === Stype, false.B, true.B)
 
-  io.out.aluCtrl.aluSrc1  := aluSrc1
-  io.out.aluCtrl.aluSrc2  := aluSrc2
-  io.out.aluCtrl.aluOp    := aluOp
+  io.aluCtrl.aluSrc1  := aluSrc1
+  io.aluCtrl.aluSrc2  := aluSrc2
+  io.aluCtrl.aluOp    := aluOp
 
 }

@@ -43,19 +43,3 @@ class BranchCtrl extends Bundle {
   val brAddr    = Output(UInt(64.W))
   val brCtrl    = Output(Bool())
 }
-
-class IDUOut extends Bundle {
-  val datasrc   = new DataSrcIO
-  val aluCtrl   = new AluIO
-  val ctrl      = new Ctrl
-}
-
-class EXUOut extends Bundle {
-  val regWrite  = new RFWriteIO
-  val branch    = new BranchCtrl
-}
-
-class JzCoreBundle extends Bundle {
-  val iduout = new IDUOut
-  val exuout = new EXUOut
-}
