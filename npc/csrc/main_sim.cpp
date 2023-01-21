@@ -15,8 +15,8 @@ static void single_cycle() {
 
 static void init_cache() {
   instr_cache[0] = 0x00138393;
-  instr_cache[1] = 0x00238393;
-  instr_cache[2] = 0x00338393;
+  instr_cache[4] = 0x00238393;
+  instr_cache[8] = 0x00338393;
 }
 
 static uint32_t pmem_read(uint64_t pc) {
