@@ -7,6 +7,8 @@ class JzCore extends Module {
   val io = IO(new Bundle {
     val pc    = Output(UInt(64.W))
     val inst  = Input(UInt(32.W))
+    val datasrc  = new DataSrcIO
+    val regWrite = new RFWriteIO
   })
 
   val ifu = Module(new IFU)
@@ -14,6 +16,8 @@ class JzCore extends Module {
   val exu = Module(new EXU)
 
   io.pc           := ifu.io.pc
+  io.datasrc      := idu.io.datasrc
+  io.regWrite     := exu.io.regWrite
   ifu.io.inst     := io.inst
 
   idu.io.fetch    := ifu.io.fetch
