@@ -7,6 +7,8 @@ class JzCore extends Module {
   val io = IO(new Bundle {
     val pc    = Output(UInt(64.W))
     val inst  = Input(UInt(32.W))
+
+    val fuck  = new JzCoreBundle
   })
 
   val ifu = Module(new IFU)
