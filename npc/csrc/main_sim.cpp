@@ -36,7 +36,7 @@ int main(int argc, char** argv, char** env) {
     // 推进仿真时间
     tfp->dump(contextp->time());
     contextp->timeInc(1);
-    tim++;
+    time++;
   }
 
   delete top;
