@@ -66,7 +66,7 @@ int main(int argc, char** argv, char** env) {
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 10){
-        jzcore->reset = 1;
+        jzcore->reset = 0;
     }
     if ((main_time % 10) == 1) { // 1 cycle is 10 ns
         jzcore->clock = 1;
