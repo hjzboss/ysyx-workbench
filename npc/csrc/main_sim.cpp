@@ -1,8 +1,19 @@
-#include "VGCD.h" // .v文件的名字为name，则为Vname.h
+#include "VJzCore.h" // .v文件的名字为name，则为Vname.h
 #include "verilated.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "verilated_vcd_c.h" // 波形仿真
+
+uint32_t instr_cache[65535] = {}
+
+void init_cache() {
+  instr_cache[0] = 0x
+}
+
+uint32_t pmem_read(uint64_t pc) {
+
+}
+
 
 int main(int argc, char** argv, char** env) {
 	VerilatedContext* contextp = new VerilatedContext;
@@ -25,6 +36,7 @@ int main(int argc, char** argv, char** env) {
 		tfp->dump(contextp->time());
 		contextp->timeInc(1);
 	}
+
 	delete top;
 	tfp->close();
 	delete contextp;

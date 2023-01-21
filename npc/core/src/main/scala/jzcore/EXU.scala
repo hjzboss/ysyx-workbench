@@ -31,4 +31,6 @@ class EXU extends Module with HasSrcDecode {
 
   // todo, mem
   io.regWrite.value := alu.io.aluOut
+
+  println("alu_o=%d\n", alu.io.aluOut)
 }
