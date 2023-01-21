@@ -70,7 +70,7 @@ int main(int argc, char** argv, char** env) {
     if ((main_time % 10) == 5) {
       jzcore->clock = 0;
     }
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
+    jzcore->io_inst = pmem_read(jzcore->io_pc);
     // Evaluate model
     jzcore->eval();
     //jzcore->io_inst = pmem_read(jzcore->io_pc);
