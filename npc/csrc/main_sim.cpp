@@ -23,7 +23,6 @@ static uint32_t pmem_read(uint64_t pc) {
   return instr_cache[pc];
 }
 
-void 
 
 int main(int argc, char** argv, char** env) {
   VerilatedContext* contextp = new VerilatedContext;
