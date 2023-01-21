@@ -28,7 +28,7 @@ int main(int argc, char** argv, char** env) {
   tfp->open("./build/sim/obj_dir/wave.vcd");
   
   init_cache();
-  while (contextp->time() < 3 && !contextp->gotFinish()) {
+  while (contextp->time() < 30 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
     top->eval();
     //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
