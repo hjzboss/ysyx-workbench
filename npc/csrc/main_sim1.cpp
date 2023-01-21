@@ -42,7 +42,7 @@ int main(int argc, char** argv, char** env) {
   Verilated::debug(0);
 
   // Randomization reset policy
-  Verilated::randReset(2);
+  //Verilated::randReset(2);
 
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   VJzCore* jzcore = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
@@ -61,8 +61,8 @@ int main(int argc, char** argv, char** env) {
 
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-    if (!jzcore->reset)
-      jzcore->io_inst = pmem_read(jzcore->io_pc);
+    //if (!jzcore->reset)
+    jzcore->io_inst = pmem_read(jzcore->io_pc);
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 1000){
