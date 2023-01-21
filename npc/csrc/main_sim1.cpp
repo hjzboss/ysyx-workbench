@@ -62,7 +62,7 @@ int main(int argc, char** argv, char** env) {
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
     uint64_t pc = jzcore->io_pc;
-    printf("%lu\n", pc);
+    printf("%lx\n", pc);
 
     //jzcore->io_inst = pmem_read(jzcore->io_pc);
 
