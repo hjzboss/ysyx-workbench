@@ -24,15 +24,16 @@ class JzCore extends Module {
   ifu.io.inst     := io.inst
   ifu.io.branch   := exu.io.branch
 
-  io.fetch        := ifu.io.fetch
-  io.regWrite     := exu.io.regWrite
   idu.io.fetch    := ifu.io.fetch
   idu.io.regWrite := exu.io.regWrite
 
-  io.datasrc      := idu.io.datasrc
-  io.aluCtrl      := idu.io.aluCtrl
-  io.ctrl         := idu.io.ctrl
   exu.io.datasrc  := idu.io.datasrc
   exu.io.aluCtrl  := idu.io.aluCtrl
   exu.io.ctrl     := idu.io.ctrl
+
+  io.branch       := exu.io.branch
+  io.regWrite     := exu.io.regWrite
+  io.datasrc      := idu.io.datasrc
+  io.aluCtrl      := idu.io.aluCtrl
+  io.ctrl         := idu.io.ctrl
 }
