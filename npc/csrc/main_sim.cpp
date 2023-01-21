@@ -63,14 +63,14 @@ int main(int argc, char** argv, char** env) {
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 8){
-        jzcore->reset = 0;
+      jzcore->reset = 0;
     }
     if ((main_time % 10) == 1) { // 1 cycle is 10 ns
-      jzcore->io_inst = pmem_read(jzcore->io_pc);
-        jzcore->clock = 1;
+      jzcore->clock = 1;
     }
     if ((main_time % 10) == 6) {
-        jzcore->clock = 0;
+      jzcore->io_inst = pmem_read(jzcore->io_pc);
+      jzcore->clock = 0;
     }
 
     // Evaluate model
