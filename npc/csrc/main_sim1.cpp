@@ -50,7 +50,7 @@ int main(int argc, char** argv, char** env) {
   VerilatedVcdC* tfp = NULL;
   Verilated::traceEverOn(true);  // Verilator must compute traced signals
   tfp = new VerilatedVcdC;
-  jzcore->trace(tfp, 0);  // Trace 99 levels of hierarchy
+  jzcore->trace(tfp, 99);  // Trace 99 levels of hierarchy
   tfp->open("./build/sim/obj_dir/wave.vcd");  // Open the dump file
 
   // initial memory
@@ -62,7 +62,7 @@ int main(int argc, char** argv, char** env) {
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
 
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    //jzcore->io_inst = pmem_read(jzcore->io_pc);
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 1000){
