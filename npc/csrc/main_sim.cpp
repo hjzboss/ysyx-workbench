@@ -61,7 +61,7 @@ int main(int argc, char** argv, char** env) {
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
 
     // reset signal remains for 1000 ns(100 cycles)
-    if(main_time > 8){
+    if(main_time > 15){
       jzcore->reset = 0;
     }
     if ((main_time % 10) == 0) { // 1 cycle is 10 ns
