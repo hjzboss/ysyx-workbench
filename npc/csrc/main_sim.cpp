@@ -46,7 +46,7 @@ int main(int argc, char** argv, char** env) {
   
   init_cache();
 
-  reset(10);
+  reset(10, contextp, tfp);
 
   while (contextp->time() < 30 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
