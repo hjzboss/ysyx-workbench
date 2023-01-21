@@ -46,9 +46,9 @@ int main(int argc, char** argv, char** env) {
   
   init_cache();
 
-  
+  reset(10);
 
-  while (contextp->time() < 3 && !contextp->gotFinish()) {
+  while (contextp->time() < 30 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
     single_cycle();
     //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
