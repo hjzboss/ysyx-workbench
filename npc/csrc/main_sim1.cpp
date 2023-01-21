@@ -61,10 +61,8 @@ int main(int argc, char** argv, char** env) {
 
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-    uint64_t pc = jzcore->io_pc;
-    printf("%lx\n", pc);
-
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
+    if (!jzcore->reset)
+      jzcore->io_inst = pmem_read(jzcore->io_pc);
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 1000){
