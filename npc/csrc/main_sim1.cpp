@@ -47,12 +47,10 @@ int main(int argc, char** argv, char** env) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   VJzCore* jzcore = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
-  // If verilator was invoked with --trace argument,
-  // and if at run time passed the +trace argument, turn on tracing
   VerilatedVcdC* tfp = NULL;
   Verilated::traceEverOn(true);  // Verilator must compute traced signals
   tfp = new VerilatedVcdC;
-  jzcore->trace(tfp, 99);  // Trace 99 levels of hierarchy
+  jzcore->trace(tfp, 0);  // Trace 99 levels of hierarchy
   tfp->open("./build/sim/obj_dir/wave.vcd");  // Open the dump file
 
   // initial memory
