@@ -6,7 +6,7 @@ NXDC_FILES = constr/top.nxdc
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
-SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim1.cpp")
+SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
 
 VERILATOR = verilator
 VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
