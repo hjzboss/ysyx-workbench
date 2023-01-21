@@ -26,6 +26,6 @@ class JzCore extends Module {
   exu.io.aluCtrl  := idu.io.aluCtrl
   exu.io.ctrl     := idu.io.ctrl
 
-  io.fuck.iduout  := idu.out
-  io.fuck.exuout  := exu.out
+  io.fuck.iduout  := idu.io.out
+  io.fuck.exuout  := exu.io.out
 }
