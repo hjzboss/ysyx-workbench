@@ -17,6 +17,7 @@ class JzCore extends Module {
   //io.datasrc      := idu.io.datasrc
   //io.regWrite     := exu.io.regWrite
   ifu.io.inst     := io.inst
+  ifu.io.branch   := exu.io.branch
 
   idu.io.fetch    := ifu.io.fetch
   idu.io.regWrite := exu.io.regWrite
