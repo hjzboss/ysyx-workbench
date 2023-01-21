@@ -13,16 +13,6 @@ static void single_cycle() {
   top->clock = 1; top->eval();
 }
 
-static void reset(int n, VerilatedContext* contextp, VerilatedVcdC* tfp) {
-  top->reset = 1;
-  while (n -- > 0) {
-    tfp->dump(contextp->time());
-    contextp->timeInc(1);
-    single_cycle();
-  }
-  top->reset = 0;
-}
-
 static void init_cache() {
   instr_cache[0] = 0x00138393;
   instr_cache[4] = 0x00238393;
@@ -46,11 +36,10 @@ int main(int argc, char** argv, char** env) {
   
   init_cache();
 
-  reset(10, contextp, tfp);
 
   while (contextp->time() < 30 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
-    single_cycle();
+    //single_cycle();
     //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
     // 推进仿真时间
     tfp->dump(contextp->time());
