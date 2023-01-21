@@ -26,8 +26,9 @@ int main(int argc, char** argv, char** env) {
   contextp->traceEverOn(true);
   top->trace(tfp, 99);
   tfp->open("./build/sim/obj_dir/wave.vcd");
+  
+  init_cache();
   int time = 0;
-
   while (!contextp->gotFinish()) {
     if (time == 3) break;
     top->io_inst = pmem_read(top->io_pc);
