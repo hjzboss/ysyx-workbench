@@ -5,23 +5,28 @@ import top.Settings
 import chisel3.util._
 
 trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
+  val resetVector = Settings.getLong("TestVector")
 }
 
 class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
-    val pc    = Output(UInt(64.W))
-    val inst  = Input(UInt(32.W))
-
-    val fetch = new InstrFetch
+    val pc      = Output(UInt(64.W))
+    val inst    = Input(UInt(32.W))
+    val branch  = Flipped(new BranchCtrl)
+    val fetch   = new InstrFetch
   })
 
   // pc
   val pc = RegInit(resetVector.U(64.W))
   val npc = Wire(UInt(64.W))
+
   val snpc = pc + 4.U
-  npc := snpc
+  val dnpc = io.branch.brAddr
+
+  npc := Mux(io.branch.brCtrl, dnpc, snpc)
   pc := npc
 
+  io.pc       := pc
   io.fetch.pc := pc
+  io.fetch.inst := io.inst
 }

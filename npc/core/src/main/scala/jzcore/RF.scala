@@ -21,5 +21,5 @@ class RF extends Module {
   
   //write
   val current = registerFile(io.write.rd)
-  registerFile(io.write.rd) := Mux(io.write.wen, io.write.value, current)
+  registerFile(io.write.rd) := Mux(io.write.wen && io.write.rd =/= 0.U(5.W), io.write.value, current)
 }

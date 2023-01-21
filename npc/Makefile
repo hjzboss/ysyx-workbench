@@ -1,6 +1,6 @@
 BUILD_DIR = ./build
 
-TOPNAME = GCD
+TOPNAME = JzCore
 NXDC_FILES = constr/top.nxdc
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
@@ -9,7 +9,7 @@ FPGA_CSRC += $(SRC_AUTO_BIND)
 SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
 
 VERILATOR = verilator
-VERILATOR_SIMFLAG = --cc --exe --build -Wall --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
+VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
 VERILATOR_FPGAFLAG = -Wall --cc \
 										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
