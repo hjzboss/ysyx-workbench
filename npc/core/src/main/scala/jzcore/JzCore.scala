@@ -16,8 +16,6 @@ class JzCore extends Module {
   val exu = Module(new EXU)
 
   io.pc           := ifu.io.pc
-  //io.datasrc      := idu.io.datasrc
-  //io.regWrite     := exu.io.regWrite
   ifu.io.inst     := io.inst
   ifu.io.branch   := exu.io.branch
 
@@ -27,4 +25,7 @@ class JzCore extends Module {
   exu.io.datasrc  := idu.io.datasrc
   exu.io.aluCtrl  := idu.io.aluCtrl
   exu.io.ctrl     := idu.io.ctrl
+
+  io.fuck.iduout  := idu.out
+  io.fuck.exuout  := exu.out
 }

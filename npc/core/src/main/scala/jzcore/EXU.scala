@@ -8,8 +8,10 @@ class EXU extends Module with HasSrcDecode {
     val datasrc   = Flipped(new DataSrcIO)
     val aluCtrl   = Flipped(new AluIO)
     val ctrl      = Flipped(new Ctrl)
-    val regWrite  = new RFWriteIO
-    val branch    = new BranchCtrl
+
+    val out       = new EXUOut
+    //val regWrite  = new RFWriteIO
+    //val branch    = new BranchCtrl
   })
   
   val alu = Module(new Alu)
@@ -27,15 +29,15 @@ class EXU extends Module with HasSrcDecode {
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
 
-  io.regWrite.rd    := io.ctrl.rd
-  io.regWrite.wen   := io.ctrl.regWen
+  io.out.regWrite.rd    := io.ctrl.rd
+  io.out.regWrite.wen   := io.ctrl.regWen
 
   // todo, mem
-  io.regWrite.value := alu.io.aluOut
+  io.out.regWrite.value := alu.io.aluOut
   println("alu_o=%d", alu.io.aluOut)
 
   // todo: branch addr
   val brAddr = 0.U(64.W)
-  io.branch.brCtrl := alu.io.brMark && io.ctrl.br
-  io.branch.brAddr := brAddr
+  io.out.branch.brCtrl := alu.io.brMark && io.ctrl.br
+  io.out.branch.brAddr := brAddr
 }
