@@ -28,16 +28,13 @@ int main(int argc, char** argv, char** env) {
   tfp->open("./build/sim/obj_dir/wave.vcd");
   
   init_cache();
-  int time = 0;
   while (!contextp->gotFinish()) {
-    if (time == 3) break;
     top->io_inst = pmem_read(top->io_pc);
     top->eval();
     //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
     // 推进仿真时间
     tfp->dump(contextp->time());
     contextp->timeInc(1);
-    time++;
   }
 
   delete top;
