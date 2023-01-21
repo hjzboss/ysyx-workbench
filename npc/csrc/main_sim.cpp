@@ -71,7 +71,11 @@ int main(int argc, char** argv, char** env) {
     if ((main_time % 10) == 6) {
       jzcore->clock = 0;
     }
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    //jzcore->io_inst = pmem_read(jzcore->io_pc);
+    if (!jzcore->reset)
+      jzcore->io_inst = 0x00138393;
+    else
+      jzcore->io_inst = 0;
     // Evaluate model
     jzcore->eval();
 
