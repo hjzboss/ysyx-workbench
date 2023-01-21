@@ -66,12 +66,13 @@ int main(int argc, char** argv, char** env) {
       jzcore->reset = 0;
     }
     if ((main_time % 10) == 1) { // 1 cycle is 10 ns
+      jzcore->io_inst = pmem_read(jzcore->io_pc);
       jzcore->clock = 1;
     }
     if ((main_time % 10) == 6) {
       jzcore->clock = 0;
     }
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    //jzcore->io_inst = pmem_read(jzcore->io_pc);
     // Evaluate model
     jzcore->eval();
     //jzcore->io_inst = pmem_read(jzcore->io_pc);
