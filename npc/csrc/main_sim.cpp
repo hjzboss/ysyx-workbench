@@ -8,22 +8,18 @@ static uint32_t instr_cache[65535] = {};
 
 static VJzCore* top;
 
-vluint64_t main_time = 0;  //initial 仿真时间
-
-double sc_time_stamp()
-{
-  return main_time;
-}
-
 static void single_cycle() {
   top->clock = 0; top->eval();
   top->clock = 1; top->eval();
-  main_time++;
 }
 
-static void reset(int n) {
+static void reset(int n, VerilatedContext* contextp, VerilatedVcdC* tfp) {
   top->reset = 1;
-  while (n -- > 0) single_cycle();
+  while (n -- > 0) {
+    tfp->dump(contextp->time());
+    contextp->timeInc(1);
+    single_cycle();
+  }
   top->reset = 0;
 }
 
@@ -50,15 +46,15 @@ int main(int argc, char** argv, char** env) {
   
   init_cache();
 
-  reset(10);
+  
 
-  while (sc_time_stamp() < 3 && !contextp->gotFinish()) {
+  while (contextp->time() < 3 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
     single_cycle();
-
+    //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
     // 推进仿真时间
-    tfp->dump(main_time);
-    main_time++;
+    tfp->dump(contextp->time());
+    contextp->timeInc(1);
   }
 
   delete top;
