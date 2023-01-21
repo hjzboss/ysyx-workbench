@@ -20,7 +20,7 @@ uint32_t pmem_read(uint64_t pc) {
 int main(int argc, char** argv, char** env) {
   VerilatedContext* contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
-  Vtop* top = new VJzCore{contextp};
+  VJzCore* top = new VJzCore{contextp};
   // 生成波形
   VerilatedVcdC* tfp = new VerilatedVcdC;
   contextp->traceEverOn(true);
