@@ -30,7 +30,7 @@ int main(int argc, char** argv, char** env) {
 
   while (!contextp->gotFinish()) {
     if (time == 3) break;
-    top->inst = pmem_read(top->pc)
+    top->io_inst = pmem_read(top->io_pc)
     top->eval();
     //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
     // 推进仿真时间
