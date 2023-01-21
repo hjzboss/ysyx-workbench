@@ -23,6 +23,8 @@ static uint32_t pmem_read(uint64_t pc) {
   return instr_cache[pc];
 }
 
+void 
+
 int main(int argc, char** argv, char** env) {
   VerilatedContext* contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
@@ -37,9 +39,10 @@ int main(int argc, char** argv, char** env) {
   while (contextp->time() < 3 && !contextp->gotFinish()) {
     top->io_inst = pmem_read(top->io_pc);
     single_cycle();
-
     //printf("en = %o, sw = %o\n", top->en, top->sw, top->valid, top->led, top->seg0); 
-
+    // 推进仿真时间
+    tfp->dump(contextp->time());
+    contextp->timeInc(1);
   }
 
   delete top;
