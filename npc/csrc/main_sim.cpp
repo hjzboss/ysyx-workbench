@@ -6,6 +6,9 @@
 // If "verilator --trace" is used, include the tracing class
 #include <verilated_vcd_c.h>
 
+// dpi-c
+#include "svdpi.h"
+
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
 // Called by $time in Verilog
@@ -14,6 +17,8 @@ double sc_time_stamp () {
 }
 
 static uint32_t instr_cache[65535] = {};
+
+static bool is_running;
 
 static void init_cache() {
   instr_cache[0] = 0x00138393;
@@ -25,8 +30,13 @@ static uint32_t pmem_read(uint64_t pc) {
   return instr_cache[pc];
 }
 
-
 #define MAX_SIM_TIME 100 //max simulation time
+
+// for ebreak instruction
+extern "C" void c_stop() {
+  printf("c: call stop\n");
+  is_running = false;
+}
 
 int main(int argc, char** argv, char** env) {
   // This is a more complicated example, please also see the simpler examples/hello_world_c.
@@ -57,8 +67,11 @@ int main(int argc, char** argv, char** env) {
   // Set some inputs
   jzcore->reset = 1;
 
+  // state is running
+  is_running = true;
+
   // Simulate until $finish
-  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
+  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && is_running) {
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 15){

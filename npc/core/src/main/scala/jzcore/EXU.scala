@@ -39,4 +39,6 @@ class EXU extends Module with HasSrcDecode {
   val brAddr = 0.U(64.W)
   io.branch.brCtrl := alu.io.brMark && io.ctrl.br
   io.branch.brAddr := brAddr
+
+  val stop = Module(new stop)
 }
