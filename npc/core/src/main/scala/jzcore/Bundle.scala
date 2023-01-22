@@ -5,8 +5,6 @@ import chisel3._
 class RFReadIO extends Bundle {
   val rs1   = Output(UInt(5.W))
   val rs2   = Output(UInt(5.W))
-  val ren1  = Output(Bool())
-  val ren2  = Output(Bool())
 }
 
 class RFWriteIO extends Bundle {
