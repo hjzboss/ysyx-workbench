@@ -35,7 +35,7 @@ static uint32_t pmem_read(uint64_t pc) {
 // for ebreak instruction
 extern "C" void c_stop() {
   printf("c: call stop\n");
-  is_running = false;
+  //is_running = false;
 }
 
 int main(int argc, char** argv, char** env) {
