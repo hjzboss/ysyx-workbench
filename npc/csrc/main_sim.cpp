@@ -24,6 +24,7 @@ static void init_cache() {
   instr_cache[0] = 0x00138393;
   instr_cache[4] = 0x00238393;
   instr_cache[8] = 0x00338393;
+  instr_cache[12] = 0x00100073
 }
 
 static uint32_t pmem_read(uint64_t pc) {
