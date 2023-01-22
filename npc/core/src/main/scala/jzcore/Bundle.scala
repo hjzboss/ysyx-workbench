@@ -39,7 +39,6 @@ class InstrFetch extends Bundle {
   val inst      = Output(UInt(32.W))
 }
 
-class BranchCtrl extends Bundle {
+class RedirectIO extends Bundle {
   val brAddr    = Output(UInt(64.W))
-  val brCtrl    = Output(Bool())
 }

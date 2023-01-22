@@ -23,19 +23,19 @@ class Alu extends Module with AluCtrlDecode {
 
   // 需要将有符号数和无符号数分开，否则报错
   val aluOut = LookupTree(io.aluOp, List(
-    Add       -> (opA + opB),
-    Sub       -> (opA - opB),
-    And       -> (opA & opB),
-    Or        -> (opA | opB),
-    Xor       -> (opA ^ opB),
+    add       -> (opA + opB),
+    sub       -> (opA - opB),
+    and       -> (opA & opB),
+    or        -> (opA | opB),
+    xor       -> (opA ^ opB),
     //LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
-    LessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
-    MoveLeft  -> (opA << opB(5, 0)),
-    LogicMovR -> (opA >> opB(5, 0)),
+    lessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
+    moveLeft  -> (opA << opB(5, 0)),
+    logicMovR -> (opA >> opB(5, 0)),
     //ArithMovR -> (opA.asSInt() >> opB),
     // todo
-    Div       -> (opA / opB),
-    Times     -> (opA * opB)
+    div       -> (opA / opB),
+    times     -> (opA * opB),
   ))
 
   io.aluOut := aluOut

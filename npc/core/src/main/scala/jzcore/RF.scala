@@ -16,8 +16,8 @@ class RF extends Module {
   // read
   val src1_pre = registerFile(io.read.rs1)
   val src2_pre = registerFile(io.read.rs2)
-  io.src1 := Mux(io.read.ren1, src1_pre, 0.U(64.W))
-  io.src2 := Mux(io.read.ren2, src2_pre, 0.U(64.W))
+  io.src1 := src1_pre
+  io.src2 := src2_pre
   
   //write
   val current = registerFile(io.write.rd)
