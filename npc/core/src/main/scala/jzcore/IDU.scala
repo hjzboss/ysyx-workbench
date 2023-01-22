@@ -56,5 +56,5 @@ class IDU extends Module with HasInstrType {
 
   // ebreak
   val stop = Module(new stop)
-  stop.io.valid = Mux(instrtype === InstrD, true.B, false.B)
+  stop.io.valid := Mux(instrtype === InstrD, true.B, false.B)
 }
