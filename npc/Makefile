@@ -3,7 +3,7 @@ BUILD_DIR = ./build
 TOPNAME = JzCore
 NXDC_FILES = constr/top.nxdc
 
-VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
+VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v *.sv")
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
 SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
