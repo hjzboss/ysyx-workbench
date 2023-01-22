@@ -38,4 +38,8 @@ class EXU extends Module {
   val brValid = 0.U(64.W)
   io.redirect.brAddr   := 0.U(64.W)
   io.redirect.valid    := brValid
+
+  // ebreak
+  val stop = Module(new stop)
+  stop.io.valid := Mux(io.ctrl.break, true.B, false.B)
 }
