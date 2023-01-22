@@ -36,6 +36,6 @@ class EXU extends Module {
 
   // todo: branch addr
   val brValid = 0.U(64.W)
-  io.redirect.brAddr  := 0.U(64.W)
-  io.redirect.valid   := brValid
+  io.redirect.bits.brAddr   := 0.U(64.W)
+  io.redirect.valid         := brValid
 }
