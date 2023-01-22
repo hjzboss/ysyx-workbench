@@ -10,7 +10,7 @@ class EXU extends Module {
     val ctrl      = Flipped(new Ctrl)
     
     val regWrite  = new RFWriteIO
-    val redirect  = Decoupled(new RedirectIO)
+    val redirect  = new RedirectIO
   })
   
   val alu = Module(new Alu)
@@ -36,6 +36,6 @@ class EXU extends Module {
 
   // todo: branch addr
   val brValid = 0.U(64.W)
-  io.redirect.bits.brAddr   := 0.U(64.W)
-  io.redirect.valid         := brValid
+  io.redirect.brAddr   := 0.U(64.W)
+  io.redirect.valid    := brValid
 }

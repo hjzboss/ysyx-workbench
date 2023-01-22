@@ -41,4 +41,5 @@ class InstrFetch extends Bundle {
 
 class RedirectIO extends Bundle {
   val brAddr    = Output(UInt(64.W))
+  val valid     = Output(Bool())
 }
