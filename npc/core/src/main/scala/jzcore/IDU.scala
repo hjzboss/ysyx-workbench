@@ -22,8 +22,8 @@ class IDU extends Module with HasInstrType {
   val rd        = inst(11, 7)
 
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
-  val instrtype = ctrlList.head
-  val aluOp     = ctrlList.tail
+  val instrtype = ctrlList(0)
+  val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
   val imm = LookupTree(instrtype, List(
