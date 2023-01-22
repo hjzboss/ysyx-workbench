@@ -12,7 +12,7 @@ class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
     val pc        = Output(UInt(64.W))
     val inst      = Input(UInt(32.W))
-    val redirect  = Flipped(new RedirectIO)
+    val redirect  = Flipped(Decoupled(new RedirectIO))
     val fetch     = new InstrFetch
   })
 

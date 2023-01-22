@@ -13,7 +13,7 @@ class JzCore extends Module {
     val ctrl    = new Ctrl
 
     val regWrite = new RFWriteIO
-    val redirect = new Decoupled(RedirectIO)
+    val redirect = Decoupled(new RedirectIO)
   })
 
   val ifu = Module(new IFU)
