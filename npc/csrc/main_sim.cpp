@@ -72,7 +72,7 @@ int main(int argc, char** argv, char** env) {
   is_running = true;
 
   // Simulate until $finish
-  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && is_running) {
+  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
 
     // reset signal remains for 1000 ns(100 cycles)
     if(main_time > 15){
@@ -83,6 +83,7 @@ int main(int argc, char** argv, char** env) {
     }
     if ((main_time % 10) == 5) {
       jzcore->clock = 0;
+      if (!is_running) break;
     }
     jzcore->io_inst = pmem_read(jzcore->io_pc);
     // Evaluate model
