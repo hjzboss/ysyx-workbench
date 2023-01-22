@@ -3,7 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 
-class EXU extends Module with HasSrcDecode {
+class EXU extends Module {
   val io = IO(new Bundle {
     val datasrc   = Flipped(new DataSrcIO)
     val aluCtrl   = Flipped(new AluIO)
@@ -36,6 +36,6 @@ class EXU extends Module with HasSrcDecode {
 
   // todo: branch addr
   val brValid = 0.U(64.W)
-  io.redirect.brCtrl  := alu.io.brMark && io.ctrl.br
+  io.redirect.brAddr  := 0.U(64.W)
   io.redirect.valid   := brValid
 }
