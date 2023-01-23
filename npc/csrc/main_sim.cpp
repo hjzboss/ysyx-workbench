@@ -88,7 +88,6 @@ int main(int argc, char** argv, char** env) {
     jzcore->io_inst = pmem_read(jzcore->io_pc);
     // Evaluate model
     jzcore->eval();
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
     tfp->dump(main_time);//dump wave
     main_time++;  // Time passes...
   }
