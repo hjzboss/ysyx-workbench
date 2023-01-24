@@ -1,0 +1,25 @@
+BUILD_DIR = ./build
+
+BLACKBOX_DIR = ./core/src/main/verilog
+
+TOPNAME = JzCore
+
+VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
+VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
+
+SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
+
+VERILATOR = verilator
+VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
+
+SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
+WAVE = wave.vcd
+
+sim: $(SIM_CSRC) $(VSRC)
+	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
+	@rm -rf $(SIM_OBJ_DIR)
+	@echo "build"
+	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
+	$(SIM_OBJ_DIR)/V$(TOPNAME)
+	@echo "wave"
+	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
