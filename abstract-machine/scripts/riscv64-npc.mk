@@ -1,5 +1,5 @@
 include $(AM_HOME)/scripts/isa/riscv64.mk
-include $(NPC_HOME)/Makefile
+include $(NPC_HOME)/scripts/sim-npc.mk
 
 AM_SRCS := riscv/npc/start.S \
            riscv/npc/trm.c \

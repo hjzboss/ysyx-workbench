@@ -1,13 +1,13 @@
-BUILD_DIR = ./build
+BUILD_DIR = ${NPC_HOME}/build
 
-BLACKBOX_DIR = ./core/src/main/verilog
+BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
 TOPNAME = JzCore
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
-SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
+SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*_sim.cpp")
 
 VERILATOR = verilator
 VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
@@ -22,4 +22,3 @@ sim: $(SIM_CSRC) $(VSRC)
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V$(TOPNAME)
 	@echo "wave"
-	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
