@@ -13,7 +13,7 @@ class JzCore extends Module {
     val ctrl    = new Ctrl
 
     val regWrite = new RFWriteIO
-    val branch   = new BranchCtrl
+    val redirect = new RedirectIO
   })
 
   val ifu = Module(new IFU)
@@ -22,7 +22,7 @@ class JzCore extends Module {
 
   io.pc           := ifu.io.pc
   ifu.io.inst     := io.inst
-  ifu.io.branch   := exu.io.branch
+  ifu.io.redirect := exu.io.redirect
 
   idu.io.fetch    := ifu.io.fetch
   idu.io.regWrite := exu.io.regWrite
@@ -31,7 +31,7 @@ class JzCore extends Module {
   exu.io.aluCtrl  := idu.io.aluCtrl
   exu.io.ctrl     := idu.io.ctrl
 
-  io.branch       := exu.io.branch
+  io.redirect     := exu.io.redirect
   io.regWrite     := exu.io.regWrite
   io.datasrc      := idu.io.datasrc
   io.aluCtrl      := idu.io.aluCtrl

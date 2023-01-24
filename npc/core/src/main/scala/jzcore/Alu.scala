@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-class Alu extends Module with AluCtrlDecode {
+class Alu extends Module {
   val io = IO(new Bundle {
     val opA     = Input(UInt(64.W))
     val opB     = Input(UInt(64.W))
@@ -23,19 +23,19 @@ class Alu extends Module with AluCtrlDecode {
 
   // 需要将有符号数和无符号数分开，否则报错
   val aluOut = LookupTree(io.aluOp, List(
-    Add       -> (opA + opB),
-    Sub       -> (opA - opB),
-    And       -> (opA & opB),
-    Or        -> (opA | opB),
-    Xor       -> (opA ^ opB),
+    AluOp.add       -> (opA + opB),
+    AluOp.sub       -> (opA - opB),
+    AluOp.and       -> (opA & opB),
+    AluOp.or        -> (opA | opB),
+    AluOp.xor       -> (opA ^ opB),
     //LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
-    LessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
-    MoveLeft  -> (opA << opB(5, 0)),
-    LogicMovR -> (opA >> opB(5, 0)),
+    AluOp.lessThanU -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
+    AluOp.moveLeft  -> (opA << opB(5, 0)),
+    AluOp.logicMovR -> (opA >> opB(5, 0)),
     //ArithMovR -> (opA.asSInt() >> opB),
     // todo
-    Div       -> (opA / opB),
-    Times     -> (opA * opB)
+    AluOp.div       -> (opA / opB),
+    AluOp.times     -> (opA * opB),
   ))
 
   io.aluOut := aluOut

@@ -10,23 +10,23 @@ trait HasResetVector {
 
 class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
-    val pc      = Output(UInt(64.W))
-    val inst    = Input(UInt(32.W))
-    val branch  = Flipped(new BranchCtrl)
-    val fetch   = new InstrFetch
+    val pc        = Output(UInt(64.W))
+    val inst      = Input(UInt(32.W))
+    val redirect  = Flipped(new RedirectIO)
+    val fetch     = new InstrFetch
   })
 
   // pc
-  val pc = RegInit(resetVector.U(64.W))
+  val pc  = RegInit(resetVector.U(64.W))
   val npc = Wire(UInt(64.W))
 
   val snpc = pc + 4.U
-  val dnpc = io.branch.brAddr
+  val dnpc = io.redirect.brAddr
 
-  npc := Mux(io.branch.brCtrl, dnpc, snpc)
-  pc := npc
+  npc := Mux(io.redirect.valid, dnpc, snpc)
+  pc  := npc
 
-  io.pc       := pc
-  io.fetch.pc := pc
+  io.pc         := pc
+  io.fetch.pc   := pc
   io.fetch.inst := io.inst
 }

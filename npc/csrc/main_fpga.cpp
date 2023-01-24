@@ -1,4 +1,4 @@
-#include "VGCD.h" // .v文件的名字为name，则为Vname.h
+#include "VJzCore.h" // .v文件的名字为name，则为Vname.h
 #include <stdio.h>
 #include <stdlib.h>
 #include <nvboard.h> // nvboard

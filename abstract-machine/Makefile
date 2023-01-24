@@ -88,7 +88,8 @@ CFLAGS   += -O2 -MMD -Wall -Werror $(INCFLAGS) \
 CXXFLAGS +=  $(CFLAGS) -ffreestanding -fno-rtti -fno-exceptions
 ASFLAGS  += -MMD $(INCFLAGS)
 LDFLAGS  += -z noexecstack
-
+### batch mode
+NEMUFLAGS += -b
 ## 4. Arch-Specific Configurations
 
 ### Paste in arch-specific configurations (e.g., from `scripts/x86_64-qemu.mk`)

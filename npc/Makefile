@@ -1,11 +1,16 @@
 BUILD_DIR = ./build
 
+BLACKBOX_DIR = ./core/src/main/verilog
+
 TOPNAME = JzCore
 NXDC_FILES = constr/top.nxdc
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
+VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
+
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
+
 SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
 
 VERILATOR = verilator

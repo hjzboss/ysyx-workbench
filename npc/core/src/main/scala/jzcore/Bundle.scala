@@ -5,8 +5,6 @@ import chisel3._
 class RFReadIO extends Bundle {
   val rs1   = Output(UInt(5.W))
   val rs2   = Output(UInt(5.W))
-  val ren1  = Output(Bool())
-  val ren2  = Output(Bool())
 }
 
 class RFWriteIO extends Bundle {
@@ -32,6 +30,7 @@ class Ctrl extends Bundle {
   val br        = Output(Bool())
   val rd        = Output(UInt(5.W))
   val regWen    = Output(Bool())
+  val break     = Output(Bool())
 }
 
 class InstrFetch extends Bundle {
@@ -39,7 +38,7 @@ class InstrFetch extends Bundle {
   val inst      = Output(UInt(32.W))
 }
 
-class BranchCtrl extends Bundle {
+class RedirectIO extends Bundle {
   val brAddr    = Output(UInt(64.W))
-  val brCtrl    = Output(Bool())
+  val valid     = Output(Bool())
 }
