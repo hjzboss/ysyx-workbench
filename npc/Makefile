@@ -55,15 +55,6 @@ clean:
 
 .PHONY: test verilog help compile bsp reformat checkformat clean
 
-sim: $(SIM_CSRC) $(VSRC)
-	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@rm -rf $(SIM_OBJ_DIR)
-	@echo "build"
-	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME)
-	@echo "wave"
-	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
-
 fpga: $(BIN)
 	@$^
 
