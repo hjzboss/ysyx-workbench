@@ -11,12 +11,14 @@ char* my_itoa(int value)
 	static char string[16];
 	char* p = string;
 
+/*
 	// negative number to positive number
 	if(value >> 31)
 	{
 		value = ((~value) + 1);
 		*p++ = '-';
 	}
+  */
 
 	// integer to string
 	do
