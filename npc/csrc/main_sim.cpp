@@ -45,10 +45,12 @@ static uint32_t pmem_read(uint64_t pc) {
 
 void one_cycle(VJzCore* dut, VerilatedVcdC* tfp) {
   dut->clock = 1;
+  jzcore->io_inst = pmem_read(jzcore->io_pc);
   dut->eval();
   tfp->dump(main_time);
   main_time++;
   dut->clock = 0;
+  jzcore->io_inst = pmem_read(jzcore->io_pc);
   dut->eval();
   tfp->dump(main_time);
   main_time++;
@@ -120,7 +122,7 @@ int main(int argc, char** argv, char** env) {
       jzcore->reset = 0;
     }
     one_cycle(jzcore, tfp);
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    //jzcore->io_inst = pmem_read(jzcore->io_pc);
     if (npc_state == NPC_END) break;
     /*
     if ((main_time & 0x01) == 0) { // 1 cycle is 10 ns
