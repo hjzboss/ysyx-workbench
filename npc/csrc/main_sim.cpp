@@ -9,6 +9,10 @@
 // dpi-c
 #include "svdpi.h"
 
+#include <stdio.h>
+
+#include <assert.h>
+
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
 // Called by $time in Verilog
@@ -16,22 +20,28 @@ double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
 }
 
-static uint32_t instr_cache[65535] = {};
+static uint8_t i_cache[65535] = {};
 
 static bool is_running;
 
-static void init_cache() {
-  instr_cache[0] = 0x00138393;
-  instr_cache[4] = 0x00238393;
-  instr_cache[8] = 0x00338393;
-  instr_cache[12] = 0x00100073;
+static void init_cache(char *dir) {
+  FILE *fp = fopen(dir, "rb");
+
+  fseek(fp, 0, SEEK_END);
+  long size = ftell(fp);
+
+  fseek(fp, 0, SEEK_SET);
+  int ret = fread(i_cache, size, 1, fp);
+  assert(ret == 1);
+
+  fclose(fp);
 }
 
 static uint32_t pmem_read(uint64_t pc) {
-  return instr_cache[pc];
+  return *(uint32_t *)(i_cache + pc);
 }
 
-#define MAX_SIM_TIME 100 //max simulation time
+#define MAX_SIM_TIME 1000 //max simulation time
 
 // for ebreak instruction
 extern "C" void c_stop() {
@@ -60,10 +70,10 @@ int main(int argc, char** argv, char** env) {
   Verilated::traceEverOn(true);  // Verilator must compute traced signals
   tfp = new VerilatedVcdC;
   jzcore->trace(tfp, 99);  // Trace 99 levels of hierarchy
-  tfp->open("./build/sim/obj_dir/wave.vcd");  // Open the dump file
+  tfp->open("/home/hjz/ysyx-workbench/npc/build/sim/obj_dir/wave.vcd");  // Open the dump file
 
   // initial memory
-  init_cache();
+  init_cache(argv[1]);
 
   // Set some inputs
   jzcore->reset = 1;

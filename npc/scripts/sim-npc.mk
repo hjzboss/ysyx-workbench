@@ -15,11 +15,13 @@ VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-modul
 SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 WAVE = wave.vcd
 
+IMAGE_OBJ ?= 
+
 sim: $(SIM_CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME)
+	$(SIM_OBJ_DIR)/V$(TOPNAME) $(IMAGE_OBJ)
 	@echo "wave"
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)

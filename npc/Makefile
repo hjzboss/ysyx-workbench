@@ -12,7 +12,6 @@ SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 
 FPGA_OBJ_DIR = $(BUILD_DIR)/fpga/obj_dir
 BIN = $(FPGA_OBJ_DIR)/$(TOPNAME)
-WAVE = wave.vcd
 
 #传递给preproject连接器的信息，添加SDL2库信息
 LDFLAGS += -lSDL2 -lSDL2_image
