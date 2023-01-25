@@ -101,38 +101,18 @@ int main(int argc, char** argv, char** env) {
 
   // state is running
   npc_state = NPC_RUNNING;
-
-  // Simulate until $finish
-  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-
-    if(main_time > 5){
-      jzcore->reset = 0;
-    }
-    if ((main_time & 0x01) == 0) {
-      if (npc_state == NPC_END) break;
-      jzcore->clock = 1;
-    }
-    if ((main_time & 0x01) == 1) {
-      jzcore->clock = 0;
-    }
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
-    // Evaluate model
-    jzcore->eval();
-    tfp->dump(main_time); // dump wave
-    main_time++;  // Time passes...
-  }
   
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
 
-    if(main_time > 15){
+    if(main_time > 3){
       jzcore->reset = 0;
     }
-    if ((main_time % 10) == 0) { // 1 cycle is 10 ns
+    if ((main_time & 0x01) == 0) { // 1 cycle is 10 ns
       if (npc_state == NPC_END) break;
       jzcore->clock = 1;
     }
-    if ((main_time % 10) == 5) {
+    if ((main_time & 0x01) == 1) {
       jzcore->clock = 0;
     }
     jzcore->io_inst = pmem_read(jzcore->io_pc);
