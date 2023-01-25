@@ -52,7 +52,7 @@ void one_cycle(VJzCore* dut, VerilatedVcdC* tfp) {
   main_time++;
 
   if (main_time == 3) dut->reset = 0;
-  dut->clock = 0
+  dut->clock = 0;
   dut->io_inst = pmem_read(dut->io_pc);
   dut->eval();
   tfp->dump(main_time);
