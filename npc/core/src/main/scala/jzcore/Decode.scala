@@ -19,7 +19,7 @@ object AluOp {
   def and       = "b0010".U
   def or        = "b0011".U
   def xor       = "b0100".U
-  def lst       = "b0101".U
+  def slt       = "b0101".U
   def lstu      = "b0110".U
   def sll       = "b0111".U
   def srl       = "b1000".U
