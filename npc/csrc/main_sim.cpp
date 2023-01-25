@@ -25,7 +25,13 @@ static uint8_t i_cache[65535] = {};
 
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
-static int npc_state;
+int npc_state;
+
+void cpu_exec(size_t num) {
+  for (int i = 0; i < num; i++) {
+    one_cycle();
+  }
+}
 
 static void init_cache(char *dir) {
   FILE *fp = fopen(dir, "rb");
@@ -52,33 +58,14 @@ void one_cycle(VJzCore* dut, VerilatedVcdC* tfp) {
   main_time++;
 
   if (main_time == 3) dut->reset = 0;
-  dut->clock = 0;
+  dut->clock = 0
   dut->io_inst = pmem_read(dut->io_pc);
   dut->eval();
   tfp->dump(main_time);
-  main_time++;
+  main_time++;    
 }
 
-/*
-void exec_single(VJzCore* dut, VerilatedVcdC* tfp) {
-  bool flag = true;
-  // Simulate until $finish
-  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && flag) {
-    if ((main_time % 10) == 0) { // 1 cycle is 10 ns
-      dut->clock = 1;
-    }
-    if ((main_time % 10) == 5) {
-      dut->clock = 0;
-      flag = 0;
-    }
-    //dut->io_inst = pmem_read(dut->io_pc);
-    // Evaluate model
-    dut->eval();
-    tfp->dump(main_time); // dump wave
-    main_time++;  // Time passes...
-  }
-}
-*/
+
 #define MAX_SIM_TIME 1000 //max simulation time
 
 // for ebreak instruction
@@ -118,7 +105,8 @@ int main(int argc, char** argv, char** env) {
   // state is running
   npc_state = NPC_RUNNING;
   
-  
+  int cmd;
+  int n;
 
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && (npc_state == NPC_RUNNING)) {
