@@ -41,7 +41,7 @@ static uint32_t pmem_read(uint64_t pc) {
   return *(uint32_t *)(i_cache + pc);
 }
 
-#define MAX_SIM_TIME 1000 //max simulation time
+#define MAX_SIM_TIME 100000 //max simulation time
 
 // for ebreak instruction
 extern "C" void c_stop() {
@@ -88,16 +88,16 @@ int main(int argc, char** argv, char** env) {
       jzcore->reset = 0;
     }
     if ((main_time % 10) == 0) { // 1 cycle is 10 ns
+      if (!is_running) break;
       jzcore->clock = 1;
     }
     if ((main_time % 10) == 5) {
       jzcore->clock = 0;
-      if (!is_running) break;
     }
     jzcore->io_inst = pmem_read(jzcore->io_pc);
     // Evaluate model
     jzcore->eval();
-    tfp->dump(main_time);//dump wave
+    tfp->dump(main_time); // dump wave
     main_time++;  // Time passes...
   }
 
