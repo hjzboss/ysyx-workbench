@@ -19,15 +19,17 @@ object AluOp {
   def and       = "b0010".U
   def or        = "b0011".U
   def xor       = "b0100".U
-  def lessThan  = "b0101".U
-  def lessThanU = "b0110".U
-  def moveLeft  = "b0111".U
-  def logicMovR = "b1000".U
-  def arithMovR = "b1001".U
+  def lst       = "b0101".U
+  def lstu      = "b0110".U
+  def sll       = "b0111".U
+  def srl       = "b1000".U
+  def sra       = "b1001".U
   // todo
   def div       = "b1010".U
   def times     = "b1011".U
   def nop       = "b1100".U
+  def jump      = "b1101".U
+  def notEq     = "b1110".U
 
   def apply() = UInt(4.W)
 }

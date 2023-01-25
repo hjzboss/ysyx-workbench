@@ -31,6 +31,7 @@ class Ctrl extends Bundle {
   val rd        = Output(UInt(5.W))
   val regWen    = Output(Bool())
   val break     = Output(Bool())
+  val isJalr    = Output(Bool())
 }
 
 class InstrFetch extends Bundle {
