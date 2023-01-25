@@ -43,6 +43,17 @@ static uint32_t pmem_read(uint64_t pc) {
   return *(uint32_t *)(i_cache + pc);
 }
 
+void one_cycle(VJzCore* dut, VerilatedVcdC* tfp) {
+  dut->clock = 1;
+  dut->eval();
+  tfp->dump(main_time);
+  main_time++;
+  dut->clock = 0;
+  dut->eval();
+  tfp->dump(main_time);
+  main_time++;
+}
+
 /*
 void exec_single(VJzCore* dut, VerilatedVcdC* tfp) {
   bool flag = true;
@@ -108,6 +119,9 @@ int main(int argc, char** argv, char** env) {
     if(main_time > 2){
       jzcore->reset = 0;
     }
+    one_cycle(jzcore, tfp);
+    if (npc_state == NPC_END) break;
+    /*
     if ((main_time & 0x01) == 0) { // 1 cycle is 10 ns
       if (npc_state == NPC_END) break;
       jzcore->clock = 1;
@@ -120,6 +134,7 @@ int main(int argc, char** argv, char** env) {
     jzcore->eval();
     tfp->dump(main_time); // dump wave
     main_time++;  // Time passes...
+    */
   }
 
   // Final model cleanup
