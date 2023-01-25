@@ -7,13 +7,6 @@ class JzCore extends Module {
   val io = IO(new Bundle {
     val pc    = Output(UInt(64.W))
     val inst  = Input(UInt(32.W))
-
-    //val datasrc = new DataSrcIO
-    //val aluCtrl = new AluIO
-    //val ctrl    = new Ctrl
-
-    //val regWrite = new RFWriteIO
-    //val redirect = new RedirectIO
   })
 
   val ifu = Module(new IFU)
@@ -31,9 +24,4 @@ class JzCore extends Module {
   exu.io.ctrl     := idu.io.ctrl
 
   io.pc           := ifu.io.pc
-  //io.redirect     := exu.io.redirect
-  //io.regWrite     := exu.io.regWrite
-  //io.datasrc      := idu.io.datasrc
-  //io.aluCtrl      := idu.io.aluCtrl
-  //io.ctrl         := idu.io.ctrl
 }
