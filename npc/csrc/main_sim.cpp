@@ -22,7 +22,9 @@ double sc_time_stamp () {
 
 static uint8_t i_cache[65535] = {};
 
-static bool is_running;
+enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
+
+static int npc_state;
 
 static void init_cache(char *dir) {
   FILE *fp = fopen(dir, "rb");
@@ -41,11 +43,31 @@ static uint32_t pmem_read(uint64_t pc) {
   return *(uint32_t *)(i_cache + pc);
 }
 
-#define MAX_SIM_TIME 100000 //max simulation time
+/*
+void exec_single(VJzCore* dut, VerilatedVcdC* tfp) {
+  bool flag = true;
+  // Simulate until $finish
+  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && flag) {
+    if ((main_time % 10) == 0) { // 1 cycle is 10 ns
+      dut->clock = 1;
+    }
+    if ((main_time % 10) == 5) {
+      dut->clock = 0;
+      flag = 0;
+    }
+    //dut->io_inst = pmem_read(dut->io_pc);
+    // Evaluate model
+    dut->eval();
+    tfp->dump(main_time); // dump wave
+    main_time++;  // Time passes...
+  }
+}
+*/
+#define MAX_SIM_TIME 1000 //max simulation time
 
 // for ebreak instruction
-extern "C" void c_stop() {
-  is_running = false;
+extern "C" void c_break() {
+  npc_state = NPC_END;
 }
 
 int main(int argc, char** argv, char** env) {
@@ -71,24 +93,43 @@ int main(int argc, char** argv, char** env) {
   jzcore->trace(tfp, 99);  // Trace 99 levels of hierarchy
   tfp->open("/home/hjz/ysyx-workbench/npc/build/sim/obj_dir/wave.vcd");  // Open the dump file
 
-  // initial memory
+  // initial i_cache
   init_cache(argv[1]);
 
   // Set some inputs
   jzcore->reset = 1;
 
   // state is running
-  is_running = true;
+  npc_state = NPC_RUNNING;
 
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
 
-    // reset signal remains for 1000 ns(100 cycles)
+    if(main_time > 5){
+      jzcore->reset = 0;
+    }
+    if ((main_time & 0x01) == 0) {
+      if (npc_state == NPC_END) break;
+      jzcore->clock = 1;
+    }
+    if ((main_time & 0x01) == 1) {
+      jzcore->clock = 0;
+    }
+    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    // Evaluate model
+    jzcore->eval();
+    tfp->dump(main_time); // dump wave
+    main_time++;  // Time passes...
+  }
+  
+  // Simulate until $finish
+  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
+
     if(main_time > 15){
       jzcore->reset = 0;
     }
     if ((main_time % 10) == 0) { // 1 cycle is 10 ns
-      if (!is_running) break;
+      if (npc_state == NPC_END) break;
       jzcore->clock = 1;
     }
     if ((main_time % 10) == 5) {
