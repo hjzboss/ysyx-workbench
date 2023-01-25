@@ -15,6 +15,7 @@
 
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
+
 // Called by $time in Verilog
 double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
@@ -49,6 +50,8 @@ void one_cycle(VJzCore* dut, VerilatedVcdC* tfp) {
   dut->eval();
   tfp->dump(main_time);
   main_time++;
+
+  if (main_time == 3) dut->reset = 0;
   dut->clock = 0;
   dut->io_inst = pmem_read(dut->io_pc);
   dut->eval();
@@ -115,15 +118,17 @@ int main(int argc, char** argv, char** env) {
   // state is running
   npc_state = NPC_RUNNING;
   
+  
+
   // Simulate until $finish
-  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
+  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && (npc_state == NPC_RUNNING)) {
     if(main_time > 2){
       jzcore->reset = 0;
     }
+
     one_cycle(jzcore, tfp);
-    //jzcore->io_inst = pmem_read(jzcore->io_pc);
-    if (npc_state == NPC_END) break;
+
+
     /*
     if ((main_time & 0x01) == 0) { // 1 cycle is 10 ns
       if (npc_state == NPC_END) break;
@@ -140,6 +145,13 @@ int main(int argc, char** argv, char** env) {
     */
   }
 
+  if (npc_state == NPC_END) {
+    printf("--------------------------HIT GOOD TRAP------------------------\n");
+  }
+  else {
+    printf("---------------------------HIT BAD TRAP------------------------\n");
+  }
+
   // Final model cleanup
   jzcore->final();
 
@@ -149,12 +161,6 @@ int main(int argc, char** argv, char** env) {
   // Destroy model
   delete jzcore; jzcore = NULL;
 
-  if (npc_state == NPC_END) {
-    printf("--------------------------HIT GOOD TRAP------------------------\n");
-  }
-  else {
-    printf("---------------------------HIT BAD TRAP------------------------\n");
-  }
   // Fin
   exit(0);
 }
