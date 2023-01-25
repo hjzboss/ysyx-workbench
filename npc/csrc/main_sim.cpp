@@ -115,11 +115,12 @@ int main(int argc, char** argv, char** env) {
   
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    //jzcore->io_inst = pmem_read(jzcore->io_pc);
     if(main_time > 2){
       jzcore->reset = 0;
     }
     one_cycle(jzcore, tfp);
+    jzcore->io_inst = pmem_read(jzcore->io_pc);
     if (npc_state == NPC_END) break;
     /*
     if ((main_time & 0x01) == 0) { // 1 cycle is 10 ns
