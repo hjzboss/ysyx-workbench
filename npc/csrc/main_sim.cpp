@@ -105,7 +105,7 @@ int main(int argc, char** argv, char** env) {
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
     jzcore->io_inst = pmem_read(jzcore->io_pc);
-    if(main_time > 3){
+    if(main_time > 2){
       jzcore->reset = 0;
     }
     if ((main_time & 0x01) == 0) { // 1 cycle is 10 ns
