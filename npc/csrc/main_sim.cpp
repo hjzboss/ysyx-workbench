@@ -151,7 +151,7 @@ int main(int argc, char** argv, char** env) {
   // Destroy model
   delete jzcore; jzcore = NULL;
 
-  if (!is_running) {
+  if (npc_state == NPC_END) {
     printf("--------------------------HIT GOOD TRAP------------------------\n");
   }
   else {
