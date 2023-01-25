@@ -45,12 +45,12 @@ static uint32_t pmem_read(uint64_t pc) {
 
 void one_cycle(VJzCore* dut, VerilatedVcdC* tfp) {
   dut->clock = 1;
-  jzcore->io_inst = pmem_read(jzcore->io_pc);
+  dut->io_inst = pmem_read(dut->io_pc);
   dut->eval();
   tfp->dump(main_time);
   main_time++;
   dut->clock = 0;
-  jzcore->io_inst = pmem_read(jzcore->io_pc);
+  dut->io_inst = pmem_read(dut->io_pc);
   dut->eval();
   tfp->dump(main_time);
   main_time++;
