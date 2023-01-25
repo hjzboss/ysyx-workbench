@@ -104,7 +104,7 @@ int main(int argc, char** argv, char** env) {
   
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME)) {
-
+    jzcore->io_inst = pmem_read(jzcore->io_pc);
     if(main_time > 3){
       jzcore->reset = 0;
     }
@@ -115,7 +115,7 @@ int main(int argc, char** argv, char** env) {
     if ((main_time & 0x01) == 1) {
       jzcore->clock = 0;
     }
-    jzcore->io_inst = pmem_read(jzcore->io_pc);
+    // jzcore->io_inst = pmem_read(jzcore->io_pc);
     // Evaluate model
     jzcore->eval();
     tfp->dump(main_time); // dump wave
