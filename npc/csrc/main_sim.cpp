@@ -27,12 +27,6 @@ enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
 int npc_state;
 
-void cpu_exec(size_t num) {
-  for (int i = 0; i < num; i++) {
-    one_cycle();
-  }
-}
-
 static void init_cache(char *dir) {
   FILE *fp = fopen(dir, "rb");
 
