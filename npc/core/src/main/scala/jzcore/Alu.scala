@@ -27,7 +27,7 @@ class Alu extends Module {
     AluOp.and       -> (opA & opB),
     AluOp.or        -> (opA | opB),
     AluOp.xor       -> (opA ^ opB),
-    //LessThan  -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
+    AluOp.slt       -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
     AluOp.sltu      -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
     AluOp.sll       -> (opA << opB(5, 0)),
     AluOp.srl       -> (opA >> opB(5, 0)),
