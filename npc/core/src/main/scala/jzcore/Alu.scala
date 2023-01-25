@@ -18,7 +18,6 @@ class Alu extends Module {
   val opB = io.opB
   val aluOp = io.aluOp
 
-  // 需要将有符号数和无符号数分开，否则报错
   val aluOut = LookupTree(io.aluOp, List(
     AluOp.add       -> (opA + opB),
     AluOp.jump      -> (opA + opB),
