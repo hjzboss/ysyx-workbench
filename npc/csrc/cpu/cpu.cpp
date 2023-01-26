@@ -44,11 +44,13 @@ static void init_cache(char *dir) {
 }
 
 
-void one_cycle() {
+void eval_wave() {
   top->clock = !top->clock;
   top->io_inst = pmem_read(top->io_pc);
   top->eval();
+#ifdef CONFIG_WAVE
   tfp->dump(main_time);
+#endif
   main_time++;
 }
 
@@ -63,15 +65,15 @@ void init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
+#ifdef CONFIG_WAVE
   init_wave();
+#endif
 
   // initial i_cache
   init_cache(dir);
 
   top->clock = 1;
   top->reset = 1;
-
-  top->eval();
 
   // state is running
   npc_state = NPC_RUNNING;
@@ -90,17 +92,12 @@ void delete_cpu() {
 }
 
 void main_loop() {
-  top->reset = 1;
-
-  // state is running
-  npc_state = NPC_RUNNING;
-
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && (npc_state == NPC_RUNNING)) {
     if(main_time > 2){
       top->reset = 0;
     }
 
-    one_cycle();
+    eval_wave();
   }
 }
