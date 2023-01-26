@@ -39,6 +39,20 @@ static void init_cache(char *dir) {
 }
 
 
+void reset(int time) {
+  top->reset = 1;
+  while (time > 0) {
+    top->clock = !top->clock;
+    top->eval();
+#ifdef CONFIG_WAVE
+    tfp->dump(main_time);
+#endif
+    main_time++;
+    time--;  
+  }
+  top->reset = 0;
+}
+
 void eval_wave() {
   top->clock = !top->clock;
   top->io_inst = pmem_read(top->io_pc);
@@ -67,28 +81,10 @@ void init_cpu(char *dir) {
   // initial i_cache
   init_cache(dir);
 
-  top->clock = 1;
-  top->reset = 1;
-  top->eval();
-#ifdef CONFIG_WAVE
-  tfp->dump(main_time);
-#endif
-  main_time++;
+  top->clock = 0;
 
-  top->clock = !top->clock;
-  top->eval();
-#ifdef CONFIG_WAVE
-  tfp->dump(main_time);
-#endif
-  main_time++;
+  reset(3);
 
-  top->clock = !top->clock;
-  top->eval();
-#ifdef CONFIG_WAVE
-  tfp->dump(main_time);
-#endif
-  main_time++;
-  top->reset = 0;
   // state is running
   npc_state = NPC_RUNNING;
 }
