@@ -1,6 +1,5 @@
 #include "../include/cpu/cpu.h"
 
-
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
 
@@ -17,11 +16,10 @@ static uint8_t i_cache[65535] = {};
 
 int npc_state;
 
-/*
 void eval_wave() {
 
 }
-*/
+
 
 // for ebreak instruction
 extern "C" void c_break() {
@@ -47,18 +45,12 @@ static void init_cache(char *dir) {
 
 
 void one_cycle() {
-  top->clock = 1;
+  if (main_time == 3) top->reset = 0;
+  top->clock = ~top->clock;
   top->io_inst = pmem_read(top->io_pc);
   top->eval();
   tfp->dump(main_time);
   main_time++;
-
-  if (main_time == 3) top->reset = 0;
-  top->clock = 0;
-  top->io_inst = pmem_read(top->io_pc);
-  top->eval();
-  tfp->dump(main_time);
-  main_time++;    
 }
 
 static void init_wave() {
