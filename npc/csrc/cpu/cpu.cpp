@@ -1,6 +1,5 @@
 #include "cpu/cpu.h"
 
-#define MAX_SIM_TIME 1000 //max simulation time
 
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
