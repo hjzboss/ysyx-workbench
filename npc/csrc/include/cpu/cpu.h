@@ -16,5 +16,15 @@
 
 #include <assert.h>
 
+#include "config/config.h"
+
+void init_cpu(char *dir);
+
+void delete_cpu();
+
+void one_cycle();
+
+void main_loop();
+
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 #endif

@@ -7,7 +7,7 @@ TOPNAME = JzCore
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
-SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*_sim.cpp")
+SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*.cpp")
 
 VERILATOR = verilator
 VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
