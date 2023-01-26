@@ -16,11 +16,6 @@ static uint8_t i_cache[65535] = {};
 
 int npc_state;
 
-void eval_wave() {
-
-}
-
-
 // for ebreak instruction
 extern "C" void c_break() {
   npc_state = NPC_END;
