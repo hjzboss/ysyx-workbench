@@ -45,8 +45,7 @@ static void init_cache(char *dir) {
 
 
 void one_cycle() {
-  if (main_time == 3) top->reset = 0;
-  top->clock = ~top->clock;
+  top->clock = !top->clock;
   top->io_inst = pmem_read(top->io_pc);
   top->eval();
   tfp->dump(main_time);
@@ -69,7 +68,10 @@ void init_cpu(char *dir) {
   // initial i_cache
   init_cache(dir);
 
+  top->clock = 1;
   top->reset = 1;
+
+  top->eval();
 
   // state is running
   npc_state = NPC_RUNNING;
