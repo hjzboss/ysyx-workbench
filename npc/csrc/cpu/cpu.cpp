@@ -69,7 +69,26 @@ void init_cpu(char *dir) {
 
   top->clock = 1;
   top->reset = 1;
+  top->eval();
+#ifdef CONFIG_WAVE
+  tfp->dump(main_time);
+#endif
+  main_time++;
 
+  top->clock = !top->clock;
+  top->eval();
+#ifdef CONFIG_WAVE
+  tfp->dump(main_time);
+#endif
+  main_time++;
+
+  top->clock = !top->clock;
+  top->eval();
+#ifdef CONFIG_WAVE
+  tfp->dump(main_time);
+#endif
+  main_time++;
+  top->reset = 0;
   // state is running
   npc_state = NPC_RUNNING;
 }
@@ -89,10 +108,6 @@ void delete_cpu() {
 void main_loop() {
   // Simulate until $finish
   while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && (npc_state == NPC_RUNNING)) {
-    if(main_time > 2){
-      top->reset = 0;
-    }
-
     eval_wave();
   }
 }
