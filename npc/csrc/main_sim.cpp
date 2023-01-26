@@ -39,6 +39,44 @@ void eval_wave() {
 }
 */
 
+// for ebreak instruction
+extern "C" void c_break() {
+  npc_state = NPC_END;
+}
+
+static uint32_t pmem_read(uint64_t pc) {
+  return *(uint32_t *)(i_cache + pc);
+}
+
+static void init_cache(char *dir) {
+  FILE *fp = fopen(dir, "rb");
+
+  fseek(fp, 0, SEEK_END);
+  long size = ftell(fp);
+
+  fseek(fp, 0, SEEK_SET);
+  int ret = fread(i_cache, size, 1, fp);
+  assert(ret == 1);
+
+  fclose(fp);
+}
+
+
+void one_cycle() {
+  top->clock = 1;
+  top->io_inst = pmem_read(top->io_pc);
+  top->eval();
+  tfp->dump(main_time);
+  main_time++;
+
+  if (main_time == 3) top->reset = 0;
+  top->clock = 0;
+  top->io_inst = pmem_read(top->io_pc);
+  top->eval();
+  tfp->dump(main_time);
+  main_time++;    
+}
+
 static void init_wave() {
   Verilated::traceEverOn(true);
   tfp = new VerilatedVcdC;
@@ -66,44 +104,6 @@ void delete_cpu() {
   // Destroy model
   delete top; 
   top = NULL;
-}
-
-static void init_cache(char *dir) {
-  FILE *fp = fopen(dir, "rb");
-
-  fseek(fp, 0, SEEK_END);
-  long size = ftell(fp);
-
-  fseek(fp, 0, SEEK_SET);
-  int ret = fread(i_cache, size, 1, fp);
-  assert(ret == 1);
-
-  fclose(fp);
-}
-
-static uint32_t pmem_read(uint64_t pc) {
-  return *(uint32_t *)(i_cache + pc);
-}
-
-void one_cycle() {
-  top->clock = 1;
-  top->io_inst = pmem_read(top->io_pc);
-  top->eval();
-  tfp->dump(main_time);
-  main_time++;
-
-  if (main_time == 3) top->reset = 0;
-  top->clock = 0;
-  top->io_inst = pmem_read(top->io_pc);
-  top->eval();
-  tfp->dump(main_time);
-  main_time++;    
-}
-
-
-// for ebreak instruction
-extern "C" void c_break() {
-  npc_state = NPC_END;
 }
 
 int main(int argc, char** argv, char** env) {
