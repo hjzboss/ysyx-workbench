@@ -1,4 +1,4 @@
-#include "cpu.h"
+#include "cpu/cpu.h"
 
 #define MAX_SIM_TIME 1000 //max simulation time
 
