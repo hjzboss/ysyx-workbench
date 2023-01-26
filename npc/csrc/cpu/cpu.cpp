@@ -1,4 +1,4 @@
-#include "include/cpu/cpu.h"
+#include "cpu.h"
 
 
 // Current simulation time (64-bit unsigned)
