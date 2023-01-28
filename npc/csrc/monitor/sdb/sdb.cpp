@@ -77,10 +77,12 @@ static int cmd_info(char *args) {
 			printf("Print register status:\n");
 			isa_reg_display();
 			break;
+      /*
 		case 'w':
 			printf("Print watchpoint information:\n");
 			watchpoint_display();
 			break;
+      */
 		default:
 			printf("Unknown parameter: %s\n", args);
 	}
@@ -279,5 +281,5 @@ void init_sdb() {
   init_regex();
 
   /* Initialize the watchpoint pool. */
-  init_wp_pool();
+  //init_wp_pool();
 }
