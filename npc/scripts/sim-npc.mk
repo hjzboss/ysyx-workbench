@@ -23,6 +23,11 @@ VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
+#LDFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
+#LDFLAGS += $(DIFFSET_SO)
+
+#VERILATOR_SIMFLAG += -LDFLAGS "$(LDFLAGS)"
+
 IMAGE_OBJ ?= 
 
 sim: $(SIM_CSRC) $(VSRC)
