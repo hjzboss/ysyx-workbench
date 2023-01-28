@@ -16,19 +16,36 @@ static uint8_t i_cache[65535] = {};
 
 int npc_state;
 
+uint8_t* guest_to_host(uint32_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
+uint32_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
+
+static uint64_t pmem_read(paddr_t addr, int len) {
+  uint64_t ret = host_read(guest_to_host(addr), len);
+  return ret;
+}
+
+/*
+static void pmem_write(paddr_t addr, int len, word_t data) {
+  host_write(guest_to_host(addr), len, data);
+}
+*/
 
 // for ebreak instruction
 extern "C" void c_break() {
   npc_state = NPC_END;
 }
 
-
-static uint32_t pmem_read(uint64_t pc) {
-  return *(uint32_t *)(i_cache + pc);
+static inline uint32_t host_read(void *addr, int len) {
+  switch (len) {
+    case 1: return *(uint8_t  *)addr;
+    case 2: return *(uint16_t *)addr;
+    case 4: return *(uint32_t *)addr;
+    case 8: return *(uint64_t *)addr;
+    default: return 0;
+  }
 }
 
-
-static void init_cache(char *dir) {
+static void load_img(char *dir) {
   FILE *fp = fopen(dir, "rb");
 
   fseek(fp, 0, SEEK_END);
@@ -59,7 +76,7 @@ void reset(int time) {
 
 void eval_wave() {
   top->clock = !top->clock;
-  top->io_inst = pmem_read(top->io_pc);
+  top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
 #ifdef CONFIG_WAVE
   tfp->dump(main_time);
@@ -85,7 +102,7 @@ void init_cpu(char *dir) {
 #endif
 
   // initial i_cache
-  init_cache(dir);
+  load_img(dir);
 
   top->clock = 0;
   reset(3);
