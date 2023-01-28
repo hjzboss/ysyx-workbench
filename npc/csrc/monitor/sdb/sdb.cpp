@@ -22,7 +22,6 @@
 #include <memory/paddr.h>
 #include <macro.h>
 #include <debug.h>
-#include <iostream>
 
 static int is_batch_mode = false;
 
@@ -41,15 +40,12 @@ static char* rl_gets() {
     line_read = NULL;
   }
 
-  std::cout << "(nemu) " << std::endl;
-  std::cin >> line_read;
-  /*
   line_read = readline("(nemu) ");
 
   if (line_read && *line_read) {
     add_history(line_read);
   }
-  */
+
 
   return line_read;
 }
