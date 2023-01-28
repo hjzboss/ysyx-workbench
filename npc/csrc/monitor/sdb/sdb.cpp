@@ -184,7 +184,7 @@ static int cmd_c(char *args) {
 
 static int cmd_q(char *args) {
 	// my change
-	npc_state = NPC_END;
+	npc_state = NPC_QUIT;
   return -1;
 }
 
