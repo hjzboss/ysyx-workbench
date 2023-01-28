@@ -37,9 +37,11 @@ class IDU extends Module with HasInstrType {
 
 
   // registerfile
-  rf.io.read.rs1      := rs1
-  rf.io.read.rs2      := rs2
-  rf.io.write         := io.regWrite
+  rf.io.rs1           := rs1
+  rf.io.rs2           := rs2
+  rf.io.wen           := io.regWrite.wen
+  rf.io.waddr         := io.regWrite.rd
+  rf.io.wdata         := io.regWrite.value
 
   io.datasrc.pc       := io.fetch.pc
   io.datasrc.src1     := rf.io.src1
