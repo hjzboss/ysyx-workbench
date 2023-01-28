@@ -114,7 +114,7 @@ static int cmd_x(char *args) {
 	// Print the data from the corresponding address
 	for (uint64_t i = 0; i < N; ++ i) {
 		uint64_t tmp = addr + 4 * i;
-		printf("0x%016x:\t", tmp);
+		printf("0x%016lx:\t", tmp);
 		for (uint64_t j = 0; j < 4; ++ j) {
 			uint64_t data = pmem_read(tmp + j, 1);
 			printf("%02lx ", data);
@@ -240,7 +240,7 @@ void sdb_mainloop() {
 
   for (char *str; (str = rl_gets()) != NULL; ) {
     if (npc_state != NPC_RUNNING) return;
-    
+
     char *str_end = str + strlen(str);
 
     /* extract the first token as the command */
