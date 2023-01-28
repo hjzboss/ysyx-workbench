@@ -5,7 +5,7 @@ import top.Settings
 import chisel3.util._
 
 trait HasResetVector {
-  val resetVector = Settings.getLong("TestVector")
+  val resetVector = Settings.getLong("ResetVector")
 }
 
 class IFU extends Module with HasResetVector{

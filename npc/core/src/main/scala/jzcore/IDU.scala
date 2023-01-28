@@ -37,9 +37,13 @@ class IDU extends Module with HasInstrType {
 
 
   // registerfile
-  rf.io.read.rs1      := rs1
-  rf.io.read.rs2      := rs2
-  rf.io.write         := io.regWrite
+  rf.io.rs1           := rs1
+  rf.io.rs2           := rs2
+  rf.io.wen           := io.regWrite.wen
+  rf.io.waddr         := io.regWrite.rd
+  rf.io.wdata         := io.regWrite.value
+  rf.io.clock         := clock
+  rf.io.reset         := reset
 
   io.datasrc.pc       := io.fetch.pc
   io.datasrc.src1     := rf.io.src1
@@ -49,6 +53,7 @@ class IDU extends Module with HasInstrType {
   io.ctrl.rd          := rd
   io.ctrl.br          := Mux(instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB, true.B, false.B)
   io.ctrl.regWen      := Mux(instrtype === InstrB || instrtype === InstrS, false.B, true.B)
+  io.ctrl.isJalr      := Mux(instrtype === InstrIJ, true.B, false.B)
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2

@@ -1,29 +1,17 @@
-BUILD_DIR = ./build
+include ./scripts/sim-npc.mk
 
-BLACKBOX_DIR = ./core/src/main/verilog
-
-TOPNAME = JzCore
 NXDC_FILES = constr/top.nxdc
-
-VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
-VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
 FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 FPGA_CSRC += $(SRC_AUTO_BIND)
 
-SIM_CSRC = $(shell find $(abspath ./csrc) -name "*_sim.cpp")
-
-VERILATOR = verilator
-VERILATOR_SIMFLAG = --cc --exe --build --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
 VERILATOR_FPGAFLAG = -Wall --cc \
 										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 
-SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 FPGA_OBJ_DIR = $(BUILD_DIR)/fpga/obj_dir
 BIN = $(FPGA_OBJ_DIR)/$(TOPNAME)
-WAVE = wave.vcd
 
 #传递给preproject连接器的信息，添加SDL2库信息
 LDFLAGS += -lSDL2 -lSDL2_image
@@ -65,15 +53,6 @@ clean:
 	-rm -rf $(BUILD_DIR)
 
 .PHONY: test verilog help compile bsp reformat checkformat clean
-
-sim: $(SIM_CSRC) $(VSRC)
-	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@rm -rf $(SIM_OBJ_DIR)
-	@echo "build"
-	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME)
-	@echo "wave"
-	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
 
 fpga: $(BIN)
 	@$^
