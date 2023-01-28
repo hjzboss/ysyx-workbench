@@ -35,7 +35,7 @@ extern "C" void c_break() {
   npc_state = NPC_END;
 }
 
-static inline uint32_t host_read(void *addr, int len) {
+static uint32_t host_read(void *addr, int len) {
   switch (len) {
     case 1: return *(uint8_t  *)addr;
     case 2: return *(uint16_t *)addr;
