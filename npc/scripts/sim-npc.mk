@@ -19,7 +19,7 @@ VERILATOR_SIMFLAG += --cc --exe --build
 # C++ compiler arguments for makefile
 VERILATOR_SIMFLAG += -CFLAGS -I${NPC_HOME}/include
 # open trace
-VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
+VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR) -Os -x-assign 0
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
