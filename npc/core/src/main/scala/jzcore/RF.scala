@@ -18,7 +18,4 @@ class RF extends BlackBox {
     val wen   = Input(Bool())
     val wdata = Input(UInt(64.W))
   })
-
-  io.clock := clock
-  io.reset := reset
 }

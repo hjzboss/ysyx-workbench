@@ -42,6 +42,8 @@ class IDU extends Module with HasInstrType {
   rf.io.wen           := io.regWrite.wen
   rf.io.waddr         := io.regWrite.rd
   rf.io.wdata         := io.regWrite.value
+  rf.io.clock         := clock
+  rf.io.reset         := reset
 
   io.datasrc.pc       := io.fetch.pc
   io.datasrc.src1     := rf.io.src1
