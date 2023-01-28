@@ -22,6 +22,9 @@
 #include <memory/paddr.h>
 #include <cpu/reg.h>
 #include <stdio.h>
+#include <system.h>
+#include <string.h>
+#include <stdlib.h>
 
 enum {
   TK_NOTYPE = 256, UNDET, AND, TK_EQ, NOT_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, POINT, REG, HEX,
