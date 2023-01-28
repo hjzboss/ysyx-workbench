@@ -23,8 +23,8 @@ VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR) -Os -x-assign 0
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
-#LDFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
-LFLAGS +=  -lreadline -ldl -pie -lSDL2
+LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
+#LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LDFLAGS += $(DIFFSET_SO)
 
 VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
