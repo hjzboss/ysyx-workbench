@@ -19,7 +19,7 @@ int npc_state;
 uint8_t* guest_to_host(uint32_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint32_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
 
-static uint64_t pmem_read(paddr_t addr, int len) {
+static uint64_t pmem_read(uint64_t addr, int len) {
   uint64_t ret = host_read(guest_to_host(addr), len);
   return ret;
 }
