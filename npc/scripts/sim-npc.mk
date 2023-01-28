@@ -23,7 +23,7 @@ VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
-LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
+LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LDFLAGS += $(DIFFSET_SO)
 
