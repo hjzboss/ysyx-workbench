@@ -19,7 +19,8 @@
  */
 #include <regex.h>
 // my change
-#include<memory/paddr.h>
+#include <memory/paddr.h>
+#include <cpu/reg.h>
 
 enum {
   TK_NOTYPE = 256, UNDET, AND, TK_EQ, NOT_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, POINT, REG, HEX,
@@ -250,7 +251,7 @@ static uint64_t is_overflow(uint64_t val1, uint64_t val2, int op) {
 				printf("An overflow occurs during pointer dereference: *%lu\n", val2);
 				assert(0);				
 			}
-			result = paddr_read(val2, 8);
+			result = pmem_read(val2, 8);
 			break;
 		default:
 			printf("Unknown operator!\n");

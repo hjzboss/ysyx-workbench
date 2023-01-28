@@ -1,3 +1,10 @@
+#include "verilated_dpi.h"
+
+static uint64_t *cpu_gpr = NULL;
+
+extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
+  cpu_gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+}
 
 const char *regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -12,7 +19,7 @@ void isa_reg_display() {
 	printf("reg \tvalue\n");
 	printf("------------------------------\n");
 	for (i=0; i<32; ++i) {
-		printf("%s:\t0x%016lx\n", regs[i], cpu.gpr[i]);
+		printf("%s:\t0x%016lx\n", regs[i], cpu_gpr[i]);
 	}
 	printf("------------------------------\n");
 }
@@ -21,7 +28,7 @@ uint64_t isa_reg_str2val(const char *s, bool *success) {
 	for (int i = 0; i < 32; i ++) {
 		if (strcmp(s, regs[i]) == 0) {
 			*success = true;
-			return cpu.gpr[i];
+			return cpu_gpr[i];
 		}
 	}
 

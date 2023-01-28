@@ -14,22 +14,27 @@
 ***************************************************************************************/
 
 #include <macro.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <cpu/cpu.h>
 
-void init_rand();
-void init_log(const char *log_file);
-void init_mem();
-void init_difftest(char *ref_so_file, long img_size, int port);
-void init_device();
+//void init_rand();
+//void init_log(const char *log_file);
+//void init_mem();
+//void init_difftest(char *ref_so_file, long img_size, int port);
+//void init_device();
 void init_sdb();
-void init_disasm(const char *triple);
+//void init_disasm(const char *triple);
 
 static void welcome() {
-  //Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
+  /*
+  Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   IFDEF(CONFIG_TRACE, Log("If trace is enabled, a log file will be generated "
         "to record the trace. This may lead to a large log file. "
         "If it is not necessary, you can disable it in menuconfig"));
   //Log("Build time: %s, %s", __TIME__, __DATE__);
-  printf("Welcome to %s-npc!\n", ANSI_FMT(str(__GUEST_ISA__), ANSI_FG_YELLOW ANSI_BG_RED));
+  */
+  printf("Welcome to %s-npc!\n", ANSI_FMT(str(riscv64), ANSI_FG_YELLOW ANSI_BG_RED));
   printf("For help, type \"help\"\n");
 }
 
@@ -78,9 +83,6 @@ void init_monitor(int argc, char *argv[]) {
   /* Parse arguments. */
   parse_args(argc, argv);
 
-  /* Initialize memory. */
-  //init_mem();
-
   /* Initialize devices. */
   //IFDEF(CONFIG_DEVICE, init_device());
 
@@ -88,7 +90,7 @@ void init_monitor(int argc, char *argv[]) {
   //init_isa();
 
   /* Load the image to memory. This will overwrite the built-in image. */
-  long img_size = load_img();
+  //long img_size = load_img();
 
   /* Initialize differential testing. */
   //init_difftest(diff_so_file, img_size, difftest_port);

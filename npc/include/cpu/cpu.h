@@ -18,13 +18,13 @@
 
 #include <config/config.h>
 
-void init_cpu(char *dir);
+void init_cpu(char *);
 
 void delete_cpu();
 
-void one_cycle();
-
 void main_loop();
+
+void cpu_exec(uint64_t);
 
 extern int npc_state;
 

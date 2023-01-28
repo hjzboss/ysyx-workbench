@@ -74,7 +74,7 @@ void reset(int time) {
 }
 
 
-void eval_wave() {
+static void eval_wave() {
   top->clock = !top->clock;
   top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
@@ -124,10 +124,11 @@ void delete_cpu() {
   top = NULL;
 }
 
+void cpu_exec(uint64_t n) {
+  while (n--) {
+    if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state = NPC_QUIT;
 
-void main_loop() {
-  // Simulate until $finish
-  while (!Verilated::gotFinish() && (main_time <= MAX_SIM_TIME) && (npc_state == NPC_RUNNING)) {
-    eval_wave();
+    if (npc_state != NPC_RUNNING) break;
+    else eval_wave();
   }
 }

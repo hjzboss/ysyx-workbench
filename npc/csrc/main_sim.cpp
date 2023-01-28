@@ -1,4 +1,5 @@
 #include <cpu/cpu.h>
+#include <monitor/sdb.h>
 
 int main(int argc, char** argv, char** env) {
 
@@ -12,8 +13,10 @@ int main(int argc, char** argv, char** env) {
 
   init_cpu(argv[1]);
 
+  init_monitor(argc, argv);
+
   // Simulate until $finish
-  main_loop();
+  sdb_mainloop();
 
   if (npc_state == NPC_END) {
     printf("--------------------------HIT GOOD TRAP------------------------\n");

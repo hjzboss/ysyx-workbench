@@ -16,8 +16,10 @@
 #ifndef __SDB_H__
 #define __SDB_H__
 
-#include <common.h>
-
 uint64_t expr(char *e, bool *success);
+
+void init_monitor(int argc, char *argv[]);
+
+void sdb_mainloop();
 
 #endif

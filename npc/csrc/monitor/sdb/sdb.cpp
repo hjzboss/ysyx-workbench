@@ -13,11 +13,11 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
-#include <isa.h>
 #include <cpu/cpu.h>
+#include <cpu/reg.h>
+#include <monitor/sdb.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include "sdb.h"
 // my change
 #include <memory/paddr.h>
 
@@ -95,7 +95,7 @@ static int cmd_x(char *args) {
 	char *n_other = NULL;
 	char n[65535];
 	sscanf(args, "%s", n);
-	paddr_t N = (paddr_t)strtol(n, &n_other, 10);
+	uint64_t N = (uint64_t)strtol(n, &n_other, 10);
 	if (n == n_other) {
 		printf("The parameter is wrong, please enter the correct parameter!\n");
 		return 0;
@@ -105,18 +105,18 @@ static int cmd_x(char *args) {
 	char *e = args + len;
 
 	bool success;
-	paddr_t addr = expr(e, &success);
+	uint64_t addr = expr(e, &success);
 	if (!success) {
 		printf("The expression is malformed!\n");
 		return 0;
 	}
 
 	// Print the data from the corresponding address
-	for (paddr_t i = 0; i < N; ++ i) {
-		paddr_t tmp = addr + 4 * i;
+	for (uint64_t i = 0; i < N; ++ i) {
+		uint64_t tmp = addr + 4 * i;
 		printf("0x%016x:\t", tmp);
-		for (paddr_t j = 0; j < 4; ++ j) {
-			word_t data = paddr_read(tmp + j, 1);
+		for (uint64_t j = 0; j < 4; ++ j) {
+			uint64_t data = pmem_read(tmp + j, 1);
 			printf("%02lx ", data);
 		}
 		printf("\n");
@@ -131,7 +131,7 @@ static int cmd_p(char *args) {
 		return 0;
 	}
 	bool success;
-	word_t res = expr(args, &success);
+	uint64_t res = expr(args, &success);
 	if (!success) {
 		printf("The expression is malformed!\n");
 	}
@@ -141,7 +141,7 @@ static int cmd_p(char *args) {
 	return 0;
 }
 
-
+/*
 static int cmd_w(char *args) {
 	if (args == NULL) {
 		printf("Missing parameters!\n");
@@ -169,7 +169,7 @@ static int cmd_d(char *args) {
 	}
 	return 0;
 }
-
+*/
 
 static int cmd_c(char *args) {
   cpu_exec(-1);
@@ -179,7 +179,7 @@ static int cmd_c(char *args) {
 
 static int cmd_q(char *args) {
 	// my change
-	nemu_state.state = NEMU_QUIT;
+	npc_state = NPC_END;
   return -1;
 }
 
@@ -197,8 +197,8 @@ static struct {
   { "info", "Print register status, print monitor information", cmd_info },
   { "x", "Scan memory", cmd_x},
   { "p", "Expression evaluation", cmd_p},
-  { "w", "Set up watchpoints", cmd_w},
-  { "d", "Delete a watchpoints", cmd_d}
+  //{ "w", "Set up watchpoints", cmd_w},
+  //{ "d", "Delete a watchpoints", cmd_d}
   /* TODO: Add more commands */
 
 };
@@ -239,6 +239,8 @@ void sdb_mainloop() {
   }
 
   for (char *str; (str = rl_gets()) != NULL; ) {
+    if (npc_state != NPC_RUNNING) return;
+    
     char *str_end = str + strlen(str);
 
     /* extract the first token as the command */
