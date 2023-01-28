@@ -16,8 +16,8 @@
 #include <cpu/cpu.h>
 #include <cpu/reg.h>
 #include <monitor/sdb.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include <readline/readline>
+#include <readline/history>
 // my change
 #include <memory/paddr.h>
 #include <macro.h>
@@ -43,7 +43,7 @@ static char* rl_gets() {
   line_read = readline("(nemu) ");
 
   if (line_read && *line_read) {
-    //add_history(line_read);
+    add_history(line_read);
   }
 
   return line_read;
