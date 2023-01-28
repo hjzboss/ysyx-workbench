@@ -16,10 +16,10 @@ static uint8_t i_cache[65535] = {};
 
 int npc_state;
 
-uint8_t* guest_to_host(uint32_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
-uint32_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
+uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
+uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
 
-static inline uint32_t host_read(void *addr, int len) {
+static inline uint64_t host_read(void *addr, int len) {
   switch (len) {
     case 1: return *(uint8_t  *)addr;
     case 2: return *(uint16_t *)addr;
@@ -29,7 +29,7 @@ static inline uint32_t host_read(void *addr, int len) {
   }
 }
 
-static uint64_t pmem_read(uint64_t addr, int len) {
+uint64_t pmem_read(uint64_t addr, int len) {
   uint64_t ret = host_read(guest_to_host(addr), len);
   return ret;
 }

@@ -41,6 +41,6 @@ class EXU extends Module {
   io.redirect.valid    := Mux(io.ctrl.br && alu.io.brMark, true.B, false.B)
 
   // ebreak
-  val stop = Module(new stop)
+  val stop = Module(new Stop)
   stop.io.valid := Mux(io.ctrl.break, true.B, false.B)
 }

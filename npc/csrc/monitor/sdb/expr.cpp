@@ -13,7 +13,6 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
-#include <isa.h>
 
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
@@ -28,9 +27,6 @@ enum {
   /* TODO: Add more token types */
 
 };
-
-//static char *integer_max = "18446744073709551615";
-//static char *hex_max = "0xffffffffffffffff";
 
 static struct rule {
   const char *regex;
@@ -104,11 +100,6 @@ static bool make_token(char *e) {
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
-
-        /* TODO: Now a new token is recognized with rules[i]. Add codes
-         * to record the token in the array `tokens'. For certain types
-         * of tokens, some extra actions should be performed.
-         */
 
         switch (rules[i].token_type) {
 					case PLUS: case TK_EQ: case MINUS: case DIVIDE: 
@@ -223,8 +214,8 @@ bool check_parentheses(int p, int q) {
 	return flag;
 }
 
-static word_t is_overflow(word_t val1, word_t val2, int op) {
-	word_t result;
+static uint64_t is_overflow(uint64_t val1, uint64_t val2, int op) {
+	uint64_t result;
 	switch(op) {
 		case PLUS:
 			result = val1 + val2;
@@ -269,34 +260,22 @@ static word_t is_overflow(word_t val1, word_t val2, int op) {
 	return result;
 }
 
-word_t eval(int p, int q) {
-	//printf("p=%d, q=%d\n", p, q);
+uint64_t eval(int p, int q) {
 	if (p > q)
 		assert(0);
 	else if (p == q) {
 		if (tokens[p].type == REG) {	
 			bool reg_success;
-			word_t reg = isa_reg_str2val(tokens[p].str + 1, &reg_success);
+			uint64_t reg = isa_reg_str2val(tokens[p].str + 1, &reg_success);
 			assert(reg_success);
 			return reg;
 		}
 		else if (tokens[p].type == INTEGER) {
 			char *tmp = NULL;
-			// Check for integer overflow
-			/*
-			if (strcmp(tokens[p].str, integer_max)) {
-				printf("Integer overflow: %s\n", tokens[p].str);
-				assert(0);
-			};*/
 			return strtol(tokens[p].str, &tmp, 10);
 		}
 		else if (tokens[p].type == HEX) {
 			char *tmp = NULL;
-			/*
-			if (strcmp(tokens[p].str, hex_max) > 0) {
-				printf("Integer overflow: %s\n", tokens[p].str);
-				assert(0);					
-			}*/
 			return strtol(tokens[p].str, &tmp, 16);
 		}
 		else {
@@ -333,7 +312,7 @@ word_t eval(int p, int q) {
 		}
 		
 		assert(op != -1);
-		word_t val1, val2;
+		uint64_t val1, val2;
 
 		if (op_type != POINT)
 			val1 = eval(p, op - 1);
@@ -355,14 +334,13 @@ word_t eval(int p, int q) {
 	}
 }
 
-word_t expr(char *e, bool *success) {
+uint64_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
     return 0;
   }
 
-  /* TODO: Insert codes to evaluate the expression. */
-	word_t res = eval(0, nr_token-1);
+	uint64_t res = eval(0, nr_token-1);
 	*success = true;
 	return res;
 }
