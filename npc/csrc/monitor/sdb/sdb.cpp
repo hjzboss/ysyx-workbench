@@ -244,7 +244,6 @@ void sdb_mainloop() {
   }
 
   for (char *str; (str = rl_gets()) != NULL; ) {
-    if (npc_state != NPC_RUNNING) return;
 
     char *str_end = str + strlen(str);
 
@@ -272,7 +271,7 @@ void sdb_mainloop() {
         break;
       }
     }
-
+    if (npc_state != NPC_RUNNING) return;
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
 }
