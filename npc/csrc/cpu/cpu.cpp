@@ -19,6 +19,16 @@ int npc_state;
 uint8_t* guest_to_host(uint32_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint32_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
 
+static inline uint32_t host_read(void *addr, int len) {
+  switch (len) {
+    case 1: return *(uint8_t  *)addr;
+    case 2: return *(uint16_t *)addr;
+    case 4: return *(uint32_t *)addr;
+    case 8: return *(uint64_t *)addr;
+    default: return 0;
+  }
+}
+
 static uint64_t pmem_read(uint64_t addr, int len) {
   uint64_t ret = host_read(guest_to_host(addr), len);
   return ret;
@@ -33,16 +43,6 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
 // for ebreak instruction
 extern "C" void c_break() {
   npc_state = NPC_END;
-}
-
-static uint32_t host_read(void *addr, int len) {
-  switch (len) {
-    case 1: return *(uint8_t  *)addr;
-    case 2: return *(uint16_t *)addr;
-    case 4: return *(uint32_t *)addr;
-    case 8: return *(uint64_t *)addr;
-    default: return 0;
-  }
 }
 
 static void load_img(char *dir) {
