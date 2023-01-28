@@ -17,16 +17,17 @@ VERILATOR_SIMFLAG =
 # build
 VERILATOR_SIMFLAG += --cc --exe --build
 # C++ compiler arguments for makefile
-VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -lreadline -ltinfo"
+VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include"
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR) -Os -x-assign 0
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
 #LDFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
+LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LDFLAGS += $(DIFFSET_SO)
 
-#VERILATOR_SIMFLAG += -LDFLAGS "$(LDFLAGS)"
+VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
 
 IMAGE_OBJ ?= 
 
