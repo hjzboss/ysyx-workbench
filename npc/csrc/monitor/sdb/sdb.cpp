@@ -16,8 +16,8 @@
 #include <cpu/cpu.h>
 #include <cpu/reg.h>
 #include <monitor/sdb.h>
-#include <readline/readline>
-#include <readline/history>
+#include <readline/readline.h>
+#include <readline/history.h>
 // my change
 #include <memory/paddr.h>
 #include <macro.h>
