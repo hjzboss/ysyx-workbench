@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <macro.h>
+#include <debug.h>
 
 enum {
   TK_NOTYPE = 256, UNDET, AND, TK_EQ, NOT_EQ, L_PARENTHESIS, R_PARENTHESIS, PLUS, MINUS, TIMES, DIVIDE, INTEGER, POINT, REG, HEX,
@@ -102,7 +103,7 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
-        Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
+        //Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
