@@ -17,13 +17,13 @@ VERILATOR_SIMFLAG =
 # build
 VERILATOR_SIMFLAG += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
-VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include --relocation-model=pic"
+VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include"
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
-LFLAGS += -lreadline -ldl -pie -lSDL2
+LFLAGS += -lreadline -ldl -pie -lSDL2 --relocation-model=pic
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LDFLAGS += $(DIFFSET_SO)
 
