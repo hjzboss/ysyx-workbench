@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-//#include <macro.h>
+#include <macro.h>
 //#include <debug.h>
 
 enum {
