@@ -1,4 +1,4 @@
-#include "cpu/cpu.h"
+#include <cpu/cpu.h>
 
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;

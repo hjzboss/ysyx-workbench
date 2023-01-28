@@ -16,7 +16,7 @@
 
 #include <assert.h>
 
-#include "config/config.h"
+#include <config/config.h>
 
 void init_cpu(char *dir);
 
