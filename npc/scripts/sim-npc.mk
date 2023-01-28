@@ -17,7 +17,7 @@ VERILATOR_SIMFLAG =
 # build
 VERILATOR_SIMFLAG += --cc --exe --build
 # C++ compiler arguments for makefile
-VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -lreadline"
+VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include"
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR) -Os -x-assign 0
 # top module
@@ -34,7 +34,7 @@ sim: $(SIM_CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
-	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
+	$(VERILATOR) $(VERILATOR_SIMFLAG) $^ -lreadline
 	$(SIM_OBJ_DIR)/V$(TOPNAME) $(IMAGE_OBJ)
 	@echo "wave"
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
