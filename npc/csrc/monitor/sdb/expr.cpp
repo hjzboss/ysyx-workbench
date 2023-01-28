@@ -71,7 +71,7 @@ void init_regex() {
   char error_msg[128];
   int ret;
 
-/*
+
   for (i = 0; i < NR_REGEX; i ++) {
     ret = regcomp(&re[i], rules[i].regex, REG_EXTENDED);
     if (ret != 0) {
@@ -79,7 +79,7 @@ void init_regex() {
       panic("regex compilation failed: %s\n%s", error_msg, rules[i].regex);
     }
   }
-  */
+
 }
 
 typedef struct token {
