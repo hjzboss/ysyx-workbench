@@ -10,7 +10,7 @@ VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*.cpp")
 
 VERILATOR = verilator
-VERILATOR_SIMFLAG = --cc --exe --build -I ${NPC_HOME}/include --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
+VERILATOR_SIMFLAG = --cc --exe --build -I${NPC_HOME}/include --trace --Mdir $(SIM_OBJ_DIR) --top-module $(TOPNAME)
 
 SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 WAVE = wave.vcd
