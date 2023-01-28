@@ -17,7 +17,7 @@ VERILATOR_SIMFLAG =
 # build
 VERILATOR_SIMFLAG += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
-VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -fPIC"
+VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include --relocation-model=pic"
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
