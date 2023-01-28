@@ -22,7 +22,6 @@
 #include <memory/paddr.h>
 #include <cpu/reg.h>
 #include <stdio.h>
-#include <system.h>
 #include <string.h>
 #include <stdlib.h>
 
