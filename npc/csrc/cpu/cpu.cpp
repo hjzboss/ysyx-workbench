@@ -1,4 +1,4 @@
-#include "../include/cpu/cpu.h"
+#include "cpu/cpu.h"
 
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
@@ -16,14 +16,17 @@ static uint8_t i_cache[65535] = {};
 
 int npc_state;
 
+
 // for ebreak instruction
 extern "C" void c_break() {
   npc_state = NPC_END;
 }
 
+
 static uint32_t pmem_read(uint64_t pc) {
   return *(uint32_t *)(i_cache + pc);
 }
+
 
 static void init_cache(char *dir) {
   FILE *fp = fopen(dir, "rb");
@@ -53,6 +56,7 @@ void reset(int time) {
   top->reset = 0;
 }
 
+
 void eval_wave() {
   top->clock = !top->clock;
   top->io_inst = pmem_read(top->io_pc);
@@ -63,12 +67,14 @@ void eval_wave() {
   main_time++;
 }
 
+
 static void init_wave() {
   Verilated::traceEverOn(true);
   tfp = new VerilatedVcdC;
   top->trace(tfp, 99);  // Trace 99 levels of hierarchy
   tfp->open("/home/hjz/ysyx-workbench/npc/build/sim/obj_dir/wave.vcd");  // Open the dump file
 }
+
 
 void init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
@@ -82,12 +88,12 @@ void init_cpu(char *dir) {
   init_cache(dir);
 
   top->clock = 0;
-
   reset(3);
 
   // state is running
   npc_state = NPC_RUNNING;
 }
+
 
 void delete_cpu() {
   // Final model cleanup
@@ -100,6 +106,7 @@ void delete_cpu() {
   delete top; 
   top = NULL;
 }
+
 
 void main_loop() {
   // Simulate until $finish
