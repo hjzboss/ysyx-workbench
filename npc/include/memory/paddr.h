@@ -1,5 +1,6 @@
 #ifndef __MEMORY_PADDR_H__
 #define __MEMORY_PADDR_H__
+#include <stdint.h>
 
 /* convert the guest physical address in the guest program to host virtual address in NEMU */
 uint8_t* guest_to_host(uint64_t paddr);
