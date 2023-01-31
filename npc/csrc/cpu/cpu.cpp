@@ -129,6 +129,8 @@ void cpu_exec(uint64_t n) {
     if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state = NPC_QUIT;
 
     if (npc_state != NPC_RUNNING) break;
-    else eval_wave();
+    else {
+      eval_wave();
+    }
   }
 }
