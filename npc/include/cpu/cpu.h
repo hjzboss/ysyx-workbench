@@ -18,6 +18,8 @@
 
 #include <config/config.h>
 
+#include <macro.h>
+
 void init_cpu(char *);
 
 void delete_cpu();
@@ -29,4 +31,7 @@ void cpu_exec(uint64_t);
 extern int npc_state;
 
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
+
+#define FMT_WORD "0x%016lx"
+
 #endif

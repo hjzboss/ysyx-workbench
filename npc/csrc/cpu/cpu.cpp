@@ -7,6 +7,8 @@ static VJzCore* top;
 static VerilatedContext* contextp = NULL;
 static VerilatedVcdC* tfp = NULL;
 
+IFDEF(CONFIG_ITRACE, char logbuf[128]);
+
 // Called by $time in Verilog
 double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
@@ -124,13 +126,37 @@ void delete_cpu() {
   top = NULL;
 }
 
+static void cpu_exec_once() {
+  eval_wave();
+#ifdef CONFIG_ITRACE
+  char *p = logbuf;
+  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", top->pc);
+  int ilen = top->snpc - top->pc;
+  int i;
+  uint8_t *inst = (uint8_t *)&s->isa.inst.val;
+  for (i = ilen - 1; i >= 0; i --) {
+    p += snprintf(p, 4, " %02x", inst[i]);
+  }
+  int ilen_max = 4;
+  int space_len = ilen_max - ilen;
+  if (space_len < 0) space_len = 0;
+  space_len = space_len * 3 + 1;
+  memset(p, ' ', space_len);
+  p += space_len;
+
+  void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+  disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
+      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+#endif
+}
+
 void cpu_exec(uint64_t n) {
   while (n--) {
     if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state = NPC_QUIT;
 
     if (npc_state != NPC_RUNNING) break;
     else {
-      eval_wave();
+      cpu_exec_once();
     }
   }
 }
