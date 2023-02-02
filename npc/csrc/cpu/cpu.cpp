@@ -123,7 +123,7 @@ void init_cpu(char *dir) {
   load_img(dir);
 
   top->clock = 0;
-  reset(2);
+  reset(3);
 
   // state is running
   npc_state.state = NPC_RUNNING;
