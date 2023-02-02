@@ -204,7 +204,7 @@ void cpu_exec(uint64_t n) {
 
   // todo
   switch (npc_state.state) {
-    case NPC_RUNNING: npc_state.state = NPC_STOP; printf("shit!!\n"); break;
+    case NPC_RUNNING: /*npc_state.state = NPC_STOP;*/ break;
 
     case NPC_END: case NPC_ABORT:
       printf("npc: %s at pc = " FMT_WORD,
