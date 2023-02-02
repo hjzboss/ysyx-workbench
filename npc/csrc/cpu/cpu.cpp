@@ -103,7 +103,6 @@ static void eval_wave() {
   main_time++;
 }
 
-
 static void init_wave() {
   Verilated::traceEverOn(true);
   tfp = new VerilatedVcdC;
@@ -143,10 +142,15 @@ void delete_cpu() {
   top = NULL;
 }
 
+static void isa_exec_once() {
+  eval_wave();
+  eval_wave();
+}
+
 static void cpu_exec_once() {
   uint64_t pc = top->io_pc;
   uint32_t inst_val = pmem_read(pc, 4);
-  eval_wave();
+  isa_exec_once();
 #ifdef CONFIG_ITRACE
   char *p = logbuf;
   p += snprintf(p, sizeof(logbuf), FMT_WORD ":", pc);
