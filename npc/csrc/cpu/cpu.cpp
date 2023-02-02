@@ -10,6 +10,7 @@ static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
+char logbuf[128];
 IFDEF(CONFIG_ITRACE, char logbuf[128]);
 
 static uint8_t i_cache[65535] = {};
