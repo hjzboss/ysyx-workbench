@@ -20,6 +20,8 @@
 
 #include <macro.h>
 
+#include <stdint.h>
+
 void init_cpu(char *);
 
 void delete_cpu();

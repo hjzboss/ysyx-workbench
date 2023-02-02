@@ -20,7 +20,6 @@
 #include <readline/history.h>
 // my change
 #include <memory/paddr.h>
-#include <macro.h>
 #include <debug.h>
 
 static int is_batch_mode = false;
