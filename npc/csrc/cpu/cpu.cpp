@@ -89,6 +89,7 @@ void reset(int time) {
     main_time++;
     time--;  
   }
+  printf("top->clock=%d\n", top->clock);
   top->reset = 0;
 }
 
