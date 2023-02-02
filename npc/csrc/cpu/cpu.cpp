@@ -1,22 +1,25 @@
 #include <cpu/cpu.h>
 
+#define MAX_INST_TO_PRINT 10
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
 
 static VJzCore* top;
 static VerilatedContext* contextp = NULL;
 static VerilatedVcdC* tfp = NULL;
-
+static bool g_print_step = false;
+static uint64_t g_timer = 0; // unit: us
+uint64_t g_nr_guest_inst = 0;
 IFDEF(CONFIG_ITRACE, char logbuf[128]);
+
+static uint8_t i_cache[65535] = {};
+
+NPCState npc_state = { .state = NPC_STOP };
 
 // Called by $time in Verilog
 double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
 }
-
-static uint8_t i_cache[65535] = {};
-
-int npc_state;
 
 uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
@@ -42,9 +45,21 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
 }
 */
 
+// todo
+static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
+#ifdef CONFIG_ITRACE_COND
+  if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
+#endif
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf)); }
+  //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+	// watchpoint
+	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
+}
+
 // for ebreak instruction
 extern "C" void c_break() {
-  npc_state = NPC_END;
+  npc_state.state = NPC_END;
+  npc_state.halt_pc = top->pc;
 }
 
 static void load_img(char *dir) {
@@ -127,36 +142,80 @@ void delete_cpu() {
 }
 
 static void cpu_exec_once() {
+  uint64_t pc = top->pc;
+  uint32_t inst_val = pmem_read(pc, 4);
   eval_wave();
 #ifdef CONFIG_ITRACE
   char *p = logbuf;
-  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", top->pc);
-  int ilen = top->snpc - top->pc;
+  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", pc);
+  int ilen = 4;
   int i;
-  uint8_t *inst = (uint8_t *)&s->isa.inst.val;
+  uint8_t *inst = (uint8_t *)&inst_val;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
-  int ilen_max = 4;
-  int space_len = ilen_max - ilen;
-  if (space_len < 0) space_len = 0;
-  space_len = space_len * 3 + 1;
-  memset(p, ' ', space_len);
-  p += space_len;
+  p += 1;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
-      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+  disassemble(p, logbuf + sizeof(logbuf) - p, pc, (uint8_t *)&inst_val, ilen);
 #endif
 }
 
-void cpu_exec(uint64_t n) {
+void execute(uint64_t n) {
   while (n--) {
-    if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state = NPC_QUIT;
+    // todo
+    //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
+    cpu_exec_once();
+    g_nr_guest_inst ++;
+    trace_and_difftest(&s, cpu.pc);
+    if (npc_state.state != NPC_RUNNING) break;
+    //IFDEF(CONFIG_DEVICE, device_update());
 
     if (npc_state != NPC_RUNNING) break;
     else {
       cpu_exec_once();
     }
+  }
+}
+
+// todo
+static void statistic() {
+  IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
+#define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
+  printf("host time spent = " NUMBERIC_FMT " us", g_timer);
+  printf("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
+  if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
+  else printf("Finish running in less than 1 us and can not calculate the simulation frequency");
+}
+
+/* Simulate how the CPU works. */
+void cpu_exec(uint64_t n) {
+  g_print_step = (n < MAX_INST_TO_PRINT);
+  switch (npc_state.state) {
+    case NPC_END: case NPC_ABORT:
+      printf("Program execution has ended. To restart the program, exit NPC and run again.\n");
+      return;
+    default: npc_state.state = NPC_RUNNING;
+  }
+
+  uint64_t timer_start = get_time();
+
+  execute(n);
+
+  uint64_t timer_end = get_time();
+  g_timer += timer_end - timer_start;
+
+  // todo
+  switch (npc_state.state) {
+    case NPC_RUNNING: npc_state.state = NPC_STOP; break;
+
+    case NPC_END: case NPC_ABORT:
+      printf("npc: %s at pc = " FMT_WORD,
+          (npc_state.state == NPC_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
+           (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
+            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
+          npc_state.halt_pc);
+      // fall through
+    case NEMU_QUIT: statistic();
   }
 }

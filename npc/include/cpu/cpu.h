@@ -28,7 +28,13 @@ void main_loop();
 
 void cpu_exec(uint64_t);
 
-extern int npc_state;
+typedef struct {
+  int state;
+  uint64_t halt_pc;
+  uint32_t halt_ret;
+} NPCState;
+
+extern NPCState npc_state;
 
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
