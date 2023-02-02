@@ -97,6 +97,7 @@ void reset(int time) {
   tfp->dump(main_time);
 #endif
   main_time++;
+  printf("%d\n", top->clock);
 }
 
 
