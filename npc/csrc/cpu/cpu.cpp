@@ -171,7 +171,7 @@ void execute(uint64_t n) {
     if (npc_state.state != NPC_RUNNING) break;
     //IFDEF(CONFIG_DEVICE, device_update());
 
-    if (npc_state != NPC_RUNNING) break;
+    if (npc_state.state != NPC_RUNNING) break;
     else {
       cpu_exec_once();
     }
