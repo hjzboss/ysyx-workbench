@@ -154,7 +154,7 @@ static void cpu_exec_once() {
 #ifdef CONFIG_ITRACE
   char *p = logbuf;
   p += snprintf(p, sizeof(logbuf), FMT_WORD ":", pc);
-  int ilen = top->io_pc - pc;
+  int ilen = 4;
   int i;
   uint8_t *inst = (uint8_t *)&inst_val;
   for (i = ilen - 1; i >= 0; i --) {
