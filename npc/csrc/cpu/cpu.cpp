@@ -154,13 +154,17 @@ static void cpu_exec_once() {
 #ifdef CONFIG_ITRACE
   char *p = logbuf;
   p += snprintf(p, sizeof(logbuf), FMT_WORD ":", pc);
-  int ilen = 4;
+  int ilen = top->pc - pc;
   int i;
   uint8_t *inst = (uint8_t *)&inst_val;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
-  p += 1;
+  int ilen_max = 4;
+  int space_len = ilen_max - ilen;
+  space_len = space_len * 3 + 1;
+  memset(p, ' ', space_len);
+  p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, logbuf + sizeof(logbuf) - p, pc, (uint8_t *)&inst_val, ilen);

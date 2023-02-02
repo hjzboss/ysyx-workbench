@@ -18,6 +18,7 @@
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
+#include <iostream>
 #include "llvm/MC/MCAsmInfo.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCDisassembler/MCDisassembler.h"
@@ -64,6 +65,7 @@ void init_disasm(const char *triple) {
   gSTI = target->createMCSubtargetInfo(gTriple, "", "");
   std::string isa = target->getName();
   if (isa == "riscv32" || isa == "riscv64") {
+    std::cout << isa << std::endl;
     gSTI->ApplyFeatureFlag("+m");
     gSTI->ApplyFeatureFlag("+a");
     gSTI->ApplyFeatureFlag("+c");
