@@ -46,9 +46,9 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
 */
 
 // todo
-static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
+static void trace_and_difftest(uint64_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
+  if (ITRACE_COND) { log_write("%s\n", logbuf); }
 #endif
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf)); }
   //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
@@ -167,7 +167,7 @@ void execute(uint64_t n) {
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
-    trace_and_difftest(&s, cpu.pc);
+    trace_and_difftest(top->pc);
     if (npc_state.state != NPC_RUNNING) break;
     //IFDEF(CONFIG_DEVICE, device_update());
 
