@@ -84,9 +84,9 @@ void reset(int time) {
     top->clock = !top->clock;
     top->eval();
 #ifdef CONFIG_WAVE
-    tfp->dump(contextp->time());
+    tfp->dump(main_time);
 #endif
-    contextp->timeInc(1);
+    main_time++;
     time--;  
   }
   top->reset = 0;
@@ -98,10 +98,9 @@ static void eval_wave() {
   top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
 #ifdef CONFIG_WAVE
-  tfp->dump(contextp->time());
+  tfp->dump(main_time);
 #endif
-  contextp->timeInc(1);
-  //main_time++;
+  main_time++;
 }
 
 static void init_wave() {
@@ -115,13 +114,11 @@ static void init_wave() {
 void init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
-  
 
 #ifdef CONFIG_WAVE
   init_wave();
 #endif
 
-  contextp = new VerilatedContext;
   // initial i_cache
   load_img(dir);
 
