@@ -1,5 +1,5 @@
 #include <cpu/cpu.h>
-
+#include <macro.h>
 #define MAX_INST_TO_PRINT 10
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
