@@ -84,13 +84,12 @@ void reset(int time) {
     top->clock = !top->clock;
     top->eval();
 #ifdef CONFIG_WAVE
-    tfp->dump(main_time);
+    tfp->dump(contextp->time());
 #endif
-    main_time++;
+    contextp->timeInc(1);
     time--;  
   }
   top->reset = 0;
-  top->eval();
 }
 
 
@@ -99,9 +98,10 @@ static void eval_wave() {
   top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
 #ifdef CONFIG_WAVE
-  tfp->dump(main_time);
+  tfp->dump(contextp->time());
 #endif
-  main_time++;
+  contextp->timeInc(1);
+  //main_time++;
 }
 
 static void init_wave() {
