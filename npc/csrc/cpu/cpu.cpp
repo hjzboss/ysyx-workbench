@@ -172,11 +172,6 @@ void execute(uint64_t n) {
     trace_and_difftest(top->io_pc);
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
-
-    if (npc_state.state != NPC_RUNNING) break;
-    else {
-      cpu_exec_once();
-    }
   }
 }
 
@@ -203,7 +198,7 @@ void cpu_exec(uint64_t n) {
   uint64_t timer_start = get_time();
 
   execute(n);
-  printf("execute finish!!!\n");
+
   uint64_t timer_end = get_time();
   g_timer += timer_end - timer_start;
 
