@@ -16,7 +16,7 @@
 
 #include <assert.h>
 
-#include <config/config.h>
+#include <config.h>
 
 #include <macro.h>
 
