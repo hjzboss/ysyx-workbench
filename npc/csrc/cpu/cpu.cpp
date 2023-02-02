@@ -89,14 +89,8 @@ void reset(int time) {
     main_time++;
     time--;  
   }
-  //printf("top->clock=%d\n", top->clock);
   top->reset = 0;
   top->eval();
-#ifdef CONFIG_WAVE
-  tfp->dump(main_time);
-#endif
-  main_time++;
-  printf("%d\n", top->clock);
 }
 
 
