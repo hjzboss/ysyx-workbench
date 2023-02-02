@@ -185,8 +185,8 @@ static void statistic() {
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   printf("host time spent = " NUMBERIC_FMT " us", g_timer);
   printf("\ntotal guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
-  if (g_timer > 0) printf("\nsimulation frequency = " NUMBERIC_FMT " inst/s\n", g_nr_guest_inst * 1000000 / g_timer);
-  else printf("Finish running in less than 1 us and can not calculate the simulation frequency\n");
+  if (g_timer > 0) printf("\nsimulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
+  else printf("\nFinish running in less than 1 us and can not calculate the simulation frequency\n");
 }
 
 /* Simulate how the CPU works. */
