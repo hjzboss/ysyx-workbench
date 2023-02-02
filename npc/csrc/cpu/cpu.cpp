@@ -59,7 +59,7 @@ static void trace_and_difftest(uint64_t dnpc) {
 // for ebreak instruction
 extern "C" void c_break() {
   npc_state.state = NPC_END;
-  npc_state.halt_pc = top->pc;
+  npc_state.halt_pc = top->io_pc;
 }
 
 static void load_img(char *dir) {
@@ -142,7 +142,7 @@ void delete_cpu() {
 }
 
 static void cpu_exec_once() {
-  uint64_t pc = top->pc;
+  uint64_t pc = top->io_pc;
   uint32_t inst_val = pmem_read(pc, 4);
   eval_wave();
 #ifdef CONFIG_ITRACE
@@ -167,7 +167,7 @@ void execute(uint64_t n) {
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
-    trace_and_difftest(top->pc);
+    trace_and_difftest(top->io_pc);
     if (npc_state.state != NPC_RUNNING) break;
     //IFDEF(CONFIG_DEVICE, device_update());
 
