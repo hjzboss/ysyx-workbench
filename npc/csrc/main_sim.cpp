@@ -18,7 +18,7 @@ int main(int argc, char** argv, char** env) {
   // Simulate until $finish
   sdb_mainloop();
 
-  if (npc_state == NPC_END) {
+  if (npc_state.state == NPC_END) {
     printf("--------------------------HIT GOOD TRAP------------------------\n");
   }
   else {
