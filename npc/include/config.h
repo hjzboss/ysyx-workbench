@@ -5,6 +5,6 @@
 
 #define MAX_SIM_TIME 1000 // max simulation time
 #define CONFIG_MBASE 0x80000000
-#define CONFIG_ITRACE
+#define CONFIG_ITRACE 1
 
 #endif
