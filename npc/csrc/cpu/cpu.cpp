@@ -16,6 +16,8 @@ static uint8_t i_cache[65535] = {};
 
 NPCState npc_state = { .state = NPC_STOP };
 
+uint64_t get_time();
+
 // Called by $time in Verilog
 double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
