@@ -125,7 +125,7 @@ void init_cpu(char *dir) {
   reset(3);
 
   // state is running
-  npc_state = NPC_RUNNING;
+  npc_state.state = NPC_RUNNING;
 }
 
 
@@ -216,6 +216,6 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           npc_state.halt_pc);
       // fall through
-    case NEMU_QUIT: statistic();
+    case NPC_QUIT: statistic();
   }
 }
