@@ -115,12 +115,13 @@ static void init_wave() {
 void init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
-  contextp = new VerilatedContext;
   
+
 #ifdef CONFIG_WAVE
   init_wave();
 #endif
 
+  contextp = new VerilatedContext;
   // initial i_cache
   load_img(dir);
 
