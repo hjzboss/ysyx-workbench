@@ -129,6 +129,7 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize the simple debugger. */
   init_sdb();
 
+  /* Initialize itrace ringbuf*/
   IFDEF(CONFIG_ITRACE, init_iringbuf());
 
   IFDEF(CONFIG_ITRACE, init_disasm(
