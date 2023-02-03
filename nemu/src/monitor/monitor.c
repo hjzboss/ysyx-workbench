@@ -24,6 +24,7 @@ void init_difftest(char *ref_so_file, long img_size, int port);
 void init_device();
 void init_sdb();
 void init_disasm(const char *triple);
+//void init_elf(const char *file);
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
@@ -101,6 +102,11 @@ static int parse_args(int argc, char *argv[]) {
 
 void init_monitor(int argc, char *argv[]) {
   /* Perform some global initialization. */
+
+
+  for (int i = 0; i < argc; ++i) {
+    puts(argv[i]);
+  }
 
   /* Parse arguments. */
   parse_args(argc, argv);
