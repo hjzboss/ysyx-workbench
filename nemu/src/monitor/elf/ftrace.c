@@ -17,11 +17,11 @@ static func func_list[MAX_FUNC_NUM]; // function list
 static int func_num = 0; // function count
 
 void init_elf(const char *file) {
-  printf("read elf file\n");
+  log_write("read elf file\n");
   FILE *fp;
   fp = fopen(file, "r");
   if (NULL == fp) {
-    printf("fail to open the file\n");
+    log_write("fail to open the file\n");
     assert(0);
   }
   // analysis head
@@ -39,7 +39,7 @@ void init_elf(const char *file) {
     elf_head.e_ident[1] != 'E' ||
     elf_head.e_ident[2] != 'L' ||
     elf_head.e_ident[3] != 'F') {
-    printf("Not a ELF file\n");
+    log_write("Not a ELF file\n");
     assert(0);
   }
 
@@ -99,12 +99,12 @@ void init_elf(const char *file) {
         if (name[j] == '\0') break;
       }
       if (j == MAX_FUNC_NAME_WIDTH) {
-        printf("ftrace: function name is too long, the excess will be stage\n");
+        log_write("ftrace: function name is too long, the excess will be stage\n");
         name[j-10] = '\0';
       }
       // limit num of func list
       if(func_num == MAX_FUNC_NUM) {
-        printf("ftrace: function is too much, more than %d!\n", MAX_FUNC_NUM);
+        log_write("ftrace: function is too much, more than %d!\n", MAX_FUNC_NUM);
         assert(0);
       }
       func_list[func_num].id = func_num;
@@ -121,11 +121,11 @@ void init_elf(const char *file) {
   start2 = NULL;
   fclose(fp);
   if(func_num == 0) {
-    printf("no function in elf file!\n");
+    log_write("no function in elf file!\n");
     assert(0);
   }
   //func_state = -1;
-  printf("read elf file finfished\n");
+  log_write("read elf file finfished\n");
 }
 
 /*

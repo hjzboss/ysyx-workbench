@@ -95,6 +95,7 @@ static int parse_args(int argc, char *argv[]) {
         printf("\t-l,--log=FILE           output log to FILE\n");
         printf("\t-d,--diff=REF_SO        run DiffTest with reference REF_SO\n");
         printf("\t-p,--port=PORT          run DiffTest with port PORT\n");
+        printf("\t-e,--elf=FILE           elf file path\n");
         printf("\n");
         exit(0);
     }
@@ -104,10 +105,6 @@ static int parse_args(int argc, char *argv[]) {
 
 void init_monitor(int argc, char *argv[]) {
   /* Perform some global initialization. */
-
-  for (int i = 0; i < argc; ++i) {
-    puts(argv[i]);
-  }
 
   /* Parse arguments. */
   parse_args(argc, argv);
