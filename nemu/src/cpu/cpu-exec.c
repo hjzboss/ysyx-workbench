@@ -44,6 +44,14 @@ static void insert_iringbuf(char* logbuf) {
   iringbuf[iring_ptr] = logbuf;
 }
 
+static void print_iringbuf() {
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    if (iring_ptr == i) printf("-->");
+    else printf("   ");
+
+    puts(iringbuf[i]);
+  }
+}
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -80,9 +88,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
-  printf("test: ");
-  puts(s->logbuf);
-  insert_iringbuf(p);
+  
+  insert_iringbuf(s->logbuf);
 #endif
 }
 
@@ -107,6 +114,7 @@ static void statistic() {
 }
 
 void assert_fail_msg() {
+  print_iringbuf();
   isa_reg_display();
   statistic();
 }
