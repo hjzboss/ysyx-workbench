@@ -17,6 +17,7 @@
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
 #include <locale.h>
+#include <string.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -41,7 +42,8 @@ void scan_watchpoint(Decode*);
 
 static void insert_iringbuf(char* logbuf) {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
-  iringbuf[iring_ptr] = logbuf;
+  strcpy(iringbuf[iring_ptr], logbuf);
+  //iringbuf[iring_ptr] = logbuf;
   puts(iringbuf[iring_ptr]);
 }
 
