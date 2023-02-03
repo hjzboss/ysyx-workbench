@@ -66,10 +66,10 @@ void free_mtrace() {
 void print_mtrace() {
   mtrace_node *ptr = mtrace_head;
   while(ptr != NULL) {
-    printf("[%016x]", ptr->addr);
+    printf("[0x%016x]", ptr->addr);
     if (ptr->read) printf(" --> ");
     else printf(" <-- ");
-    printf("%lu, len=%d bytes\n", ptr->value, ptr->len);
+    printf("0x%016lx, len=%d bytes\n", ptr->value, ptr->len);
 
     ptr = ptr->next;
   }
