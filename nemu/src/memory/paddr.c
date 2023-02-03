@@ -43,11 +43,13 @@ static void insert_mtrace(bool is_read, paddr_t addr, int len, uint64_t value) {
   node->len = len;
   node->value = value;
   node->next = NULL;
-
+  
+  // log
   log_write("[0x%016x]", node->addr);
   if (node->read) log_write(" --> ");
   else log_write(" <-- ");
   log_write("0x%016lx, len=%d bytes\n", node->value, node->len);
+
   if (mtrace_head == NULL) {
     mtrace_head = node;
     mtrace_tail = node;
