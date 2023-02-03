@@ -49,8 +49,6 @@ void init_iringbuf() {
 static void insert_iringbuf(char* logbuf) {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
   strcpy(iringbuf[iring_ptr], logbuf);
-  //iringbuf[iring_ptr] = logbuf;
-  puts(iringbuf[iring_ptr]);
 }
 
 static void print_iringbuf() {
