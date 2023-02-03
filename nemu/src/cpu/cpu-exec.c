@@ -34,7 +34,7 @@ static bool g_print_step = false;
 void device_update();
 bool scan_wp();
 void scan_watchpoint(Decode*);
-
+IFDEF(CONFIG_MTRACE, void print_mtrace());
 
 #ifdef CONFIG_ITRACE
 // my change
@@ -124,6 +124,7 @@ static void statistic() {
 
 void assert_fail_msg() {
   IFDEF(CONFIG_ITRACE, print_iringbuf());
+  IFDEF(CONFIG_MTRACE, print_mtrace());
   isa_reg_display();
   statistic();
 }
