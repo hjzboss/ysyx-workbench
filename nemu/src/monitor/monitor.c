@@ -16,6 +16,7 @@
 #include <isa.h>
 #include <memory/paddr.h>
 
+void init_iringbuf();
 void init_rand();
 void init_log(const char *log_file);
 void init_mem();
@@ -127,6 +128,8 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Initialize the simple debugger. */
   init_sdb();
+
+  IFDEF(CONFIG_ITRACE, init_iringbuf());
 
   IFDEF(CONFIG_ITRACE, init_disasm(
     MUXDEF(CONFIG_ISA_x86,     "i686",

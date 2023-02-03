@@ -40,11 +40,17 @@ void device_update();
 bool scan_wp();
 void scan_watchpoint(Decode*);
 
+void init_iringbuf() {
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    iringbuf[i] = (char*)malloc(128);
+  }
+}
+
 static void insert_iringbuf(char* logbuf) {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
-  memcpy(iringbuf[iring_ptr], logbuf, strlen(logbuf));
+  strcpy(iringbuf[iring_ptr], logbuf);
   //iringbuf[iring_ptr] = logbuf;
-  //puts(iringbuf[iring_ptr]);
+  puts(iringbuf[iring_ptr]);
 }
 
 static void print_iringbuf() {
