@@ -53,12 +53,14 @@ static void insert_iringbuf(char* logbuf) {
 }
 
 static void print_iringbuf() {
+  printf("---itrace message start---\n");
   for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
     if (iring_ptr == i) printf("-->");
     else printf("   ");
 
     puts(iringbuf[i]);
   }
+  printf("---itrace message end---\n");
 }
 #endif
 

@@ -64,6 +64,7 @@ void free_mtrace() {
 }
 
 void print_mtrace() {
+  printf("---mtrace message start---\n");
   mtrace_node *ptr = mtrace_head;
   while(ptr != NULL) {
     printf("[0x%016x]", ptr->addr);
@@ -73,6 +74,7 @@ void print_mtrace() {
 
     ptr = ptr->next;
   }
+  printf("---mtrace message end---\n");
 }
 #endif
 
