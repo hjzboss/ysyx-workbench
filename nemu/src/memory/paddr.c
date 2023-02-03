@@ -69,7 +69,7 @@ void print_mtrace() {
     printf("[0x%016x]", ptr->addr);
     if (ptr->read) printf(" --> ");
     else printf(" <-- ");
-    printf("0x%lx, len=%d bytes\n", ptr->value, ptr->len);
+    printf("0x%016lx, len=%d bytes\n", ptr->value, ptr->len);
 
     ptr = ptr->next;
   }
