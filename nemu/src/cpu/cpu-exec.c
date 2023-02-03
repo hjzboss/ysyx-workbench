@@ -30,9 +30,20 @@ uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
+// my change
+static char* iringbuf[MAX_INST_TO_PRINT] = {};
+static int iring_ptr = -1;
+
+
 void device_update();
 bool scan_wp();
 void scan_watchpoint(Decode*);
+
+static void insert_iringbuf(char* logbuf) {
+  iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
+  iringbuf[iring_ptr] = logbuf;
+}
+
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -69,6 +80,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+  printf("test: ");
+  puts(p);
+  insert_iringbuf(p);
 #endif
 }
 
