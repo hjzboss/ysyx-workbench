@@ -31,14 +31,14 @@ uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
-// my change
-static char* iringbuf[MAX_INST_TO_PRINT] = {};
-static int iring_ptr = -1;
-
-
 void device_update();
 bool scan_wp();
 void scan_watchpoint(Decode*);
+
+#ifdef CONFIG_ITRACE
+// my change
+static char* iringbuf[MAX_INST_TO_PRINT] = {};
+static int iring_ptr = -1;
 
 void init_iringbuf() {
   for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
@@ -59,6 +59,7 @@ static void print_iringbuf() {
     puts(iringbuf[i]);
   }
 }
+#endif
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
