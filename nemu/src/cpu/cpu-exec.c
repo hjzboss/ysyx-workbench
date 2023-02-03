@@ -35,7 +35,6 @@ void device_update();
 bool scan_wp();
 void scan_watchpoint(Decode*);
 
-void print_mtrace();
 
 #ifdef CONFIG_ITRACE
 // my change
@@ -115,7 +114,6 @@ static void execute(uint64_t n) {
 }
 
 static void statistic() {
-  print_mtrace();
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
