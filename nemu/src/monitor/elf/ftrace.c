@@ -222,13 +222,13 @@ static int check_func_type(uint32_t inst) {
 }
 
 
-void ftrace(paddr_t addr, uint32_t inst) {
+void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc) {
   int type = check_func_type(inst);
   printf("type = %d\n", type);
   if (type == OTHER) return;
   else if (type == CALL)
-    insert_ftrace(CALL, addr, find_func(addr));
+    insert_ftrace(CALL, addr, find_func(next_pc));
   else
-    insert_ftrace(RET, addr, find_func(addr));
+    insert_ftrace(RET, addr, find_func(next_pc));
 }
 #endif

@@ -66,7 +66,7 @@ static void print_iringbuf() {
 
 #ifdef CONFIG_FTRACE
 void print_ftrace();
-void ftrace(paddr_t addr, uint32_t inst);
+void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc);
 #endif
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
@@ -109,7 +109,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(pc, s->dnpc);
+  ftrace(pc, s->isa.inst.val, s->dnpc);
 #endif
 }
 
