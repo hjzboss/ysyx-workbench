@@ -5,7 +5,7 @@
 FILE *log_fp = NULL;
 static char buff[1000];
 
-void log_init(char *file) {
+void init_log(char *file) {
   log_fp = fopen(file, "w+");
   if(log_fp == NULL) {
     printf("can't open or create log file: %s\n", file);

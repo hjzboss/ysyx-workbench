@@ -25,6 +25,7 @@
 void init_sdb();
 void init_disasm(const char *triple);
 IFDEF(CONFIG_ITRACE, void init_iringbuf());
+void init_log(char *file);
 
 static void welcome() {
   /*
@@ -87,7 +88,7 @@ void init_monitor(int argc, char *argv[]) {
   //IFDEF(CONFIG_DEVICE, init_device());
 
   init_log(log_file);
-  
+
   /* Perform ISA dependent initialization. */
   //init_isa();
 
