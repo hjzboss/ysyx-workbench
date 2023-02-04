@@ -75,7 +75,8 @@ static int cmd_info(char *args) {
 	switch (arg) {
 		case 'r':
 			printf("Print register status:\n");
-			isa_reg_display();
+			bool list[34];
+			isa_reg_display(list);
 			break;
       /*
 		case 'w':
@@ -89,7 +90,7 @@ static int cmd_info(char *args) {
 	return 0;
 }
 
-
+pc
 static int cmd_x(char *args) {
 	if (args == NULL) {
 		printf("Input parameters are required!\n");
