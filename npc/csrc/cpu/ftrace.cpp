@@ -191,8 +191,9 @@ void init_elf(const char *file) {
   printf("read elf file finfished\n");
 }
 
+/*
 // pc in which function
-static int find_func(paddr_t pc) {
+static int find_func(uint64_t pc) {
   for (int i = 0; i < func_num; i++) {
     if(pc == func_list[i].start_addr || ((pc >= func_list[i].start_addr) && (pc < (func_list[i].start_addr + func_list[i].size)))) {
       return i;
@@ -203,7 +204,7 @@ static int find_func(paddr_t pc) {
   return 0;
 }
 
-/*
+
 // check the function type
 static int check_func_type(uint32_t inst) {
   uint8_t op = inst & 0x07f;
