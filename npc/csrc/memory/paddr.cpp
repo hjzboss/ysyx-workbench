@@ -20,6 +20,12 @@ uint64_t pmem_read(uint64_t addr, int len) {
   return ret;
 }
 
+/*
+static void pmem_write(paddr_t addr, int len, word_t data) {
+  host_write(guest_to_host(addr), len, data);
+}
+*/
+
 void load_img(char *dir) {
   FILE *fp = fopen(dir, "rb");
 

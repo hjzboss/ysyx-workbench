@@ -12,7 +12,33 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 IFDEF(CONFIG_ITRACE, char logbuf[128]);
 
-//static uint8_t i_cache[65535] = {};
+// itrace iringbuf
+#ifdef CONFIG_ITRACE
+static char* iringbuf[MAX_INST_TO_PRINT] = {};
+static int iring_ptr = -1;
+
+void init_iringbuf() {
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    iringbuf[i] = (char*)malloc(128);
+  }
+}
+
+static void insert_iringbuf(char* logbuf) {
+  iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
+  strcpy(iringbuf[iring_ptr], logbuf);
+}
+
+static void print_iringbuf() {
+  printf("---itrace message start---\n");
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    if (iring_ptr == i) printf("-->");
+    else printf("   ");
+
+    puts(iringbuf[i]);
+  }
+  printf("---itrace message end---\n");
+}
+#endif
 
 NPCState npc_state = { .state = NPC_STOP };
 
@@ -26,30 +52,6 @@ double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
 }
 
-/*
-uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
-uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
-
-static inline uint64_t host_read(void *addr, int len) {
-  switch (len) {
-    case 1: return *(uint8_t  *)addr;
-    case 2: return *(uint16_t *)addr;
-    case 4: return *(uint32_t *)addr;
-    case 8: return *(uint64_t *)addr;
-    default: return 0;
-  }
-}
-
-uint64_t pmem_read(uint64_t addr, int len) {
-  uint64_t ret = host_read(guest_to_host(addr), len);
-  return ret;
-}
-*/
-/*
-static void pmem_write(paddr_t addr, int len, word_t data) {
-  host_write(guest_to_host(addr), len, data);
-}
-*/
 
 // todo
 static void trace_and_difftest(uint64_t dnpc) {
@@ -68,20 +70,15 @@ extern "C" void c_break() {
   npc_state.halt_pc = top->io_pc;
 }
 
-/*
-static void load_img(char *dir) {
-  FILE *fp = fopen(dir, "rb");
 
-  fseek(fp, 0, SEEK_END);
-  long size = ftell(fp);
-
-  fseek(fp, 0, SEEK_SET);
-  int ret = fread(i_cache, size, 1, fp);
-  assert(ret == 1);
-
-  fclose(fp);
+void assert_fail_msg() {
+  IFDEF(CONFIG_ITRACE, print_iringbuf());
+  IFDEF(CONFIG_MTRACE, print_mtrace());
+  IFDEF(CONFIG_FTRACE, print_ftrace(false));
+  isa_reg_display();
+  statistic();
 }
-*/
+
 
 static void reset(int time) {
   top->reset = 1;
@@ -190,6 +187,7 @@ void execute(uint64_t n) {
 
 // todo
 static void statistic() {
+  print_iringbuf();
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   printf("host time spent = " NUMBERIC_FMT " us", g_timer);
