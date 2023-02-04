@@ -46,6 +46,7 @@ static void insert_ftrace(int type, paddr_t addr, int func_no) {
     ftrace_tail->next = node;
     ftrace_tail = node;
   }
+  printf("%d\n", ftrace_tail->func_no);
 }
 
 void free_ftrace() {
@@ -186,7 +187,6 @@ void init_elf(const char *file) {
     printf("no function in elf file!\n");
     assert(0);
   }
-  //func_state = -1;
   printf("read elf file finfished\n");
 }
 
