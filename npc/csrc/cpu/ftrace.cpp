@@ -65,12 +65,12 @@ void print_ftrace(bool log) {
   while(ptr != NULL) {
     // log message
     if (ptr->type == CALL) {
-      if(log) log_write("0x%016x: call [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
-      else printf("0x%016x: call [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      if(log) log_write("0x%016lx: call [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      else printf("0x%016lx: call [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
     }
     else {
-      if(log) log_write("0x%016x: ret [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
-      else printf("0x%016x: ret [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      if(log) log_write("0x%016lx: ret [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      else printf("0x%016lx: ret [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
     }
     ptr = ptr->next;
   }
