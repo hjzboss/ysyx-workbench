@@ -25,6 +25,7 @@ void init_difftest(char *ref_so_file, long img_size);
 void init_sdb();
 void init_disasm(const char *triple);
 void init_elf(const char *file);
+long init_cpu(char *);
 IFDEF(CONFIG_ITRACE, void init_iringbuf());
 
 static void welcome() {
@@ -99,13 +100,13 @@ void init_monitor(int argc, char *argv[]) {
   /* Perform ISA dependent initialization. */
   //init_isa();
 
-  init_cpu(img_file);
+  long size = init_cpu(img_file);
 
   /* Load the image to memory. This will overwrite the built-in image. */
   //long img_size = load_img();
 
   /* Initialize differential testing. */
-  init_difftest(diff_so_file, img_size);
+  init_difftest(diff_so_file, size);
 
   /* Initialize the simple debugger. */
   init_sdb();

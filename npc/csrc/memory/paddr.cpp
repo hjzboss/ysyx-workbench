@@ -26,7 +26,7 @@ static void pmem_write(paddr_t addr, int len, word_t data) {
 }
 */
 
-void load_img(char *dir) {
+long load_img(char *dir) {
   FILE *fp = fopen(dir, "rb");
 
   fseek(fp, 0, SEEK_END);
@@ -37,4 +37,5 @@ void load_img(char *dir) {
   assert(ret == 1);
 
   fclose(fp);
+  return size;
 }

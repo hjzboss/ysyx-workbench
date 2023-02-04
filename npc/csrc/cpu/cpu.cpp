@@ -111,7 +111,7 @@ static void init_wave() {
 }
 
 
-void init_cpu(char *dir) {
+long init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
@@ -120,13 +120,15 @@ void init_cpu(char *dir) {
 #endif
 
   // initial i_cache
-  load_img(dir);
+  long size = load_img(dir);
 
   top->clock = 0;
   reset(4);
 
   // state is running
   npc_state.state = NPC_RUNNING;
+
+  return size;
 }
 
 

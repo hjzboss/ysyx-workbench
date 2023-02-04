@@ -24,11 +24,9 @@
 
 #include <debug.h>
 
-void init_cpu(char *);
+long init_cpu(char *);
 
 void delete_cpu();
-
-void main_loop();
 
 void cpu_exec(uint64_t);
 
