@@ -46,6 +46,7 @@ uint64_t get_time();
 
 uint64_t pmem_read(uint64_t addr, int len);
 void load_img(char *dir);
+void isa_reg_display();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -191,7 +192,7 @@ void assert_fail_msg() {
   IFDEF(CONFIG_ITRACE, print_iringbuf());
   IFDEF(CONFIG_MTRACE, print_mtrace());
   IFDEF(CONFIG_FTRACE, print_ftrace(false));
-  //isa_reg_display();
+  isa_reg_display();
   statistic();
 }
 
