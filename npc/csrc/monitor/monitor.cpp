@@ -77,14 +77,13 @@ static int parse_args(int argc, char *argv[]) {
 
 void init_monitor(int argc, char *argv[]) {
   /* Perform some global initialization. */
-
+  printf("jhasdasd\n");
   /* Parse arguments. */
   parse_args(argc, argv);
 
   /* Initialize devices. */
   //IFDEF(CONFIG_DEVICE, init_device());
 
-  printf("jhasdasd\n");
   init_log(log_file);
 
   /* Perform ISA dependent initialization. */
