@@ -18,6 +18,8 @@ CPUState cpu = {};
 static char* iringbuf[MAX_INST_TO_PRINT] = {};
 static int iring_ptr = -1;
 
+IFDEF(CONFIG_DIFFTEST, void difftest_step());
+
 void init_iringbuf() {
   for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
     iringbuf[i] = (char*)malloc(128);
