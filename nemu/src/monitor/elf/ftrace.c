@@ -173,7 +173,6 @@ void init_elf(const char *file) {
       func_list[func_num].start_addr = sym->st_value;
       func_list[func_num].size = sym->st_size;
       strcpy(func_list[func_num].name, name);
-      printf("0x%016lx\n", func_list[func_num].start_addr);
       func_num++;
     }
     sym++;
@@ -193,7 +192,6 @@ void init_elf(const char *file) {
 
 // pc in which function
 static int find_func(paddr_t pc) {
-  printf("0x%016x\n", pc);
   for (int i = 0; i < func_num; i++) {
     if(pc == func_list[i].start_addr || ((pc >= func_list[i].start_addr) && (pc < (func_list[i].start_addr + func_list[i].size)))) {
       return i;

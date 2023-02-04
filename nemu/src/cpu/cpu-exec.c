@@ -109,7 +109,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(pc, s->isa.inst.val);
+  ftrace(pc, s->dnpc);
 #endif
 }
 
@@ -125,7 +125,7 @@ static void execute(uint64_t n) {
 }
 
 static void statistic() {
-  IFDEF(CONFIG_FTRACE, print_ftrace(false));
+  IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
