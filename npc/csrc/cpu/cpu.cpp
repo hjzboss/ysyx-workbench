@@ -150,7 +150,7 @@ static void isa_exec_once() {
 static void cpu_exec_once() {
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
-  cpu.inst = pmem_read(pc, 4);
+  cpu.inst = pmem_read(cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_ITRACE
   char *p = cpu.logbuf;
