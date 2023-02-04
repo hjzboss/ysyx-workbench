@@ -65,12 +65,12 @@ void print_ftrace(bool log) {
   while(ptr != NULL) {
     // log message
     if (ptr->type == CALL) {
-      if(log) log_write("0x%016x: call [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
-      else printf("0x%016x: call [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      if(log) log_write("0x%016x: call [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      else printf("0x%016x: call [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
     }
     else {
-      if(log) log_write("0x%016x: ret [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
-      else printf("0x%016x: ret [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      if(log) log_write("0x%016x: ret [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      else printf("0x%016x: ret [%s@0x%016lx]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
     }
     ptr = ptr->next;
   }
@@ -196,7 +196,7 @@ static int find_func(uint64_t pc) {
       return i;
     }
   }
-  printf("0x%016x no funciton match!\n", pc);
+  printf("0x%016lx no funciton match!\n", pc);
   assert(0);
   return 0;
 }
