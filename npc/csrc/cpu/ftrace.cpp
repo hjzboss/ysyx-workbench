@@ -31,7 +31,7 @@ typedef struct node {
 static fringbuf *ftrace_head = NULL;
 static fringbuf *ftrace_tail = NULL;
 
-static void insert_ftrace(int type, paddr_t addr, int func_no, paddr_t next_pc) {
+static void insert_ftrace(int type, uint64_t addr, int func_no, uint64_t next_pc) {
   fringbuf *node = (fringbuf*)malloc(sizeof(fringbuf));
   node->type = type;
   node->addr = addr;
