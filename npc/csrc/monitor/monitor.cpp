@@ -86,6 +86,8 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize devices. */
   //IFDEF(CONFIG_DEVICE, init_device());
 
+  init_log(log_file);
+  
   /* Perform ISA dependent initialization. */
   //init_isa();
 
@@ -102,7 +104,7 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_ITRACE, init_disasm("riscv64" "-pc-linux-gnu"));
 
   IFDEF(CONFIG_ITRACE, init_iringbuf());
-  
+
   /* Display welcome message. */
   welcome();
 }

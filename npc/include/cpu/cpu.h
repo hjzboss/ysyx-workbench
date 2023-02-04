@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 
+#include <debug.h>
+
 void init_cpu(char *);
 
 void delete_cpu();

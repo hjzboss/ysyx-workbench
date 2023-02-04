@@ -1,6 +1,8 @@
 #include <cpu/cpu.h>
 #include <monitor/sdb.h>
 
+void log_exit();
+
 int main(int argc, char** argv, char** env) {
 
   // Prevent unused variable warnings
@@ -17,6 +19,8 @@ int main(int argc, char** argv, char** env) {
 
   // Simulate until $finish
   sdb_mainloop();
+
+  log_exit();
 
   delete_cpu();
 

@@ -23,6 +23,8 @@ VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
+NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
+
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LDFLAGS += $(DIFFSET_SO)
@@ -36,6 +38,6 @@ sim: $(SIM_CSRC) $(VSRC)
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME) $(IMAGE_OBJ)
+	$(SIM_OBJ_DIR)/V$(TOPNAME) $(IMAGE_OBJ) $(NPC_FLAG)
 	@echo "wave"
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
