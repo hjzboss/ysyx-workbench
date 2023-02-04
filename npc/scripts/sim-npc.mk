@@ -27,6 +27,7 @@ IMAGE_OBJ ?=
 
 NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
 NPC_FLAG += -i $(IMAGE_OBJ)
+NPC_FLAG += -e ${IMAGE}.elf
 
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
