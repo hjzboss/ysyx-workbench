@@ -42,8 +42,13 @@ extern NPCState npc_state;
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
 typedef struct {
-  
-}
+  uint64_t pc;
+  uint64_t npc;
+  uint32_t inst;
+  IFDEF(CONFIG_ITRACE, char logbuf[128]);
+} CPUState;
+
+extern CPUState cpu;
 
 #define FMT_WORD "0x%016lx"
 

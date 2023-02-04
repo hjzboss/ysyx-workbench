@@ -10,7 +10,8 @@ static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
-IFDEF(CONFIG_ITRACE, char logbuf[128]);
+
+CPUState cpu = {};
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -23,9 +24,9 @@ void init_iringbuf() {
   }
 }
 
-static void insert_iringbuf(char* logbuf) {
+static void insert_iringbuf() {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
-  strcpy(iringbuf[iring_ptr], logbuf);
+  strcpy(iringbuf[iring_ptr], cpu.logbuf);
 }
 
 static void print_iringbuf() {
@@ -61,8 +62,8 @@ double sc_time_stamp () {
 
 // todo
 static void trace_and_difftest(uint64_t dnpc) {
-  IFDEF(CONFIG_ITRACE, log_write("%s\n", logbuf));
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf)); }
+  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
   //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
@@ -145,15 +146,16 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  uint64_t pc = top->io_pc;
-  uint32_t inst_val = pmem_read(pc, 4);
+  cpu.pc = top->io_pc;
+  cpu.npc = top->io_nextPc;
+  cpu.inst = pmem_read(pc, 4);
   isa_exec_once();
 #ifdef CONFIG_ITRACE
-  char *p = logbuf;
-  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", pc);
+  char *p = cpu.logbuf;
+  p += snprintf(p, sizeof(cpu.logbuf), FMT_WORD ":", cpu.pc);
   int ilen = 4;
   int i;
-  uint8_t *inst = (uint8_t *)&inst_val;
+  uint8_t *inst = (uint8_t *)&cpu.inst;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -164,13 +166,13 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, logbuf + sizeof(logbuf) - p, pc, (uint8_t *)&inst_val, ilen);
+  disassemble(p, cpu.logbuf + sizeof(cpu.logbuf) - p, cpu.pc, (uint8_t *)&cpu.inst, ilen);
 
-  insert_iringbuf(logbuf);
+  insert_iringbuf();
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(pc, inst_val, top->io_pc);
+  ftrace(cpu.pc, cpu.inst, cpu.npc);
 #endif
 }
 

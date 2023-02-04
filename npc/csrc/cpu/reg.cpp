@@ -1,4 +1,5 @@
 #include "verilated_dpi.h"
+#include <cpu/cpu.h>
 
 uint64_t *cpu_gpr = NULL;
 
