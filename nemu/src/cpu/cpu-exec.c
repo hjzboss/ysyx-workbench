@@ -64,6 +64,11 @@ static void print_iringbuf() {
 }
 #endif
 
+#ifdef CONFIG_FTRACE
+void print_ftrace();
+void ftrace(paddr_t addr, uint32_t inst);
+#endif
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
@@ -102,6 +107,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
   
   insert_iringbuf(s->logbuf);
 #endif
+
+#ifdef CONFIG_FTRACE
+  ftrace(pc, s->isa.inst.val);
+#endif
 }
 
 static void execute(uint64_t n) {
@@ -116,6 +125,7 @@ static void execute(uint64_t n) {
 }
 
 static void statistic() {
+  IFDEF(CONFIG_FTRACE, print_ftrace(false));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
@@ -127,6 +137,7 @@ static void statistic() {
 void assert_fail_msg() {
   IFDEF(CONFIG_ITRACE, print_iringbuf());
   IFDEF(CONFIG_MTRACE, print_mtrace());
+  IFDEF(CONFIG_FTRACE, print_ftrace(false));
   isa_reg_display();
   statistic();
 }

@@ -1,9 +1,13 @@
 #include <elf.h>
 #include <common.h>
+#include <utils.h>
 
 #ifdef CONFIG_FTRACE
 #define MAX_FUNC_NAME_WIDTH 50
 #define MAX_FUNC_NUM 50
+enum func_type {
+  CALL, RET, OTHER
+};
 
 typedef struct {
   int id;
@@ -15,6 +19,64 @@ typedef struct {
 static func func_list[MAX_FUNC_NUM]; // function list
 
 static int func_num = 0; // function count
+
+typedef struct node{
+  /* data */
+  int type;
+  paddr_t addr;
+  int func_no; // 函数类型
+  struct node *next;
+} fringbuf;
+
+static fringbuf *ftrace_head = NULL;
+static fringbuf *ftrace_tail = NULL;
+
+static void insert_ftrace(int type, paddr_t addr, int func_no) {
+  fringbuf *node = (fringbuf*)malloc(sizeof(fringbuf));
+  node->type = type;
+  node->addr = addr;
+  node->func_no = func_no;
+  node->next = NULL;
+
+  if (ftrace_head == NULL) {
+    ftrace_head = node;
+    ftrace_tail = node;
+  }
+  else {
+    ftrace_tail->next = node;
+    ftrace_tail = node;
+  }
+}
+
+void free_ftrace() {
+  fringbuf *tmp;
+  while(ftrace_head != NULL) {
+    tmp = ftrace_head->next;
+    free(ftrace_head);
+    ftrace_head = tmp;
+  }
+}
+
+void print_ftrace(bool log) {
+  if(log) log_write("---ftrace message start---\n");
+  else printf("---ftrace message start---\n");
+  fringbuf *ptr = ftrace_head;
+  while(ptr != NULL) {
+    // log message
+    if (ptr->type == CALL) {
+      if(log) log_write("0x%016x: call [%s]\n", ptr->addr, func_list[ptr->func_no].name);
+      else printf("0x%016x: call [%s]\n", ptr->addr, func_list[ptr->func_no].name);
+    }
+    else {
+      if(log) log_write("0x%016x: ret [%s]\n", ptr->addr, func_list[ptr->func_no].name);
+      else printf("0x%016x: ret [%s]\n", ptr->addr, func_list[ptr->func_no].name);
+    }
+    ptr = ptr->next;
+  }
+  if(log) log_write("---ftrace message end---\n");
+  else log_write("---ftrace message end---\n");
+}
+
 
 void init_elf(const char *file) {
   printf("read elf file\n");
@@ -128,18 +190,42 @@ void init_elf(const char *file) {
   printf("read elf file finfished\n");
 }
 
-/*
 // pc in which function
-static int func_pc(vaddr_t addr) {
+static int find_func(paddr_t pc) {
   for (int i = 0; i < func_num; i++) {
-    if(addr == func_list[i].start_addr || ((addr >= func_list[i].start_addr) && (addr < (func_list[i].start_addr + func_list[i].size)))) {
+    if(pc == func_list[i].start_addr || ((pc >= func_list[i].start_addr) && (pc < (func_list[i].start_addr + func_list[i].size)))) {
       return i;
     }
   }
-  printf("0x%016lx no funciton match!\n", addr);
+  printf("0x%016x no funciton match!\n", pc);
   assert(0);
   return 0;
 }
-*/
 
+// check the function type
+static int check_func_type(uint32_t inst) {
+  uint8_t op = inst & 0x7f;
+  uint8_t rd = (inst >> 7) & 0x1f;
+  uint8_t rs1 = (inst >> 15) & 0x1f;
+  bool rs1_link = rs1 == 0x1 || rs1 == 0x5;
+  bool rd_link = rd == 0x1 || rd == 0x5;
+  // jalr
+  if (op == 0x67) {
+    if (!rd_link && rs1_link) return RET;
+    else if (rs1 == rd && rd_link && rs1_link) return CALL;
+  }
+  else if (op == 0x6f && rd_link) return CALL;
+
+  return OTHER;
+}
+
+
+void ftrace(paddr_t addr, uint32_t inst) {
+  int type = check_func_type(inst);
+  if (type == OTHER) return;
+  else if (type == CALL)
+    insert_ftrace(CALL, addr, find_func(addr));
+  else
+    insert_ftrace(RET, addr, find_func(addr));
+}
 #endif
