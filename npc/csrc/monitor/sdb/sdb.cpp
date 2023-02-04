@@ -90,7 +90,7 @@ static int cmd_info(char *args) {
 	return 0;
 }
 
-pc
+
 static int cmd_x(char *args) {
 	if (args == NULL) {
 		printf("Input parameters are required!\n");
