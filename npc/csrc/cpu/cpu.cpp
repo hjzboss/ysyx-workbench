@@ -191,7 +191,7 @@ static void statistic() {
 void assert_fail_msg() {
   IFDEF(CONFIG_ITRACE, print_iringbuf());
   IFDEF(CONFIG_MTRACE, print_mtrace());
-  IFDEF(CONFIG_FTRACE, print_ftrace(false));
+  //IFDEF(CONFIG_FTRACE, print_ftrace(false));
   isa_reg_display();
   statistic();
 }
