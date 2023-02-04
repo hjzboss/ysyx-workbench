@@ -11,7 +11,7 @@ enum func_type {
 typedef struct {
   int id;
   size_t size;
-  vaddr_t start_addr;
+  uint64_t start_addr;
   char name[MAX_FUNC_NAME_WIDTH]; // function name
 } func;
 
@@ -19,8 +19,8 @@ static func func_list[MAX_FUNC_NUM]; // function list
 
 static int func_num = 0; // function count
 
+/*
 typedef struct node {
-  /* data */
   int type;
   paddr_t addr;
   int func_no; // 函数类型
@@ -28,7 +28,7 @@ typedef struct node {
   struct node *next;
 } fringbuf;
 
-/*
+
 static fringbuf *ftrace_head = NULL;
 static fringbuf *ftrace_tail = NULL;
 
