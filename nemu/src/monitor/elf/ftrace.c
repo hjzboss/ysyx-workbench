@@ -20,7 +20,7 @@ static func func_list[MAX_FUNC_NUM]; // function list
 
 static int func_num = 0; // function count
 
-typedef struct node{
+typedef struct node {
   /* data */
   int type;
   paddr_t addr;
@@ -173,6 +173,7 @@ void init_elf(const char *file) {
       func_list[func_num].start_addr = sym->st_value;
       func_list[func_num].size = sym->st_size;
       strcpy(func_list[func_num].name, name);
+      puts(func_list[func_num].name);
       func_num++;
     }
     sym++;
