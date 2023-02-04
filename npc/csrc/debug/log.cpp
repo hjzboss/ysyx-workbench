@@ -21,22 +21,3 @@ void log_exit() {
     fclose(log_fp);
   }
 }
-
-void log_write(bool print_screen, const char *fmt, ...) {
-  assert(fmt);
-  buff[0] = '\0';
-
-  va_list ap;
-  va_start(ap, fmt);
-  int n = vsprintf(buff, fmt, ap);
-  va_end(ap);
-
-  if(log_fp != NULL) {
-    // write to log file
-    fprintf(log_fp, "%s", buff);
-  }
-  // print to screen
-  if(print_screen) {
-    printf("%s", buff);
-  }
-}
