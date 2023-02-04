@@ -19,12 +19,11 @@ static func func_list[MAX_FUNC_NUM]; // function list
 
 static int func_num = 0; // function count
 
-/*
 typedef struct node {
   int type;
-  paddr_t addr;
+  uint64_t addr;
   int func_no; // 函数类型
-  paddr_t obj_addr; // 目标地址
+  uint64_t obj_addr; // 目标地址
   struct node *next;
 } fringbuf;
 
@@ -78,7 +77,6 @@ void print_ftrace(bool log) {
   if(log) log_write("---ftrace message end---\n");
   else log_write("---ftrace message end---\n");
 }
-*/
 
 void init_elf(const char *file) {
   printf("read elf file\n");
@@ -191,7 +189,6 @@ void init_elf(const char *file) {
   printf("read elf file finfished\n");
 }
 
-/*
 // pc in which function
 static int find_func(uint64_t pc) {
   for (int i = 0; i < func_num; i++) {
@@ -223,7 +220,7 @@ static int check_func_type(uint32_t inst) {
 }
 
 
-void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc) {
+void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc) {
   int type = check_func_type(inst);
   if (type == OTHER) return;
   else if (type == CALL)
@@ -231,5 +228,4 @@ void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc) {
   else
     insert_ftrace(RET, addr, find_func(next_pc), next_pc);
 }
-*/
 #endif

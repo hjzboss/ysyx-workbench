@@ -40,6 +40,11 @@ static void print_iringbuf() {
 }
 #endif
 
+#ifdef CONFIG_FTRACE
+void print_ftrace();
+void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
+#endif
+
 NPCState npc_state = { .state = NPC_STOP };
 
 uint64_t get_time();
@@ -163,6 +168,10 @@ static void cpu_exec_once() {
 
   insert_iringbuf(logbuf);
 #endif
+
+#ifdef CONFIG_FTRACE
+  ftrace(pc, inst_val, top->io_pc);
+#endif
 }
 
 void execute(uint64_t n) {
@@ -179,7 +188,7 @@ void execute(uint64_t n) {
 
 // todo
 static void statistic() {
-  print_iringbuf();
+  IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   printf("host time spent = " NUMBERIC_FMT " us", g_timer);

@@ -65,7 +65,7 @@ static void print_iringbuf() {
 #endif
 
 #ifdef CONFIG_FTRACE
-void print_ftrace();
+void print_ftrace(bool);
 void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc);
 #endif
 
