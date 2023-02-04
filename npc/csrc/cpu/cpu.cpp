@@ -53,7 +53,7 @@ NPCState npc_state = { .state = NPC_STOP };
 uint64_t get_time();
 
 uint64_t pmem_read(uint64_t addr, int len);
-void load_img(char *dir);
+long load_img(char *dir);
 void isa_reg_display(bool*);
 
 // Called by $time in Verilog
