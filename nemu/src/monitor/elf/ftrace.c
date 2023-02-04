@@ -46,7 +46,6 @@ static void insert_ftrace(int type, paddr_t addr, int func_no) {
     ftrace_tail->next = node;
     ftrace_tail = node;
   }
-  printf("%d\n", ftrace_tail->func_no);
 }
 
 void free_ftrace() {
@@ -222,6 +221,7 @@ static int check_func_type(uint32_t inst) {
 
 void ftrace(paddr_t addr, uint32_t inst) {
   int type = check_func_type(inst);
+  printf("type = %d\n", type);
   if (type == OTHER) return;
   else if (type == CALL)
     insert_ftrace(CALL, addr, find_func(addr));
