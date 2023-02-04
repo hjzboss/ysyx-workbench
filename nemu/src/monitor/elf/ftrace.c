@@ -203,6 +203,7 @@ static int find_func(paddr_t pc) {
 
 // check the function type
 static int check_func_type(uint32_t inst) {
+  printf("0x%08x\n", inst);
   uint8_t op = inst & 0x07f;
   printf("op=%x\n", op);
   uint8_t rd = (inst >> 7) & 0x1f;
