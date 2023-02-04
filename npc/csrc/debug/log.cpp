@@ -1,16 +1,19 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <debug.h>
 
 FILE *log_fp = NULL;
 static char buff[1000];
 
-void init_log(char *file) {
-  log_fp = fopen(file, "w+");
-  if(log_fp == NULL) {
-    printf("can't open or create log file: %s\n", file);
-    assert(0);
+void init_log(const char *log_file) {
+  log_fp = stdout;
+  if (log_file != NULL) {
+    FILE *fp = fopen(log_file, "w");
+    Assert(fp, "Can not open '%s'", log_file);
+    log_fp = fp;
   }
+  Log("Log is written to %s", log_file ? log_file : "stdout");
 }
 
 void log_exit() {
