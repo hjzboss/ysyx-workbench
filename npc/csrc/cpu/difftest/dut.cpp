@@ -57,7 +57,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   assert(handle);
 
   // for c++, type must be same
-  ref_difftest_memcpy = (void(*)(paddr_t addr, void *buf, size_t n, bool direction)) dlsym(handle, "difftest_memcpy");
+  ref_difftest_memcpy = (void(*)(uint64_t addr, void *buf, size_t n, bool direction))dlsym(handle, "difftest_memcpy");
   assert(ref_difftest_memcpy);
 
   ref_difftest_regcpy = (void(*)(void *dut, bool direction)) dlsym(handle, "difftest_regcpy");
