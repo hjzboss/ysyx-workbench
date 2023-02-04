@@ -23,7 +23,7 @@ VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
-#NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
+NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
 
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
