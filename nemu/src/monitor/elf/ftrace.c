@@ -25,17 +25,19 @@ typedef struct node {
   int type;
   paddr_t addr;
   int func_no; // 函数类型
+  paddr_t obj_addr; // 目标地址
   struct node *next;
 } fringbuf;
 
 static fringbuf *ftrace_head = NULL;
 static fringbuf *ftrace_tail = NULL;
 
-static void insert_ftrace(int type, paddr_t addr, int func_no) {
+static void insert_ftrace(int type, paddr_t addr, int func_no, paddr_t next_pc) {
   fringbuf *node = (fringbuf*)malloc(sizeof(fringbuf));
   node->type = type;
   node->addr = addr;
   node->func_no = func_no;
+  node->obj_addr = next_pc;
   node->next = NULL;
 
   if (ftrace_head == NULL) {
@@ -64,12 +66,12 @@ void print_ftrace(bool log) {
   while(ptr != NULL) {
     // log message
     if (ptr->type == CALL) {
-      if(log) log_write("0x%016x: call [%s]\n", ptr->addr, func_list[ptr->func_no].name);
-      else printf("0x%016x: call [%s]\n", ptr->addr, func_list[ptr->func_no].name);
+      if(log) log_write("0x%016x: call [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      else printf("0x%016x: call [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
     }
     else {
-      if(log) log_write("0x%016x: ret [%s]\n", ptr->addr, func_list[ptr->func_no].name);
-      else printf("0x%016x: ret [%s]\n", ptr->addr, func_list[ptr->func_no].name);
+      if(log) log_write("0x%016x: ret [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
+      else printf("0x%016x: ret [%s@0x%016x]\n", ptr->addr, func_list[ptr->func_no].name, ptr->obj_addr);
     }
     ptr = ptr->next;
   }
@@ -223,8 +225,8 @@ void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc) {
   int type = check_func_type(inst);
   if (type == OTHER) return;
   else if (type == CALL)
-    insert_ftrace(CALL, addr, find_func(next_pc));
+    insert_ftrace(CALL, addr, find_func(next_pc), next_pc);
   else
-    insert_ftrace(RET, addr, find_func(next_pc));
+    insert_ftrace(RET, addr, find_func(next_pc), next_pc);
 }
 #endif
