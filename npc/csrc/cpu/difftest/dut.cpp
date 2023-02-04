@@ -9,6 +9,8 @@ extern uint64_t *cpu_gpr;
 
 static bool is_skip_ref = false;
 void isa_reg_display(bool *);
+uint8_t* guest_to_host(uint64_t paddr);
+uint64_t host_to_guest(uint8_t *haddr);
 
 /*
 void difftest_skip_ref() {
