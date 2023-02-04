@@ -55,9 +55,7 @@ double sc_time_stamp () {
 
 // todo
 static void trace_and_difftest(uint64_t dnpc) {
-#ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", logbuf); }
-#endif
+  IFDEF(CONFIG_ITRACE, log_write("%s\n", logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf)); }
   //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 	// watchpoint
