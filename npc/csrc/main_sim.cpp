@@ -18,13 +18,6 @@ int main(int argc, char** argv, char** env) {
   // Simulate until $finish
   sdb_mainloop();
 
-  if (npc_state == NPC_END) {
-    printf("--------------------------HIT GOOD TRAP------------------------\n");
-  }
-  else {
-    printf("---------------------------HIT BAD TRAP------------------------\n");
-  }
-
   delete_cpu();
 
   // Fin

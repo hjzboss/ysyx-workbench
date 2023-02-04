@@ -20,7 +20,6 @@
 #include <readline/history.h>
 // my change
 #include <memory/paddr.h>
-#include <macro.h>
 #include <debug.h>
 
 static int is_batch_mode = false;
@@ -183,8 +182,8 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-	// my change
-	npc_state = NPC_QUIT;
+  // my change
+  npc_state.state = NPC_QUIT;
   return -1;
 }
 
@@ -271,7 +270,7 @@ void sdb_mainloop() {
         break;
       }
     }
-    if (npc_state != NPC_RUNNING) return;
+    if (npc_state.state != NPC_RUNNING) return;
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
 }

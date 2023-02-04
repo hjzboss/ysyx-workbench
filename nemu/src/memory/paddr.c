@@ -24,6 +24,66 @@ static uint8_t *pmem = NULL;
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #endif
 
+#ifdef CONFIG_MTRACE
+typedef struct node {
+  bool read;
+  paddr_t addr;
+  uint64_t value;
+  int len;
+  struct node *next;
+} mtrace_node;
+
+static mtrace_node *mtrace_head = NULL;
+static mtrace_node *mtrace_tail = NULL;
+
+static void insert_mtrace(bool is_read, paddr_t addr, int len, uint64_t value) {
+  mtrace_node *node = (mtrace_node*)malloc(sizeof(mtrace_node));
+  node->read = is_read;
+  node->addr = addr;
+  node->len = len;
+  node->value = value;
+  node->next = NULL;
+  
+  // log
+  log_write("[0x%016x]", node->addr);
+  if (node->read) log_write(" --> ");
+  else log_write(" <-- ");
+  log_write("0x%016lx, len=%d bytes\n", node->value, node->len);
+
+  if (mtrace_head == NULL) {
+    mtrace_head = node;
+    mtrace_tail = node;
+  }
+  else {
+    mtrace_tail->next = node;
+    mtrace_tail = node;
+  }
+}
+
+void free_mtrace() {
+  mtrace_node *tmp;
+  while(mtrace_head != NULL) {
+    tmp = mtrace_head->next;
+    free(mtrace_head);
+    mtrace_head = tmp;
+  }
+}
+
+void print_mtrace() {
+  printf("---mtrace message start---\n");
+  mtrace_node *ptr = mtrace_head;
+  while(ptr != NULL) {
+    printf("[0x%016x]", ptr->addr);
+    if (ptr->read) printf(" --> ");
+    else printf(" <-- ");
+    printf("0x%016lx, len=%d bytes\n", ptr->value, ptr->len);
+
+    ptr = ptr->next;
+  }
+  printf("---mtrace message end---\n");
+}
+#endif
+
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
 
@@ -57,14 +117,23 @@ void init_mem() {
 }
 
 word_t paddr_read(paddr_t addr, int len) {
-  if (likely(in_pmem(addr))) return pmem_read(addr, len);
-  IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
+  word_t result = 0;
+  if (likely(in_pmem(addr))) {
+    result = pmem_read(addr, len);
+    IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result));
+    return result;
+  }
+  IFDEF(CONFIG_DEVICE, result = mmio_read(addr, len);
+   IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result)); return result);
   out_of_bound(addr);
   return 0;
 }
 
 void paddr_write(paddr_t addr, int len, word_t data) {
-  if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
-  IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
+  if (likely(in_pmem(addr))) { 
+    pmem_write(addr, len, data); 
+    IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data));
+    return; }
+  IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data)); return);
   out_of_bound(addr);
 }

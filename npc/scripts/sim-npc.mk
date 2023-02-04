@@ -17,13 +17,13 @@ VERILATOR_SIMFLAG =
 # build
 VERILATOR_SIMFLAG += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
-VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include"
+VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/include -std=c++14 -fno-exceptions -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS"
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
-LFLAGS += -lreadline -ldl -pie -lSDL2
+LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
 #LDFLAGS += $(DIFFSET_SO)
 

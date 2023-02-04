@@ -17,6 +17,7 @@
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
 #include <locale.h>
+#include <string.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -33,6 +34,35 @@ static bool g_print_step = false;
 void device_update();
 bool scan_wp();
 void scan_watchpoint(Decode*);
+IFDEF(CONFIG_MTRACE, void print_mtrace());
+
+#ifdef CONFIG_ITRACE
+// my change
+static char* iringbuf[MAX_INST_TO_PRINT] = {};
+static int iring_ptr = -1;
+
+void init_iringbuf() {
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    iringbuf[i] = (char*)malloc(128);
+  }
+}
+
+static void insert_iringbuf(char* logbuf) {
+  iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
+  strcpy(iringbuf[iring_ptr], logbuf);
+}
+
+static void print_iringbuf() {
+  printf("---itrace message start---\n");
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    if (iring_ptr == i) printf("-->");
+    else printf("   ");
+
+    puts(iringbuf[i]);
+  }
+  printf("---itrace message end---\n");
+}
+#endif
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -69,6 +99,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+  
+  insert_iringbuf(s->logbuf);
 #endif
 }
 
@@ -85,7 +117,7 @@ static void execute(uint64_t n) {
 
 static void statistic() {
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
-#define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
+#define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
@@ -93,6 +125,8 @@ static void statistic() {
 }
 
 void assert_fail_msg() {
+  IFDEF(CONFIG_ITRACE, print_iringbuf());
+  IFDEF(CONFIG_MTRACE, print_mtrace());
   isa_reg_display();
   statistic();
 }
