@@ -203,11 +203,8 @@ static int find_func(paddr_t pc) {
 
 // check the function type
 static int check_func_type(uint32_t inst) {
-  printf("0x%08x\n", inst);
   uint8_t op = inst & 0x07f;
-  printf("op=%x\n", op);
   uint8_t rd = (inst >> 7) & 0x1f;
-  printf("rd=%x\n", rd);
   uint8_t rs1 = (inst >> 15) & 0x1f;
   bool rs1_link = rs1 == 0x1 || rs1 == 0x5;
   bool rd_link = rd == 0x1 || rd == 0x5;
@@ -224,7 +221,6 @@ static int check_func_type(uint32_t inst) {
 
 void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc) {
   int type = check_func_type(inst);
-  printf("type = %d\n", type);
   if (type == OTHER) return;
   else if (type == CALL)
     insert_ftrace(CALL, addr, find_func(next_pc));
