@@ -38,6 +38,6 @@ sim: $(SIM_CSRC) $(VSRC)
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG) $(IMAGE_OBJ)
+	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG)
 	@echo "wave"
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
