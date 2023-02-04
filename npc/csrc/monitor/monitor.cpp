@@ -20,7 +20,7 @@
 //void init_rand();
 void init_log(const char *log_file);
 //void init_mem();
-//void init_difftest(char *ref_so_file, long img_size, int port);
+void init_difftest(char *ref_so_file, long img_size);
 //void init_device();
 void init_sdb();
 void init_disasm(const char *triple);
@@ -44,7 +44,6 @@ void sdb_set_batch_mode();
 static char *log_file = NULL;
 static char *diff_so_file = NULL;
 static char *img_file = NULL;
-static int difftest_port = 1234;
 static char *elf_file = NULL;
 
 static int parse_args(int argc, char *argv[]) {
@@ -105,7 +104,7 @@ void init_monitor(int argc, char *argv[]) {
   //long img_size = load_img();
 
   /* Initialize differential testing. */
-  //init_difftest(diff_so_file, img_size, difftest_port);
+  init_difftest(diff_so_file, img_size);
 
   /* Initialize the simple debugger. */
   init_sdb();

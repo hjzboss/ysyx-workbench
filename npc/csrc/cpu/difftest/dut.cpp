@@ -8,11 +8,13 @@ extern const char *regs[];
 extern uint64_t *cpu_gpr;
 
 static bool is_skip_ref = false;
-void isa_reg_display();
+void isa_reg_display(bool *);
 
+/*
 void difftest_skip_ref() {
   is_skip_ref = true;
 }
+*/
 
 NEMUCPUState cpu_diff = {};
 
@@ -41,7 +43,7 @@ static void checkregs(NEMUCPUState *ref) {
 
   if(!same) {
     // print all dut regs when error
-    isa_reg_display();
+    isa_reg_display(err_list);
     npc_state.state = NPC_ABORT;
     npc_state.halt_pc = cpu.pc;
   }
@@ -86,6 +88,7 @@ void init_difftest(char *ref_so_file, long img_size) {
 void difftest_step() {
   NEMUCPUState ref_r;
 
+  /*
   if (is_skip_ref) {
     // to skip the checking of an instruction, just copy the reg state to reference design
     // next pc
@@ -95,6 +98,7 @@ void difftest_step() {
     is_skip_ref = false;
     return;
   }
+  */
   // ref execute once
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_r.gpr, DIFFTEST_TO_DUT);

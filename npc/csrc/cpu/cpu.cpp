@@ -52,7 +52,7 @@ uint64_t get_time();
 
 uint64_t pmem_read(uint64_t addr, int len);
 void load_img(char *dir);
-void isa_reg_display();
+void isa_reg_display(bool*);
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -64,7 +64,7 @@ double sc_time_stamp () {
 static void trace_and_difftest(uint64_t dnpc) {
   IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
-  //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+  IFDEF(CONFIG_DIFFTEST, difftest_step());
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
@@ -203,7 +203,8 @@ void assert_fail_msg() {
   IFDEF(CONFIG_ITRACE, print_iringbuf());
   IFDEF(CONFIG_MTRACE, print_mtrace());
   //IFDEF(CONFIG_FTRACE, print_ftrace(false));
-  isa_reg_display();
+  bool err_list[34];
+  isa_reg_display(err_list);
   statistic();
 }
 
