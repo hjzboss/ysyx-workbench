@@ -71,15 +71,6 @@ extern "C" void c_break() {
 }
 
 
-void assert_fail_msg() {
-  IFDEF(CONFIG_ITRACE, print_iringbuf());
-  IFDEF(CONFIG_MTRACE, print_mtrace());
-  IFDEF(CONFIG_FTRACE, print_ftrace(false));
-  isa_reg_display();
-  statistic();
-}
-
-
 static void reset(int time) {
   top->reset = 1;
   while (time > 0) {
@@ -194,6 +185,14 @@ static void statistic() {
   printf("\ntotal guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) printf("\nsimulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
   else printf("\nFinish running in less than 1 us and can not calculate the simulation frequency\n");
+}
+
+void assert_fail_msg() {
+  IFDEF(CONFIG_ITRACE, print_iringbuf());
+  IFDEF(CONFIG_MTRACE, print_mtrace());
+  IFDEF(CONFIG_FTRACE, print_ftrace(false));
+  //isa_reg_display();
+  statistic();
 }
 
 /* Simulate how the CPU works. */
