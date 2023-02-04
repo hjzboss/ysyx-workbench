@@ -12,17 +12,21 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 IFDEF(CONFIG_ITRACE, char logbuf[128]);
 
-static uint8_t i_cache[65535] = {};
+//static uint8_t i_cache[65535] = {};
 
 NPCState npc_state = { .state = NPC_STOP };
 
 uint64_t get_time();
+
+uint64_t pmem_read(uint64_t addr, int len);
+void load_img(char *dir);
 
 // Called by $time in Verilog
 double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
 }
 
+/*
 uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
 
@@ -40,7 +44,7 @@ uint64_t pmem_read(uint64_t addr, int len) {
   uint64_t ret = host_read(guest_to_host(addr), len);
   return ret;
 }
-
+*/
 /*
 static void pmem_write(paddr_t addr, int len, word_t data) {
   host_write(guest_to_host(addr), len, data);
@@ -64,6 +68,7 @@ extern "C" void c_break() {
   npc_state.halt_pc = top->io_pc;
 }
 
+/*
 static void load_img(char *dir) {
   FILE *fp = fopen(dir, "rb");
 
@@ -76,9 +81,9 @@ static void load_img(char *dir) {
 
   fclose(fp);
 }
+*/
 
-
-void reset(int time) {
+static void reset(int time) {
   top->reset = 1;
   while (time > 0) {
     top->clock = !top->clock;

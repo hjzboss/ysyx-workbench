@@ -1,0 +1,34 @@
+#include <cpu/cpu.h>
+
+static uint8_t i_cache[65535] = {};
+
+static uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
+static uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
+
+static inline uint64_t host_read(void *addr, int len) {
+  switch (len) {
+    case 1: return *(uint8_t  *)addr;
+    case 2: return *(uint16_t *)addr;
+    case 4: return *(uint32_t *)addr;
+    case 8: return *(uint64_t *)addr;
+    default: return 0;
+  }
+}
+
+uint64_t pmem_read(uint64_t addr, int len) {
+  uint64_t ret = host_read(guest_to_host(addr), len);
+  return ret;
+}
+
+void load_img(char *dir) {
+  FILE *fp = fopen(dir, "rb");
+
+  fseek(fp, 0, SEEK_END);
+  long size = ftell(fp);
+
+  fseek(fp, 0, SEEK_SET);
+  int ret = fread(i_cache, size, 1, fp);
+  assert(ret == 1);
+
+  fclose(fp);
+}
