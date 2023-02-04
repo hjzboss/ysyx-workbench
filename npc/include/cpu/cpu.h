@@ -39,8 +39,11 @@ typedef struct {
 } NPCState;
 
 extern NPCState npc_state;
-
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
+
+typedef struct {
+  
+}
 
 #define FMT_WORD "0x%016lx"
 
