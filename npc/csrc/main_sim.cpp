@@ -13,8 +13,6 @@ int main(int argc, char** argv, char** env) {
   // Set debug level, 0 is off, 9 is highest presently used
   Verilated::debug(0);
 
-  init_cpu(argv[1]);
-
   init_monitor(argc, argv);
 
   // Simulate until $finish

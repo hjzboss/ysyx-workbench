@@ -23,7 +23,10 @@ VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG += --top-module $(TOPNAME)
 
+IMAGE_OBJ ?= 
+
 NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
+NPC_FLAG += -i $(IMAGE_OBJ)
 
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 #LFLAGS +=  -lreadline -ldl -pie -lSDL2
@@ -31,13 +34,11 @@ LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 
 VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
 
-IMAGE_OBJ ?= 
-
 sim: $(SIM_CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG) $(IMAGE_OBJ)
+	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG)
 	@echo "wave"
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
