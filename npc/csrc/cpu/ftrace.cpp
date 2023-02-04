@@ -1,5 +1,4 @@
 #include <elf.h>
-#include <utils.h>
 #include <cpu/cpu.h>
 
 #ifdef CONFIG_FTRACE
