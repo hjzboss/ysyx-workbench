@@ -128,7 +128,7 @@
     ioe_write(reg, &__io_param); })
 
 
-#define log_write(...) IFDEF(CONFIG_TARGET_NATIVE_ELF, \
+#define log_write(...) IFNDEF(CONFIG_TARGET_NATIVE_ELF, \
   do { \
     extern FILE* log_fp; \
     fprintf(log_fp, __VA_ARGS__); \
