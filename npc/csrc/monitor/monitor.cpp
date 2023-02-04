@@ -102,6 +102,7 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_ITRACE, init_disasm("riscv64" "-pc-linux-gnu"));
 
   IFDEF(CONFIG_ITRACE, init_iringbuf());
+  
   /* Display welcome message. */
   welcome();
 }
