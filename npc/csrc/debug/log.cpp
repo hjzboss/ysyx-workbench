@@ -7,6 +7,7 @@ FILE *log_fp = NULL;
 static char buff[1000];
 
 void init_log(const char *log_file) {
+  printf("log: %s\n", log_file);
   log_fp = stdout;
   if (log_file != NULL) {
     FILE *fp = fopen(log_file, "w");
