@@ -40,7 +40,7 @@ extern NPCState npc_state;
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
 typedef struct {
-  uint64_t gpr[32];
+  uint64_t *gpr;
   uint64_t pc;
   uint64_t npc;
   uint32_t inst;
