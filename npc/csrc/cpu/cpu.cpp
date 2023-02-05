@@ -11,6 +11,8 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 
+extern uint64_t *cpu_gpr;
+
 CPUState cpu = {};
 
 // itrace iringbuf
@@ -125,6 +127,10 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
+  cpu.gpr = cpu_gpr;
+  cpu.pc = top->io_pc;
+  cpu.npc = top->nextPc;
+  
   // state is running
   npc_state.state = NPC_RUNNING;
 

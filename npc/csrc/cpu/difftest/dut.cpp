@@ -34,10 +34,10 @@ static void checkregs(NEMUCPUState *ref) {
 
   // check reg
   for(int i = 0; i < 32; i++) {
-    if(ref->gpr[i] != cpu_gpr[i]) {
+    if(ref->gpr[i] != cpu.gpr[i]) {
       log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
       log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
-      log_write("dut %s: 0x%016lx\n", regs[i], cpu_gpr[i]);
+      log_write("dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
       same = false;
       err_list[i] = true;
     }
@@ -59,7 +59,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   assert(handle);
 
   // for c++, type must be same
-  ref_difftest_memcpy = (void(*)(uint64_t addr, void *buf, size_t n, bool direction))dlsym(handle, "difftest_memcpy");
+  ref_difftest_memcpy = (void(*)(uint64_t addr, void *buf, size_t n, bool direction)) dlsym(handle, "difftest_memcpy");
   assert(ref_difftest_memcpy);
 
   ref_difftest_regcpy = (void(*)(void *dut, bool direction)) dlsym(handle, "difftest_regcpy");
@@ -70,9 +70,7 @@ void init_difftest(char *ref_so_file, long img_size) {
 
   ref_difftest_raise_intr =(void(*)(uint64_t NO)) dlsym(handle, "difftest_raise_intr");
   assert(ref_difftest_raise_intr);
-
-  // ref_difftest_init = (void(*)()) dlsym(handle, "difftest_init");
-  // 
+ 
   void (*ref_difftest_init)() = (void(*)())dlsym(handle, "difftest_init");
   assert(ref_difftest_init);
 
@@ -84,7 +82,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
-  ref_difftest_regcpy(cpu_gpr, DIFFTEST_TO_REF);
+  ref_difftest_regcpy(cpu, DIFFTEST_TO_REF);
 }
 
 void difftest_step() {
@@ -94,16 +92,16 @@ void difftest_step() {
   if (is_skip_ref) {
     // to skip the checking of an instruction, just copy the reg state to reference design
     // next pc
-    memcpy(&cpu_diff, cpu_gpr, 32 * sizeof(cpu_diff.gpr[0]));
+    memcpy(&cpu_diff, cpu, 32 * sizeof(cpu_diff.gpr[0]));
     cpu_diff.pc = cpu.npc;
-    ref_difftest_regcpy(&cpu_diff.gpr, DIFFTEST_TO_REF);
+    ref_difftest_regcpy(&cpu_diff., DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
   }
   */
   // ref execute once
   ref_difftest_exec(1);
-  ref_difftest_regcpy(&ref_r.gpr, DIFFTEST_TO_DUT);
+  ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
   checkregs(&ref_r);
 }
