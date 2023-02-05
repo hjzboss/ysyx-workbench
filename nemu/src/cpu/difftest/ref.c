@@ -18,8 +18,6 @@
 #include <difftest-def.h>
 #include <memory/paddr.h>
 
-extern CPU_state cpu;
-
 #define REG_SIZE 264
 
 void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
