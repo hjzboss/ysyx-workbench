@@ -20,7 +20,7 @@
 //void init_rand();
 void init_log(const char *log_file);
 //void init_mem();
-void init_difftest(char *ref_so_file, long img_size);
+IFDEF(CONFIG_DIFFTEST, void init_difftest(char *ref_so_file, long img_size));
 //void init_device();
 void init_sdb();
 void init_disasm(const char *triple);
@@ -106,7 +106,7 @@ void init_monitor(int argc, char *argv[]) {
   //long img_size = load_img();
 
   /* Initialize differential testing. */
-  init_difftest(diff_so_file, size);
+  IFDEF(CONFIG_DIFFTEST, init_difftest(diff_so_file, size));
 
   /* Initialize the simple debugger. */
   init_sdb();
