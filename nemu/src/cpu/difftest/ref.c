@@ -33,6 +33,9 @@ void difftest_regcpy(void *dut, bool direction) {
   if(direction == DIFFTEST_TO_REF) {
     memcpy(&cpu, dut, REG_SIZE);
     //printf("refpc=0x%016lx\n", *dut);
+    for (int i = 0; i < 32; i++) {
+      cpu.gpr[i] = 0;
+    }
     cpu.pc = 0x80000000;
   }
   else {
