@@ -51,99 +51,99 @@ static char* rl_gets() {
 
 
 static int cmd_si(char *args) {
-	char *other = NULL;
-	uint64_t iter_num = 1;
-	if (args != NULL) {
-		// convert string to integer
-		iter_num = (uint64_t)strtol(args, &other, 10);
-		if (other == args) {
-			printf("The parameter must be an integer!\n");
-			return 0;
-		} 
-	}
-	cpu_exec(iter_num);
-	return 0;
+  char *other = NULL;
+  uint64_t iter_num = 1;
+  if (args != NULL) {
+    // convert string to integer
+    iter_num = (uint64_t)strtol(args, &other, 10);
+    if (other == args) {
+      printf("The parameter must be an integer!\n");
+      return 0;
+    } 
+  }
+  cpu_exec(iter_num);
+  return 0;
 }
 
 
 static int cmd_info(char *args) {
-	if (args == NULL) {
-		printf("Input parameters are required!\n");
-		return 0;
-	}
-	char arg = args[0];
-	switch (arg) {
-		case 'r':
-			printf("Print register status:\n");
-			bool list[34];
-			isa_reg_display(list);
-			break;
+  if (args == NULL) {
+    printf("Input parameters are required!\n");
+    return 0;
+  }
+  char arg = args[0];
+  switch (arg) {
+    case 'r':
+      printf("Print register status:\n");
+      bool list[34];
+      isa_reg_display(list);
+      break;
       /*
-		case 'w':
-			printf("Print watchpoint information:\n");
-			watchpoint_display();
-			break;
+    case 'w':
+      printf("Print watchpoint information:\n");
+      watchpoint_display();
+      break;
       */
-		default:
-			printf("Unknown parameter: %s\n", args);
-	}
-	return 0;
+    default:
+      printf("Unknown parameter: %s\n", args);
+  }
+  return 0;
 }
 
 
 static int cmd_x(char *args) {
-	if (args == NULL) {
-		printf("Input parameters are required!\n");
-		return 0;
-	}
+  if (args == NULL) {
+    printf("Input parameters are required!\n");
+    return 0;
+  }
 
-	char *n_other = NULL;
-	char n[65535];
-	sscanf(args, "%s", n);
-	uint64_t N = (uint64_t)strtol(n, &n_other, 10);
-	if (n == n_other) {
-		printf("The parameter is wrong, please enter the correct parameter!\n");
-		return 0;
-	}
+  char *n_other = NULL;
+  char n[65535];
+  sscanf(args, "%s", n);
+  uint64_t N = (uint64_t)strtol(n, &n_other, 10);
+  if (n == n_other) {
+    printf("The parameter is wrong, please enter the correct parameter!\n");
+    return 0;
+  }
 
-	int len = strlen(n);
-	char *e = args + len;
+  int len = strlen(n);
+  char *e = args + len;
 
-	bool success;
-	uint64_t addr = expr(e, &success);
-	if (!success) {
-		printf("The expression is malformed!\n");
-		return 0;
-	}
+  bool success;
+  uint64_t addr = expr(e, &success);
+  if (!success) {
+    printf("The expression is malformed!\n");
+    return 0;
+  }
 
-	// Print the data from the corresponding address
-	for (uint64_t i = 0; i < N; ++ i) {
-		uint64_t tmp = addr + 4 * i;
-		printf("0x%016lx:\t", tmp);
-		for (uint64_t j = 0; j < 4; ++ j) {
-			uint64_t data = pmem_read(tmp + j, 1);
-			printf("%02lx ", data);
-		}
-		printf("\n");
-	}
-	return 0;
+  // Print the data from the corresponding address
+  for (uint64_t i = 0; i < N; ++ i) {
+    uint64_t tmp = addr + 4 * i;
+    printf("0x%016lx:\t", tmp);
+    for (uint64_t j = 0; j < 4; ++ j) {
+      uint64_t data = pmem_read(tmp + j, 1);
+      printf("%02lx ", data);
+    }
+    printf("\n");
+  }
+  return 0;
 }
 
 
 static int cmd_p(char *args) {
-	if (args == NULL) {
-		printf("Missing parameters!\n");
-		return 0;
-	}
-	bool success;
-	uint64_t res = expr(args, &success);
-	if (!success) {
-		printf("The expression is malformed!\n");
-	}
-	else {
-		printf("%s=%lu\n", args, res);
-	}
-	return 0;
+  if (args == NULL) {
+    printf("Missing parameters!\n");
+    return 0;
+  }
+  bool success;
+  uint64_t res = expr(args, &success);
+  if (!success) {
+    printf("The expression is malformed!\n");
+  }
+  else {
+    printf("%s=%lu\n", args, res);
+  }
+  return 0;
 }
 
 /*
@@ -198,10 +198,10 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "Step into", cmd_si},
+  { "si", "Step into", cmd_si },
   { "info", "Print register status, print monitor information", cmd_info },
-  { "x", "Scan memory", cmd_x},
-  { "p", "Expression evaluation", cmd_p},
+  { "x", "Scan memory", cmd_x },
+  { "p", "Expression evaluation", cmd_p },
   //{ "w", "Set up watchpoints", cmd_w},
   //{ "d", "Delete a watchpoints", cmd_d}
   /* TODO: Add more commands */
