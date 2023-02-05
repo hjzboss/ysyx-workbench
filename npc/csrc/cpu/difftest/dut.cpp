@@ -82,7 +82,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
-  ref_difftest_regcpy(cpu, DIFFTEST_TO_REF);
+  ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
 }
 
 void difftest_step() {
@@ -92,7 +92,7 @@ void difftest_step() {
   if (is_skip_ref) {
     // to skip the checking of an instruction, just copy the reg state to reference design
     // next pc
-    memcpy(&cpu_diff, cpu, 32 * sizeof(cpu_diff.gpr[0]));
+    memcpy(&cpu_diff, &cpu, 32 * sizeof(cpu_diff.gpr[0]));
     cpu_diff.pc = cpu.npc;
     ref_difftest_regcpy(&cpu_diff., DIFFTEST_TO_REF);
     is_skip_ref = false;
