@@ -11,8 +11,6 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 
-extern uint64_t *cpu_gpr;
-
 CPUState cpu = {};
 
 // itrace iringbuf
