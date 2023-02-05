@@ -26,8 +26,6 @@ void init_sdb();
 void init_disasm(const char *triple);
 void init_elf(const char *file);
 
-extern CPU_state cpu;
-
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   IFDEF(CONFIG_TRACE, Log("If trace is enabled, a log file will be generated "
@@ -131,8 +129,6 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Initialize differential testing. */
   init_difftest(diff_so_file, img_size, difftest_port);
-
-  printf("nemu_pc=%016lx\n", cpu.pc);
 
   /* Initialize the simple debugger. */
   init_sdb();
