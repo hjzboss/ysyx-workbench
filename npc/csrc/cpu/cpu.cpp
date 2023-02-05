@@ -127,8 +127,7 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  cpu.gpr = cpu_gpr;
-  cpu.pc = top->io_pc;
+  cpu.pc = CONFIG_MBASE;
   cpu.npc = top->io_nextPc;
 
   // state is running
