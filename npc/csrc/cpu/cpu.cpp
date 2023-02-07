@@ -67,7 +67,9 @@ static void trace_and_difftest(uint64_t dnpc) {
   IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
   //printf("pc=%016lx\n", cpu.pc);
-  IFDEF(CONFIG_DIFFTEST, difftest_step());
+  //IFDEF(CONFIG_DIFFTEST, difftest_step());
+  bool err_list[34];
+  isa_reg_display(err_list);
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }

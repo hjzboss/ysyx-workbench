@@ -7,7 +7,8 @@ class JzCore extends Module {
   val io = IO(new Bundle {
     val pc        = Output(UInt(64.W))
     val nextPc    = Output(UInt(64.W))
-    val regWrite  = new RFWriteIO
+    val regWrite  = new RFWriteIO // 用于更新仿真环境的寄存器信息
+
     val inst      = Input(UInt(32.W))
   })
 
