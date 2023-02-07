@@ -43,6 +43,7 @@ static void checkregs(NEMUCPUState *ref) {
     }
   }
 
+  printf("here------------------------------------\n");
   if(!same) {
     // print all dut regs when error
     isa_reg_display(err_list);
