@@ -134,7 +134,7 @@ void scan_watchpoint(Decode *_this) {
 
 	
 	if (flag) {
-		puts(_this->logbuf);
+		IFDEF(CONFIG_ITRACE, puts(_this->logbuf));
 		nemu_state.state = NEMU_STOP;
 	}
 }

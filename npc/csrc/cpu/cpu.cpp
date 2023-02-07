@@ -10,50 +10,64 @@ static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
-IFDEF(CONFIG_ITRACE, char logbuf[128]);
+extern uint64_t* gpr;
 
-static uint8_t i_cache[65535] = {};
+CPUState cpu = {};
+
+// itrace iringbuf
+#ifdef CONFIG_ITRACE
+static char* iringbuf[MAX_INST_TO_PRINT] = {};
+static int iring_ptr = -1;
+
+IFDEF(CONFIG_DIFFTEST, void difftest_step());
+
+void init_iringbuf() {
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    iringbuf[i] = (char*)malloc(128);
+  }
+}
+
+static void insert_iringbuf() {
+  iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
+  strcpy(iringbuf[iring_ptr], cpu.logbuf);
+}
+
+static void print_iringbuf() {
+  printf("---itrace message start---\n");
+  for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
+    if (iring_ptr == i) printf("-->");
+    else printf("   ");
+
+    puts(iringbuf[i]);
+  }
+  printf("---itrace message end---\n");
+}
+#endif
+
+#ifdef CONFIG_FTRACE
+void print_ftrace(bool);
+void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
+#endif
 
 NPCState npc_state = { .state = NPC_STOP };
 
 uint64_t get_time();
+
+uint64_t pmem_read(uint64_t addr, int len);
+long load_img(char *dir);
+void isa_reg_display(bool*);
 
 // Called by $time in Verilog
 double sc_time_stamp () {
   return main_time; // Note does conversion to real, to match SystemC
 }
 
-uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
-uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
-
-static inline uint64_t host_read(void *addr, int len) {
-  switch (len) {
-    case 1: return *(uint8_t  *)addr;
-    case 2: return *(uint16_t *)addr;
-    case 4: return *(uint32_t *)addr;
-    case 8: return *(uint64_t *)addr;
-    default: return 0;
-  }
-}
-
-uint64_t pmem_read(uint64_t addr, int len) {
-  uint64_t ret = host_read(guest_to_host(addr), len);
-  return ret;
-}
-
-/*
-static void pmem_write(paddr_t addr, int len, word_t data) {
-  host_write(guest_to_host(addr), len, data);
-}
-*/
 
 // todo
 static void trace_and_difftest(uint64_t dnpc) {
-#ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", logbuf); }
-#endif
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf)); }
-  //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
+  IFDEF(CONFIG_DIFFTEST, difftest_step());
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
@@ -64,21 +78,8 @@ extern "C" void c_break() {
   npc_state.halt_pc = top->io_pc;
 }
 
-static void load_img(char *dir) {
-  FILE *fp = fopen(dir, "rb");
 
-  fseek(fp, 0, SEEK_END);
-  long size = ftell(fp);
-
-  fseek(fp, 0, SEEK_SET);
-  int ret = fread(i_cache, size, 1, fp);
-  assert(ret == 1);
-
-  fclose(fp);
-}
-
-
-void reset(int time) {
+static void reset(int time) {
   top->reset = 1;
   while (time > 0) {
     top->clock = !top->clock;
@@ -111,7 +112,7 @@ static void init_wave() {
 }
 
 
-void init_cpu(char *dir) {
+long init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
@@ -120,13 +121,18 @@ void init_cpu(char *dir) {
 #endif
 
   // initial i_cache
-  load_img(dir);
+  long size = load_img(dir);
 
   top->clock = 0;
   reset(4);
 
+  cpu.pc = top->io_pc;
+  cpu.npc = top->io_nextPc;
+
   // state is running
   npc_state.state = NPC_RUNNING;
+
+  return size;
 }
 
 
@@ -148,15 +154,16 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  uint64_t pc = top->io_pc;
-  uint32_t inst_val = pmem_read(pc, 4);
+  cpu.pc = top->io_pc;
+  cpu.npc = top->io_nextPc;
+  cpu.inst = pmem_read(cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_ITRACE
-  char *p = logbuf;
-  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", pc);
+  char *p = cpu.logbuf;
+  p += snprintf(p, sizeof(cpu.logbuf), FMT_WORD ":", cpu.pc);
   int ilen = 4;
   int i;
-  uint8_t *inst = (uint8_t *)&inst_val;
+  uint8_t *inst = (uint8_t *)&cpu.inst;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -167,7 +174,13 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, logbuf + sizeof(logbuf) - p, pc, (uint8_t *)&inst_val, ilen);
+  disassemble(p, cpu.logbuf + sizeof(cpu.logbuf) - p, cpu.pc, (uint8_t *)&cpu.inst, ilen);
+
+  insert_iringbuf();
+#endif
+
+#ifdef CONFIG_FTRACE
+  ftrace(cpu.pc, cpu.inst, cpu.npc);
 #endif
 }
 
@@ -185,12 +198,22 @@ void execute(uint64_t n) {
 
 // todo
 static void statistic() {
+  IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   printf("host time spent = " NUMBERIC_FMT " us", g_timer);
   printf("\ntotal guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) printf("\nsimulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
   else printf("\nFinish running in less than 1 us and can not calculate the simulation frequency\n");
+}
+
+void assert_fail_msg() {
+  IFDEF(CONFIG_ITRACE, print_iringbuf());
+  IFDEF(CONFIG_MTRACE, print_mtrace());
+  //IFDEF(CONFIG_FTRACE, print_ftrace(false));
+  bool err_list[34];
+  isa_reg_display(err_list);
+  statistic();
 }
 
 /* Simulate how the CPU works. */

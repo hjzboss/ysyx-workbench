@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void isa_reg_display();
+void isa_reg_display(bool*);
 uint64_t isa_reg_str2val(const char *s, bool *success);
 
 #endif

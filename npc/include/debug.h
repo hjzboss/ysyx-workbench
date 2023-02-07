@@ -17,6 +17,7 @@
 #define __DEBUG_H__
 
 #include <stdio.h>
+#include <macro.h>
 //#include <utils.h>
 
 #define Log(format, ...) \

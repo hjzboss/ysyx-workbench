@@ -22,13 +22,7 @@
 
 #include <stdint.h>
 
-void init_cpu(char *);
-
-void delete_cpu();
-
-void main_loop();
-
-void cpu_exec(uint64_t);
+#include <debug.h>
 
 typedef struct {
   int state;
@@ -37,8 +31,17 @@ typedef struct {
 } NPCState;
 
 extern NPCState npc_state;
-
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
+
+typedef struct {
+  IFDEF(CONFIG_DIFFTEST, uint64_t gpr[32]); // 只是为了传给difftest一个初始的空寄存器组
+  uint64_t pc;
+  uint64_t npc;
+  uint32_t inst;
+  IFDEF(CONFIG_ITRACE, char logbuf[128]);
+} CPUState;
+
+extern CPUState cpu;
 
 #define FMT_WORD "0x%016lx"
 

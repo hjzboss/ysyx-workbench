@@ -127,4 +127,19 @@
   ({ reg##_T __io_param = (reg##_T) { __VA_ARGS__ }; \
     ioe_write(reg, &__io_param); })
 
+
+#define log_write(...) IFNDEF(CONFIG_TARGET_NATIVE_ELF, \
+  do { \
+    extern FILE* log_fp; \
+    fprintf(log_fp, __VA_ARGS__); \
+    fflush(log_fp); \
+  } while (0) \
+)
+
+#define _Log(...) \
+  do { \
+    printf(__VA_ARGS__); \
+    log_write(__VA_ARGS__); \
+  } while (0)
+
 #endif

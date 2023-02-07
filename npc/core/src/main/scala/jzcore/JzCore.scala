@@ -5,8 +5,9 @@ import chisel3.util._
 
 class JzCore extends Module {
   val io = IO(new Bundle {
-    val pc    = Output(UInt(64.W))
-    val inst  = Input(UInt(32.W))
+    val pc      = Output(UInt(64.W))
+    val nextPc = Output(UInt(64.W))
+    val inst    = Input(UInt(32.W))
   })
 
   val ifu = Module(new IFU)
@@ -24,4 +25,5 @@ class JzCore extends Module {
   exu.io.ctrl     := idu.io.ctrl
 
   io.pc           := ifu.io.pc
+  io.nextPc       := ifu.io.nextPc
 }

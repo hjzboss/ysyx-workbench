@@ -45,7 +45,7 @@ static void decode_operand(Decode *s, int *dest, word_t *src1, word_t *src2, wor
     case TYPE_I: src1R();          immI(); break;
     case TYPE_U:                   immU(); break;
     case TYPE_S: src1R(); src2R(); immS(); break;
-		case TYPE_J: src1R();          immJ(); break;
+    case TYPE_J: src1R();          immJ(); break;
     case TYPE_B: src1R(); src2R(); immB(); break;
     case TYPE_R: src1R(); src2R();         break;
   }
@@ -61,10 +61,10 @@ static int decode_exec(Decode *s) {
   decode_operand(s, &dest, &src1, &src2, &imm, concat(TYPE_, type)); \
   __VA_ARGS__ ; \
 }
-	
-	// 模式匹配宏，nemu/include/cpu/decode.h
-	// INSTPAT(模式字符串, 指令名称, 指令类型, 指令执行操作);
-	// 如果匹配到指令，则会调用decode_operand()
+
+  // 模式匹配宏，nemu/include/cpu/decode.h
+  // INSTPAT(模式字符串, 指令名称, 指令类型, 指令执行操作);
+  // 如果匹配到指令，则会调用decode_operand()
   INSTPAT_START();
   INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(dest) = src1 + src2);
   INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(dest) = src1 - src2);

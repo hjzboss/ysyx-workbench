@@ -1,6 +1,9 @@
 #include <cpu/cpu.h>
 #include <monitor/sdb.h>
 
+void log_exit();
+void delete_cpu();
+
 int main(int argc, char** argv, char** env) {
 
   // Prevent unused variable warnings
@@ -11,12 +14,12 @@ int main(int argc, char** argv, char** env) {
   // Set debug level, 0 is off, 9 is highest presently used
   Verilated::debug(0);
 
-  init_cpu(argv[1]);
-
   init_monitor(argc, argv);
 
   // Simulate until $finish
   sdb_mainloop();
+
+  log_exit();
 
   delete_cpu();
 

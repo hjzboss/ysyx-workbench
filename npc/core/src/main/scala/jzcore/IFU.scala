@@ -11,6 +11,7 @@ trait HasResetVector {
 class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
     val pc        = Output(UInt(64.W))
+    val nextPc    = Output(UInt(64.W))
     val inst      = Input(UInt(32.W))
     val redirect  = Flipped(new RedirectIO)
     val fetch     = new InstrFetch
@@ -26,6 +27,7 @@ class IFU extends Module with HasResetVector{
   npc := Mux(io.redirect.valid, dnpc, snpc)
   pc  := npc
 
+  io.nextPc     := npc
   io.pc         := pc
   io.fetch.pc   := pc
   io.fetch.inst := io.inst
