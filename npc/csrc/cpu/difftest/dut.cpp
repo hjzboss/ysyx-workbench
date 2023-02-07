@@ -5,7 +5,7 @@
 #ifdef CONFIG_DIFFTEST
 
 extern const char *regs[];
-extern uint64_t *cpu_gpr;
+//extern uint64_t *cpu_gpr;
 
 static bool is_skip_ref = false;
 void isa_reg_display(bool *);
@@ -32,12 +32,13 @@ static void checkregs(NEMUCPUState *ref) {
     err_list[33] = true;
   }
 
-  // check reg
+  
   for (int i = 0; i < 32; i++) {
     printf("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
     printf("dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
   }
-
+  
+  // check reg
   for (int i = 0; i < 32; i++) {
     if(ref->gpr[i] != cpu.gpr[i]) {
       log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
@@ -110,7 +111,6 @@ void difftest_step() {
   ref_difftest_exec(1);
   
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-  //printf("here------------------------------------\n");
   checkregs(&ref_r);
   printf("here------------------------------------\n");
 }
