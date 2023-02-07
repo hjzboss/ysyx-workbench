@@ -25,6 +25,7 @@
 static int is_batch_mode = false;
 
 void init_regex();
+void cpu_exec(uint64_t);
 //void init_wp_pool();
 //void watchpoint_display();
 //void free_wp(int);
