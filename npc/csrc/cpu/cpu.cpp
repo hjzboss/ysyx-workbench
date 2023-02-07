@@ -10,10 +10,9 @@ static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
+extern uint64_t* gpr;
 
-CPUState cpu = {
-  .gpr = NULL
-};
+CPUState cpu = {};
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -131,6 +130,7 @@ long init_cpu(char *dir) {
 
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
+  cpu.gpr = gpr;
 
   // state is running
   npc_state.state = NPC_RUNNING;
