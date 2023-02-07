@@ -23,6 +23,7 @@ NEMUCPUState cpu_diff = {};
 static void checkregs(NEMUCPUState *ref) {
   bool same = true;
   bool err_list[34] = {};
+  cpu.gpr = cpu_gpr;
   // check next pc
   if(ref->pc != cpu.npc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
@@ -82,6 +83,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
+  cpu.gpr = cpu_gpr;
   ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
   //printf("init_pc=%016lx\n", cpu.pc);
 }

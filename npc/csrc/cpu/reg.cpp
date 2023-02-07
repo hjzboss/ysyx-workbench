@@ -1,8 +1,10 @@
 #include "verilated_dpi.h"
 #include <cpu/cpu.h>
 
+uint64_t *cpu_gpr = NULL;
+
 extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
-  cpu.gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+  cpu_gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
 }
 
 const char *regs[] = {
