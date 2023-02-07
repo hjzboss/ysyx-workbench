@@ -40,7 +40,7 @@ extern NPCState npc_state;
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
 typedef struct {
-  uint64_t gpr[32];
+  IFDEF(CONFIG_DIFFTEST, uint64_t gpr[32]); // 只是为了传给difftest一个初始的空寄存器组
   uint64_t pc;
   uint64_t npc;
   uint32_t inst;
