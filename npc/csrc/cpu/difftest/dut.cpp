@@ -24,10 +24,10 @@ static void checkregs(NEMUCPUState *ref) {
   bool same = true;
   bool err_list[34] = {};
   // check next pc
-  if(ref->pc != cpu.npc) {
+  if(ref->pc != cpu.pc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
     log_write("ref pc: 0x%016lx\n", ref->pc);
-    log_write("dut pc: 0x%016lx\n", cpu.npc);
+    log_write("dut pc: 0x%016lx\n", cpu.pc);
     same = false;
     err_list[33] = true;
   }
