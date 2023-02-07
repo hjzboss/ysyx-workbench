@@ -159,7 +159,7 @@ static void cpu_exec_once() {
   cpu.inst = pmem_read(cpu.pc, 4);
   isa_exec_once();
   for (int i = 0; i < 32; i++) {
-    printf("debug: dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
+    printf("debug: dut: 0x%016lx\n", cpu.gpr[i]);
   }
 #ifdef CONFIG_ITRACE
   char *p = cpu.logbuf;
