@@ -2,6 +2,7 @@
 #include <monitor/sdb.h>
 
 void log_exit();
+void delete_cpu();
 
 int main(int argc, char** argv, char** env) {
 

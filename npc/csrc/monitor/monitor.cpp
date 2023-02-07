@@ -28,7 +28,6 @@ void init_elf(const char *file);
 long init_cpu(char *);
 IFDEF(CONFIG_ITRACE, void init_iringbuf());
 long init_cpu(char *);
-void delete_cpu();
 void cpu_exec(uint64_t);
 
 static void welcome() {
