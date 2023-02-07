@@ -24,12 +24,6 @@
 
 #include <debug.h>
 
-long init_cpu(char *);
-
-void delete_cpu();
-
-void cpu_exec(uint64_t);
-
 typedef struct {
   int state;
   uint64_t halt_pc;

@@ -27,6 +27,9 @@ void init_disasm(const char *triple);
 void init_elf(const char *file);
 long init_cpu(char *);
 IFDEF(CONFIG_ITRACE, void init_iringbuf());
+long init_cpu(char *);
+void delete_cpu();
+void cpu_exec(uint64_t);
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
