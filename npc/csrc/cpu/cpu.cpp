@@ -29,7 +29,7 @@ void init_iringbuf() {
 
 static void insert_iringbuf() {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
-  strcpy(iringbuf[iring_ptr], cpu.logbuf);
+  strcpy(iringbuf[iring_ptr], cpu->logbuf);
 }
 
 static void print_iringbuf() {
@@ -65,11 +65,11 @@ double sc_time_stamp () {
 
 // todo
 static void trace_and_difftest(uint64_t dnpc) {
-  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
+  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu->logbuf));
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu->logbuf)); }
   //printf("pc=%016lx\n", cpu.pc);
   //IFDEF(CONFIG_DIFFTEST, difftest_step());
-  printf("%lx\n", cpu.gpr[1]);
+  printf("%lx\n", cpu->gpr[1]);
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
@@ -131,6 +131,7 @@ long init_cpu(char *dir) {
   cpu = (CPUState*)malloc(sizeof(CPUState));
   cpu->pc = top->io_pc;
   cpu->npc = top->io_nextPc;
+  IFDEF(CONFIG_ITRACE, cpu->logbuf = (char*)malloc(128));
 
   // state is running
   npc_state.state = NPC_RUNNING;
