@@ -24,7 +24,7 @@ static void checkregs(NEMUCPUState *ref) {
   bool same = true;
   bool err_list[34] = {};
   // check next pc
-  if(ref->pc != cpu.npc) {
+  if (ref->pc != cpu.npc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
     log_write("ref pc: 0x%016lx\n", ref->pc);
     log_write("dut pc: 0x%016lx\n", cpu.npc);
@@ -32,9 +32,13 @@ static void checkregs(NEMUCPUState *ref) {
     err_list[33] = true;
   }
 
-  printf("here------------------------------------\n");
   // check reg
-  for(int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++) {
+    printf("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
+    printf("dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
+  }
+
+  for (int i = 0; i < 32; i++) {
     if(ref->gpr[i] != cpu.gpr[i]) {
       log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
       log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
@@ -44,7 +48,7 @@ static void checkregs(NEMUCPUState *ref) {
     }
   }
 
-  if(!same) {
+  if (!same) {
     // print all dut regs when error
     isa_reg_display(err_list);
     npc_state.state = NPC_ABORT;
