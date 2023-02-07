@@ -5,11 +5,9 @@ import chisel3.util._
 
 class JzCore extends Module {
   val io = IO(new Bundle {
-    val pc        = Output(UInt(64.W))
-    val nextPc    = Output(UInt(64.W))
-    val regWrite  = new RFWriteIO // 用于更新仿真环境的寄存器信息
-
-    val inst      = Input(UInt(32.W))
+    val pc      = Output(UInt(64.W))
+    val nextPc = Output(UInt(64.W))
+    val inst    = Input(UInt(32.W))
   })
 
   val ifu = Module(new IFU)
@@ -28,5 +26,4 @@ class JzCore extends Module {
 
   io.pc           := ifu.io.pc
   io.nextPc       := ifu.io.nextPc
-  io.regWrite     := exu.io.regWrite
 }
