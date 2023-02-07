@@ -130,7 +130,7 @@ long init_cpu(char *dir) {
 
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
-  cpu.gpr = gpr;
+  //cpu.gpr = gpr;
 
   // state is running
   npc_state.state = NPC_RUNNING;
