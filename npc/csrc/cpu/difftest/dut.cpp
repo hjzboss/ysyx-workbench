@@ -23,7 +23,6 @@ NEMUCPUState cpu_diff = {};
 static void checkregs(NEMUCPUState *ref) {
   bool same = true;
   bool err_list[34] = {};
-  cpu.gpr = cpu_gpr;
   // check next pc
   if(ref->pc != cpu.npc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
@@ -35,10 +34,10 @@ static void checkregs(NEMUCPUState *ref) {
 
   // check reg
   for(int i = 0; i < 32; i++) {
-    if(ref->gpr[i] != cpu.gpr[i]) {
+    if(ref->gpr[i] != cpu_gpr[i]) {
       log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
       log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
-      log_write("dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
+      log_write("dut %s: 0x%016lx\n", regs[i], cpu_gpr[i]);
       same = false;
       err_list[i] = true;
     }
