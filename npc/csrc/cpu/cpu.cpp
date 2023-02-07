@@ -165,7 +165,7 @@ static void cpu_exec_once() {
   isa_exec_once();
 #ifdef CONFIG_ITRACE
   char *p = cpu->logbuf;
-  p += snprintf(p, sizeof(cpu->logbuf), FMT_WORD ":", cpu->pc);
+  p += snprintf(p, sizeof(128), FMT_WORD ":", cpu->pc);
   int ilen = 4;
   int i;
   uint8_t *inst = (uint8_t *)&cpu->inst;
@@ -179,7 +179,7 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, cpu->logbuf + sizeof(cpu->logbuf) - p, cpu->pc, (uint8_t *)&cpu->inst, ilen);
+  disassemble(p, cpu->logbuf + sizeof(128) - p, cpu->pc, (uint8_t *)&cpu->inst, ilen);
 
   insert_iringbuf();
 #endif
