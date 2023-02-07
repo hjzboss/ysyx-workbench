@@ -69,7 +69,6 @@ static void trace_and_difftest(uint64_t dnpc) {
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
   //printf("pc=%016lx\n", cpu.pc);
   //IFDEF(CONFIG_DIFFTEST, difftest_step());
-  cpu.gpr = gpr;
   printf("%lx\n", cpu.gpr[1]);
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
@@ -131,7 +130,6 @@ long init_cpu(char *dir) {
 
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
-  cpu.gpr = gpr;
 
   // state is running
   npc_state.state = NPC_RUNNING;
