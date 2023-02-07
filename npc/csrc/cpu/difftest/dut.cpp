@@ -32,12 +32,6 @@ static void checkregs(NEMUCPUState *ref) {
     err_list[33] = true;
   }
 
-  
-  for (int i = 0; i < 32; i++) {
-    printf("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
-    printf("dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
-  }
-  
   // check reg
   for (int i = 0; i < 32; i++) {
     if(ref->gpr[i] != cpu.gpr[i]) {

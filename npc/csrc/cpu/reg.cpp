@@ -1,6 +1,8 @@
 #include "verilated_dpi.h"
 #include <cpu/cpu.h>
 
+static uint64_t *gpr = NULL;
+
 const char *regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -9,7 +11,7 @@ const char *regs[] = {
 };
 
 extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
-  cpu.gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+  gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
 }
 
 void isa_reg_display(bool *err_list) {
