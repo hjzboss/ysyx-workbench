@@ -5,7 +5,7 @@
 #ifdef CONFIG_DIFFTEST
 
 extern const char *regs[];
-//extern uint64_t *cpu_gpr;
+extern uint64_t *cpu_gpr;
 
 static bool is_skip_ref = false;
 void isa_reg_display(bool *);
@@ -24,30 +24,30 @@ static void checkregs(NEMUCPUState *ref) {
   bool same = true;
   bool err_list[34] = {};
   // check next pc
-  if (ref->pc != cpu->npc) {
+  if(ref->pc != cpu.npc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
     log_write("ref pc: 0x%016lx\n", ref->pc);
-    log_write("dut pc: 0x%016lx\n", cpu->npc);
+    log_write("dut pc: 0x%016lx\n", cpu.npc);
     same = false;
     err_list[33] = true;
   }
 
   // check reg
-  for (int i = 0; i < 32; i++) {
-    if(ref->gpr[i] != cpu->gpr[i]) {
+  for(int i = 0; i < 32; i++) {
+    if(ref->gpr[i] != cpu.gpr[i]) {
       log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
       log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
-      log_write("dut %s: 0x%016lx\n", regs[i], cpu->gpr[i]);
+      log_write("dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
       same = false;
       err_list[i] = true;
     }
   }
 
-  if (!same) {
+  if(!same) {
     // print all dut regs when error
     isa_reg_display(err_list);
     npc_state.state = NPC_ABORT;
-    npc_state.halt_pc = cpu->pc;
+    npc_state.halt_pc = cpu.pc;
   }
 }
 
@@ -82,7 +82,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
-  ref_difftest_regcpy(cpu, DIFFTEST_TO_REF);
+  ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
   //printf("init_pc=%016lx\n", cpu.pc);
 }
 
@@ -100,13 +100,11 @@ void difftest_step() {
     return;
   }
   */
-
   // ref execute once
   ref_difftest_exec(1);
-  
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
+
   checkregs(&ref_r);
-  printf("here------------------------------------\n");
 }
 
 #endif

@@ -12,7 +12,7 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 
-CPUState *cpu = NULL;
+CPUState cpu = {};
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -29,7 +29,7 @@ void init_iringbuf() {
 
 static void insert_iringbuf() {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
-  strcpy(iringbuf[iring_ptr], cpu->logbuf);
+  strcpy(iringbuf[iring_ptr], cpu.logbuf);
 }
 
 static void print_iringbuf() {
@@ -65,11 +65,11 @@ double sc_time_stamp () {
 
 // todo
 static void trace_and_difftest(uint64_t dnpc) {
-  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu->logbuf));
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu->logbuf)); }
+  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
   //printf("pc=%016lx\n", cpu.pc);
   //IFDEF(CONFIG_DIFFTEST, difftest_step());
-  printf("%lx\n", cpu->gpr[1]);
+  printf("%lx\n", cpu.gpr[1]);
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
@@ -128,10 +128,9 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  cpu = (CPUState*)malloc(sizeof(CPUState));
-  cpu->pc = top->io_pc;
-  cpu->npc = top->io_nextPc;
-  IFDEF(CONFIG_ITRACE, cpu->logbuf = (char*)malloc(128));
+  cpu.pc = top->io_pc;
+  cpu.npc = top->io_nextPc;
+  cpu.gpr = gpr;
 
   // state is running
   npc_state.state = NPC_RUNNING;
@@ -150,7 +149,6 @@ void delete_cpu() {
   // Destroy model
   delete top; 
   top = NULL;
-  free(cpu);
 }
 
 static void isa_exec_once() {
@@ -159,16 +157,16 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  cpu->pc = top->io_pc;
-  cpu->npc = top->io_nextPc;
-  cpu->inst = pmem_read(cpu->pc, 4);
+  cpu.pc = top->io_pc;
+  cpu.npc = top->io_nextPc;
+  cpu.inst = pmem_read(cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_ITRACE
-  char *p = cpu->logbuf;
-  p += snprintf(p, sizeof(128), FMT_WORD ":", cpu->pc);
+  char *p = cpu.logbuf;
+  p += snprintf(p, sizeof(cpu.logbuf), FMT_WORD ":", cpu.pc);
   int ilen = 4;
   int i;
-  uint8_t *inst = (uint8_t *)&cpu->inst;
+  uint8_t *inst = (uint8_t *)&cpu.inst;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -179,13 +177,13 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, cpu->logbuf + sizeof(128) - p, cpu->pc, (uint8_t *)&cpu->inst, ilen);
+  disassemble(p, cpu.logbuf + sizeof(cpu.logbuf) - p, cpu.pc, (uint8_t *)&cpu.inst, ilen);
 
   insert_iringbuf();
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(cpu->pc, cpu->inst, cpu->npc);
+  ftrace(cpu.pc, cpu.inst, cpu.npc);
 #endif
 }
 
