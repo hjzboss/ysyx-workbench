@@ -10,9 +10,6 @@ const char *regs[] = {
 
 extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
   cpu.gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
-  for (int i = 0; i < 32; i++) {
-    printf("debug: dut %s: 0x%016lx\n", regs[i], cpu.gpr[i]);
-  }
 }
 
 void isa_reg_display(bool *err_list) {
