@@ -10,6 +10,7 @@ static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
+extern uint64_t* gpr;
 
 CPUState cpu = {};
 
@@ -68,7 +69,7 @@ static void trace_and_difftest(uint64_t dnpc) {
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
   //printf("pc=%016lx\n", cpu.pc);
   //IFDEF(CONFIG_DIFFTEST, difftest_step());
-  printf("%lx\n", cpu.gpr[1]);
+  printf("%lx\n", gpr[1]);
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
