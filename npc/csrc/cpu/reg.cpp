@@ -11,7 +11,7 @@ const char *regs[] = {
 };
 
 extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
-  cpu.gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+  cpu->gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
 }
 
 void isa_reg_display(bool *err_list) {

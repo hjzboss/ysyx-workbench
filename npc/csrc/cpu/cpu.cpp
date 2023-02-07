@@ -12,7 +12,7 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 
-CPUState cpu = {};
+CPUState *cpu = NULL;
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -128,8 +128,9 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  cpu.pc = top->io_pc;
-  cpu.npc = top->io_nextPc;
+  cpu = (CPUState*)malloc(sizeof(CPUState));
+  cpu->pc = top->io_pc;
+  cpu->npc = top->io_nextPc;
 
   // state is running
   npc_state.state = NPC_RUNNING;
@@ -148,6 +149,7 @@ void delete_cpu() {
   // Destroy model
   delete top; 
   top = NULL;
+  free(cpu);
 }
 
 static void isa_exec_once() {
@@ -156,16 +158,16 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  cpu.pc = top->io_pc;
-  cpu.npc = top->io_nextPc;
-  cpu.inst = pmem_read(cpu.pc, 4);
+  cpu->pc = top->io_pc;
+  cpu->npc = top->io_nextPc;
+  cpu->inst = pmem_read(cpu->pc, 4);
   isa_exec_once();
 #ifdef CONFIG_ITRACE
-  char *p = cpu.logbuf;
-  p += snprintf(p, sizeof(cpu.logbuf), FMT_WORD ":", cpu.pc);
+  char *p = cpu->logbuf;
+  p += snprintf(p, sizeof(cpu->logbuf), FMT_WORD ":", cpu->pc);
   int ilen = 4;
   int i;
-  uint8_t *inst = (uint8_t *)&cpu.inst;
+  uint8_t *inst = (uint8_t *)&cpu->inst;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -176,13 +178,13 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, cpu.logbuf + sizeof(cpu.logbuf) - p, cpu.pc, (uint8_t *)&cpu.inst, ilen);
+  disassemble(p, cpu->logbuf + sizeof(cpu->logbuf) - p, cpu->pc, (uint8_t *)&cpu->inst, ilen);
 
   insert_iringbuf();
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(cpu.pc, cpu.inst, cpu.npc);
+  ftrace(cpu->pc, cpu->inst, cpu->npc);
 #endif
 }
 
