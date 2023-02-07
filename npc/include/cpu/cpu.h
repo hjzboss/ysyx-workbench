@@ -44,7 +44,7 @@ typedef struct {
   uint64_t pc;
   uint64_t npc;
   uint32_t inst;
-  IFDEF(CONFIG_ITRACE, char logbuf[128]);
+  IFDEF(CONFIG_ITRACE, char *logbuf);
 } CPUState;
 
 extern CPUState *cpu;
