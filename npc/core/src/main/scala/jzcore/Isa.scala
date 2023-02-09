@@ -17,6 +17,15 @@ object RV64IM extends HasInstrType {
   def MUL     = BitPat("b0000001_?????_?????_000_?????_0110011")
   def DIV     = BitPat("b0000001_?????_?????_100_?????_0110011")
 
+  def ADDW    = BITPAT("b0000000_?????_?????_000_?????_0111011")
+  def SUBW    = BitPat("b0100000_?????_?????_000_?????_0111011")
+  def MULW    = BitPat("b0000001_?????_?????_000_?????_0111011")
+  def DIVW    = BitPat("b0000001_?????_?????_100_?????_0111011")
+  def SLLW    = BitPat("b0000000_?????_?????_001_?????_0111011")
+  def SRLW    = BitPat("b0000000_?????_?????_101_?????_0111011")
+  def SRAW    = BitPat("b0100000_?????_?????_101_?????_0111011")
+  def REMW    = BitPat("b0000001_?????_?????_110_?????_0111011")
+
   def ADDI    = BitPat("b???????_?????_?????_000_?????_0010011")
 
   def EBREAK  = BitPat("b0000000_00001_00000_000_00000_1110011")
@@ -49,6 +58,15 @@ object RV64IM extends HasInstrType {
     AND     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.and),
     MUL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mul),
     DIV     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.div),
+
+    ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,addw),
+    SUBW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,subw),
+    MULW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,mulw),
+    DIVW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,divw),
+    SLLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,sllw),
+    SRLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,srlw),
+    SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,sraw),
+    REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,remw),
 
     ADDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
 
