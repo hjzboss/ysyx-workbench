@@ -51,14 +51,14 @@ class IDU extends Module with HasInstrType {
   io.datasrc.imm      := imm
 
   io.ctrl.rd          := rd
-  io.ctrl.br          := Mux(instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB, true.B, false.B)
-  io.ctrl.regWen      := Mux(instrtype === InstrB || instrtype === InstrS, false.B, true.B)
-  io.ctrl.isJalr      := Mux(instrtype === InstrIJ, true.B, false.B)
+  io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS
+  io.ctrl.isJalr      := instrtype === InstrIJ
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
 
   // ebreak
-  io.ctrl.break       := Mux(instrtype === InstrD, true.B, false.B)
+  io.ctrl.break       := instrtype === InstrD
 }
