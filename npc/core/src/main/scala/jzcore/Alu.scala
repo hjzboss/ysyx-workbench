@@ -35,7 +35,7 @@ class Alu extends Module {
     AluOp.bltu      -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
     AluOp.sll       -> (opA << opB(5, 0)),
     AluOp.srl       -> (opA >> opB(5, 0)),
-    AluOp.sra       -> (opA.asSInt() >> opB).asUInt(),
+    AluOp.sra       -> (opA.asSInt() >> opB(5, 0)).asUInt(),
     // todo
     AluOp.div       -> (opA / opB),
     AluOp.mul       -> (opA * opB),
@@ -45,9 +45,9 @@ class Alu extends Module {
     AluOp.subw      -> (opA - opB),
     AluOp.mulw      -> (opA * opB),
     AluOp.divw      -> (opA / opB),
-    AluOp.sllw      -> (opA << opB(5, 0)),
-    AluOp.srlw      -> (opA >> opB(5, 0)),
-    AluOp.sraw      -> (opA.asSInt() >> opB).asUInt(),
+    AluOp.sllw      -> (opA << opB(4, 0)),
+    AluOp.srlw      -> (opA >> opB(4, 0)),
+    AluOp.sraw      -> (opA.asSInt() >> opB(4, 0)).asUInt(),
     AluOp.remw      -> (opA % opB)
   ))
 
