@@ -59,14 +59,14 @@ object RV64IM extends HasInstrType {
     MUL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mul),
     DIV     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.div),
 
-    ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,addw),
-    SUBW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,subw),
-    MULW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,mulw),
-    DIVW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,divw),
-    SLLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,sllw),
-    SRLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,srlw),
-    SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,sraw),
-    REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp,remw),
+    ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.addw),
+    SUBW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.subw),
+    MULW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mulw),
+    DIVW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.divw),
+    SLLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sllw),
+    SRLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.srlw),
+    SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sraw),
+    REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remw),
 
     ADDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
 
