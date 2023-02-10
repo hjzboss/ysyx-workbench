@@ -36,7 +36,7 @@ class IDU extends Module with HasInstrType {
   ))
 
   val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTable)
-  val lsType       = lsList(0)
+  val lsType       = lsList.head
   val loadMem      = lsList(1)
 
   // registerfile

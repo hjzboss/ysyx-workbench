@@ -41,7 +41,7 @@ class EXU extends Module {
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
     LsType.lb   -> SignExt(rdata(7, 0), 64),
-    LsType.lbu  -> Cat(0.U(56.W), rdata(7, 0)),
+    LsType.lbu  -> ZeroExt(rdata(7, 0), 64),
     LsType.lhu  -> ZeroExt(rdata(15, 0), 64),
   ))
   val aluOut  = alu.io.aluOut
