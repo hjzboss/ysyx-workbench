@@ -31,10 +31,10 @@ class EXU extends Module {
   val lsType  = io.ctrl.lsType
   val rdata   = lsu.io.rdata
   val wmask   = LookupTreeDefault(lsType, Wmask.nop, List(
-    LsType.sd   -> List(Wmask.double, rdata),
-    LsType.sw   -> List(Wmask.word, rdata),
-    LsType.sh   -> List(Wmask.double, rdata),
-    LsType.sb   -> List(Wmask.double, rdata),
+    LsType.sd   -> Wmask.double,
+    LsType.sw   -> Wmask.word,
+    LsType.sh   -> Wmask.half,
+    LsType.sb   -> Wmask.byte,
   ))
   val lsuOut  = LookupTreeDefault(lsType, rdata, List(
     LsType.ld   -> rdata,
