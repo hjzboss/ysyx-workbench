@@ -30,20 +30,21 @@ class EXU extends Module {
 
   val lsType  = io.ctrl.lsType
   val rdata   = lsu.io.rdata
-  val wmask   = LookupTreeDefault(lsType, Wmask.nop, List(
-    LsType.sd   -> Wmask.double,
-    LsType.sw   -> Wmask.word,
-    LsType.sh   -> Wmask.half,
-    LsType.sb   -> Wmask.byte,
+  val lsList   = LookupTreeDefault(lsType, List(Wmask.nop, rdata), List(
+    LsType.sd   -> List(Wmask.double, rdata),
+    LsType.sw   -> List(Wmask.word, rdata),
+    LsType.sh   -> List(Wmask.half, rdata),
+    LsType.sb   -> List(Wmask.byte, rdata),
+
+    LsType.ld   -> List(Wmask.nop, rdata),
+    LsType.lw   -> List(Wmask.nop, SignExt(rdata(31, 0), 64)),
+    LsType.lh   -> List(Wmask.nop, SignExt(rdata(15, 0), 64)),
+    LsType.lb   -> List(Wmask.nop, SignExt(rdata(7, 0), 64)),
+    LsType.lbu  -> List(Wmask.nop, ZeroExt(rdata(7, 0), 64)),
+    LsType.lhu  -> List(Wmask.nop, ZeroExt(rdata(15, 0), 64)),
   ))
-  val lsuOut  = LookupTreeDefault(lsType, rdata, List(
-    LsType.ld   -> rdata,
-    LsType.lw   -> SignExt(rdata(31, 0), 64),
-    LsType.lh   -> SignExt(rdata(15, 0), 64),
-    LsType.lb   -> SignExt(rdata(7, 0), 64),
-    LsType.lbu  -> ZeroExt(rdata(7, 0), 64),
-    LsType.lhu  -> ZeroExt(rdata(15, 0), 64),
-  ))
+  val wmask   = lsList(0)
+  val lsuOut  = lsList(1)
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
