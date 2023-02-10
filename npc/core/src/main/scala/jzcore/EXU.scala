@@ -30,8 +30,9 @@ class EXU extends Module {
 
   val lsType  = io.ctrl.lsType
   val rdata   = lsu.io.rdata
-  val lsList  = List(Wmask.nop, rdata)
-  lsList  := LookupTree(lsType, List(
+  val wmask   = Wmask.nop
+  val lsuOut  = rdata
+  val lsList  = LookupTree(lsType, List(
     LsType.sd   -> List(Wmask.double, rdata),
     LsType.sw   -> List(Wmask.word, rdata),
     LsType.sh   -> List(Wmask.half, rdata),
@@ -44,8 +45,8 @@ class EXU extends Module {
     LsType.lbu  -> List(Wmask.nop, ZeroExt(rdata(7, 0), 64)),
     LsType.lhu  -> List(Wmask.nop, ZeroExt(rdata(15, 0), 64)),
   ))
-  val wmask   = lsList(0)
-  val lsuOut  = lsList(1)
+  val wmask   := lsList(0)
+  val lsuOut  := lsList(1)
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
