@@ -35,7 +35,7 @@ class IDU extends Module with HasInstrType {
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
-  val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.LsTable)
+  val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTable)
   val lsType       = lsList(0)
   val loadMem      = lsList(1)
 
