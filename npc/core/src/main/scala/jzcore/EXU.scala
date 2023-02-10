@@ -30,35 +30,20 @@ class EXU extends Module {
 
   val lsType  = io.ctrl.lsType
   val rdata   = lsu.io.rdata
-  def ld      = BitPat("b0000")
-  def lw      = BitPat("b0001")
-  def lh      = BitPat("b0010")
-  def lb      = BitPat("b0011")
-  def lbu     = BitPat("b0100")
-  def lhu     = BitPat("b0101")
-  def sd      = BitPat("b0110")
-  def sw      = BitPat("b0111")
-  def sh      = BitPat("b1000")
-  def sb      = BitPat("b1001")
-
-  def nop     = "b1010".U
-  val lsuTable = Array(
-    sd   -> List(Wmask.double, rdata),
-    sw   -> List(Wmask.word, rdata),
-    sh   -> List(Wmask.half, rdata),
-    sb   -> List(Wmask.byte, rdata),
-
-    ld   -> List(Wmask.nop, rdata),
-    lw   -> List(Wmask.nop, SignExt(rdata(31, 0), 64)),
-    lh   -> List(Wmask.nop, SignExt(rdata(15, 0), 64)),
-    lb   -> List(Wmask.nop, SignExt(rdata(7, 0), 64)),
-    lbu  -> List(Wmask.nop, ZeroExt(rdata(7, 0), 64)),
-    lhu  -> List(Wmask.nop, ZeroExt(rdata(15, 0), 64)),
-  )
-  val lsuDefault = List(nop, rdata)
-  val lsList  = ListLookup(lsType, lsuDefault, lsuTable)
-  val wmask   = lsList(0)
-  val lsuOut  = lsList(1)
+  val wmask   = LookupTreeDefault(lsType, Wmask.nop, List(
+    LsType.sd   -> List(Wmask.double, rdata),
+    LsType.sw   -> List(Wmask.word, rdata),
+    LsType.sh   -> List(Wmask.double, rdata),
+    LsType.sb   -> List(Wmask.double, rdata),
+  ))
+  val lsuOut  = LookupTreeDefault(lsType, rdata, List(
+    LsType.ld   -> rdata,
+    LsType.lw   -> SignExt(rdata(31, 0), 64),
+    LsType.lh   -> SignExt(rdata(15, 0), 64),
+    LsType.lb   -> SignExt(rdata(7, 0), 64),
+    LsType.lbu  -> ZeroExt(rdata(7, 0), 64),
+    LsType.lhu  -> ZeroExt(rdata(15, 0), 64),
+  ))
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
