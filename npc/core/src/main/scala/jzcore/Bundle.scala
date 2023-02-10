@@ -27,11 +27,14 @@ class AluIO extends Bundle {
 }
 
 class Ctrl extends Bundle {
-  val br        = Output(Bool())
-  val rd        = Output(UInt(5.W))
-  val regWen    = Output(Bool())
-  val break     = Output(Bool())
-  val isJalr    = Output(Bool())
+  val br            = Output(Bool())
+  val rd            = Output(UInt(5.W))
+  val regWen        = Output(Bool())
+  val break         = Output(Bool())
+  val isJalr        = Output(Bool())
+  val lsType        = Output(UInt(2.W))
+  val wdata         = Output(UInt(64.W))
+  val loadMem       = Output(Bool())
 }
 
 class InstrFetch extends Bundle {

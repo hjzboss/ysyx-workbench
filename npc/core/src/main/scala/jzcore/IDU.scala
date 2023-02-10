@@ -35,6 +35,9 @@ class IDU extends Module with HasInstrType {
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
+  val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.LsTable)
+  val lsType       = lsList(0)
+  val loadMem      = lsList(1)
 
   // registerfile
   rf.io.rs1           := rs1
@@ -54,6 +57,9 @@ class IDU extends Module with HasInstrType {
   io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
   io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS
   io.ctrl.isJalr      := instrtype === InstrIJ
+  io.ctrl.lsType      := lsType
+  io.ctrl.wdata       := rf.io.src2
+  io.ctrl.loadMem     := loadMem
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2

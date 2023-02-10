@@ -52,6 +52,29 @@ object AluOp {
   def apply() = UInt(4.W)
 }
 
+object Wmask {
+  def double  = "b11111111".U
+  def word    = "b00001111".U 
+  def half    = "b00000011".U
+  def byte    = "b00000001".U
+  def nop     = "b00000000".U
+}
+
+object LsType {
+  def ld      = "b0000".U
+  def lw      = "b0001".U
+  def lh      = "b0010".U
+  def lb      = "b0011".U
+  def lbu     = "b0100".U
+  def lhu     = "b0101".U
+  def sd      = "b0110".U
+  def sw      = "b0111".U
+  def sh      = "b1000".U
+  def sb      = "b1001".U
+
+  def nop     = "b1010".U
+}
+
 trait HasInstrType {
   def InstrN  = "b0000".U
   def InstrI  = "b0100".U

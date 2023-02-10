@@ -26,6 +26,12 @@ object RV64IM extends HasInstrType {
   def SRAW    = BitPat("b0100000_?????_?????_101_?????_0111011")
   def REMW    = BitPat("b0000001_?????_?????_110_?????_0111011")
 
+  def LD      = BitPat("b???????_?????_?????_011_?????_0000011")
+  def LW      = BitPat("b???????_?????_?????_010_?????_0000011")
+  def LH      = BitPat("b???????_?????_?????_001_?????_0000011")
+  def LB      = BitPat("b???????_?????_?????_000_?????_0000011")
+	def LBU     = BitPat("b???????_?????_?????_100_?????_0000011")
+  def LHU     = BitPat("b???????_?????_?????_101_?????_0000011")
   def ADDI    = BitPat("b???????_?????_?????_000_?????_0010011")
   def SLTI    = BitPat("b???????_?????_?????_010_?????_0010011")
   def SLTIU   = BitPat("b???????_?????_?????_011_?????_0010011")
@@ -60,7 +66,7 @@ object RV64IM extends HasInstrType {
   def SH      = BitPat("b???????_?????_?????_001_?????_0100011")
   def SB      = BitPat("b???????_?????_?????_000_?????_0100011")
 
-  val table = Array (
+  val table = Array(
     ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add),
     SUB     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sub),
     SLL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sll),
@@ -83,6 +89,12 @@ object RV64IM extends HasInstrType {
     SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sraw),
     REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remw),
 
+    LD      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
+    LW      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
+    LH      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
+    LB      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
+    LBU     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
+    LHU     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
     ADDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
     SLTI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.slt),
     SLTIU   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sltu),
@@ -112,14 +124,30 @@ object RV64IM extends HasInstrType {
     BLTU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bltu),
     BGEU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bgeu),
 
-    SD      -> List(InstrS, SrcType.nul, SrcType.nul, AluOp.nop), //todo
-    SW      -> List(InstrS, SrcType.nul, SrcType.nul, AluOp.nop), //todo
-    SH      -> List(InstrS, SrcType.nul, SrcType.nul, AluOp.nop), //todo
-    SB      -> List(InstrS, SrcType.nul, SrcType.nul, AluOp.nop), //todo
+    SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SB      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
   )
+
+  val lsTable = Array(
+    LD      -> List(LsType.ld, true.B),
+    LW      -> List(LsType.lw, true.B),
+    LH      -> List(LsType.lh, true.B),
+    LB      -> List(LsType.lb, true.B),
+    LBU     -> List(LsType.lbu, true.B),
+    LHU     -> List(LsType.lhu, true.B),
+
+    SD      -> List(LsType.sd, false.B),
+    SW      -> List(LsType.sw, false.B),
+    SH      -> List(LsType.sh, false.B),
+    SB      -> List(LsType.sb, false.B),
+  )
+
 }
 
 object Instruction extends HasInstrType {
   def NOP = 0x00000013.U
   val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul)
+  val LsDefault     = List(LsType.nop, false.B)
 }
