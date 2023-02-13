@@ -8,7 +8,7 @@ class Alu extends Module {
   val io = IO(new Bundle {
     val opA     = Input(UInt(64.W))
     val opB     = Input(UInt(64.W))
-    val aluOp   = Input(UInt(4.W))
+    val aluOp   = Input(UInt(6.W))
     
     val aluOut  = Output(UInt(64.W))
     val brMark  = Output(Bool())
