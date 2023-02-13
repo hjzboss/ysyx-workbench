@@ -15,7 +15,7 @@ static inline uint64_t host_read(void *addr, int len) {
   }
 }
 
-static inline void host_write(void *addr, int len, word_t data) {
+static inline void host_write(void *addr, int len, uint64_t data) {
   switch (len) {
     case 1: *(uint8_t  *)addr = data; return;
     case 2: *(uint16_t *)addr = data; return;
@@ -31,7 +31,7 @@ uint64_t paddr_read(uint64_t addr, int len) {
 }
 
 
-void paddr_write(paddr_t addr, int len, uint64_t data) {
+void paddr_write(uint64_t addr, int len, uint64_t data) {
   host_write(guest_to_host(addr), len, data);
 }
 

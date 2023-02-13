@@ -54,7 +54,7 @@ NPCState npc_state = { .state = NPC_STOP };
 uint64_t get_time();
 
 uint64_t paddr_read(uint64_t addr, int len);
-void paddr_write(paddr_t addr, int len, word_t data);
+void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 
