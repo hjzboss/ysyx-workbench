@@ -30,10 +30,10 @@ class IFU extends Module with HasResetVector{
   val inst = instFetch.io.inst
 
   npc               := Mux(io.redirect.valid, dnpc, snpc)
-  pc                := npc
-
   instFetch.io.pc   := pc
   
+  pc                := npc
+
   io.inst           := inst
   io.nextPc         := npc
   io.pc             := pc
