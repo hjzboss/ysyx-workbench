@@ -79,13 +79,17 @@ extern "C" void c_break() {
   npc_state.halt_pc = top->io_pc;
 }
 
-
-extern "C" void pmem_read(long long raddr, long long *rdata) {
+extern "C" void inst_read(long long raddr, long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
   if(raddr < 0x80000000ull) {
     *rdata = 0x00000013;
     return;
   }
+  *rdata = paddr_read(raddr & ~0x7ull, 4);
+}
+
+extern "C" void pmem_read(long long raddr, long long *rdata) {
+  // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
   *rdata = paddr_read(raddr & ~0x7ull, 8);
 }
 
