@@ -75,6 +75,11 @@ object LsType {
   def nop     = "b1010".U
 }
 
+object RegWrite {
+  def loadMem = true.B
+  def loadAlu = false.B
+}
+
 trait HasInstrType {
   def InstrN  = "b0000".U
   def InstrI  = "b0100".U

@@ -69,69 +69,70 @@ object RV64IM extends HasInstrType {
 
 
   val table = Array(
-    ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add),
-    SUB     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sub),
-    SLL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sll),
-    SLT     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.slt),
-    SLTU    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sltu),
-    XOR     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.xor),
-    SRL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.srl),
-    SRA     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sra),
-    OR      -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.or),
-    AND     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.and),
-    MUL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mul),
-    DIV     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.div),
+    ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add, LsType.nop, RegWrite.loadAlu),
+    SUB     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sub, LsType.nop, RegWrite.loadAlu),
+    SLL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sll, LsType.nop, RegWrite.loadAlu),
+    SLT     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.slt, LsType.nop, RegWrite.loadAlu),
+    SLTU    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sltu, LsType.nop, RegWrite.loadAlu),
+    XOR     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.xor, LsType.nop, RegWrite.loadAlu),
+    SRL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.srl, LsType.nop, RegWrite.loadAlu),
+    SRA     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sra, LsType.nop, RegWrite.loadAlu),
+    OR      -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.or, LsType.nop, RegWrite.loadAlu),
+    AND     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.and, LsType.nop, RegWrite.loadAlu),
+    MUL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mul, LsType.nop, RegWrite.loadAlu),
+    DIV     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.div, LsType.nop, RegWrite.loadAlu),
 
-    ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.addw),
-    SUBW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.subw),
-    MULW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mulw),
-    DIVW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.divw),
-    SLLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sllw),
-    SRLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.srlw),
-    SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sraw),
-    REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remw),
+    ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.addw, LsType.nop, RegWrite.loadAlu),
+    SUBW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.subw, LsType.nop, RegWrite.loadAlu),
+    MULW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mulw, LsType.nop, RegWrite.loadAlu),
+    DIVW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.divw, LsType.nop, RegWrite.loadAlu),
+    SLLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sllw, LsType.nop, RegWrite.loadAlu),
+    SRLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.srlw, LsType.nop, RegWrite.loadAlu),
+    SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sraw, LsType.nop, RegWrite.loadAlu),
+    REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remw, LsType.nop, RegWrite.loadAlu),
 
-    LD      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    LW      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    LH      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    LB      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    LBU     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    LHU     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    ADDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add),
-    SLTI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.slt),
-    SLTIU   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sltu),
-    XORI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.xor),
-    ORI     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.or),
-    ANDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.and),
-    SLLI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sll),
-    SRLI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srl),
-    SRAI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sra),
-    ADDIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.addw),
-    SLLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sllw),
-    SRLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srlw),
-    SRAIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sraw),
+    LD      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.ld, RegWrite.loadMem),
+    LW      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.lw, RegWrite.loadMem),
+    LH      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.lh, RegWrite.loadMem),
+    LB      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.lb, RegWrite.loadMem),
+    LBU     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.lbu, RegWrite.loadMem),
+    LHU     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.lhu, RegWrite.loadMem),
+    ADDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.nop, RegWrite.loadAlu),
+    SLTI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.slt, LsType.nop, RegWrite.loadAlu),
+    SLTIU   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sltu, LsType.nop, RegWrite.loadAlu),
+    XORI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.xor, LsType.nop, RegWrite.loadAlu),
+    ORI     -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.or, LsType.nop, RegWrite.loadAlu),
+    ANDI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.and, LsType.nop, RegWrite.loadAlu),
+    SLLI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sll, LsType.nop, RegWrite.loadAlu),
+    SRLI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srl, LsType.nop, RegWrite.loadAlu),
+    SRAI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sra, LsType.nop, RegWrite.loadAlu),
+    ADDIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.addw, LsType.nop, RegWrite.loadAlu),
+    SLLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sllw, LsType.nop, RegWrite.loadAlu),
+    SRLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srlw, LsType.nop, RegWrite.loadAlu),
+    SRAIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sraw, LsType.nop, RegWrite.loadAlu),
 
-    EBREAK  -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
+    EBREAK  -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop, LsType.nop, RegWrite.loadAlu),
 
-    AUIPC   -> List(InstrU, SrcType.pc, SrcType.imm, AluOp.add),
-    LUI     -> List(InstrU, SrcType.nul, SrcType.imm, AluOp.add),
+    AUIPC   -> List(InstrU, SrcType.pc, SrcType.imm, AluOp.add, LsType.nop, RegWrite.loadAlu),
+    LUI     -> List(InstrU, SrcType.nul, SrcType.imm, AluOp.add, LsType.nop, RegWrite.loadAlu),
 
-    JAL     -> List(InstrJ, SrcType.pc, SrcType.plus4, AluOp.jump),
-    JALR    -> List(InstrIJ, SrcType.pc, SrcType.plus4, AluOp.jump),
+    JAL     -> List(InstrJ, SrcType.pc, SrcType.plus4, AluOp.jump, LsType.nop, RegWrite.loadAlu),
+    JALR    -> List(InstrIJ, SrcType.pc, SrcType.plus4, AluOp.jump, LsType.nop, RegWrite.loadAlu),
 
-    BEQ     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.beq),
-    BNE     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bne),
-    BLT     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.blt),
-    BGE     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bge),
-    BLTU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bltu),
-    BGEU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bgeu),
+    BEQ     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.beq, LsType.nop, RegWrite.loadAlu),
+    BNE     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bne, LsType.nop, RegWrite.loadAlu),
+    BLT     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.blt, LsType.nop, RegWrite.loadAlu),
+    BGE     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bge, LsType.nop, RegWrite.loadAlu),
+    BLTU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bltu, LsType.nop, RegWrite.loadAlu),
+    BGEU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bgeu, LsType.nop, RegWrite.loadAlu),
 
-    SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
-    SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
-    SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
-    SB      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sd, RegWrite.loadAlu),
+    SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sw, RegWrite.loadAlu),
+    SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sh, RegWrite.loadAlu),
+    SB      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sb, RegWrite.loadAlu),
   )
 
+/*
   val lsTable = Array(
     LD      -> List(LsType.ld, true.B),
     LW      -> List(LsType.lw, true.B),
@@ -145,10 +146,11 @@ object RV64IM extends HasInstrType {
     SH      -> List(LsType.sh, false.B),
     SB      -> List(LsType.sb, false.B),
   )
+  */
 }
 
 object Instruction extends HasInstrType {
   def NOP = 0x00000013.U
-  val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul)
-  val LsDefault     = List(LsType.nop, false.B)
+  val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul, LsType.nop, RegWrite.loadAlu)
+  //val LsDefault     = List(LsType.nop, false.B)
 }

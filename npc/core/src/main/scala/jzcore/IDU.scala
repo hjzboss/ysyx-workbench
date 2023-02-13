@@ -26,6 +26,8 @@ class IDU extends Module with HasInstrType {
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
+  val lsType    = ctrlList(4)
+  val loadMem   = ctrlList(5)
   val imm = LookupTree(instrtype, List(
     InstrI    -> SignExt(inst(31, 20), 64),
     InstrIJ   -> SignExt(inst(31, 20), 64),
@@ -35,9 +37,11 @@ class IDU extends Module with HasInstrType {
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
+/*
   val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTable)
   val lsType       = lsList(0)
   val loadMem      = lsList(1)
+  */
 
   // registerfile
   rf.io.rs1           := rs1
