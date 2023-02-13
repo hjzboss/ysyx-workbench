@@ -47,16 +47,16 @@ static struct rule {
   {" +", TK_NOTYPE},																						// spaces
   {"\\+", PLUS},																								// plus
   {"==", TK_EQ},																								// equal
-	{"0x[0-9a-f]+", HEX},																					// hex
-	{"\\$(0|ra|gp|t[p0-6]|s10|s11|s[p0-9]|a[0-7])", REG},								// reg
-	{"[0-9]+", INTEGER},																					// integer
-	{"-", MINUS},																									// minus
-	{"\\*", UNDET},																								// times and pointer dereference
-	{"/", DIVIDE},																								// divide
-	{"\\(", L_PARENTHESIS},																				// left parenthesis
-	{"\\)", R_PARENTHESIS},																				// right parenthesis
-	{"!=", NOT_EQ},																								// not equal
-	{"&&", AND},																									// and
+  {"0x[0-9a-f]+", HEX},																					// hex
+  {"\\$(0|ra|gp|t[p0-6]|s10|s11|s[p0-9]|a[0-7])", REG},								// reg
+  {"[0-9]+", INTEGER},																					// integer
+  {"-", MINUS},																									// minus
+  {"\\*", UNDET},																								// times and pointer dereference
+  {"/", DIVIDE},																								// divide
+  {"\\(", L_PARENTHESIS},																				// left parenthesis
+  {"\\)", R_PARENTHESIS},																				// right parenthesis
+  {"!=", NOT_EQ},																								// not equal
+  {"&&", AND},																									// and
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -258,7 +258,7 @@ static uint64_t is_overflow(uint64_t val1, uint64_t val2, int op) {
 				printf("An overflow occurs during pointer dereference: *%lu\n", val2);
 				assert(0);				
 			}
-			result = pmem_read(val2, 8);
+			result = paddr_read(val2, 8);
 			break;
 		default:
 			printf("Unknown operator!\n");

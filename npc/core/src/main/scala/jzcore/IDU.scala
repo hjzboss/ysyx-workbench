@@ -26,6 +26,9 @@ class IDU extends Module with HasInstrType {
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
+  val lsType    = ctrlList(4)
+  val loadMem   = ctrlList(5)
+  val wmask     = ctrlList(6)
   val imm = LookupTree(instrtype, List(
     InstrI    -> SignExt(inst(31, 20), 64),
     InstrIJ   -> SignExt(inst(31, 20), 64),
@@ -35,6 +38,11 @@ class IDU extends Module with HasInstrType {
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
+/*
+  val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTable)
+  val lsType       = lsList(0)
+  val loadMem      = lsList(1)
+  */
 
   // registerfile
   rf.io.rs1           := rs1
@@ -51,14 +59,18 @@ class IDU extends Module with HasInstrType {
   io.datasrc.imm      := imm
 
   io.ctrl.rd          := rd
-  io.ctrl.br          := Mux(instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB, true.B, false.B)
-  io.ctrl.regWen      := Mux(instrtype === InstrB || instrtype === InstrS, false.B, true.B)
-  io.ctrl.isJalr      := Mux(instrtype === InstrIJ, true.B, false.B)
+  io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS
+  io.ctrl.isJalr      := instrtype === InstrIJ
+  io.ctrl.lsType      := lsType
+  io.ctrl.wdata       := rf.io.src2
+  io.ctrl.loadMem     := loadMem
+  io.ctrl.wmask       := wmask
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
 
   // ebreak
-  io.ctrl.break       := Mux(instrtype === InstrD, true.B, false.B)
+  io.ctrl.break       := instrtype === InstrD
 }

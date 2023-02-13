@@ -10,12 +10,16 @@ trait HasResetVector {
 
 class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
+    // 用于仿真环境
     val pc        = Output(UInt(64.W))
     val nextPc    = Output(UInt(64.W))
-    val inst      = Input(UInt(32.W))
+    val inst      = Output(UInt(32.W))
+
     val redirect  = Flipped(new RedirectIO)
     val fetch     = new InstrFetch
   })
+
+  val instFetch = Module(new InstFetch)
 
   // pc
   val pc  = RegInit(resetVector.U(64.W))
@@ -23,12 +27,17 @@ class IFU extends Module with HasResetVector{
 
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
+  val inst = instFetch.io.inst
 
-  npc := Mux(io.redirect.valid, dnpc, snpc)
-  pc  := npc
+  npc               := Mux(io.redirect.valid, dnpc, snpc)
+  instFetch.io.pc   := pc
+  
+  pc                := npc
 
-  io.nextPc     := npc
-  io.pc         := pc
-  io.fetch.pc   := pc
-  io.fetch.inst := io.inst
+  io.inst           := inst
+  io.nextPc         := npc
+  io.pc             := pc
+
+  io.fetch.pc       := pc
+  io.fetch.inst     := inst
 }

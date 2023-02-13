@@ -122,7 +122,7 @@ static int cmd_x(char *args) {
     uint64_t tmp = addr + 4 * i;
     printf("0x%016lx:\t", tmp);
     for (uint64_t j = 0; j < 4; ++ j) {
-      uint64_t data = pmem_read(tmp + j, 1);
+      uint64_t data = paddr_read(tmp + j, 1);
       printf("%02lx ", data);
     }
     printf("\n");

@@ -23,15 +23,19 @@ class DataSrcIO extends Bundle {
 class AluIO extends Bundle {
   val aluSrc1 = Output(UInt(3.W))
   val aluSrc2 = Output(UInt(3.W))
-  val aluOp   = Output(UInt(4.W))
+  val aluOp   = Output(UInt(6.W))
 }
 
 class Ctrl extends Bundle {
-  val br        = Output(Bool())
-  val rd        = Output(UInt(5.W))
-  val regWen    = Output(Bool())
-  val break     = Output(Bool())
-  val isJalr    = Output(Bool())
+  val br            = Output(Bool())
+  val rd            = Output(UInt(5.W))
+  val regWen        = Output(Bool())
+  val break         = Output(Bool())
+  val isJalr        = Output(Bool())
+  val lsType        = Output(UInt(2.W))
+  val wdata         = Output(UInt(64.W))
+  val loadMem       = Output(Bool())
+  val wmask         = Output(UInt(8.W))
 }
 
 class InstrFetch extends Bundle {

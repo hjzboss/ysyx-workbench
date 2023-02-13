@@ -14,24 +14,76 @@ object SrcType {
 }
 
 object AluOp {
-  def add       = "b0000".U
-  def sub       = "b0001".U
-  def and       = "b0010".U
-  def or        = "b0011".U
-  def xor       = "b0100".U
-  def slt       = "b0101".U
-  def sltu      = "b0110".U
-  def sll       = "b0111".U
-  def srl       = "b1000".U
-  def sra       = "b1001".U
+  def add       = "b000000".U
+  def sub       = "b000001".U
+  def and       = "b000010".U
+  def or        = "b000011".U
+  def xor       = "b000100".U
+  def slt       = "b000101".U
+  def sltu      = "b000110".U
+  def sll       = "b000111".U
+  def srl       = "b001000".U
+  def sra       = "b001001".U
+  def rem       = "b001101".U
   // todo
-  def div       = "b1010".U
-  def times     = "b1011".U
-  def nop       = "b1100".U
-  def jump      = "b1101".U
-  def notEq     = "b1110".U
+  def div       = "b001010".U
+  def mul       = "b001011".U
+
+  def nop       = "b001100".U
+
+  def jump      = "b001110".U
+
+  def beq       = "b001111".U
+  def bne       = "b010000".U
+  def bge       = "b010001".U
+  def blt       = "b010010".U
+  def bltu      = "b010011".U
+  def bgeu      = "b010100".U
+
+  def addw      = "b010101".U
+  def subw      = "b010110".U
+  def mulw      = "b010111".U
+  def divw      = "b011000".U
+  def sllw      = "b011001".U
+  def srlw      = "b011010".U
+  def sraw      = "b011011".U
+  def remw      = "b011100".U
+
+  def apply() = UInt(6.W)
+}
+
+object Wmask {
+  def double  = "b11111111".U
+  def word    = "b00001111".U 
+  def half    = "b00000011".U
+  def byte    = "b00000001".U
+  def nop     = "b00000000".U
+
+  def apply() = UInt(8.W)
+}
+
+object LsType {
+  def ld      = "b0000".U
+  def lw      = "b0001".U
+  def lh      = "b0010".U
+  def lb      = "b0011".U
+  def lbu     = "b0100".U
+  def lhu     = "b0101".U
+  def sd      = "b0110".U
+  def sw      = "b0111".U
+  def sh      = "b1000".U
+  def sb      = "b1001".U
+
+  def nop     = "b1010".U
 
   def apply() = UInt(4.W)
+}
+
+object RegWrite {
+  def loadMem = true.B
+  def loadAlu = false.B
+
+  def apply() = Bool()
 }
 
 trait HasInstrType {
