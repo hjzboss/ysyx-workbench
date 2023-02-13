@@ -82,7 +82,10 @@ extern "C" void c_break() {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
-  if(raddr < 0x80000000ull) return;
+  if(raddr < 0x80000000ull) {
+    *rdata = 0;
+    return;
+  }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
 }
 
@@ -107,7 +110,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
 static void reset(int time) {
   top->reset = 1;
   while (time > 0) {
-    printf("debug:");
     top->clock = !top->clock;
     top->eval();
 #ifdef CONFIG_WAVE
