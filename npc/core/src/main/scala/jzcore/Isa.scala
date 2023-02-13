@@ -106,7 +106,7 @@ object RV64IM extends HasInstrType {
     SLLI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sll, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SRLI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srl, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SRAI    -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sra, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    ADDIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.addw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    ADDIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.addiw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SLLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sllw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SRLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srlw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SRAIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sraw, LsType.nop, RegWrite.loadAlu, Wmask.nop),

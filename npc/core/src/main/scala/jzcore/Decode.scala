@@ -48,6 +48,7 @@ object AluOp {
   def srlw      = "b011010".U
   def sraw      = "b011011".U
   def remw      = "b011100".U
+  def addiw     = "b011101".U
 
   def apply() = UInt(4.W)
 }
