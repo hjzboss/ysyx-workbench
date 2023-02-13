@@ -58,6 +58,8 @@ object Wmask {
   def half    = "b00000011".U
   def byte    = "b00000001".U
   def nop     = "b00000000".U
+
+  def apply() = UInt(8.W)
 }
 
 object LsType {
@@ -73,6 +75,8 @@ object LsType {
   def sb      = "b1001".U
 
   def nop     = "b1010".U
+
+  def apply() = UInt(4.W)
 }
 
 object RegWrite {
