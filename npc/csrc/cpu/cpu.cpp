@@ -82,8 +82,8 @@ extern "C" void c_break() {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
+  printf("debug: raddr=%lx\n", raddr);
   *rdata = paddr_read(raddr & ~0x7ull, 8);
-  printf("debug: execute\n");
 }
 
 
