@@ -23,15 +23,13 @@ class IFU extends Module with HasResetVector{
 
   // pc
   val pc  = RegInit(resetVector.U(64.W))
+  printf(p"pc=$pc")
   val npc = Wire(UInt(64.W))
 
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
   val inst = instFetch.io.inst
 
-  if(io.redirect.valid != true.B) {
-    printf("yes")
-  }
   npc               := Mux(io.redirect.valid, dnpc, snpc)
   pc                := npc
 
