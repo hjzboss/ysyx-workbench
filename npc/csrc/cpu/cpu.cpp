@@ -82,6 +82,7 @@ extern "C" void c_break() {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
+  printf("debug: execute\n");
   *rdata = paddr_read(raddr & ~0x7ull, 8);
 }
 
@@ -150,7 +151,6 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  printf("debug: execute\n");
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
 
