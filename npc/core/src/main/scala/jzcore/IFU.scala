@@ -23,7 +23,6 @@ class IFU extends Module with HasResetVector{
 
   // pc
   val pc  = RegInit(resetVector.U(64.W))
-  printf(p"pc=$pc")
   val npc = Wire(UInt(64.W))
 
   val snpc = pc + 4.U
