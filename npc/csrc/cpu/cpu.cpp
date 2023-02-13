@@ -109,7 +109,6 @@ static void reset(int time) {
   while (time > 0) {
     top->clock = !top->clock;
     top->eval();
-    printf("debug: execute1\n");
 #ifdef CONFIG_WAVE
     tfp->dump(main_time);
 #endif
@@ -150,6 +149,7 @@ long init_cpu(char *dir) {
   long size = load_img(dir);
 
   top->clock = 0;
+  printf("debug: pc=%lx\n", top->pc);
   reset(4);
 
   cpu.pc = top->io_pc;
