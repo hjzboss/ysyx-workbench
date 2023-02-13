@@ -183,6 +183,7 @@ static void isa_exec_once() {
 
 static void cpu_exec_once() {
   cpu.pc = top->io_pc;
+  printf("sim: pc=%lx\n", cpu.pc);
   cpu.npc = top->io_nextPc;
   cpu.inst = paddr_read(cpu.pc, 4);
   isa_exec_once();
