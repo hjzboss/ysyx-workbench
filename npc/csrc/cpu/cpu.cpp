@@ -209,7 +209,6 @@ static void cpu_exec_once() {
 }
 
 void execute(uint64_t n) {
-  printf("debug: execute\n");
   while (n--) {
     // todo
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;

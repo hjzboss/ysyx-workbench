@@ -104,6 +104,7 @@ void init_monitor(int argc, char *argv[]) {
   //init_isa();
 
   long size = init_cpu(img_file);
+  printf("debug: execute\n");
 
   /* Load the image to memory. This will overwrite the built-in image. */
   //long img_size = load_img();
