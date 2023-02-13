@@ -64,7 +64,7 @@ double sc_time_stamp () {
 }
 
 
-// todo
+// todo: watchpoint
 static void trace_and_difftest(uint64_t dnpc) {
   IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
