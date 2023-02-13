@@ -82,6 +82,8 @@ object LsType {
 object RegWrite {
   def loadMem = true.B
   def loadAlu = false.B
+
+  def apply() = Bool()
 }
 
 trait HasInstrType {
