@@ -79,7 +79,7 @@ extern "C" void c_break() {
   npc_state.halt_pc = top->io_pc;
 }
 
-extern "C" void inst_read(long long raddr, long *rdata) {
+extern "C" void inst_read(long long raddr, int *rdata) {
   if(raddr < 0x80000000ull) {
     *rdata = 0x00000013;
     return;
