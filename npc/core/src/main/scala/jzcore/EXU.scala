@@ -50,7 +50,7 @@ class EXU extends Module {
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
 
-  lsu.io.raddr         := aluOut
+  lsu.io.raddr         := Mux(io.ctrl.loadMem, aluOut, 0.U(64.W))
   lsu.io.waddr         := aluOut
   lsu.io.wdata         := io.ctrl.wdata
   lsu.io.wmask         := wmask
