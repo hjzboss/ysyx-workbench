@@ -70,7 +70,7 @@ object RV64IM extends HasInstrType {
   def NOP     = BitPat("b0000000_00000_00000_000_00000_0000000")
 
   val table = Array(
-    NOP     -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nul),
+    NOP     -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
     ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add),
     SUB     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sub),
     SLL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sll),
