@@ -149,7 +149,7 @@ long init_cpu(char *dir) {
   long size = load_img(dir);
 
   top->clock = 0;
-  printf("debug: pc=%lx\n", top->pc);
+  printf("debug: pc=%lx\n", top->io_pc);
   reset(4);
 
   cpu.pc = top->io_pc;
