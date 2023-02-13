@@ -49,7 +49,7 @@ object AluOp {
   def sraw      = "b011011".U
   def remw      = "b011100".U
 
-  def apply() = UInt(4.W)
+  def apply() = UInt(6.W)
 }
 
 object Wmask {
