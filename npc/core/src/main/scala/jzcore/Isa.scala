@@ -67,7 +67,10 @@ object RV64IM extends HasInstrType {
   def SH      = BitPat("b???????_?????_?????_001_?????_0100011")
   def SB      = BitPat("b???????_?????_?????_000_?????_0100011")
 
+  def NOP     = BitPat("b0000000_00000_00000_000_00000_0000000")
+
   val table = Array(
+    NOP     -> List(InstrD, SrcType.nop, SrcType.nop, AluOp.nop),
     ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add),
     SUB     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sub),
     SLL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sll),
@@ -147,7 +150,6 @@ object RV64IM extends HasInstrType {
 }
 
 object Instruction extends HasInstrType {
-  def NOP = 0x00000013.U
   val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul)
   val LsDefault     = List(LsType.nop, false.B)
 }
