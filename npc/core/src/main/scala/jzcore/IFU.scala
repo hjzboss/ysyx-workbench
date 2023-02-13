@@ -29,7 +29,7 @@ class IFU extends Module with HasResetVector{
   val dnpc = io.redirect.brAddr
   val inst = instFetch.io.inst
 
-  if(io.redirect.valid == true.B) {
+  if(io.redirect.valid != true.B) {
     printf("yes")
   }
   npc               := Mux(io.redirect.valid, dnpc, snpc)
