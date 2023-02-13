@@ -28,6 +28,7 @@ class IDU extends Module with HasInstrType {
   val aluSrc2   = ctrlList(2)
   val lsType    = ctrlList(4)
   val loadMem   = ctrlList(5)
+  val wmask     = ctrlList(6)
   val imm = LookupTree(instrtype, List(
     InstrI    -> SignExt(inst(31, 20), 64),
     InstrIJ   -> SignExt(inst(31, 20), 64),
@@ -64,6 +65,7 @@ class IDU extends Module with HasInstrType {
   io.ctrl.lsType      := lsType
   io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
+  io.ctrl.wmask       := wmask
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2

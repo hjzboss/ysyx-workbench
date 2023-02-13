@@ -35,6 +35,7 @@ class Ctrl extends Bundle {
   val lsType        = Output(UInt(2.W))
   val wdata         = Output(UInt(64.W))
   val loadMem       = Output(Bool())
+  val wmask         = Output(UInt(8.W))
 }
 
 class InstrFetch extends Bundle {
