@@ -147,6 +147,7 @@ long init_cpu(char *dir) {
   // initial i_cache
   long size = load_img(dir);
 
+  printf("debug: execute\n");
   top->clock = 0;
   reset(4);
 
