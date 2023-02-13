@@ -53,7 +53,8 @@ NPCState npc_state = { .state = NPC_STOP };
 
 uint64_t get_time();
 
-uint64_t pmem_read(uint64_t addr, int len);
+uint64_t paddr_read(uint64_t addr, int len);
+void paddr_write(paddr_t addr, int len, word_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 
@@ -79,6 +80,29 @@ extern "C" void c_break() {
 }
 
 
+extern "C" void pmem_read(long long raddr, long long *rdata) {
+  // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
+  *rdata = paddr_read(raddr & ~0x7ull, 8);
+}
+
+
+extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
+  // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
+  // `wmask`中每比特表示`wdata`中1个字节的掩码,
+  // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
+  if (wmask == 0x00) return;
+  int len;
+  switch(wmask) {
+    case 0x01: len = 1; break;
+    case 0x03: len = 2; break;
+    case 0x0f: len = 4; break;
+    case 0xff: len = 8; break;
+    default: len =  8;
+  }
+  paddr_write(waddr & ~0x7ull, len, wdata);
+}
+
+
 static void reset(int time) {
   top->reset = 1;
   while (time > 0) {
@@ -96,7 +120,7 @@ static void reset(int time) {
 
 static void eval_wave() {
   top->clock = !top->clock;
-  top->io_inst = pmem_read(top->io_pc, 4);
+  //top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
 #ifdef CONFIG_WAVE
   tfp->dump(main_time);
@@ -156,7 +180,7 @@ static void isa_exec_once() {
 static void cpu_exec_once() {
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
-  cpu.inst = pmem_read(cpu.pc, 4);
+  cpu.inst = paddr_read(cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_ITRACE
   char *p = cpu.logbuf;

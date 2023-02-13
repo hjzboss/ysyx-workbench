@@ -15,16 +15,26 @@ static inline uint64_t host_read(void *addr, int len) {
   }
 }
 
-uint64_t pmem_read(uint64_t addr, int len) {
+static inline void host_write(void *addr, int len, word_t data) {
+  switch (len) {
+    case 1: *(uint8_t  *)addr = data; return;
+    case 2: *(uint16_t *)addr = data; return;
+    case 4: *(uint32_t *)addr = data; return;
+    case 8: *(uint64_t *)addr = data; return;
+    default: assert(0);
+  }
+}
+
+uint64_t paddr_read(uint64_t addr, int len) {
   uint64_t ret = host_read(guest_to_host(addr), len);
   return ret;
 }
 
-/*
-static void pmem_write(paddr_t addr, int len, word_t data) {
+
+void paddr_write(paddr_t addr, int len, uint64_t data) {
   host_write(guest_to_host(addr), len, data);
 }
-*/
+
 
 long load_img(char *dir) {
   FILE *fp = fopen(dir, "rb");
