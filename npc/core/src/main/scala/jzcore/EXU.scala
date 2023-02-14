@@ -47,7 +47,8 @@ class EXU extends Module {
     LsType.sb   -> rdata,
     LsType.nop  -> rdata
   ))*/
-  val lsuOut = Mux(lsType === LsType.lbu, ZeroExt(rdata(7, 0), 64), rdata)
+  var lsuOut = rdata
+  if(lsType === LsType.lbu) lsuOut = ZeroExt(rdata(7, 0), 64)
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
