@@ -5,6 +5,67 @@ static uint8_t i_cache[65535] = {};
 uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
 
+
+#ifdef CONFIG_MTRACE
+typedef struct node {
+  bool read;
+  paddr_t addr;
+  uint64_t value;
+  int len;
+  struct node *next;
+} mtrace_node;
+
+static mtrace_node *mtrace_head = NULL;
+static mtrace_node *mtrace_tail = NULL;
+
+static void insert_mtrace(bool is_read, paddr_t addr, int len, uint64_t value) {
+  mtrace_node *node = (mtrace_node*)malloc(sizeof(mtrace_node));
+  node->read = is_read;
+  node->addr = addr;
+  node->len = len;
+  node->value = value;
+  node->next = NULL;
+  
+  // log
+  log_write("[0x%016x]", node->addr);
+  if (node->read) log_write(" --> ");
+  else log_write(" <-- ");
+  log_write("0x%016lx, len=%d bytes\n", node->value, node->len);
+
+  if (mtrace_head == NULL) {
+    mtrace_head = node;
+    mtrace_tail = node;
+  }
+  else {
+    mtrace_tail->next = node;
+    mtrace_tail = node;
+  }
+}
+
+void free_mtrace() {
+  mtrace_node *tmp;
+  while(mtrace_head != NULL) {
+    tmp = mtrace_head->next;
+    free(mtrace_head);
+    mtrace_head = tmp;
+  }
+}
+
+void print_mtrace() {
+  printf("---mtrace message start---\n");
+  mtrace_node *ptr = mtrace_head;
+  while(ptr != NULL) {
+    printf("[0x%016x]", ptr->addr);
+    if (ptr->read) printf(" --> ");
+    else printf(" <-- ");
+    printf("0x%016lx, len=%d bytes\n", ptr->value, ptr->len);
+
+    ptr = ptr->next;
+  }
+  printf("---mtrace message end---\n");
+}
+#endif
+
 static inline uint64_t host_read(void *addr, int len) {
   switch (len) {
     case 1: return *(uint8_t  *)addr;
@@ -26,12 +87,14 @@ static inline void host_write(void *addr, int len, uint64_t data) {
 }
 
 uint64_t paddr_read(uint64_t addr, int len) {
+  IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result));
   uint64_t ret = host_read(guest_to_host(addr), len);
   return ret;
 }
 
 
 void paddr_write(uint64_t addr, int len, uint64_t data) {
+  IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data));
   host_write(guest_to_host(addr), len, data);
 }
 
