@@ -112,7 +112,14 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     }
     wmask = wmask >> 1;
   }
-  rdata = (rdata & ~wmask_64) + (wdata << wmask_64);
+  uint64_t tmp = wmask_64;
+  int shift_cnt = 0;
+  for(int i = 64; i > 0; i--) {
+    if(tmp & 0x01 == 0x01) break;
+    shift_cnt++;
+    tmp = tmp >> 1;
+  }
+  rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
   printf("waddr=%llx, data=%lx, wmask_64=%lx\n", waddr, rdata, wmask_64);
   paddr_write(waddr & ~0x7ull, 8, rdata);
 }
