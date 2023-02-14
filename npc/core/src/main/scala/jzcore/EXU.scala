@@ -28,12 +28,12 @@ class EXU extends Module {
   val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
-  val lsType  = io.ctrl.lsType
+  //val lsType  = io.ctrl.lsType
   val rdata   = lsu.io.rdata
   val wmask   = io.ctrl.wmask
   
-  // 此处可能有问题，lw，lbu,lhu出错，也可能是pmem_read的问题
-  val lsuOut  = LookupTree(lsType, List(
+  // 此处有问题，lw，lbu,lhu出错
+  val lsuOut  = LookupTree(io.ctrl.lsType, List(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
