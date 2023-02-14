@@ -57,6 +57,7 @@ uint64_t paddr_read(uint64_t addr, int len);
 void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
+void print_mtrace();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
