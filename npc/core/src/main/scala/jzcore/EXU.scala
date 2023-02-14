@@ -33,6 +33,7 @@ class EXU extends Module {
   val wmask   = io.ctrl.wmask
   
   // 此处有问题，lw，lbu,lhu出错
+  /*
   val lsuOut  = MuxLookup(lsType, rdata, Array(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
@@ -45,7 +46,8 @@ class EXU extends Module {
     LsType.sh   -> rdata,
     LsType.sb   -> rdata,
     LsType.nop  -> rdata
-  ))
+  ))*/
+  val lsuOut = rdata
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
