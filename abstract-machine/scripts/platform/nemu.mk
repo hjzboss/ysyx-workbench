@@ -27,4 +27,4 @@ run: image
 	$(MAKE) -C $(NEMU_HOME) ISA=$(ISA) run ARGS="$(NEMUFLAGS)" IMG=$(IMAGE).bin
 
 gdb: image
-	$(MAKE) -C $(NEMU_HOME) ISA=$(ISA) gdb ARGS="$(NEMUFLAGS)" IMG=/home/hjz/ysyx-workbench/am-kernels/tests/cpu-tests/build/recursion-riscv64-npc.bin
+	$(MAKE) -C $(NEMU_HOME) ISA=$(ISA) gdb ARGS="$(NEMUFLAGS)" IMG=$(IMAGE).bin
