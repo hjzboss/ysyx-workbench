@@ -107,10 +107,13 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   uint64_t wmask_64 = 0;
   uint8_t *index = (uint8_t*)&wmask_64;
   for(int i = 0; i < 8; i++, wmask >> 1, index++) {
+    printf("begin\n");
     if(wmask & 0x01 == 0x01) {
+      printf("fuck ");
       *index = 0xff;
     }
   }
+  printf("end\n");
   rdata = (rdata & ~wmask_64) + (wdata & wmask_64);
   printf("waddr=%llx, data=%lx, wmask=%x, wmask_64=%lx\n", waddr, rdata, wmask, wmask_64);
   paddr_write(waddr & ~0x7ull, 8, rdata);
