@@ -33,7 +33,7 @@ class EXU extends Module {
   val wmask   = io.ctrl.wmask
   
   // 此处有问题，lw，lbu,lhu出错
-  val lsuOut  = LookupTree(lsType, rdata, Array(
+  val lsuOut  = LookupTree(lsType, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
