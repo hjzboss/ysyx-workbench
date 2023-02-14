@@ -33,7 +33,7 @@ class EXU extends Module {
   val wmask   = io.ctrl.wmask
   
   // 此处可能有问题，lw，lbu,lhu出错，也可能是pmem_read的问题
-  val lsuOut  = LookupTreeDefault(lsType, rdata, List(
+  val lsuOut  = LookupTree(lsType, List(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
