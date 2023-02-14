@@ -9,7 +9,7 @@ uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; 
 #ifdef CONFIG_MTRACE
 typedef struct node {
   bool read;
-  paddr_t addr;
+  uint64_t addr;
   uint64_t value;
   int len;
   struct node *next;
@@ -18,7 +18,7 @@ typedef struct node {
 static mtrace_node *mtrace_head = NULL;
 static mtrace_node *mtrace_tail = NULL;
 
-static void insert_mtrace(bool is_read, paddr_t addr, int len, uint64_t value) {
+static void insert_mtrace(bool is_read, uint64_t addr, int len, uint64_t value) {
   mtrace_node *node = (mtrace_node*)malloc(sizeof(mtrace_node));
   node->read = is_read;
   node->addr = addr;
