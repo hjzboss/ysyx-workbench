@@ -63,11 +63,11 @@ object Wmask {
 }
 
 object LsType {
-  def lbu      = "b0000".U
+  def ld      = "b0000".U
   def lw      = "b0001".U
   def lh      = "b0010".U
   def lb      = "b0011".U
-  def ld     = "b0100".U
+  def lbu     = "b0100".U
   def lhu     = "b0101".U
   def sd      = "b0110".U
   def sw      = "b0111".U
