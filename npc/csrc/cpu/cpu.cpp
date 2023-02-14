@@ -105,11 +105,13 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   if(wmask == 0 || waddr < 0x80000000ull) return;
   uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
   uint64_t wmask_64 = 0;
+  
   uint8_t *index = (uint8_t*)&wmask_64;
-  for(int i = 0; i < 8; i++, wmask >> (char)1, index++) {
+  for(int i = 0; i < 8; i++, wmask >> 1, index++) {
     if(wmask & 0x01) {
       *index = 0xff;
     }
+    else *index = 0x00;
   }
   rdata = (rdata & ~wmask_64) + (wdata & wmask_64);
   printf("waddr=%llx, data=%lx, wmask=%x, wmask_64=%lx\n", waddr, rdata, wmask, wmask_64);
