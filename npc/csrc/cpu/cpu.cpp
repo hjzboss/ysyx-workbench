@@ -191,7 +191,6 @@ static void isa_exec_once() {
 
 static void cpu_exec_once() {
   cpu.pc = top->io_pc;
-  printf("sim: pc=%lx\n", cpu.pc);
   cpu.npc = top->io_nextPc;
   cpu.inst = paddr_read(cpu.pc, 4);
   isa_exec_once();
@@ -227,7 +226,7 @@ void execute(uint64_t n) {
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
-    trace_and_difftest(top->io_pc);
+    trace_and_difftest(cpu.npc);
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
