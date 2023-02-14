@@ -107,8 +107,8 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   uint64_t wmask_64 = 0;
   uint8_t wmask_u = (uint8_t)wmask;
   uint8_t *index = (uint8_t*)&wmask_64;
-  for(int i = 0; i < 8; i++, wmask >> 1, index++) {
-    if(wmask & 0x01) {
+  for(int i = 0; i < 8; i++, wmask_u >> 1, index++) {
+    if(wmask_u & 0x01) {
       *index = 0xff;
     }
   }
