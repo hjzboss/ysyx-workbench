@@ -81,6 +81,7 @@ void init_difftest(char *ref_so_file, long img_size) {
 
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
+  printf("pc=%016lx\n", cpu.pc);
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
   ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
   //printf("init_pc=%016lx\n", cpu.pc);

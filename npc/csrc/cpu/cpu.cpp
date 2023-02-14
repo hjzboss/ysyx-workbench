@@ -162,7 +162,6 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  printf("pc=%016lx\n", top->io_pc);
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
 
