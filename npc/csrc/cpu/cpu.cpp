@@ -103,15 +103,15 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if(wmask == 0x00 || waddr < 0x80000000ull) return;
-  int len;
+  uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
   switch(wmask) {
-    case 0x01: len = 1; break;
-    case 0x03: len = 2; break;
-    case 0x0f: len = 4; break;
-    case 0xff: len = 8; break;
+    case 0x01: rdata = (rdata & ~0x0ff) + (wdata & 0x0ff); break;
+    case 0x03: rdata = (rdata & ~0x0ffff) + (wdata & 0x0ffff); break;
+    case 0x0f: rdata = (rdata & ~0x0ffffffff) + (wdata & 0x0ffffffff); break;
+    case 0xff: rdata = wdata; break;
     default: len =  8;
   }
-  paddr_write(waddr & ~0x7ull, len, wdata);
+  paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
 
