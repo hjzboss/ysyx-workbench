@@ -87,8 +87,8 @@ static inline void host_write(void *addr, int len, uint64_t data) {
 }
 
 uint64_t paddr_read(uint64_t addr, int len) {
-  IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result));
   uint64_t ret = host_read(guest_to_host(addr), len);
+  IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, ret));
   return ret;
 }
 
