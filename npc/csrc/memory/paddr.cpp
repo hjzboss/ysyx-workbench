@@ -27,7 +27,7 @@ static void insert_mtrace(bool is_read, uint64_t addr, int len, uint64_t value) 
   node->next = NULL;
   
   // log
-  log_write("[0x%016x]", node->addr);
+  log_write("[0x%016lx]", node->addr);
   if (node->read) log_write(" --> ");
   else log_write(" <-- ");
   log_write("0x%016lx, len=%d bytes\n", node->value, node->len);
@@ -55,7 +55,7 @@ void print_mtrace() {
   printf("---mtrace message start---\n");
   mtrace_node *ptr = mtrace_head;
   while(ptr != NULL) {
-    printf("[0x%016x]", ptr->addr);
+    printf("[0x%016lx]", ptr->addr);
     if (ptr->read) printf(" --> ");
     else printf(" <-- ");
     printf("0x%016lx, len=%d bytes\n", ptr->value, ptr->len);
