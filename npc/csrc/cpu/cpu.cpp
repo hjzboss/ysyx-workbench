@@ -111,7 +111,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     case 0xff: rdata = wdata; break;
     default: rdata = rdata;
   }
-  printf("waddr=%llx, data=%lx\n", waddr, rdata);
+  printf("waddr=%llx, data=%lx, wmask=%x\n", waddr, rdata, wmask);
   paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
