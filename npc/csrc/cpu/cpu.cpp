@@ -109,7 +109,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     case 0x03: rdata = (rdata & ~0x0ffff) + (wdata & 0x0ffff); break;
     case 0x0f: rdata = (rdata & ~0x0ffffffff) + (wdata & 0x0ffffffff); break;
     case 0xff: rdata = wdata; break;
-    default: len =  8;
+    default: rdata = rdata;
   }
   paddr_write(waddr & ~0x7ull, 8, rdata);
 }
