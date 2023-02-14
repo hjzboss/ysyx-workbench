@@ -73,7 +73,6 @@ object LsType {
   def sw      = "b0111".U
   def sh      = "b1000".U
   def sb      = "b1001".U
-
   def nop     = "b1010".U
 
   def apply() = UInt(4.W)

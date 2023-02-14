@@ -28,18 +28,23 @@ class EXU extends Module {
   val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
-  //val lsType  = io.ctrl.lsType
+  val lsType  = io.ctrl.lsType
   val rdata   = lsu.io.rdata
   val wmask   = io.ctrl.wmask
   
   // 此处有问题，lw，lbu,lhu出错
-  val lsuOut  = LookupTree(io.ctrl.lsType, List(
+  val lsuOut  = LookupTree(lsType, List(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
     LsType.lb   -> SignExt(rdata(7, 0), 64),
     LsType.lbu  -> ZeroExt(rdata(7, 0), 64),
     LsType.lhu  -> ZeroExt(rdata(15, 0), 64),
+    LsType.sd   -> rdata,
+    LsType.sw   -> rdata,
+    LsType.sh   -> rdata,
+    LsType.sb   -> rdata,
+    LsType.nop  -> rdata
   ))
   val aluOut  = alu.io.aluOut
 
