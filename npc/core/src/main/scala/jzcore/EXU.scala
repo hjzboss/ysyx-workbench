@@ -34,7 +34,7 @@ class EXU extends Module {
   
   // 此处有问题，lw，lbu,lhu出错
   /*
-  val lsuOut  = MuxLookup(lsType, rdata, Array(
+  val lsuOut  = LookupTree(lsType, rdata, Array(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
@@ -47,7 +47,7 @@ class EXU extends Module {
     LsType.sb   -> rdata,
     LsType.nop  -> rdata
   ))*/
-  val lsuOut = rdata
+  val lsuOut = Mux(lsType === LsType.lbu, ZeroExt(rdata(7, 0), 64), rdata)
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
