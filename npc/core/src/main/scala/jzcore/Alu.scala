@@ -40,7 +40,7 @@ class Alu extends Module {
     AluOp.div       -> (opA.asSInt() / opB.asSInt()),
     AluOp.divu      -> (opA / opB),
     AluOp.mul       -> (opA * opB),
-    AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
+    //AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
     AluOp.rem       -> (opA.asSInt() % opB.asSInt()),
     AluOp.remu      -> (opA % opB),
 
