@@ -40,6 +40,7 @@ class EXU extends Module {
     LsType.lb   -> SignExt(rdata(7, 0), 64),
     LsType.lbu  -> ZeroExt(rdata(7, 0), 64),
     LsType.lhu  -> ZeroExt(rdata(15, 0), 64),
+    LsType.lwu  -> ZeroExt(rdata(31, 0), 64),
     LsType.sd   -> rdata,
     LsType.sw   -> rdata,
     LsType.sh   -> rdata,

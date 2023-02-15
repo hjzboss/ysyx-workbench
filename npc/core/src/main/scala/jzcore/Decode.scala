@@ -49,6 +49,14 @@ object AluOp {
   def sraw      = "b011011".U
   def remw      = "b011100".U
 
+  def mulh      = "b011101".U
+  def mulhsu    = "b011110".U
+  def mulhu     = "b011111".U
+  def divu      = "b100000".U
+  def remu      = "b100001".U
+  def divuw     = "b100010".U
+  def remuw     = "b100011".U
+
   def apply() = UInt(6.W)
 }
 
@@ -69,6 +77,7 @@ object LsType {
   def lb      = "b0011".U
   def lbu     = "b0100".U
   def lhu     = "b0101".U
+  def lwu     = "b1011".U
   def sd      = "b0110".U
   def sw      = "b0111".U
   def sh      = "b1000".U

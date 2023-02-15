@@ -106,12 +106,14 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
   uint64_t wmask_64 = 0;
   uint8_t *index = (uint8_t*)&wmask_64;
+  // 将8位的掩码转换为64位的掩码
   for(int i = 0; i < 8; i++, index++) {
     if(wmask & 0x01 == 0x01) {
       *index = 0xff;
     }
     wmask = wmask >> 1;
   }
+  // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
   uint64_t tmp = wmask_64;
   int shift_cnt = 0;
   for(int i = 64; i > 0; i--) {
@@ -120,7 +122,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     tmp = tmp >> 1;
   }
   rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-  printf("waddr=%llx, data=%lx, wmask_64=%lx\n", waddr, rdata, wmask_64);
+  //printf("waddr=%llx, data=%lx, wmask_64=%lx\n", waddr, rdata, wmask_64);
   paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
