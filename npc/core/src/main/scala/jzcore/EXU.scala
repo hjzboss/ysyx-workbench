@@ -72,5 +72,6 @@ class EXU extends Module {
   io.redirect.valid    := Mux(io.ctrl.br && alu.io.brMark, true.B, false.B)
 
   // ebreak
-  stop.io.valid := Mux(io.ctrl.break, true.B, false.B)
+  stop.io.valid        := Mux(io.ctrl.break, true.B, false.B)
+  stop.io.haltRet      := io.datasrc.src1
 }

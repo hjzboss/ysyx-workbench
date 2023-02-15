@@ -48,7 +48,7 @@ class IDU extends Module with HasInstrType {
   */
 
   // registerfile
-  rf.io.rs1           := rs1
+  rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
   rf.io.rs2           := rs2
   rf.io.wen           := io.regWrite.wen
   rf.io.waddr         := io.regWrite.rd

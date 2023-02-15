@@ -75,9 +75,10 @@ static void trace_and_difftest(uint64_t dnpc) {
 }
 
 // for ebreak instruction
-extern "C" void c_break() {
+extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
   npc_state.halt_pc = top->io_pc;
+  nemu_state.halt_ret = halt_ret;
 }
 
 extern "C" void inst_read(long long raddr, int *rdata) {
