@@ -119,12 +119,12 @@ object RV64IM extends HasInstrType {
     JAL     -> List(InstrJ, SrcType.pc, SrcType.plus4, AluOp.jump, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     JALR    -> List(InstrIJ, SrcType.pc, SrcType.plus4, AluOp.jump, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
-    BEQ     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.beq, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BNE     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bne, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BLT     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.blt, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BGE     -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bge, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BLTU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bltu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BGEU    -> List(InstrB, SrcType.pc, SrcType.imm, AluOp.bgeu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BEQ     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.beq, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BNE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bne, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BLT     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.blt, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BGE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bge, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BLTU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bltu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BGEU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bgeu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
     SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sd, RegWrite.loadAlu, Wmask.double),
     SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sw, RegWrite.loadAlu, Wmask.word),
