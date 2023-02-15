@@ -57,7 +57,7 @@ class Alu extends Module {
   ))
 
   val isOne = aluOut === 1.U(64.W)
-  val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.mulw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw || AluOp.divuw || AluOp.remuw
+  val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.mulw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw || aluOp === AluOp.divuw || aluOp === AluOp.remuw
   
   val aluOutw = SignExt(aluOut(31, 0), 64)
   io.aluOut := Mux(isWop, aluOutw, aluOut)
