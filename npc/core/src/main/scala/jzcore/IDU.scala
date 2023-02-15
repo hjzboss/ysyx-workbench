@@ -12,6 +12,8 @@ class IDU extends Module with HasInstrType {
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new Ctrl
+
+    val lsType    = Output(UInt(4.W))
   })
 
   val rf        = Module(new RF)
@@ -73,4 +75,6 @@ class IDU extends Module with HasInstrType {
 
   // ebreak
   io.ctrl.break       := instrtype === InstrD
+
+  io.lsType           := lsType
 }
