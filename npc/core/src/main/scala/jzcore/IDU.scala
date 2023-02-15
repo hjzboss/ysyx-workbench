@@ -13,6 +13,7 @@ class IDU extends Module with HasInstrType {
     val aluCtrl   = new AluIO
     val ctrl      = new Ctrl
 
+    // 防止信号被优化
     val lsType    = Output(UInt(4.W))
   })
 
