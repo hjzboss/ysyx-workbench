@@ -37,22 +37,27 @@ class Alu extends Module {
     AluOp.srl       -> (opA >> opB(5, 0)),
     AluOp.sra       -> (opA.asSInt() >> opB(5, 0)).asUInt(),
     // todo
-    AluOp.div       -> (opA / opB),
+    AluOp.div       -> (opA.asSInt() / opB.asSInt()).asUInt(),
+    AluOp.divu      -> (opA / opB),
     AluOp.mul       -> (opA * opB),
-    AluOp.rem       -> (opA % opB),
+    AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
+    AluOp.rem       -> (opA.asSInt() % opB.asSInt()).asUInt(),
+    AluOp.remu      -> (opA % opB),
 
     AluOp.addw      -> (opA + opB),
     AluOp.subw      -> (opA - opB),
     AluOp.mulw      -> (opA * opB),
-    AluOp.divw      -> (opA / opB),
+    AluOp.divw      -> (opA.asSInt() / opB.asSInt()).asUInt(),
+    AluOp.divuw     -> (opA / opB),
     AluOp.sllw      -> (opA << opB(4, 0)),
-    AluOp.srlw      -> (opA >> opB(4, 0)),
-    AluOp.sraw      -> (opA.asSInt() >> opB(4, 0)).asUInt(),
-    AluOp.remw      -> (opA % opB)
+    AluOp.srlw      -> (ZeroExt(opA(31, 0), 64) >> opB(4, 0)),
+    AluOp.sraw      -> (SignExt(opA(31, 0), 64).asSInt() >> opB(4, 0)).asUInt(),
+    AluOp.remw      -> (SignExt(opA(31, 0), 64).asSInt() % SignExt(opB(31, 0), 64).asSInt()).asUInt(),
+    AluOp.remuw     -> (ZeroExt(opA(31, 0), 64) % ZeroExt(opB(31, 0), 64))
   ))
 
-  val isOne = aluOp === 1.U(64.W)
-  val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.mulw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw
+  val isOne = aluOut.asUInt() === 1.U(64.W)
+  val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.mulw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw || aluOp === AluOp.divuw || aluOp === AluOp.remuw
   
   val aluOutw = SignExt(aluOut(31, 0), 64)
   io.aluOut := Mux(isWop, aluOutw, aluOut)

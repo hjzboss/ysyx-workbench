@@ -214,6 +214,7 @@ static int check_func_type(uint32_t inst) {
   if (op == 0x67) {
     if (!rd_link && rs1_link) return RET;
     else if (rs1 == rd && rd_link && rs1_link) return CALL;
+    else if (!rs1_link && rd_link) return CALL;
   }
   else if (op == 0x6f && rd_link) return CALL;
 

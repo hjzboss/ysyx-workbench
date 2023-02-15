@@ -57,6 +57,7 @@ uint64_t paddr_read(uint64_t addr, int len);
 void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
+void print_mtrace();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -74,9 +75,10 @@ static void trace_and_difftest(uint64_t dnpc) {
 }
 
 // for ebreak instruction
-extern "C" void c_break() {
+extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
   npc_state.halt_pc = top->io_pc;
+  npc_state.halt_ret = halt_ret;
 }
 
 extern "C" void inst_read(long long raddr, int *rdata) {
@@ -101,16 +103,28 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
-  if(wmask == 0x00 || waddr < 0x80000000ull) return;
-  int len;
-  switch(wmask) {
-    case 0x01: len = 1; break;
-    case 0x03: len = 2; break;
-    case 0x0f: len = 4; break;
-    case 0xff: len = 8; break;
-    default: len =  8;
+  if(wmask == 0 || waddr < 0x80000000ull) return;
+  uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
+  uint64_t wmask_64 = 0;
+  uint8_t *index = (uint8_t*)&wmask_64;
+  // 将8位的掩码转换为64位的掩码
+  for(int i = 0; i < 8; i++, index++) {
+    if(wmask & 0x01 == 0x01) {
+      *index = 0xff;
+    }
+    wmask = wmask >> 1;
   }
-  paddr_write(waddr & ~0x7ull, len, wdata);
+  // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
+  uint64_t tmp = wmask_64;
+  int shift_cnt = 0;
+  for(int i = 64; i > 0; i--) {
+    if(tmp & 0x01 == 0x01) break;
+    shift_cnt++;
+    tmp = tmp >> 1;
+  }
+  rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+  //printf("waddr=%llx, data=%lx, wmask_64=%lx\n", waddr, rdata, wmask_64);
+  paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
 
@@ -190,7 +204,6 @@ static void isa_exec_once() {
 
 static void cpu_exec_once() {
   cpu.pc = top->io_pc;
-  printf("sim: pc=%lx\n", cpu.pc);
   cpu.npc = top->io_nextPc;
   cpu.inst = paddr_read(cpu.pc, 4);
   isa_exec_once();
@@ -226,7 +239,7 @@ void execute(uint64_t n) {
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
-    trace_and_difftest(top->io_pc);
+    trace_and_difftest(cpu.npc);
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }

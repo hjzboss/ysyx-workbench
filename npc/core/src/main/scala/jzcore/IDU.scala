@@ -12,6 +12,9 @@ class IDU extends Module with HasInstrType {
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new Ctrl
+
+    // 防止信号被优化
+    val lsType    = Output(UInt(4.W))
   })
 
   val rf        = Module(new RF)
@@ -45,7 +48,7 @@ class IDU extends Module with HasInstrType {
   */
 
   // registerfile
-  rf.io.rs1           := rs1
+  rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
   rf.io.rs2           := rs2
   rf.io.wen           := io.regWrite.wen
   rf.io.waddr         := io.regWrite.rd
@@ -73,4 +76,6 @@ class IDU extends Module with HasInstrType {
 
   // ebreak
   io.ctrl.break       := instrtype === InstrD
+
+  io.lsType           := lsType
 }

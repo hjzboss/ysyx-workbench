@@ -20,11 +20,8 @@ void isa_reg_display(bool *err_list) {
   printf("------------------------------\n");
   printf("reg \tvalue\n");
   printf("------------------------------\n");
-  printf("pc:\t0x%016lx\n", cpu.pc);
-  #ifdef CONFIG_DIFFTEST
-  if (err_list[33]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), regs[i], cpu_gpr[i]);
-  else printf("%s:\t0x%016lx\n", regs[i], cpu_gpr[i]);
-  #endif
+  if (err_list[33]) printf(ANSI_FMT("pc:\t0x%016lx\n", ANSI_FG_RED), cpu.pc);
+  else printf("pc:\t0x%016lx\n", cpu.pc);
 
   for (i=0; i<32; ++i) {
     if (err_list[i]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), regs[i], cpu_gpr[i]);

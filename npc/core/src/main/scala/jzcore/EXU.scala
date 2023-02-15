@@ -32,15 +32,22 @@ class EXU extends Module {
   val rdata   = lsu.io.rdata
   val wmask   = io.ctrl.wmask
   
-  // 此处可能有问题，lw，lbu,lhu出错，也可能是pmem_read的问题
-  val lsuOut  = LookupTreeDefault(lsType, rdata, List(
+  // 此处有问题，lw，lbu,lhu出错
+  val lsuOut  = LookupTree(lsType, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
     LsType.lh   -> SignExt(rdata(15, 0), 64),
     LsType.lb   -> SignExt(rdata(7, 0), 64),
     LsType.lbu  -> ZeroExt(rdata(7, 0), 64),
     LsType.lhu  -> ZeroExt(rdata(15, 0), 64),
+    LsType.lwu  -> ZeroExt(rdata(31, 0), 64),
+    LsType.sd   -> rdata,
+    LsType.sw   -> rdata,
+    LsType.sh   -> rdata,
+    LsType.sb   -> rdata,
+    LsType.nop  -> rdata
   ))
+
   val aluOut  = alu.io.aluOut
 
   alu.io.opA           := opA
@@ -65,5 +72,6 @@ class EXU extends Module {
   io.redirect.valid    := Mux(io.ctrl.br && alu.io.brMark, true.B, false.B)
 
   // ebreak
-  stop.io.valid := Mux(io.ctrl.break, true.B, false.B)
+  stop.io.valid        := Mux(io.ctrl.break, true.B, false.B)
+  stop.io.haltRet      := io.datasrc.src1
 }
