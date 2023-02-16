@@ -50,7 +50,8 @@ int printf(const char *fmt, ...) {
       continue;
     }
     ++p;
-    int fix_num = 0;
+    int fix_num = 0; // 填充0的数目
+    // 判断是否要填充0
     if (*p == '0') {
       ++p;
       char tmp = *p;
