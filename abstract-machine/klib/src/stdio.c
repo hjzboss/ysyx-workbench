@@ -49,11 +49,30 @@ int printf(const char *fmt, ...) {
       putch(*p);
       continue;
     }
-    switch (*++p) {
+    ++p;
+    int fix_num = 0;
+    if (*p == '0') {
+      ++p;
+      char tmp = *p;
+      if (tmp <= '9' && tmp >= '0')
+        fix_num = tmp - '0';
+      else
+        panic("bad use!");
+      ++p;
+      while (*p <= '9' && *p >= '0') {
+        fix_num = fix_num * 10 + (*p - '0');
+        ++p;
+      }
+    }
+    switch (*p) {
       case 'd':
         ival = va_arg(ap, int);
         char *str = my_itoa(ival);
         len = strlen(str);
+        int rem = fix_num - len;
+        if (rem > 0) {
+          for (int i = 0; i < rem; i++) putch('0');
+        }
         // todo
         for (int i = 0; i < len; i++) {
           putch(*str);
@@ -62,6 +81,7 @@ int printf(const char *fmt, ...) {
         arg_cnt += len;
         break;
       case 's':
+        if (fix_num != 0) panic("bad use!");
         sval = va_arg(ap, char*);
         len = strlen(sval);
         // todo
