@@ -93,6 +93,7 @@ int printf(const char *fmt, ...) {
         arg_cnt += len;
         break;
       default:
+        putch(*p);
         panic("Not implemented");
     }
   }
