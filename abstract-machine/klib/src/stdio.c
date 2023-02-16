@@ -6,6 +6,25 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
+char* num2str(int num, int base) {
+  static char str[16];
+  char tmp[32];
+  int len = 0;
+  if (num == 0) tmp[len++] = 0;
+  else while (num) {
+    tmp[len++] = num % base;
+    num = num / base;
+  }
+  int i = 0;
+  while (len-- > 0) {
+    if (tmp[len] < 10) str[i] = tmp[len] + '0';
+    else str[i] = tmp[len] - 10 + 'A';
+    i++;
+  }
+  return str;
+}
+
+
 char* my_itoa(int value) {
 	int i = 0, k = 0, size = 0;;
 	static char string[16];
@@ -78,6 +97,21 @@ int printf(const char *fmt, ...) {
         for (int i = 0; i < len; i++) {
           putch(*str);
           str++;
+        }
+        arg_cnt += len;
+        break;
+      case 'x':
+        ival = va_arg(ap, int);
+        char *string = num2str(ival, 16);
+        len = strlen(string);
+        int remx = fix_num - len;
+        if (remx > 0) {
+          for (int i = 0; i < remx; i++) putch('0');
+        }
+        // todo
+        for (int i = 0; i < len; i++) {
+          putch(*string);
+          string++;
         }
         arg_cnt += len;
         break;
