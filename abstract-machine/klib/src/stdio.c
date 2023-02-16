@@ -5,6 +5,7 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
+
 char* my_itoa(int value) {
 	int i = 0, k = 0, size = 0;;
 	static char string[16];
@@ -35,7 +36,47 @@ char* my_itoa(int value) {
 }
 
 int printf(const char *fmt, ...) {
-  panic("Not implemented");
+  va_list ap;
+  char *p, *sval;
+  int ival;
+  size_t len;
+
+  size_t arg_cnt = 0;
+
+  va_start(ap, fmt);
+  for (p = (char *)fmt; *p; p++) {
+    if (*p != '%') {
+      putch(*p);
+      continue;
+    }
+    switch (*++p) {
+      case 'd':
+        ival = va_arg(ap, int);
+        char *str = my_itoa(ival);
+        len = strlen(str);
+        // todo
+        for (int i = 0; i < len; i++) {
+          putch(*str);
+          str++;
+        }
+        arg_cnt += len;
+        break;
+      case 's':
+        sval = va_arg(ap, char*);
+        len = strlen(sval);
+        // todo
+        for (int i = 0; i < len; i++) {
+          putch(*sval);
+          sval++;
+        }
+        arg_cnt += len;
+        break;
+      default:
+        panic("Not implemented");
+    }
+  }
+  va_end(ap);
+  return arg_cnt;
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
