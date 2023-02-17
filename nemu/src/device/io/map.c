@@ -33,6 +33,7 @@ dnode *dtrace_head = NULL;
 dnode *dtrace_tail = NULL;
 
 void insert_dtrace(paddr_t addr, int len, word_t data, IOMap *map, bool is_read) {
+  printf("insert dtrace\n");
   dnode *n = (dnode*)malloc(sizeof(dnode));
   n->addr = addr;
   n->len = len;
@@ -116,7 +117,6 @@ word_t map_read(paddr_t addr, int len, IOMap *map) {
   paddr_t offset = addr - map->low;
   invoke_callback(map->callback, offset, len, false); // prepare data to read
   word_t ret = host_read(map->space + offset, len);
-  printf("just fuck it!\n");
   IFDEF(CONFIG_DTRACE, insert_dtrace(addr, len, ret, map, true));
   return ret;
 }
