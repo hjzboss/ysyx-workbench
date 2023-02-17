@@ -71,6 +71,7 @@ int printf(const char *fmt, ...) {
     }
     ++p;
     int fix_num = 0; // 填充0的数目
+    bool fix_zero = false;
     // 判断是否要填充0
     if (*p == '0') {
       ++p;
@@ -84,16 +85,24 @@ int printf(const char *fmt, ...) {
         fix_num = fix_num * 10 + (*p - '0');
         ++p;
       }
+      fix_zero = true;
     }
+    else if (*p <= '9' && *p > '0') {
+      fix_num = *p - '0';
+    }
+    int fix_ch;
+    int rem;
     switch (*p) {
       case 'c':
       case 'd':
         ival = va_arg(ap, int);
         char *str = my_itoa(ival);
         len = strlen(str);
-        int rem = fix_num - len;
+        rem = fix_num - len;
         if (rem > 0) {
-          for (int i = 0; i < rem; i++) putch('0');
+          fix_ch = fix_zero ? '0' : ' ';
+          if (fix_zero) 
+          for (int i = 0; i < rem; i++) putch(fix_ch);
         }
         // todo
         putstr(str);
@@ -103,9 +112,10 @@ int printf(const char *fmt, ...) {
         ival = va_arg(ap, int);
         char *string = num2str(ival, 16);
         len = strlen(string);
-        int remx = fix_num - len;
-        if (remx > 0) {
-          for (int i = 0; i < remx; i++) putch('0');
+        rem = fix_num - len;
+        if (rem > 0) {
+          fix_ch = fix_zero ? '0' : ' ';
+          for (int i = 0; i < rem; i++) putch(fix_ch);
         }
         // todo
         putstr(string);
