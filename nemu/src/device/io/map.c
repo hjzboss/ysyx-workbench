@@ -61,6 +61,7 @@ void free_dtrace() {
 }
 
 void print_dtrace() {
+  printf("fuck it\n");
   log_write("---dtrace message start---\n");
   dnode *ptr = dtrace_head;
   while(ptr != NULL) {
