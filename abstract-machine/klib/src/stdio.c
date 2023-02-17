@@ -95,10 +95,7 @@ int printf(const char *fmt, ...) {
           for (int i = 0; i < rem; i++) putch('0');
         }
         // todo
-        for (int i = 0; i < len; i++) {
-          putch(*str);
-          str++;
-        }
+        putstr(str);
         arg_cnt += len;
         break;
       case 'x':
@@ -110,10 +107,7 @@ int printf(const char *fmt, ...) {
           for (int i = 0; i < remx; i++) putch('0');
         }
         // todo
-        for (int i = 0; i < len; i++) {
-          putch(*string);
-          string++;
-        }
+        putstr(string);
         arg_cnt += len;
         break;
       case 's':
@@ -121,10 +115,7 @@ int printf(const char *fmt, ...) {
         sval = va_arg(ap, char*);
         len = strlen(sval);
         // todo
-        for (int i = 0; i < len; i++) {
-          putch(*sval);
-          sval++;
-        }
+        putstr(sval);
         arg_cnt += len;
         break;
       default:
