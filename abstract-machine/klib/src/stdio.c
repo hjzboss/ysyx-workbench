@@ -6,6 +6,7 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
+// todo
 char* num2str(int num, int base) {
   static char str[16];
   char tmp[32];
