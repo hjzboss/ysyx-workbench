@@ -88,7 +88,6 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
-          if (fix_zero) 
           for (int i = 0; i < rem; i++) *out++ = fix_ch;
         }
         // todo
