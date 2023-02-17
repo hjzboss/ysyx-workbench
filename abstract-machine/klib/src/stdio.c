@@ -152,43 +152,10 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
 }
 
 int sprintf(char *out, const char *fmt, ...) {
-  char *s = out;
   va_list ap;
-  char *p, *sval;
-  int ival;
-  size_t len;
-
-  size_t arg_cnt = 0;
-
   va_start(ap, fmt);
-  for (p = (char *)fmt; *p; p++) {
-    if (*p != '%') {
-      *s++ = *p;
-      continue;
-    }
-    switch (*++p) {
-      case 'd':
-        ival = va_arg(ap, int);
-        char *str = my_itoa(ival);
-        len = strlen(str);
-        strcpy(s, str);
-        s += len;
-        arg_cnt += len;
-        break;
-      case 's':
-        sval = va_arg(ap, char*);
-        len = strlen(sval);
-        strcpy(s, sval);
-        s += len;
-        arg_cnt += len;
-        break;
-      default:
-        panic("Not implemented");
-    }
-  }
+  int arg_cnt = vsprintf(out, fmt, ap);
   va_end(ap);
-
-  *s = '\0';
   return arg_cnt;
 }
 
@@ -197,7 +164,6 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
-
   panic("Not implemented");
 }
 
