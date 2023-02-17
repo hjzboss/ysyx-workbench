@@ -130,7 +130,7 @@ static void execute(uint64_t n) {
 }
 
 static void statistic() {
-  IFDEF(CONFIG_FTRACE, print_ftrace(false));
+  IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFDEF(CONFIG_DTRACE, print_dtrace());
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
