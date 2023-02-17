@@ -86,6 +86,7 @@ int printf(const char *fmt, ...) {
       }
     }
     switch (*p) {
+      case 'c':
       case 'd':
         ival = va_arg(ap, int);
         char *str = my_itoa(ival);
