@@ -23,6 +23,7 @@ void engine_start();
 int is_exit_status_bad();
 void free_mtrace();
 void free_ftrace();
+void free_dtrace();
 
 int main(int argc, char *argv[]) {
   /* Initialize the monitor. */
@@ -64,6 +65,8 @@ int main(int argc, char *argv[]) {
   IFDEF(CONFIG_MTRACE, free_mtrace());
   
   IFDEF(CONFIG_FTRACE, free_ftrace());
+
+  IFDEF(CONFIG_FTRACE, free_dtrace());
   
   return is_exit_status_bad();
 }

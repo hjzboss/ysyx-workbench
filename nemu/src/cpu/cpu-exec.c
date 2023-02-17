@@ -69,6 +69,10 @@ void print_ftrace(bool);
 void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc);
 #endif
 
+#ifdef CONFIG_DTRACE
+void print_dtrace();
+#endif
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
@@ -127,6 +131,7 @@ static void execute(uint64_t n) {
 
 static void statistic() {
   IFDEF(CONFIG_FTRACE, print_ftrace(true));
+  IFDEF(CONFIG_DTRACE, print_dtrace());
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
