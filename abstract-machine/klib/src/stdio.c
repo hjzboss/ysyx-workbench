@@ -26,33 +26,38 @@ char* num2str(int num, int base) {
 }
 
 
-char* my_itoa(int value) {
-	int i = 0, k = 0, size = 0;;
-	static char string[16];
-	char* p = string;
+char* my_itoa(int value, int radix) {
+  int i = 0, k = 0, size = 0;;
+  static char string[16];
+  char* p = string;
 
-	// negative number to positive number
-	if(value >> 31) {
-		value = ((~value) + 1);
-		*p++ = '-';
-	}
+  // negative number to positive number
+  if(value >> 31) {
+    value = ((~value) + 1);
+    *p++ = '-';
+  }
 
-	// integer to string
-	do {
-		p[size++] = value % 10 + '0';
-		value /= 10;
-	} while(value > 0);
+  // integer to string
+  do {
+    if (radix == 10)
+      p[size] = value % 10 + '0';
+    else
+      p[size] = (value % 16) - 10 + 'A';
+    //p[size++] = value % 10 + '0';
+    ++size;
+    value /= 10;
+  } while(value > 0);
 
-	p[size] = '\0';
+  p[size] = '\0';
 
-	// reverse
-	for(i = 0, k = size - 1; i < k; i++, k--) {
-		p[i] ^= p[k];
-		p[k] ^= p[i];
-		p[i] ^= p[k];
-	}
+  // reverse
+  for(i = 0, k = size - 1; i < k; i++, k--) {
+    p[i] ^= p[k];
+    p[k] ^= p[i];
+    p[i] ^= p[k];
+  }
 
-	return string;
+  return string;
 }
 
 int printf(const char *fmt, ...) {
@@ -105,7 +110,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'c':
       case 'd':
         ival = va_arg(ap, int);
-        char *str = my_itoa(ival);
+        char *str = my_itoa(ival, 10);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
@@ -120,7 +125,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         break;
       case 'x':
         ival = va_arg(ap, int);
-        char *string = num2str(ival, 16);
+        char *string = my_itoa(ival, 16);
         len = strlen(string);
         rem = fix_num - len;
         if (rem > 0) {
