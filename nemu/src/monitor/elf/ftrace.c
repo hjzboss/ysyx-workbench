@@ -3,8 +3,8 @@
 #include <utils.h>
 
 #ifdef CONFIG_FTRACE
-#define MAX_FUNC_NAME_WIDTH 5000
-#define MAX_FUNC_NUM 50
+#define MAX_FUNC_NAME_WIDTH 50
+#define MAX_FUNC_NUM 5000
 enum func_type {
   CALL, RET, OTHER
 };
