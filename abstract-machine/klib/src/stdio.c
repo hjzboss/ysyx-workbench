@@ -6,7 +6,6 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
-// todo
 char* num2str(int num, int base) {
   static char str[16];
   char tmp[32];
@@ -33,36 +32,6 @@ char* num2str(int num, int base) {
   return str;
 }
 
-/*
-char* my_itoa(int value) {
-  int i = 0, k = 0, size = 0;;
-  static char string[16];
-  char* p = string;
-
-  // negative number to positive number
-  if(value >> 31) {
-    value = ((~value) + 1);
-    *p++ = '-';
-  }
-
-  // integer to string
-  do {
-    p[size++] = value % 10 + '0';
-    value /= 10;
-  } while(value > 0);
-
-  p[size] = '\0';
-
-  // reverse
-  for(i = 0, k = size - 1; i < k; i++, k--) {
-    p[i] ^= p[k];
-    p[k] ^= p[i];
-    p[i] ^= p[k];
-  }
-
-  return string;
-}
-*/
 
 int printf(const char *fmt, ...) {
   va_list ap;
