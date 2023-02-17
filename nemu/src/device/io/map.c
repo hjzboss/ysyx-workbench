@@ -18,6 +18,63 @@
 #include <memory/vaddr.h>
 #include <device/map.h>
 
+#ifdef CONFIG_DTRACE
+typedef struct node {
+  paddr_t addr;
+  int len;
+  word_t data;
+  IOMap *map;
+  bool is_read;
+  struct node *next;
+} dnode;
+
+dnode *dtrace_head = NULL;
+dnode *dtrace_tail = NULL;
+
+void insert_dtrace(paddr_t addr, int len, word_t data, IOMap *map, bool is_read) {
+  dnode *n = (dnode*)malloc(sizeof(dnode));
+  n->addr = addr;
+  n->len = len;
+  n->data = data;
+  n->map = map;
+  n->is_read = is_read;
+  n->next = NULL;
+
+  if (dtrace_head == NULL) {
+    dtrace_head = n;
+    dtrace_tail = n;
+  }
+  else {
+    dtrace_tail->next = n;
+    dtrace_tail = n;
+  }
+}
+
+void free_dtrace() {
+  dnode *tmp;
+  while(dtrace_head != NULL) {
+    tmp = dtrace_head->next;
+    free(dtrace_head);
+    dtrace_head = tmp;
+  }
+}
+
+void print_dtrace() {
+  log_write("---dtrace message start---\n");
+  dnode *ptr = dtrace_head;
+  while(ptr != NULL) {
+    log_write("%s: ", ptr->map->name);
+    log_write("[0x%016x]", ptr->addr);
+    if (ptr->is_read) log_write(" --> ");
+    else log_write(" <-- ");
+    log_write("0x%016lx, len=%d bytes\n", ptr->data, ptr->len);
+
+    ptr = ptr->next;
+  }
+  log_write("---dtrace message end---\n");
+}
+#endif
+
 #define IO_SPACE_MAX (2 * 1024 * 1024)
 
 static uint8_t *io_space = NULL;
