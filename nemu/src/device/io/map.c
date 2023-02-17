@@ -61,18 +61,18 @@ void free_dtrace() {
 }
 
 void print_dtrace() {
-  printf("---dtrace message start---\n");
+  log_write("---dtrace message start---\n");
   dnode *ptr = dtrace_head;
   while(ptr != NULL) {
-    printf("%s: ", ptr->map->name);
-    printf("[0x%016x]", ptr->addr);
-    if (ptr->is_read) printf(" --> ");
-    else printf(" <-- ");
-    printf("0x%016lx, len=%d bytes\n", ptr->data, ptr->len);
+    log_write("%s: ", ptr->map->name);
+    log_write("[0x%016x]", ptr->addr);
+    if (ptr->is_read) log_write(" --> ");
+    else log_write(" <-- ");
+    log_write("0x%016lx, len=%d bytes\n", ptr->data, ptr->len);
 
     ptr = ptr->next;
   }
-  printf("---dtrace message end---\n");
+  log_write("---dtrace message end---\n");
 }
 #endif
 
