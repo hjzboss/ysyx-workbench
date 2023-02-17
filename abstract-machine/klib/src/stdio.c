@@ -120,7 +120,9 @@ int printf(const char *fmt, ...) {
         arg_cnt += len;
         break;
       default:
+        putstr("fuck:");
         putch(*p);
+        putch('\n');
         panic("Not implemented");
     }
   }
