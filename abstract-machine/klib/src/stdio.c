@@ -88,7 +88,10 @@ int printf(const char *fmt, ...) {
       fix_zero = true;
     }
     else if (*p <= '9' && *p > '0') {
-      fix_num = *p - '0';
+      do {
+        fix_num = fix_num * 10 + (*p - '0');
+        ++p;
+      } while (*p <= '9' && *p >= '0');
     }
     int fix_ch;
     int rem;
