@@ -17,6 +17,7 @@
 #include <memory/host.h>
 #include <memory/vaddr.h>
 #include <device/map.h>
+#include <macro.h>
 
 #ifdef CONFIG_DTRACE
 typedef struct node {
@@ -115,6 +116,7 @@ word_t map_read(paddr_t addr, int len, IOMap *map) {
   paddr_t offset = addr - map->low;
   invoke_callback(map->callback, offset, len, false); // prepare data to read
   word_t ret = host_read(map->space + offset, len);
+  printf("just fuck it!\n");
   IFDEF(CONFIG_DTRACE, insert_dtrace(addr, len, ret, map, true));
   return ret;
 }
