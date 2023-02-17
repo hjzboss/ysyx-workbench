@@ -57,16 +57,22 @@ char* my_itoa(int value) {
 
 int printf(const char *fmt, ...) {
   va_list ap;
+  va_start(ap, fmt);
+  char buf[200];
+  int arg_cnt = vsprintf(buf, fmt, ap);
+  va_end(ap);
+  putstr(buf);
+  return arg_cnt;
+}
+
+int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
-  size_t len;
-
-  size_t arg_cnt = 0;
-
-  va_start(ap, fmt);
+  int len;
+  int arg_cnt = 0;
   for (p = (char *)fmt; *p; p++) {
     if (*p != '%') {
-      putch(*p);
+      *out++ = *p;
       continue;
     }
     ++p;
@@ -105,10 +111,11 @@ int printf(const char *fmt, ...) {
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
           if (fix_zero) 
-          for (int i = 0; i < rem; i++) putch(fix_ch);
+          for (int i = 0; i < rem; i++) *out++ = fix_ch;
         }
         // todo
-        putstr(str);
+        strcpy(out, str);
+        out += len;
         arg_cnt += len;
         break;
       case 'x':
@@ -118,18 +125,19 @@ int printf(const char *fmt, ...) {
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
-          for (int i = 0; i < rem; i++) putch(fix_ch);
+          for (int i = 0; i < rem; i++) *out++ = fix_ch;
         }
         // todo
-        putstr(string);
+        strcpy(out, string);
+        out += len;
         arg_cnt += len;
         break;
       case 's':
         if (fix_num != 0) panic("bad use!");
         sval = va_arg(ap, char*);
         len = strlen(sval);
-        // todo
-        putstr(sval);
+        strcpy(out, sval);
+        out += len;
         arg_cnt += len;
         break;
       default:
@@ -139,12 +147,8 @@ int printf(const char *fmt, ...) {
         panic("Not implemented");
     }
   }
-  va_end(ap);
+  *out = '\0';
   return arg_cnt;
-}
-
-int vsprintf(char *out, const char *fmt, va_list ap) {
-  panic("Not implemented");
 }
 
 int sprintf(char *out, const char *fmt, ...) {
@@ -193,6 +197,7 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
+
   panic("Not implemented");
 }
 
