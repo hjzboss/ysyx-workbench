@@ -29,11 +29,10 @@ typedef struct node {
   struct node *next;
 } dnode;
 
-dnode *dtrace_head = NULL;
-dnode *dtrace_tail = NULL;
+static dnode *dtrace_head = NULL;
+static dnode *dtrace_tail = NULL;
 
 void insert_dtrace(paddr_t addr, int len, word_t data, IOMap *map, bool is_read) {
-  printf("insert dtrace\n");
   dnode *n = (dnode*)malloc(sizeof(dnode));
   n->addr = addr;
   n->len = len;
