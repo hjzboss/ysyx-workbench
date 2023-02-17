@@ -10,5 +10,5 @@ void __am_input_keybrd(AM_INPUT_KEYBRD_T *kbd) {
   if (kbd->keydown) {
     printf("keydown\n");
   }
-  kbd->keycode = ((keycode | KEYDOWN_MASK) ^ KEYDOWN_MASK);
+  kbd->keycode = keycode & ~KEYDOWN_MASK;
 }
