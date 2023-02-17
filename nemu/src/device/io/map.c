@@ -17,7 +17,7 @@
 #include <memory/host.h>
 #include <memory/vaddr.h>
 #include <device/map.h>
-#include <macro.h>
+#include <utils.h>
 
 #ifdef CONFIG_DTRACE
 typedef struct node {
