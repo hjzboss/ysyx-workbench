@@ -1,6 +1,5 @@
 #include <am.h>
 #include <nemu.h>
-#include <klib.h>
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
 
@@ -25,8 +24,7 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   };
 }
 
-void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
-  printf("fuck\n");
+void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl, int a) {
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
   int height = data & 0x0000ffff;
