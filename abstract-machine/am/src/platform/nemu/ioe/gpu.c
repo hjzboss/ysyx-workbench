@@ -24,7 +24,8 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   };
 }
 
-void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl, int a) {
+void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
+  /*
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
   int height = data & 0x0000ffff;
@@ -43,6 +44,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl, int a) {
   if (ctl->sync) {
     outl(SYNC_ADDR, 1);
   }
+  */
 }
 
 void __am_gpu_status(AM_GPU_STATUS_T *status) {
