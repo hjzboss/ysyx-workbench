@@ -25,7 +25,6 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
-  /*
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
   int height = data & 0x0000ffff;
@@ -34,13 +33,13 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   }
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
   uint32_t *pixels_tmp = (uint32_t *)ctl->pixels;
-  fb += width * ctl->y + ctl->x;
+  fb += height * ctl->y + ctl->x; // 定位屏幕
   for (int j = 0; j < ctl->h; j++) {
     for (int i = 0; i < ctl->w; i++) {
       outl((uintptr_t)fb++, *pixels_tmp++);
     }
     fb += width - ctl->w;
-  }*/
+  }
   if (ctl->sync) {
     outl(SYNC_ADDR, 1);
   }
