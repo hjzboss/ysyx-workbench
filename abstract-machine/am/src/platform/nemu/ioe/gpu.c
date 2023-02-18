@@ -40,11 +40,10 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
       outl((uintptr_t)fb++, *pixels_tmp++);
     }
     fb += width - ctl->w;
-  }
+  }*/
   if (ctl->sync) {
     outl(SYNC_ADDR, 1);
   }
-  */
 }
 
 void __am_gpu_status(AM_GPU_STATUS_T *status) {
