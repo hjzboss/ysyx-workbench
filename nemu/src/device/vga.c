@@ -65,7 +65,6 @@ static inline void update_screen() {
 static void init_screen() {}
 
 static inline void update_screen() {
-  printf("fuck!\n");
   io_write(AM_GPU_FBDRAW, 0, 0, vmem, screen_width(), screen_height(), true);
 }
 #endif
