@@ -5,7 +5,7 @@
 
 void __am_gpu_init() {
   // only for test initial
-  uint32_t data = (uint32_t) inl(VGACTL_ADDR);
+  uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
   int height = data & 0x0000ffff;
   int i;
@@ -25,14 +25,14 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
-  uint32_t data = (uint32_t) inl(VGACTL_ADDR);
+  uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
   int height = data & 0x0000ffff;
   if((ctl->x + ctl->w > width) || (ctl->y + ctl->h > height)) {
     panic("out of display range");
   }
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
-  uint32_t *pixels_tmp = (uint32_t *) ctl->pixels;
+  uint32_t *pixels_tmp = (uint32_t *)ctl->pixels;
   fb += width * ctl->y + ctl->x;
   for (int j = 0; j < ctl->h; j++) {
     for (int i = 0; i < ctl->w; i++) {
