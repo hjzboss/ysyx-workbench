@@ -28,7 +28,6 @@ static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
   }
 }
 
-/*
 #ifndef CONFIG_TARGET_AM
 static void timer_intr() {
   if (nemu_state.state == NEMU_RUNNING) {
@@ -37,7 +36,6 @@ static void timer_intr() {
   }
 }
 #endif
-*/
 
 void init_timer() {
   rtc_port_base = (uint32_t *)new_space(8);
@@ -46,5 +44,5 @@ void init_timer() {
 #else
   add_mmio_map("rtc", CONFIG_RTC_MMIO, rtc_port_base, 8, rtc_io_handler);
 #endif
-  //IFNDEF(CONFIG_TARGET_AM, add_alarm_handle(timer_intr));
+  IFNDEF(CONFIG_TARGET_AM, add_alarm_handle(timer_intr));
 }
