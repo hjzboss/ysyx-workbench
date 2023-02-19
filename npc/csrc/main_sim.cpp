@@ -6,8 +6,6 @@ void delete_cpu();
 
 int main(int argc, char** argv, char** env) {
 
-  printf("debug\n\n\n\n\n\n\n\n");
-
   // Prevent unused variable warnings
   if (0 && argc && argv && env) {}
   // Pass arguments so Verilated code can see them, e.g. $value$plusargs
