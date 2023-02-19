@@ -84,10 +84,11 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'd':
         ival = va_arg(ap, int);
         char *str = num2str(ival, 10);
+        putstr("str=");
+        putstr(str);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
-          putstr("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
           fix_ch = fix_zero ? '0' : ' ';
           for (int i = 0; i < rem; i++) *out++ = fix_ch;
         }
