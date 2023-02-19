@@ -16,6 +16,7 @@ int main(int argc, char** argv, char** env) {
 
   init_monitor(argc, argv);
 
+  printf("debug\n\n\n\n\n\n\n\n");
   // Simulate until $finish
   sdb_mainloop();
 
