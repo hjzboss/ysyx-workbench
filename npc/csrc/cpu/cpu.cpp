@@ -99,7 +99,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = 0x00000000;
     return;
   }
-  else if (raddr == 0xa0000010) {
+  else if (raddr == 0xa0000100) {
     printf("fuck\n");
   }
   else if (raddr == CONFIG_RTC_MMIO || raddr == CONFIG_RTC_MMIO + 4) {
