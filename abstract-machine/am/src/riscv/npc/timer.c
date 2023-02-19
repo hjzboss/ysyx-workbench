@@ -11,9 +11,11 @@ void __am_timer_init() {
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
   // todo
   uptime->us = (uint64_t)inl(RTC_ADDR);
+  printf("%lx\n", uptime->us);
 }
 
 void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
+  // todo
   rtc->second = 0;
   rtc->minute = 0;
   rtc->hour   = 0;
