@@ -1,4 +1,5 @@
 #include <am.h>
+#include <klib.h>
 
 #define RTC_ADDR        (0xa0000048)
 //#define UPTIME_ADDR     (0xa000004b)
@@ -9,6 +10,7 @@ void __am_timer_init() {
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
   // todo
+  printf("shit\n");
   uptime->us = (uint64_t)inl(RTC_ADDR);
 }
 
