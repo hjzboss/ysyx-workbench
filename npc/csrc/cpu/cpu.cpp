@@ -169,6 +169,7 @@ long init_cpu(char *dir) {
   init_wave();
 #endif
 
+  printf("debug\n\n\n\n\n\n\n\n");
   // initial i_cache
   long size = load_img(dir);
 
