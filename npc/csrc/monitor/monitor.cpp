@@ -24,7 +24,7 @@ IFDEF(CONFIG_DIFFTEST, void init_difftest(char *ref_so_file, long img_size));
 //void init_device();
 void init_sdb();
 void init_disasm(const char *triple);
-void init_elf(const char *file);
+IFDEF(CONFIG_FTRACE, void init_elf(const char *file));
 long init_cpu(char *);
 IFDEF(CONFIG_ITRACE, void init_iringbuf());
 long init_cpu(char *);
@@ -96,7 +96,7 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize devices. */
   //IFDEF(CONFIG_DEVICE, init_device());
 
-  init_elf(elf_file);
+  IFDEF(CONFIG_FTRACE, init_elf(elf_file));
 
   init_log(log_file);
 
