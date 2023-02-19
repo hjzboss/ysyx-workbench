@@ -2,6 +2,7 @@
 #include <klib.h>
 
 void __am_timer_init() {
+  printf("shit!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
