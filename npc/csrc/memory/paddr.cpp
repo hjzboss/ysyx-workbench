@@ -1,6 +1,6 @@
 #include <cpu/cpu.h>
 
-static uint8_t i_cache[65535] = {};
+static uint8_t i_cache[10000000] = {};
 
 uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
