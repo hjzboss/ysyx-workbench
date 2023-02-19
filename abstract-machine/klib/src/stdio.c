@@ -29,6 +29,7 @@ char* num2str(int num, int base) {
     else str[i] = tmp[len] - 10 + 'A';
     i++;
   }
+  str[i] = '\0';
   return str;
 }
 
@@ -84,8 +85,6 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'd':
         ival = va_arg(ap, int);
         char *str = num2str(ival, 10);
-        putstr("str=");
-        putstr(str);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
