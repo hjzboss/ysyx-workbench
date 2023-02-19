@@ -18,7 +18,7 @@ static const char mainargs[] = MAINARGS;
 void outb(uintptr_t addr, uint8_t  data) { *(volatile uint8_t  *)addr = data; }
 
 void putch(char ch) {
-  outb(SERIAL_PORT, ' ');
+  outb(SERIAL_PORT, ch);
 }
 
 void halt(int code) {
