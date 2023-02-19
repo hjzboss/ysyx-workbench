@@ -1,7 +1,7 @@
 #include <cpu/cpu.h>
 #include <time.h>
 #include <sys/time.h>
-#include <unistd.h>
+#include <stdlib.h>
 #define MAX_INST_TO_PRINT 10
 
 // Current simulation time (64-bit unsigned)
@@ -14,7 +14,7 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
-static struct timeval boot_time = {};
+static uint32_t *rtc_port_base = NULL;
 
 CPUState cpu = {};
 
@@ -101,12 +101,14 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO || raddr == CONFIG_RTC_MMIO + 4) {
     // timer
-    static uint64_t us = get_time();
-    if (raddr == CONFIG_RTC_MMIO) {
-      *rdata = (uint32_t)us;
+    if (raddr == CONFIG_RTC_MMIO + 4) {
+      uint64_t us = get_time();
+      rtc_port_base[0] = (uint32_t)us;
+      rtc_port_base[1] = us >> 32;
+      *rdata = rtc_port_base[1];
     }
     else {
-      *rdata = us >> 32;
+      *rdata = rtc_port_base[0];
     }
     return;
   }
@@ -188,6 +190,8 @@ long init_cpu(char *dir) {
 
   // initial i_cache
   long size = load_img(dir);
+
+  rtc_port_base = (uint32_t*)malloc(8);
 
   top->clock = 0;
   reset(4);
