@@ -82,7 +82,7 @@ extern "C" void c_break(long long halt_ret) {
 }
 
 extern "C" void inst_read(long long raddr, int *rdata) {
-  if(raddr < 0x80000000ull) {
+  if (raddr < 0x80000000ull) {
     *rdata = 0x00000013;
     return;
   }
@@ -91,9 +91,13 @@ extern "C" void inst_read(long long raddr, int *rdata) {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
-  if(raddr < 0x80000000ull) {
+  if (raddr < 0x80000000ull) {
     *rdata = 0x00000000;
     return;
+  }
+  else if (raddr == CONFIG_RTC_MMIO) {
+    // timer
+    
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
 }
@@ -105,6 +109,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0 || waddr < 0x80000000ull) return;
   if (waddr == CONFIG_SERIAL_MMIO) {
+    // uart
     putchar(wdata);
     return;
   }
