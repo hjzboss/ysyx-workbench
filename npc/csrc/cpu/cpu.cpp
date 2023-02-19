@@ -128,6 +128,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   }
   else if (waddr == 0xa0000100) {
     printf("fuck\n");
+    return;
   }
   uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
   uint64_t wmask_64 = 0;
