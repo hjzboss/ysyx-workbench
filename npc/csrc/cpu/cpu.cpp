@@ -101,8 +101,18 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
     time_t current = 0;
-    while (1) {
-
+    for (uint64_t i = 0; i < UINT64_MAX; i++) {
+      for (uint64_t j = 0 ; j < UINT64_MAX; i++) {
+        for (uint64_t k = 0; k < UINT64_MAX; k++) {
+          while (1) {
+            time(&last);
+            if ((current - last) != 0) {
+              *rdata = get_time() - boot_time;
+              return;
+            }
+          }
+        }
+      }
     }
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
