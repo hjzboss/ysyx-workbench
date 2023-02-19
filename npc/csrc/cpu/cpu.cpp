@@ -1,4 +1,5 @@
 #include <cpu/cpu.h>
+#include <time.h>
 #define MAX_INST_TO_PRINT 10
 
 // Current simulation time (64-bit unsigned)
@@ -97,7 +98,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
-    
+    *rdata = get_time();
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
 }
@@ -132,7 +133,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     tmp = tmp >> 1;
   }
   rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-  //printf("waddr=%llx, data=%lx, wmask_64=%lx\n", waddr, rdata, wmask_64);
   paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
@@ -180,6 +180,9 @@ long init_cpu(char *dir) {
 
   // initial i_cache
   long size = load_img(dir);
+
+  // initial boot time
+  get_time();
 
   top->clock = 0;
   reset(4);

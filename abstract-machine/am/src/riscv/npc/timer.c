@@ -1,12 +1,14 @@
 #include <am.h>
-#include <nemu.h>
+
+#define RTC_ADDR        (0xa0000048)
+//#define UPTIME_ADDR     (0xa000004b)
 
 void __am_timer_init() {
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
   // todo
-  uptime->us = (((uint64_t)inl(RTC_ADDR + 4)) << 32) | inl(RTC_ADDR);
+  uptime->us = *(uint64_t*)(RTC_ADDR);
 }
 
 void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
