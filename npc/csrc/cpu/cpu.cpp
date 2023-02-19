@@ -1,6 +1,7 @@
 #include <cpu/cpu.h>
 #include <time.h>
 #include <sys/time.h>
+#include <unistd.h>
 #define MAX_INST_TO_PRINT 10
 
 // Current simulation time (64-bit unsigned)
@@ -100,6 +101,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
+    sleep(1);
     struct timeval now;
     gettimeofday(&now, NULL);
     long seconds = now.tv_sec - boot_time.tv_sec;
