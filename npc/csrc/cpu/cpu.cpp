@@ -106,8 +106,8 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
       *rdata = (uint32_t)us;
     }
     else {
-      printf("fuck\n");
       *rdata = us >> 32;
+      printf("fuck\n");
     }
     return;
   }
