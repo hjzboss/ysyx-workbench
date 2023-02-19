@@ -101,11 +101,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    long seconds = now.tv_sec - boot_time.tv_sec;
-    long useconds = now.tv_usec - boot_time.tv_usec;
-    *rdata = seconds * 1000000 + (useconds + 500);
+    *rdata = get_time();
     return;
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
@@ -186,8 +182,6 @@ long init_cpu(char *dir) {
 
   // initial i_cache
   long size = load_img(dir);
-
-  gettimeofday(&boot_time, NULL);
 
   top->clock = 0;
   reset(4);
