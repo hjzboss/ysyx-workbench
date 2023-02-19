@@ -10,5 +10,6 @@
 #define CONFIG_FTRACE 1
 //#define CONFIG_DIFFTEST 1
 #define CONFIG_RTC_MMIO 0xa0000048
+#define CONFIG_SERIAL_MMIO 0xa00003f8
 //#define CONFIG_MTRACE 1
 #endif
