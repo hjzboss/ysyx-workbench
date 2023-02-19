@@ -12,6 +12,7 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
+static uint64_t boot_time = 0;
 
 CPUState cpu = {};
 
@@ -98,7 +99,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
-    *rdata = get_time();
+    *rdata = get_time() - boot_time;
     return;
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
@@ -183,7 +184,7 @@ long init_cpu(char *dir) {
   long size = load_img(dir);
 
   // initial boot time
-  get_time();
+  boot_time = get_time();
 
   top->clock = 0;
   reset(4);
