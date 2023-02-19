@@ -2,10 +2,10 @@
 #include <klib.h>
 
 void __am_timer_init() {
+  printf("debug\n\n\n\n\n\n\n\n");
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
-  printf("debug\n\n\n\n\n\n\n\n");
   uptime->us = 0;
 }
 
