@@ -99,9 +99,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = 0x00000000;
     return;
   }
-  else if (raddr == 0xa0000100) {
-    printf("fuck\n");
-  }
   else if (raddr == CONFIG_RTC_MMIO || raddr == CONFIG_RTC_MMIO + 4) {
     // timer
     if (raddr == CONFIG_RTC_MMIO + 4) {
@@ -128,6 +125,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     // uart
     putchar(wdata);
     return;
+  }
+  else if (waddr == 0xa0000100) {
+    printf("fuck\n");
   }
   uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
   uint64_t wmask_64 = 0;
