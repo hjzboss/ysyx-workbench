@@ -101,7 +101,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
-    sleep(1);
     struct timeval now;
     gettimeofday(&now, NULL);
     long seconds = now.tv_sec - boot_time.tv_sec;
