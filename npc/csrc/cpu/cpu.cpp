@@ -103,10 +103,10 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     // timer
     static uint64_t us = get_time();
     if (raddr == CONFIG_RTC_MMIO) {
-      printf("fuck\n");
       *rdata = (uint32_t)us;
     }
     else {
+      printf("fuck\n");
       *rdata = us >> 32;
     }
     return;
