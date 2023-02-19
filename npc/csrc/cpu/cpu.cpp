@@ -99,9 +99,15 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = 0x00000000;
     return;
   }
-  else if (raddr == CONFIG_RTC_MMIO) {
+  else if (raddr == CONFIG_RTC_MMIO || raddr == CONFIG_RTC_MMIO + 4) {
     // timer
-    *rdata = get_time();
+    static uint64_t us = get_time();
+    if (raddr == CONFIG_RTC_MMIO) {
+      *rdata = (uint32_t)us;
+    }
+    else {
+      *rdata = us >> 32;
+    }
     return;
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
