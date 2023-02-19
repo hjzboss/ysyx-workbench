@@ -183,9 +183,7 @@ long init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
-#ifdef CONFIG_WAVE
-  init_wave();
-#endif
+  IFDEF(CONFIG_WAVE, init_wave());
 
   // initial i_cache
   long size = load_img(dir);
