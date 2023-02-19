@@ -13,6 +13,7 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 static uint64_t boot_time = 0;
+static uint64_t last = 0;
 
 CPUState cpu = {};
 
@@ -99,6 +100,11 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
+    uint64_t now = get_time();
+    if (now - last < 1000000 / 60) {
+      return;
+    }
+    last = now;
     *rdata = get_time() - boot_time;
     return;
   }
