@@ -101,7 +101,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   else if (raddr == CONFIG_RTC_MMIO) {
     // timer
     uint64_t now = get_time();
-    if (now - last < 1000000 / 60) {
+    if (now - last < 10000000000) {
       return;
     }
     last = now;
