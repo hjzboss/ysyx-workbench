@@ -102,11 +102,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     // timer
     time_t current = 0;
     while (1) {
-      time(&last);
-      if ((current - last) != 0) {
-        *rdata = get_time() - boot_time;
-        return;
-      }
+
     }
   }
   *rdata = paddr_read(raddr & ~0x7ull, 8);
