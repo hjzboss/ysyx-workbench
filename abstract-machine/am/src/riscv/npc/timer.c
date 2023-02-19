@@ -2,13 +2,14 @@
 
 #define RTC_ADDR        (0xa0000048)
 //#define UPTIME_ADDR     (0xa000004b)
+static inline uint64_t inl(uint64_t addr) { return *(volatile uint64_t *)addr; }
 
 void __am_timer_init() {
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
   // todo
-  uptime->us = *(uint64_t*)(RTC_ADDR);
+  uptime->us = (uint64_t)inl(RTC_ADDR);
 }
 
 void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
