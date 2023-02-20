@@ -14,7 +14,7 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
-extern uint32_t vgactl_port_base[2];
+extern uint32_t *vgactl_port_base;
 static uint32_t *rtc_port_base = NULL;
 
 CPUState cpu = {};
