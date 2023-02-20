@@ -260,12 +260,12 @@ void sdb_mainloop() {
       args = NULL;
     }
 
-/*
+
 #ifdef CONFIG_DEVICE
     extern void sdl_clear_event_queue();
     sdl_clear_event_queue();
 #endif
-*/
+
 
     int i;
     for (i = 0; i < NR_CMD; i ++) {

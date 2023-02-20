@@ -14,6 +14,7 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
+extern uint32_t vgactl_port_base[2];
 static uint32_t *rtc_port_base = NULL;
 
 CPUState cpu = {};
@@ -112,7 +113,12 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     }
     return;
   }
-  *rdata = paddr_read(raddr & ~0x7ull, 8);
+  else if (raddr == 0xa0000100) {
+    *rdata = ((uint64_t)vgactl_port_base[1] << 32) | vgactl_port_base[0];
+  }
+  else {
+    *rdata = paddr_read(raddr & ~0x7ull, 8);
+  }
 }
 
 
@@ -126,26 +132,36 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     putchar(wdata);
     return;
   }
-  uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
-  uint64_t wmask_64 = 0;
-  uint8_t *index = (uint8_t*)&wmask_64;
-  // 将8位的掩码转换为64位的掩码
-  for(int i = 0; i < 8; i++, index++) {
-    if(wmask & 0x01 == 0x01) {
-      *index = 0xff;
+  else if (waddr == 0xa0000100) {
+    assert((wmask & 0xFF) == 0xF || (wmask & 0xFF) == 0xF0);
+    if((wmask & 0xFF) == 0x0F){ 
+      vgactl_port_base[0] = wdata;
+    } else {
+      vgactl_port_base[1] = wdata;
     }
-    wmask = wmask >> 1;
   }
-  // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
-  uint64_t tmp = wmask_64;
-  int shift_cnt = 0;
-  for(int i = 64; i > 0; i--) {
-    if(tmp & 0x01 == 0x01) break;
-    shift_cnt++;
-    tmp = tmp >> 1;
+  else {
+    uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
+    uint64_t wmask_64 = 0;
+    uint8_t *index = (uint8_t*)&wmask_64;
+    // 将8位的掩码转换为64位的掩码
+    for(int i = 0; i < 8; i++, index++) {
+      if(wmask & 0x01 == 0x01) {
+        *index = 0xff;
+      }
+      wmask = wmask >> 1;
+    }
+    // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
+    uint64_t tmp = wmask_64;
+    int shift_cnt = 0;
+    for(int i = 64; i > 0; i--) {
+      if(tmp & 0x01 == 0x01) break;
+      shift_cnt++;
+      tmp = tmp >> 1;
+    }
+    rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+    paddr_write(waddr & ~0x7ull, 8, rdata);
   }
-  rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-  paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
 

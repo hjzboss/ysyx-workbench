@@ -1,92 +1,80 @@
-/***************************************************************************************
-* Copyright (c) 2014-2022 Zihao Yu, Nanjing University
-*
-* NEMU is licensed under Mulan PSL v2.
-* You can use this software according to the terms and conditions of the Mulan PSL v2.
-* You may obtain a copy of Mulan PSL v2 at:
-*          http://license.coscl.org.cn/MulanPSL2
-*
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-* MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-*
-* See the Mulan PSL v2 for more details.
-***************************************************************************************/
-/*
-#include <cpu/cpu.h>
-#include <device/map.h>
-
-#define SCREEN_W (MUXDEF(CONFIG_VGA_SIZE_800x600, 800, 400))
-#define SCREEN_H (MUXDEF(CONFIG_VGA_SIZE_800x600, 600, 300))
-
-static uint32_t screen_width() {
-  return MUXDEF(CONFIG_TARGET_AM, io_read(AM_GPU_CONFIG).width, SCREEN_W);
-}
-
-static uint32_t screen_height() {
-  return MUXDEF(CONFIG_TARGET_AM, io_read(AM_GPU_CONFIG).height, SCREEN_H);
-}
-
-static uint32_t screen_size() {
-  return screen_width() * screen_height() * sizeof(uint32_t);
-}
-
-static void *vmem = NULL;
-static uint32_t *vgactl_port_base = NULL;
-
-#ifdef CONFIG_VGA_SHOW_SCREEN
 #ifndef CONFIG_TARGET_AM
 #include <SDL2/SDL.h>
+#endif
+
+#include <time.h>
+uint32_t vgactl_port_base[2];
+uint32_t screen_width  = 400;
+uint32_t screen_height = 300;
+uint32_t* vmem;
+//extern void wrap_up_trace();
 
 static SDL_Renderer *renderer = NULL;
 static SDL_Texture *texture = NULL;
 
 static void init_screen() {
-  SDL_Window *window = NULL;
-  char title[128];
-  sprintf(title, "%s-NEMU", str(__GUEST_ISA__));
-  SDL_Init(SDL_INIT_VIDEO);
-  SDL_CreateWindowAndRenderer(
-      SCREEN_W * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)),
-      SCREEN_H * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)),
-      0, &window, &renderer);
-  SDL_SetWindowTitle(window, title);
-  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
-      SDL_TEXTUREACCESS_STATIC, SCREEN_W, SCREEN_H);
+    SDL_Window *window = NULL;
+    char title[128];
+    sprintf(title, "riscv64-NPC");
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_CreateWindowAndRenderer(screen_width*2, screen_height*2, 0, &window, &renderer);
+    SDL_SetWindowTitle(window, title);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, screen_width, screen_height);
 }
 
 static inline void update_screen() {
-  SDL_UpdateTexture(texture, NULL, vmem, SCREEN_W * sizeof(uint32_t));
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, texture, NULL, NULL);
-  SDL_RenderPresent(renderer);
+    SDL_UpdateTexture(texture, NULL, vmem, screen_width * sizeof(uint32_t));
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
 }
-#else
-static void init_screen() {}
 
-static inline void update_screen() {
-  io_write(AM_GPU_FBDRAW, 0, 0, vmem, screen_width(), screen_height(), true);
+static uint32_t screen_size() {
+  return screen_width * screen_height * sizeof(uint32_t);
 }
-#endif
-#endif
 
-void vga_update_screen() {
-  // TODO: call `update_screen()` when the sync register is non-zero,
-  // then zero out the sync register
-  if (vgactl_port_base[1] == 1) {
-    update_screen();
-    vgactl_port_base[1] = 0;
-  }
+void vga_update_screen(){
+    int sync = vgactl_port_base[1];
+    if(sync){
+        update_screen();
+        vgactl_port_base[1] = 0;
+    }
+}
+
+void device_update() {
+    static uint64_t last = 0;
+    struct timespec nowspec;
+    clock_gettime(CLOCK_MONOTONIC_COARSE, &nowspec);
+    uint64_t now = nowspec.tv_sec * 1000000 + nowspec.tv_nsec / 1000;
+    if (now - last < 1000000) {
+        return;
+    }
+    // printf("update screen\n");
+    last = now;
+    vga_update_screen();
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            //wrap_up_trace();
+            exit(0);
+
+            break;
+        default: break;
+        }
+    }
+}
+
+void sdl_clear_event_queue() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event));
 }
 
 void init_vga() {
-  vgactl_port_base = (uint32_t *)new_space(8);
-  vgactl_port_base[0] = (screen_width() << 16) | screen_height();
-  add_mmio_map("vgactl", CONFIG_VGA_CTL_MMIO, vgactl_port_base, 8, NULL);
-
-  vmem = new_space(screen_size());
-  add_mmio_map("vmem", CONFIG_FB_ADDR, vmem, screen_size(), NULL);
-  IFDEF(CONFIG_VGA_SHOW_SCREEN, init_screen());
-  IFDEF(CONFIG_VGA_SHOW_SCREEN, memset(vmem, 0, screen_size()));
+    vmem = (uint32_t *)malloc(screen_height * screen_width * sizeof(uint32_t));
+    init_screen();
+    vgactl_port_base[0] = (screen_width << 16) | screen_height;
+    vgactl_port_base[1] = 0;
+    printf("init vga complete\n");
 }
-*/
