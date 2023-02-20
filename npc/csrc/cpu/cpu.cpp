@@ -106,12 +106,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 4) {
     // timer
     if (raddr == CONFIG_TIMER_MMIO) {
-      if (!boot_flag) {
-        gettimeofday(&boot_time, NULL);
-        boot_flag = true;
-        *rdata = 0;
-        return;
-      }
       struct timeval now;
       gettimeofday(&now, NULL);
       long seconds = now.tv_sec - boot_time.tv_sec;
@@ -222,7 +216,7 @@ long init_cpu(char *dir) {
 
   rtc_port_base = (uint32_t*)malloc(8);
 
-  //gettimeofday(&boot_time, NULL);
+  gettimeofday(&boot_time, NULL);
 
   top->clock = 0;
   reset(4);
