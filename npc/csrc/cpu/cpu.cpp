@@ -63,7 +63,7 @@ long load_img(char *dir);
 void isa_reg_display(bool*);
 void print_mtrace();
 void write_vga(uint64_t wdata, uint8_t wmask);
-void read_vga();
+uint64_t read_vga();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
