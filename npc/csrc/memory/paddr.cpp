@@ -106,6 +106,7 @@ void paddr_write(uint64_t addr, int len, uint64_t data) {
   if (in_pmem(addr)) {
     IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data));
     host_write(guest_to_host(addr), len, data);
+    return;
   }
   out_of_bound(addr);
 }
