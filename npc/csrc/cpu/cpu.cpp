@@ -109,8 +109,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
       if (!boot_flag) {
         gettimeofday(&boot_time, NULL);
         boot_flag = true;
-        *rdata = 0;
-        return;
       }
       struct timeval now;
       gettimeofday(&now, NULL);
