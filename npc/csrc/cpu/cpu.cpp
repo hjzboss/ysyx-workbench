@@ -105,7 +105,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 4) {
     // timer
-    if (raddr == CONFIG_TIMER_MMIO + 4) {
+    if (raddr == CONFIG_TIMER_MMIO) {
       if (!boot_flag) {
         gettimeofday(&boot_time, NULL);
         boot_flag = true;
