@@ -15,7 +15,7 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 static uint32_t *rtc_port_base = NULL;
-static struct timeval boot_time = NULL;
+static struct timeval boot_time = 0;
 
 CPUState cpu = {};
 
@@ -105,7 +105,9 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 4) {
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 4) {
-      
+      if (boot_time == 0) {
+        gettimeofday(&boot_time, NULL);
+      }
       struct timeval now;
       gettimeofday(&now, NULL);
       long seconds = now.tv_sec - boot_time.tv_sec;
@@ -216,7 +218,7 @@ long init_cpu(char *dir) {
 
   rtc_port_base = (uint32_t*)malloc(8);
 
-  gettimeofday(&boot_time, NULL);
+  //gettimeofday(&boot_time, NULL);
 
   top->clock = 0;
   reset(4);
