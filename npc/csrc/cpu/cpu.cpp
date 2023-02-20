@@ -14,7 +14,6 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
-extern uint32_t *vgactl_port_base;
 static uint32_t *rtc_port_base = NULL;
 
 CPUState cpu = {};
@@ -63,6 +62,8 @@ void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 void print_mtrace();
+void write_vga(uint64_t wdata, uint8_t wmask);
+void read_vga();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -114,7 +115,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == 0xa0000100) {
-    *rdata = ((uint64_t)vgactl_port_base[1] << 32) | vgactl_port_base[0];
+    *rdata = read_vga();
   }
   else {
     *rdata = paddr_read(raddr & ~0x7ull, 8);
@@ -134,11 +135,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   }
   else if (waddr == 0xa0000100) {
     assert((wmask & 0xFF) == 0xF || (wmask & 0xFF) == 0xF0);
-    if((wmask & 0xFF) == 0x0F){ 
-      vgactl_port_base[0] = wdata;
-    } else {
-      vgactl_port_base[1] = wdata;
-    }
+    write_vga(wdata, wmask);
   }
   else {
     uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);

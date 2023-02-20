@@ -1,7 +1,4 @@
-#ifndef CONFIG_TARGET_AM
 #include <SDL2/SDL.h>
-#endif
-
 #include <time.h>
 uint32_t vgactl_port_base[2];
 uint32_t screen_width  = 400;
@@ -77,4 +74,16 @@ void init_vga() {
     vgactl_port_base[0] = (screen_width << 16) | screen_height;
     vgactl_port_base[1] = 0;
     printf("init vga complete\n");
+}
+
+void write_vga(uint64_t wdata, uint8_t wmask) {
+  if((wmask & 0xFF) == 0x0F) { 
+    vgactl_port_base[0] = wdata;
+  } else {
+    vgactl_port_base[1] = wdata;
+  }
+}
+
+uint64_t read_vga() {
+  return ((uint64_t)vgactl_port_base[1] << 32) | vgactl_port_base[0];
 }
