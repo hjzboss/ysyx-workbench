@@ -8,7 +8,7 @@
 #define RESET_VECTOR (PMEM_LEFT + CONFIG_PC_RESET_OFFSET)
 
 static inline bool in_pmem(uint64_t addr) {
-  return addr - CONFIG_MBASE < CONFIG_MSIZE;
+  return addr - CONFIG_MBASE <= CONFIG_MSIZE;
 }
 
 /* convert the guest physical address in the guest program to host virtual address in NEMU */
