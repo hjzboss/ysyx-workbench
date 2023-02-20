@@ -1,6 +1,7 @@
 #include <am.h>
 #include <sys/time.h>
 #include <time.h>
+#include <stdio.h>
 
 static struct timeval boot_time = {};
 
@@ -25,6 +26,7 @@ void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
   long seconds = now.tv_sec - boot_time.tv_sec;
   long useconds = now.tv_usec - boot_time.tv_usec;
   uptime->us = seconds * 1000000 + (useconds + 500);
+  //printf("%lu\n", uptime->us);
 }
 
 void __am_timer_init() {
