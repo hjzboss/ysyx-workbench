@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
 #include <time.h>
-uint32_t vgactl_port_base[2];
+static uint32_t vgactl_port_base[2];
 uint32_t screen_width  = 400;
 uint32_t screen_height = 300;
 uint32_t* vmem;
