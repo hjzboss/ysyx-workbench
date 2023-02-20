@@ -99,9 +99,9 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = 0x00000000;
     return;
   }
-  else if (raddr == CONFIG_RTC_MMIO || raddr == CONFIG_RTC_MMIO + 4) {
+  else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 4) {
     // timer
-    if (raddr == CONFIG_RTC_MMIO + 4) {
+    if (raddr == CONFIG_TIMER_MMIO + 4) {
       uint64_t us = get_time();
       rtc_port_base[0] = (uint32_t)us;
       rtc_port_base[1] = us >> 32;
@@ -124,10 +124,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
-    return;
-  }
-  else if (waddr == 0xa0000100) {
-    printf("fuck\n");
     return;
   }
   uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);

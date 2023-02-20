@@ -1,10 +1,16 @@
 #include <cpu/cpu.h>
+#include <memory/paddr.h>
 
 static uint8_t i_cache[10000000] = {};
 
 uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
 
+
+static void out_of_bound(uint64_t addr) {
+  panic("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD,
+      addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
+}
 
 #ifdef CONFIG_MTRACE
 typedef struct node {
@@ -87,15 +93,21 @@ static inline void host_write(void *addr, int len, uint64_t data) {
 }
 
 uint64_t paddr_read(uint64_t addr, int len) {
-  uint64_t ret = host_read(guest_to_host(addr), len);
-  IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, ret));
-  return ret;
+  if (in_pmem(addr)) {
+    uint64_t ret = host_read(guest_to_host(addr), len);
+    IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, ret));
+    return ret;
+  }
+  out_of_bound(addr);
 }
 
 
 void paddr_write(uint64_t addr, int len, uint64_t data) {
-  IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data));
-  host_write(guest_to_host(addr), len, data);
+  if (in_pmem(addr)) {
+    IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data));
+    host_write(guest_to_host(addr), len, data);
+  }
+  out_of_bound(addr);
 }
 
 
