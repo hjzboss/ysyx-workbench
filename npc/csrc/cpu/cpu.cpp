@@ -107,6 +107,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 4) {
       gettimeofday(&boot_time, NULL);
+      return;
     }
     else if (raddr == CONFIG_TIMER_MMIO) {
       struct timeval now;
