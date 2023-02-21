@@ -1,3 +1,4 @@
+/*
 #include <SDL2/SDL.h>
 #include <time.h>
 static uint32_t vgactl_port_base[2];
@@ -87,3 +88,4 @@ void write_vga(uint64_t wdata, uint8_t wmask) {
 uint64_t read_vga() {
   return ((uint64_t)vgactl_port_base[1] << 32) | vgactl_port_base[0];
 }
+*/

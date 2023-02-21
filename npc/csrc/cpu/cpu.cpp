@@ -65,8 +65,6 @@ void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 void print_mtrace();
-void write_vga(uint64_t wdata, uint8_t wmask);
-uint64_t read_vga();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -118,9 +116,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     }
     return;
   }
-  else if (raddr == 0xa0000100) {
-    *rdata = read_vga();
-  }
   else {
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
@@ -136,10 +131,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     // uart
     putchar(wdata);
     return;
-  }
-  else if (waddr == 0xa0000100) {
-    assert((wmask & 0xFF) == 0xF || (wmask & 0xFF) == 0xF0);
-    write_vga(wdata, wmask);
   }
   else {
     uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
