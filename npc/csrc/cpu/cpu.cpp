@@ -14,11 +14,11 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
-//static uint32_t *rtc_port_base = NULL;
 static struct timeval boot_time = {};
-static bool boot_flag = false;
 
 CPUState cpu = {};
+
+IFDEF(CONFIG_MTRACE, void free_mtrace());
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -51,6 +51,7 @@ static void print_iringbuf() {
 #endif
 
 #ifdef CONFIG_FTRACE
+void free_ftrace();
 void print_ftrace(bool);
 void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
 #endif
@@ -114,13 +115,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
       long seconds = now.tv_sec - boot_time.tv_sec;
       long useconds = now.tv_usec - boot_time.tv_usec;
       *rdata = seconds * 1000000;
-      
-      /*
-      uint64_t us = get_time();
-      rtc_port_base[0] = (uint32_t)us;
-      rtc_port_base[1] = us >> 32;
-      *rdata = rtc_port_base[1];
-      */
     }
     return;
   }
@@ -189,7 +183,6 @@ static void reset(int time) {
 
 static void eval_wave() {
   top->clock = !top->clock;
-  //top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
 #ifdef CONFIG_WAVE
   tfp->dump(main_time);
@@ -214,8 +207,6 @@ long init_cpu(char *dir) {
   // initial i_cache
   long size = load_img(dir);
 
-  //rtc_port_base = (uint32_t*)malloc(8);
-
   top->clock = 0;
   reset(4);
 
@@ -239,6 +230,9 @@ void delete_cpu() {
   // Destroy model
   delete top; 
   top = NULL;
+
+  IFDEF(CONFIG_FTRACE, free_ftrace());
+  IFDEF(CONFIG_MTRACE, free_mtrace());
 }
 
 static void isa_exec_once() {
