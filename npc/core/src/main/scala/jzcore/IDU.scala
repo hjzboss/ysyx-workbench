@@ -79,4 +79,5 @@ class IDU extends Module with HasInstrType {
   io.ctrl.break       := instrtype === InstrD
 
   io.lsType           := lsType
+  io.aluOp            := aluOp
 }
