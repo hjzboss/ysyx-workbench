@@ -113,7 +113,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
       gettimeofday(&now, NULL);
       long seconds = now.tv_sec - boot_time.tv_sec;
       long useconds = now.tv_usec - boot_time.tv_usec;
-      *rdata = seconds * 1000000 + (useconds + 500);
+      *rdata = seconds * 1000000;
       
       /*
       uint64_t us = get_time();
