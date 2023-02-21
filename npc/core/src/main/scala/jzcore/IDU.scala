@@ -15,6 +15,7 @@ class IDU extends Module with HasInstrType {
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
+    val aluOp     = Output(UInt(6.W))
   })
 
   val rf        = Module(new RF)
