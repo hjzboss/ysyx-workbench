@@ -2,9 +2,13 @@
 #include <klib.h>
 
 #define RTC_ADDR        (0xa0000048)
+#define RTC_INIT        (0xa0000052)
 static inline uint64_t inl(uint64_t addr) { return *(volatile uint64_t *)addr; }
 
+//static uint64_t boot_time = 0;
+
 void __am_timer_init() {
+  (uint64_t)inl(RTC_INIT);
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
