@@ -124,7 +124,7 @@ word_t paddr_read(paddr_t addr, int len) {
     return result;
   }
   IFDEF(CONFIG_DEVICE, result = mmio_read(addr, len);
-   IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result)); return result);
+      IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result)); return result);
   out_of_bound(addr);
   return 0;
 }

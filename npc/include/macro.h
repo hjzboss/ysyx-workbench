@@ -142,4 +142,7 @@
     log_write(__VA_ARGS__); \
   } while (0)
 
+
+#define FMT_PADDR "0x%016lx"
+#define FMT_WORD "0x%016lx"
 #endif

@@ -69,6 +69,10 @@ void print_ftrace(bool);
 void ftrace(paddr_t addr, uint32_t inst, paddr_t next_pc);
 #endif
 
+#ifdef CONFIG_DTRACE
+void print_dtrace();
+#endif
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
@@ -116,7 +120,6 @@ static void exec_once(Decode *s, vaddr_t pc) {
 static void execute(uint64_t n) {
   Decode s;
   for (; n > 0; n --) {
-    //printf("cpupc=0x%016lx\n", cpu.pc);
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
@@ -127,6 +130,7 @@ static void execute(uint64_t n) {
 
 static void statistic() {
   IFDEF(CONFIG_FTRACE, print_ftrace(true));
+  IFDEF(CONFIG_DTRACE, print_dtrace());
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64 
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
@@ -145,7 +149,6 @@ void assert_fail_msg() {
 
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
-  //printf("cpupc=0x%016lx\n", cpu.pc);
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT:

@@ -13,17 +13,16 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
-#include <isa.h>
-#include <memory/host.h>
-#include <memory/vaddr.h>
+/*
+#include <memory/paddr.h>
 #include <device/map.h>
-#include <utils.h>
+#include <cpu/cpu.h>
 
 #ifdef CONFIG_DTRACE
 typedef struct node {
-  paddr_t addr;
+  uint64_t addr;
   int len;
-  word_t data;
+  uint64_t data;
   IOMap *map;
   bool is_read;
   struct node *next;
@@ -32,7 +31,7 @@ typedef struct node {
 static dnode *dtrace_head = NULL;
 static dnode *dtrace_tail = NULL;
 
-void insert_dtrace(paddr_t addr, int len, word_t data, IOMap *map, bool is_read) {
+void insert_dtrace(uint64_t addr, int len, uint64_t data, IOMap *map, bool is_read) {
   dnode *n = (dnode*)malloc(sizeof(dnode));
   n->addr = addr;
   n->len = len;
@@ -90,7 +89,7 @@ uint8_t* new_space(int size) {
   return p;
 }
 
-static void check_bound(IOMap *map, paddr_t addr) {
+static void check_bound(IOMap *map, uint64_t addr) {
   if (map == NULL) {
     Assert(map != NULL, "address (" FMT_PADDR ") is out of bound at pc = " FMT_WORD, addr, cpu.pc);
   } else {
@@ -100,7 +99,7 @@ static void check_bound(IOMap *map, paddr_t addr) {
   }
 }
 
-static void invoke_callback(io_callback_t c, paddr_t offset, int len, bool is_write) {
+static void invoke_callback(io_callback_t c, uint64_t offset, int len, bool is_write) {
   if (c != NULL) { c(offset, len, is_write); }
 }
 
@@ -110,21 +109,20 @@ void init_map() {
   p_space = io_space;
 }
 
-word_t map_read(paddr_t addr, int len, IOMap *map) {
-  assert(len >= 1 && len <= 8);
+uint64_t map_read(uint64_t addr, IOMap *map) {
   check_bound(map, addr);
-  paddr_t offset = addr - map->low;
-  invoke_callback(map->callback, offset, len, false); // prepare data to read
-  word_t ret = host_read(map->space + offset, len);
-  IFDEF(CONFIG_DTRACE, insert_dtrace(addr, len, ret, map, true));
+  uint64_t offset = addr - map->low;
+  invoke_callback(map->callback, offset, 0, false); // prepare data to read
+  uint64_t ret = paddr_read(map->space + offset, 8);
+  IFDEF(CONFIG_DTRACE, insert_dtrace(addr, 8, ret, map, true));
   return ret;
 }
 
-void map_write(paddr_t addr, int len, word_t data, IOMap *map) {
-  assert(len >= 1 && len <= 8);
+void map_write(uint64_t addr, uint64_t mask, uint64_t data, IOMap *map) {
   check_bound(map, addr);
-  paddr_t offset = addr - map->low;
-  host_write(map->space + offset, len, data);
+  uint64_t offset = addr - map->low;
+  paddr_write(map->space + offset, len, data);
   invoke_callback(map->callback, offset, len, true);
   IFDEF(CONFIG_DTRACE, insert_dtrace(addr, len, data, map, false));
 }
+*/

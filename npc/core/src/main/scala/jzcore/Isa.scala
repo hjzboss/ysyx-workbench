@@ -89,7 +89,11 @@ object RV64IM extends HasInstrType {
     OR      -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.or, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     AND     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.and, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     MUL     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mul, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    MULH    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mulh, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     DIV     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.div, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    DIVU    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.divu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    REM     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.rem, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    REMU    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
     ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.addw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SUBW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.subw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
@@ -99,6 +103,8 @@ object RV64IM extends HasInstrType {
     SRLW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.srlw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SRAW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.sraw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     REMW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    DIVUW   -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.divuw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    REMUW   -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remuw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
     LD      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.ld, RegWrite.loadMem, Wmask.nop),
     LW      -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.add, LsType.lw, RegWrite.loadMem, Wmask.nop),

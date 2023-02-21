@@ -1,4 +1,7 @@
 #include <cpu/cpu.h>
+#include <time.h>
+#include <sys/time.h>
+#include <stdlib.h>
 #define MAX_INST_TO_PRINT 10
 
 // Current simulation time (64-bit unsigned)
@@ -11,8 +14,11 @@ static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
+static struct timeval boot_time = {};
 
 CPUState cpu = {};
+
+IFDEF(CONFIG_MTRACE, void free_mtrace());
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -45,6 +51,7 @@ static void print_iringbuf() {
 #endif
 
 #ifdef CONFIG_FTRACE
+void free_ftrace();
 void print_ftrace(bool);
 void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
 #endif
@@ -58,6 +65,8 @@ void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 void print_mtrace();
+void write_vga(uint64_t wdata, uint8_t wmask);
+uint64_t read_vga();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -82,7 +91,7 @@ extern "C" void c_break(long long halt_ret) {
 }
 
 extern "C" void inst_read(long long raddr, int *rdata) {
-  if(raddr < 0x80000000ull) {
+  if (raddr < 0x80000000ull) {
     *rdata = 0x00000013;
     return;
   }
@@ -91,11 +100,30 @@ extern "C" void inst_read(long long raddr, int *rdata) {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
-  if(raddr < 0x80000000ull) {
+  if (raddr < 0x80000000ull) {
     *rdata = 0x00000000;
     return;
   }
-  *rdata = paddr_read(raddr & ~0x7ull, 8);
+  else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
+    // timer
+    if (raddr == CONFIG_TIMER_MMIO + 8) {
+      gettimeofday(&boot_time, NULL);
+    }
+    else if (raddr == CONFIG_TIMER_MMIO) {
+      struct timeval now;
+      gettimeofday(&now, NULL);
+      long seconds = now.tv_sec - boot_time.tv_sec;
+      long useconds = now.tv_usec - boot_time.tv_usec;
+      *rdata = seconds * 1000000;
+    }
+    return;
+  }
+  else if (raddr == 0xa0000100) {
+    *rdata = read_vga();
+  }
+  else {
+    *rdata = paddr_read(raddr & ~0x7ull, 8);
+  }
 }
 
 
@@ -103,28 +131,38 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
-  if(wmask == 0 || waddr < 0x80000000ull) return;
-  uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
-  uint64_t wmask_64 = 0;
-  uint8_t *index = (uint8_t*)&wmask_64;
-  // 将8位的掩码转换为64位的掩码
-  for(int i = 0; i < 8; i++, index++) {
-    if(wmask & 0x01 == 0x01) {
-      *index = 0xff;
+  if (wmask == 0 || waddr < 0x80000000ull) return;
+  if (waddr == CONFIG_SERIAL_MMIO) {
+    // uart
+    putchar(wdata);
+    return;
+  }
+  else if (waddr == 0xa0000100) {
+    assert((wmask & 0xFF) == 0xF || (wmask & 0xFF) == 0xF0);
+    write_vga(wdata, wmask);
+  }
+  else {
+    uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
+    uint64_t wmask_64 = 0;
+    uint8_t *index = (uint8_t*)&wmask_64;
+    // 将8位的掩码转换为64位的掩码
+    for(int i = 0; i < 8; i++, index++) {
+      if(wmask & 0x01 == 0x01) {
+        *index = 0xff;
+      }
+      wmask = wmask >> 1;
     }
-    wmask = wmask >> 1;
+    // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
+    uint64_t tmp = wmask_64;
+    int shift_cnt = 0;
+    for(int i = 64; i > 0; i--) {
+      if(tmp & 0x01 == 0x01) break;
+      shift_cnt++;
+      tmp = tmp >> 1;
+    }
+    rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+    paddr_write(waddr & ~0x7ull, 8, rdata);
   }
-  // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
-  uint64_t tmp = wmask_64;
-  int shift_cnt = 0;
-  for(int i = 64; i > 0; i--) {
-    if(tmp & 0x01 == 0x01) break;
-    shift_cnt++;
-    tmp = tmp >> 1;
-  }
-  rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-  //printf("waddr=%llx, data=%lx, wmask_64=%lx\n", waddr, rdata, wmask_64);
-  paddr_write(waddr & ~0x7ull, 8, rdata);
 }
 
 
@@ -145,7 +183,6 @@ static void reset(int time) {
 
 static void eval_wave() {
   top->clock = !top->clock;
-  //top->io_inst = pmem_read(top->io_pc, 4);
   top->eval();
 #ifdef CONFIG_WAVE
   tfp->dump(main_time);
@@ -165,9 +202,7 @@ long init_cpu(char *dir) {
   // Construct the Verilated model, from Vjzcore.h generated from Verilating "jzcore.v"
   top = new VJzCore; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
-#ifdef CONFIG_WAVE
-  init_wave();
-#endif
+  IFDEF(CONFIG_WAVE, init_wave());
 
   // initial i_cache
   long size = load_img(dir);
@@ -195,6 +230,9 @@ void delete_cpu() {
   // Destroy model
   delete top; 
   top = NULL;
+
+  IFDEF(CONFIG_FTRACE, free_ftrace());
+  IFDEF(CONFIG_MTRACE, free_mtrace());
 }
 
 static void isa_exec_once() {
@@ -241,7 +279,7 @@ void execute(uint64_t n) {
     g_nr_guest_inst ++;
     trace_and_difftest(cpu.npc);
     if (npc_state.state != NPC_RUNNING) break;
-    IFDEF(CONFIG_DEVICE, device_update());
+    //IFDEF(CONFIG_DEVICE, device_update());
   }
 }
 
