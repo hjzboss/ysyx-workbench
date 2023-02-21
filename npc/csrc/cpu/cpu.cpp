@@ -122,9 +122,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
       *rdata = rtc_port_base[1];
       */
     }
-    else {
-      *rdata = rtc_port_base[0];
-    }
     return;
   }
   else if (raddr == 0xa0000100) {
