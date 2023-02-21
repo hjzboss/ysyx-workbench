@@ -2,7 +2,7 @@
 #include <klib.h>
 
 #define RTC_ADDR        (0xa0000048)
-#define RTC_INIT        (0xa000004c)
+#define RTC_INIT        (0xa0000050)
 static inline uint64_t inl(uint64_t addr) { return *(volatile uint64_t *)addr; }
 
 //static uint64_t boot_time = 0;
