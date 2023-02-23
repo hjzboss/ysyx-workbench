@@ -13,9 +13,9 @@ int main() {
   Log("'Hello World!' from Nanos-lite");
   Log("Build time: %s, %s", __TIME__, __DATE__);
 
+  printf("shit\n");
   init_mm();
 
-  printf("shit\n");
   init_device();
 
   init_ramdisk();
