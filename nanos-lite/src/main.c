@@ -19,6 +19,7 @@ int main() {
 
   init_ramdisk();
 
+  printf("shit\n");
 #ifdef HAS_CTE
   init_irq();
 #endif
