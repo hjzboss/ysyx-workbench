@@ -37,10 +37,7 @@ char* num2str(int num, int base) {
 int printf(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  char buf[20000000000];
-  putch('\n');
-  putch('\n');
-  putch('\n');
+  char buf[200];
   int arg_cnt = vsprintf(buf, fmt, ap);
   va_end(ap);
   putstr(buf);
