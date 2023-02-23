@@ -15,11 +15,11 @@ int main() {
 
   init_mm();
 
+  printf("shit\n");
   init_device();
 
   init_ramdisk();
 
-  printf("shit\n");
 #ifdef HAS_CTE
   init_irq();
 #endif
