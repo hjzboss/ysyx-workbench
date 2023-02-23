@@ -39,6 +39,9 @@ int printf(const char *fmt, ...) {
   va_start(ap, fmt);
   char buf[20000000000];
   int arg_cnt = vsprintf(buf, fmt, ap);
+  putch('\n');
+  putch('\n');
+  putch('\n');
   va_end(ap);
   putstr(buf);
   return arg_cnt;
