@@ -38,10 +38,10 @@ int printf(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   char buf[20000000000];
+  putch('\n');
+  putch('\n');
+  putch('\n');
   int arg_cnt = vsprintf(buf, fmt, ap);
-  putch('\n');
-  putch('\n');
-  putch('\n');
   va_end(ap);
   putstr(buf);
   return arg_cnt;
