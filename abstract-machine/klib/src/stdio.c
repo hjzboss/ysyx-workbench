@@ -6,8 +6,7 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
-static char* num2str(int num, int base) {
-  static char str[32];
+static void num2str(char* str, int num, int base) {
   char tmp[32];
   int len = 0;
   bool is_neg = false;
@@ -32,7 +31,6 @@ static char* num2str(int num, int base) {
     i++;
   }
   str[i] = '\0';
-  return str;
 }
 
 
@@ -52,7 +50,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   unsigned long ptr;
   int len;
   int arg_cnt = 0;
-  char* str;
+  char str[32];
   for (p = (char *)fmt; *p; p++) {
     if (*p != '%') {
       *out++ = *p;
@@ -88,7 +86,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'c':
       case 'd':
         ival = va_arg(ap, int);
-        str = num2str(ival, 10);
+        num2str(str, ival, 10);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
@@ -102,7 +100,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         break;
       case 'p':
         ptr = (unsigned long)va_arg(ap, void*);
-        str = num2str(ptr, 16);
+        num2str(str, ptr, 16);
         len = strlen(str);
         *out++ = '0';
         *out++ = 'x';
@@ -118,15 +116,15 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         break;
       case 'x':
         ival = va_arg(ap, int);
-        char *string = num2str(ival, 16);
-        len = strlen(string);
+        num2str(str, ival, 16);
+        len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
           for (int i = 0; i < rem; i++) *out++ = fix_ch;
         }
         // todo
-        strcpy(out, string);
+        strcpy(out, str);
         out += len;
         arg_cnt += len;
         break;
