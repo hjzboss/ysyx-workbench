@@ -99,7 +99,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         arg_cnt += len;
         break;
       case 'p':
-        ptr = (unsigned long)va_arg(ap, void*);
+        ptr = va_arg(ap, unsigned long);
         num2str(str, ptr, 16);
         len = strlen(str);
         *out++ = '0';
