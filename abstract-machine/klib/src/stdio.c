@@ -104,6 +104,8 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         ptr = va_arg(ap, long long);
         str = num2str(ptr, 16);
         len = strlen(str);
+        *out++ = '0';
+        *out++ = 'x';
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
