@@ -101,8 +101,8 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         arg_cnt += len;
         break;
       case 'p':
-        ptr = va_arg(ap, unsigned long int);
-        str = num2str(ptr, 10);
+        ptr = va_arg(ap, long long);
+        str = num2str(ptr, 16);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
