@@ -105,8 +105,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         *out++ = 'x';
         rem = 16 - len;
         if (rem > 0) {
-          fix_ch = fix_zero ? '0' : ' ';
-          for (int i = 0; i < rem; i++) *out++ = fix_ch;
+          for (int i = 0; i < rem; i++) *out++ = '0';
         }
         // todo
         strcpy(out, str);
