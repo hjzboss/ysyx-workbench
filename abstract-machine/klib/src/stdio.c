@@ -103,7 +103,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         len = strlen(str);
         *out++ = '0';
         *out++ = 'x';
-        rem = fix_num - len;
+        rem = 16 - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
           for (int i = 0; i < rem; i++) *out++ = fix_ch;
