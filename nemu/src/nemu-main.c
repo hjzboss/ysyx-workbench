@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   
   IFDEF(CONFIG_FTRACE, free_ftrace());
 
-  IFDEF(CONFIG_FTRACE, free_dtrace());
+  IFDEF(CONFIG_DTRACE, free_dtrace());
   
   return is_exit_status_bad();
 }
