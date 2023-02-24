@@ -199,6 +199,7 @@ static int find_func(paddr_t pc) {
     }
   }
   printf("0x%016x no funciton match!\n", pc);
+  print_ftrace(false);
   assert(0);
   return 0;
 }
