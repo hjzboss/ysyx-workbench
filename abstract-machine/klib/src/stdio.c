@@ -26,7 +26,7 @@ void num2str(char* str, uint64_t num, int base) {
   int i = is_neg ? 1 : 0;
   while (len-- > 0) {
     if (tmp[len] < 10) str[i] = tmp[len] + '0';
-    else str[i] = tmp[len] - 10 + 'a';
+    else str[i] = tmp[len] - 10 + 'A';
     i++;
   }
   str[i] = '\0';
