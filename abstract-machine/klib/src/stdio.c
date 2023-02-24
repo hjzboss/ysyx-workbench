@@ -12,12 +12,14 @@ char* num2str(int num, int base) {
   int len = 0;
   bool is_neg = false;
   if (num == 0) tmp[len++] = 0;
+  /*
   else if(num >> 31) {
     // 负数
     num = ((~num) + 1);
     str[0] = '-';
     is_neg = true;
   }
+  */
   else while (num) {
     tmp[len++] = num % base;
     num = num / base;
@@ -47,8 +49,10 @@ int printf(const char *fmt, ...) {
 int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
+  unsigned long int ptr;
   int len;
   int arg_cnt = 0;
+  char* str;
   for (p = (char *)fmt; *p; p++) {
     if (*p != '%') {
       *out++ = *p;
@@ -84,7 +88,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'c':
       case 'd':
         ival = va_arg(ap, int);
-        char *str = num2str(ival, 10);
+        str = num2str(ival, 10);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
@@ -97,6 +101,19 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         arg_cnt += len;
         break;
       case 'p':
+        ptr = va_arg(ap, unsigned long int);
+        str = num2str(ptr, 16);
+        len = strlen(str);
+        rem = fix_num - len;
+        if (rem > 0) {
+          fix_ch = fix_zero ? '0' : ' ';
+          for (int i = 0; i < rem; i++) *out++ = fix_ch;
+        }
+        // todo
+        strcpy(out, str);
+        out += len;
+        arg_cnt += len;
+        break;
       case 'x':
         ival = va_arg(ap, int);
         char *string = num2str(ival, 16);
