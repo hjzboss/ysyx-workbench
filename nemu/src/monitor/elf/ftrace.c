@@ -174,7 +174,7 @@ void init_elf(const char *file) {
       func_list[func_num].id = func_num;
       func_list[func_num].start_addr = sym->st_value;
       if (strcmp(name, "__am_asm_trap") == 0)
-        func_list[func_num].size = 150; // todo
+        func_list[func_num].size = 160; // todo
       else
         func_list[func_num].size = sym->st_size;
       strcpy(func_list[func_num].name, name);
