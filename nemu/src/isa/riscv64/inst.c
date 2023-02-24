@@ -44,6 +44,7 @@ static void decode_operand(Decode *s, int *dest, word_t *src1, word_t *src2, wor
   int rs1 = BITS(i, 19, 15);
   int rs2 = BITS(i, 24, 20);
   int srcCsr = BITS(i, 31, 20);
+  if (srcCsr == 0x341) printf("shit\n");
   *dest = rd;
   switch (type) {
     case TYPE_I: src1R();          immI(); break;

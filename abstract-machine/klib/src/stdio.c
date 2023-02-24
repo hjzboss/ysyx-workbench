@@ -12,14 +12,12 @@ char* num2str(int num, int base) {
   int len = 0;
   bool is_neg = false;
   if (num == 0) tmp[len++] = 0;
-  /*
   else if(num >> 31) {
     // 负数
     num = ((~num) + 1);
     str[0] = '-';
     is_neg = true;
   }
-  */
   else while (num) {
     tmp[len++] = num % base;
     num = num / base;
