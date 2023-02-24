@@ -17,8 +17,7 @@ void num2str(char* str, uint64_t num, int base) {
     num = ((~num) + 1);
     str[0] = '-';
     is_neg = true;
-  }
-  */
+  }*/
   else while (num) {
     tmp[len++] = num % base;
     num = num / base;
