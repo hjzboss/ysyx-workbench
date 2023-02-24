@@ -6,7 +6,7 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
-void num2str(char* str, int num, int base) {
+void num2str(char* str, uint64_t num, int base) {
   char tmp[32];
   int len = 0;
   bool is_neg = false;
