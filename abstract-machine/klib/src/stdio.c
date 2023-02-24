@@ -98,7 +98,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         break;
       case 'p':
       case 'x':
-        ival = va_arg(ap, unsigned);
+        ival = va_arg(ap, int);
         char *string = num2str(ival, 16);
         len = strlen(string);
         rem = fix_num - len;
