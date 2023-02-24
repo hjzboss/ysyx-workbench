@@ -49,7 +49,7 @@ int printf(const char *fmt, ...) {
 int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
-  unsigned long int ptr;
+  long long ptr;
   int len;
   int arg_cnt = 0;
   char* str;
