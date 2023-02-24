@@ -173,9 +173,10 @@ void init_elf(const char *file) {
       }
       func_list[func_num].id = func_num;
       func_list[func_num].start_addr = sym->st_value;
+      //if (name == "")
       func_list[func_num].size = sym->st_size;
       strcpy(func_list[func_num].name, name);
-      printf("%s\n", name);
+      printf("%s, %ld\n", name, sym->st_size);
       func_num++;
     }
     sym++;
