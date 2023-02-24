@@ -7,7 +7,7 @@
 
 
 char* num2str(int num, int base) {
-  static char str[16];
+  static char str[32];
   char tmp[32];
   int len = 0;
   bool is_neg = false;
