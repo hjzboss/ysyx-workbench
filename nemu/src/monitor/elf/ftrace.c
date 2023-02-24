@@ -5,6 +5,8 @@
 #ifdef CONFIG_FTRACE
 #define MAX_FUNC_NAME_WIDTH 50
 #define MAX_FUNC_NUM 5000
+#define ECALL 0x73
+#define MRET 0x30200073
 enum func_type {
   CALL, RET, OTHER
 };
@@ -209,6 +211,8 @@ static int find_func(paddr_t pc) {
 
 // check the function type
 static int check_func_type(uint32_t inst) {
+  if (inst == ECALL) return CALL;
+  if (inst == MRET) return RET;
   uint8_t op = inst & 0x07f;
   uint8_t rd = (inst >> 7) & 0x1f;
   uint8_t rs1 = (inst >> 15) & 0x1f;
