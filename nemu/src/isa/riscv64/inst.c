@@ -30,7 +30,7 @@ enum {
 
 #define src1R() do { *src1 = R(rs1); } while (0)
 #define src2R() do { *src2 = R(rs2); } while (0)
-#define csrR() do { if (srcCsr == 0x305) *csr = 1; else if (srcCsr == 0x341) *csr = 2; else if (srcCsr == 0x300) *csr = 3; } while (0);
+#define csrR() do { if (srcCsr == 0x305) *csr = 1; else if (srcCsr == 0x341) *csr = 2; else if (srcCsr == 0x342) *csr = 3; else if (srcCsr == 0x300) *csr = 0; } while (0);
 #define immI() do { *imm = SEXT(BITS(i, 31, 20), 12); } while(0)
 #define immU() do { *imm = SEXT(BITS(i, 31, 12), 20) << 12; } while(0)
 #define immS() do { *imm = (SEXT(BITS(i, 31, 25), 7) << 5) | BITS(i, 11, 7); } while(0)

@@ -32,6 +32,9 @@ static void restart() {
 
   /* The zero register is always 0. */
   cpu.gpr[0] = 0;
+
+  /*将mstatus初始化为0xa00001800*/
+  cpu.csr[0] = 0xa00001800;
 }
 
 void init_isa() {
