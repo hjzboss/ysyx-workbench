@@ -84,6 +84,8 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'c':
       case 'd':
         ival = va_arg(ap, int);
+        putch(ival);
+        putch('\n');
         char *str = num2str(ival, 10);
         len = strlen(str);
         rem = fix_num - len;
