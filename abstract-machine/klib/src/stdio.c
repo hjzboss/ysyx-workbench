@@ -49,7 +49,7 @@ int printf(const char *fmt, ...) {
 int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
-  long long ptr;
+  unsigned long ptr;
   int len;
   int arg_cnt = 0;
   char* str;
@@ -101,7 +101,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         arg_cnt += len;
         break;
       case 'p':
-        ptr = va_arg(ap, long long);
+        ptr = (unsigned long)va_arg(ap, void*);
         str = num2str(ptr, 16);
         len = strlen(str);
         *out++ = '0';
