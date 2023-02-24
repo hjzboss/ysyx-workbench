@@ -102,6 +102,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         break;
       case 'p':
         ptr = va_arg(ap, unsigned long int);
+        putch(ptr);
         str = num2str(ptr, 16);
         len = strlen(str);
         rem = fix_num - len;
