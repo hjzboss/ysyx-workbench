@@ -7,8 +7,8 @@
 
 
 char* num2str(int num, int base) {
-  static char str[32];
-  char tmp[32];
+  static char str[50];
+  char tmp[50];
   int len = 0;
   bool is_neg = false;
   if (num == 0) tmp[len++] = 0;
