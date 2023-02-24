@@ -50,7 +50,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   unsigned long ptr;
   int len;
   int arg_cnt = 0;
-  char str[32];
+  char str[32] = {};
   for (p = (char *)fmt; *p; p++) {
     if (*p != '%') {
       *out++ = *p;
