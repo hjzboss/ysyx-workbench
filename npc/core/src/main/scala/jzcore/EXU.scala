@@ -11,7 +11,7 @@ class EXU extends Module {
     val ctrl      = Flipped(new Ctrl)
     
     val regWrite  = new RFWriteIO
-    val csrWrite  = new csrWriteIO
+    val csrWrite  = new CsrWriteIO
     val redirect  = new RedirectIO
   })
   

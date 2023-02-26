@@ -45,7 +45,7 @@ class IDU extends Module with HasInstrType {
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
-  val csrRaddr = LookupTreeDefault(csr, 0.U(2.W), List(
+  val csrRaddr = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
     CsrId.mepc    -> CsrAddr.mepc,
