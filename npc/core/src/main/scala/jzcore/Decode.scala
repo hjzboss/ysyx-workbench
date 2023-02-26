@@ -99,19 +99,19 @@ object RegWrite {
 }
 
 object CsrId {
-  def mstatus = "h300"
-  def mtvec   = "h305"
-  def mepc    = "h341"
-  def mcause  = "h342"
+  def mstatus = "h300".U
+  def mtvec   = "h305".U
+  def mepc    = "h341".U
+  def mcause  = "h342".U
 
   def apply() = UInt(12.W)
 }
 
 object CsrAddr {
-  def mstatus = "b00"
-  def mtvec   = "b01"
-  def mepc    = "b10"
-  def mcause  = "b11"
+  def mstatus = "b00".U
+  def mtvec   = "b01".U
+  def mepc    = "b10".U
+  def mcause  = "b11".U
 
   def apply() = UInt(2.W)
 }
