@@ -53,7 +53,11 @@ class Alu extends Module {
     AluOp.srlw      -> (ZeroExt(opA(31, 0), 64) >> opB(4, 0)),
     AluOp.sraw      -> (SignExt(opA(31, 0), 64).asSInt() >> opB(4, 0)).asUInt(),
     AluOp.remw      -> (SignExt(opA(31, 0), 64).asSInt() % SignExt(opB(31, 0), 64).asSInt()).asUInt(),
-    AluOp.remuw     -> (ZeroExt(opA(31, 0), 64) % ZeroExt(opB(31, 0), 64))
+    AluOp.remuw     -> (ZeroExt(opA(31, 0), 64) % ZeroExt(opB(31, 0), 64)),
+
+    AluOp.csrrw     -> opB,
+    AluOp.csrrs     -> (opA | opB),
+    AluOp.csrrc     -> (opA & ~opB)
   ))
 
   val isOne = aluOut.asUInt() === 1.U(64.W)

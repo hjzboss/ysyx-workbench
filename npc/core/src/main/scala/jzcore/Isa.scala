@@ -76,6 +76,13 @@ object RV64IM extends HasInstrType {
   def SH      = BitPat("b???????_?????_?????_001_?????_0100011")
   def SB      = BitPat("b???????_?????_?????_000_?????_0100011")
 
+  def CSRRW   = BitPat("b???????_?????_?????_001_?????_1110011")
+  def CSRRS   = BitPat("b???????_?????_?????_010_?????_1110011")
+  def CSRRC   = BitPat("b???????_?????_?????_011_?????_1110011")
+  def CSRRWI  = BitPat("b???????_?????_?????_101_?????_1110011")
+  def CSRRSI  = BitPat("b???????_?????_?????_110_?????_1110011")
+  def CSRRCI  = BitPat("b???????_?????_?????_111_?????_1110011")
+
 
   val table = Array(
     ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add, LsType.nop, RegWrite.loadAlu, Wmask.nop),
@@ -143,6 +150,13 @@ object RV64IM extends HasInstrType {
     BLTU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bltu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     BGEU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bgeu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
+    CSRRW   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    CSRRS   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrs, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    CSRRC   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrc, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    CSRRWI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    CSRRSI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrs, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    CSRRCI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrc, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+
     SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sd, RegWrite.loadAlu, Wmask.double),
     SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sw, RegWrite.loadAlu, Wmask.word),
     SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sh, RegWrite.loadAlu, Wmask.half),
@@ -162,6 +176,15 @@ object RV64IM extends HasInstrType {
     SW      -> List(LsType.sw, false.B),
     SH      -> List(LsType.sh, false.B),
     SB      -> List(LsType.sb, false.B),
+  )
+
+  val csrTable = Array(
+    CSRRW   -> List(InstrZ, CsrOp.nul),
+    CSRRS   -> List(InstrZ, CsrOp.set),
+    CSRRC   -> List(InstrZ, CsrOp.clear),
+    CSRRWI  -> List(InstrZ, CsrOp.),
+    CSRRSI  -> List(InstrZ, ),
+    CSRRCI  -> List(InstrZ, ),
   )
   */
 }

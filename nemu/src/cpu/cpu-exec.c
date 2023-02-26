@@ -36,6 +36,7 @@ bool scan_wp();
 void scan_watchpoint(Decode*);
 IFDEF(CONFIG_MTRACE, void print_mtrace());
 
+// todo
 #ifdef CONFIG_ETRACE1
 typedef struct node {
   char cause[32];

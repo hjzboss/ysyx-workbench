@@ -8,6 +8,7 @@ class IDU extends Module with HasInstrType {
   val io = IO(new Bundle {
     val fetch     = Flipped(new InstrFetch)
     val regWrite  = Flipped(new RFWriteIO)
+    val csrWrite  = Flipped(new CSRWriteIO)
 
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
@@ -18,11 +19,13 @@ class IDU extends Module with HasInstrType {
   })
 
   val rf        = Module(new RF)
+  val csrReg    = Module(new CsrReg)
   val inst      = io.fetch.inst
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)
   val rd        = inst(11, 7)
+  val csr       = inst(31, 20)
 
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val instrtype = ctrlList(0)
@@ -33,12 +36,20 @@ class IDU extends Module with HasInstrType {
   val loadMem   = ctrlList(5)
   val wmask     = ctrlList(6)
   val imm = LookupTree(instrtype, List(
+    InstrZ    -> ZeroExt(inst(19, 15), 64),
     InstrI    -> SignExt(inst(31, 20), 64),
     InstrIJ   -> SignExt(inst(31, 20), 64),
     InstrS    -> SignExt(Cat(inst(31, 25), inst(11, 7)), 64),
     InstrB    -> SignExt(Cat(inst(31), inst(7), inst(30, 25), inst(11, 8), 0.U(1.W)), 64),
     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
+  ))
+
+  val csrRaddr = LookupTreeDefault(csr, 0.U(2.W), List(
+    CsrId.mstatus -> CsrAddr.mstatus,
+    CsrId.mtvec   -> CsrAddr.mtvec,
+    CsrId.mepc    -> CsrAddr.mepc,
+    CsrId.mcause  -> CsrAddr.mcause
   ))
 
 /*
@@ -56,9 +67,14 @@ class IDU extends Module with HasInstrType {
   rf.io.clock         := clock
   rf.io.reset         := reset
 
+  csrReg.io.raddr     := csrRaddr
+  csrReg.io.waddr     := io.csrWrite.waddr
+  csrReg.io.wen       := io.csrWrite.wen
+  csrReg.io.wdata     := io.csrWrite.wdata
+
   io.datasrc.pc       := io.fetch.pc
   io.datasrc.src1     := rf.io.src1
-  io.datasrc.src2     := rf.io.src2
+  io.datasrc.src2     := Mux(instrtype === InstrZ, csrReg.io.csrSrc, rf.io.src2)
   io.datasrc.imm      := imm
 
   io.ctrl.rd          := rd
@@ -69,6 +85,8 @@ class IDU extends Module with HasInstrType {
   io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
+  io.ctrl.isCsr       := instrtype === InstrZ
+  io.ctrl.csrWaddr    := csrRaddr
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
