@@ -42,7 +42,7 @@ typedef struct {
   IFDEF(CONFIG_ITRACE, char logbuf[128]);
 } CPUState;
 
-extern CPUState cpu;
+extern CPUState npc_cpu;
 
 #define FMT_WORD "0x%016lx"
 

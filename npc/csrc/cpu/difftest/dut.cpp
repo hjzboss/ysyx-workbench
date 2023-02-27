@@ -25,10 +25,10 @@ static void checkregs(NEMUCPUState *ref) {
   int list_len = 34 + CSR_NUM;
   bool err_list[list_len] = {};
   // check next pc
-  if(ref->pc != cpu.pc) {
+  if(ref->pc != npc_cpu.pc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
     log_write("ref pc: 0x%016lx\n", ref->pc);
-    log_write("dut pc: 0x%016lx\n", cpu.pc);
+    log_write("dut pc: 0x%016lx\n", npc_cpu.pc);
     same = false;
     err_list[33] = true;
   }
@@ -59,7 +59,7 @@ static void checkregs(NEMUCPUState *ref) {
     // print all dut regs when error
     isa_reg_display(err_list);
     npc_state.state = NPC_ABORT;
-    npc_state.halt_pc = cpu.pc;
+    npc_state.halt_pc = npc_cpu.pc;
   }
 }
 
@@ -94,7 +94,7 @@ void init_difftest(char *ref_so_file, long img_size) {
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
-  ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+  ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
 }
 
 void difftest_step() {
@@ -111,10 +111,12 @@ void difftest_step() {
     }
 
     
-    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+    ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
   }
+
+  // todo: 执行ref_difftest_exec过后，cpu.pc就变了
 
   // ref execute once
   ref_difftest_exec(1);
