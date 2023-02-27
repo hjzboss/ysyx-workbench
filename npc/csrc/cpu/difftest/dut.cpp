@@ -15,6 +15,7 @@ uint8_t* guest_to_host(uint64_t paddr);
 uint64_t host_to_guest(uint8_t *haddr);
 
 void difftest_skip_ref() {
+  printf("shit\n");
   is_skip_ref = true;
 }
 
