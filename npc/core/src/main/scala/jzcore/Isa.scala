@@ -196,6 +196,6 @@ object RV64IM extends HasInstrType {
 
 object Instruction extends HasInstrType {
   def NOP = 0x00000013.U
-  val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul, LsType.nop, RegWrite.loadAlu, Wmask.nop)
+  val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul)
   val LsDefault     = List(LsType.nop, Wmask.nop, RegWrite.loadAlu)
 }
