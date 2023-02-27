@@ -239,6 +239,7 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
+  printf("%lx, %lx\n", cpu.pc, top->io_pc);
   cpu.pc = top->io_pc;
   cpu.npc = top->io_nextPc;
   cpu.inst = paddr_read(cpu.pc, 4);
