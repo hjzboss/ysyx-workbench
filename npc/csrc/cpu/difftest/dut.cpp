@@ -115,7 +115,7 @@ void difftest_step() {
     is_skip_ref = false;
     return;
   }
-
+  printf("%lx\n", cpu.pc);
   // ref execute once
   ref_difftest_exec(1);
   printf("%lx\n", cpu.pc);
