@@ -71,6 +71,8 @@ class IDU extends Module with HasInstrType {
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
+  csrReg.io.clock     := clock
+  csrReg.io.reset     := reset              
 
   io.datasrc.pc       := io.fetch.pc
   io.datasrc.src1     := rf.io.src1
