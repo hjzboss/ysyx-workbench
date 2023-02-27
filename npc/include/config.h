@@ -1,7 +1,7 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
-//#define CONFIG_WAVE 1 // 启动波形仿真
+#define CONFIG_WAVE 1 // 启动波形仿真
 
 #define CSR_NUM 4
 

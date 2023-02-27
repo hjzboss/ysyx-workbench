@@ -24,7 +24,6 @@ static void checkregs(NEMUCPUState *ref) {
   bool same = true;
   int list_len = 34 + CSR_NUM;
   bool err_list[list_len] = {};
-  printf("%lx, %lx\n", ref->pc, cpu.pc);
   // check next pc
   if(ref->pc != cpu.pc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
