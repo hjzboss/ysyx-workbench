@@ -263,8 +263,8 @@ static void cpu_exec_once() {
 
   insert_iringbuf();
 #endif
-  printf("pc=%d\n", cpu.pc);
-  printf("pc=%d\n", top->io_pc);
+  printf("pc=%lx\n", cpu.pc);
+  printf("pc=%lx\n", top->io_pc);
 
 #ifdef CONFIG_FTRACE
   ftrace(cpu.pc, cpu.inst, cpu.npc);
