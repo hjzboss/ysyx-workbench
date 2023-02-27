@@ -103,11 +103,11 @@ void difftest_step() {
   if (is_skip_ref) {
     
     for (int i = 0; i < 32; i++) {
-      cpu.gpr[i] = cpu_gpr[i];
+      npc_cpu.gpr[i] = cpu_gpr[i];
     }
 
     for (int i = 0; i < CSR_NUM; i++) {
-      cpu.csr[i] = cpu_csr[i];
+      npc_cpu.csr[i] = cpu_csr[i];
     }
 
     

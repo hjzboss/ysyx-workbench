@@ -9,7 +9,7 @@ uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; 
 
 static void out_of_bound(uint64_t addr) {
   panic("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD,
-      addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
+      addr, PMEM_LEFT, PMEM_RIGHT, npc_cpu.pc);
 }
 
 #ifdef CONFIG_MTRACE
