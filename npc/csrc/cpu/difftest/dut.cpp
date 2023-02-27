@@ -100,17 +100,22 @@ void init_difftest(char *ref_so_file, long img_size) {
 void difftest_step() {
   NEMUCPUState ref_r;
 
-  /*
   if (is_skip_ref) {
-    // to skip the checking of an instruction, just copy the reg state to reference design
-    // next pc
-    memcpy(&cpu_diff, &cpu, 32 * sizeof(cpu_diff.gpr[0]));
-    cpu_diff.pc = cpu.npc;
-    ref_difftest_regcpy(&cpu_diff., DIFFTEST_TO_REF);
+    
+    for (int i = 0; i < 32; i++) {
+      cpu.gpr[i] = cpu_gpr[i];
+    }
+
+    for (int i = 0; i < CSR_NUM; i++) {
+      cpu.csr[i] = cpu_csr[i];
+    }
+
+    
+    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
   }
-  */
+
   // ref execute once
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);

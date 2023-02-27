@@ -20,7 +20,10 @@ CPUState cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
 IFDEF(CONFIG_DTRACE, void free_dtrace());
-IFDEF(CONFIG_DIFFTEST, void difftest_step());
+#ifdef CONFIG_DIFFTEST
+void difftest_skip_ref();
+void difftest_step();
+#endif
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -73,7 +76,7 @@ double sc_time_stamp () {
 
 
 // todo: watchpoint
-static void trace_and_difftest(uint64_t dnpc) {
+static void trace_and_difftest() {
   IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step());
@@ -236,7 +239,7 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  cpu.pc = top->io_pc;
+  cpu.pc = 1;
   cpu.npc = top->io_nextPc;
   cpu.inst = paddr_read(cpu.pc, 4);
   isa_exec_once();
@@ -268,11 +271,10 @@ static void cpu_exec_once() {
 
 void execute(uint64_t n) {
   while (n--) {
-    // todo
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
-    trace_and_difftest(cpu.npc);
+    trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     //IFDEF(CONFIG_DEVICE, device_update());
   }
