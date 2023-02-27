@@ -72,7 +72,7 @@ class EXU extends Module {
 
   // ecall mret
   io.redirect.brAddr   := Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
-  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType == System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 
   // csr
   io.csrWrite.waddr    := io.ctrl.csrWaddr

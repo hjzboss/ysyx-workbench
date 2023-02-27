@@ -182,9 +182,9 @@ object RV64IM extends HasInstrType {
   )
 
   val systemCtrl = Array(
-    ECALL   -> System.ecall,
-    MRET    -> System.mret,
-    EBREAK  -> System.ebreak,
+    ECALL   -> List(System.ecall),
+    MRET    -> List(System.mret),
+    EBREAK  -> List(System.ebreak),
   )
 
 /*

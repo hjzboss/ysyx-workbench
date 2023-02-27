@@ -53,7 +53,7 @@ class IDU extends Module with HasInstrType {
     CsrId.mcause  -> CsrAddr.mcause
   ))
 
-  val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)
+  val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
