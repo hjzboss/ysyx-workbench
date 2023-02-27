@@ -9,10 +9,10 @@ class CsrReg extends BlackBox {
     val clock   = Input(Clock())
     val reset   = Input(Bool())
 
-    val raddr   = Input(UInt(3.W))
+    val raddr   = Input(UInt(2.W))
     val csrSrc  = Output(UInt(64.W))
 
-    val waddr   = Input(UInt(3.W))
+    val waddr   = Input(UInt(2.W))
     val wen     = Input(Bool())
     val wdata   = Input(UInt(64.W))
   })
