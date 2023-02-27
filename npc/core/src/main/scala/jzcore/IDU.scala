@@ -76,7 +76,7 @@ class IDU extends Module with HasInstrType {
   csrReg.io.no        := io.csrWrite.no
 
   io.datasrc.pc       := io.fetch.pc
-  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
