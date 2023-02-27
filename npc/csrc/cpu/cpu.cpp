@@ -79,6 +79,7 @@ double sc_time_stamp () {
 static void trace_and_difftest() {
   IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
+  printf("%lx\n", cpu.pc);
   IFDEF(CONFIG_DIFFTEST, difftest_step());
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
@@ -263,8 +264,6 @@ static void cpu_exec_once() {
 
   insert_iringbuf();
 #endif
-  printf("pc=%lx\n", cpu.pc);
-  printf("pc=%lx\n", top->io_pc);
 
 #ifdef CONFIG_FTRACE
   ftrace(cpu.pc, cpu.inst, cpu.npc);
