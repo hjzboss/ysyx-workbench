@@ -101,7 +101,7 @@ object RV64IM extends HasInstrType {
     MULH    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.mulh),
     DIV     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.div),
     DIVU    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.divu),
-    REM     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remp),
+    REM     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.rem),
     REMU    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.remu),
 
     ADDW    -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.addw),
