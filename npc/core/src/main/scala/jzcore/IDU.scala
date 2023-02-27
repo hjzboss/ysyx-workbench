@@ -53,6 +53,7 @@ class IDU extends Module with HasInstrType {
     CsrId.mcause  -> CsrAddr.mcause
   ))
 
+  val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
@@ -62,17 +63,21 @@ class IDU extends Module with HasInstrType {
   rf.io.wdata         := io.regWrite.value
   rf.io.clock         := clock
   rf.io.reset         := reset
-
-  csrReg.io.raddr     := csrRaddr
+  
+  csrReg.io.raddr     := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
   csrReg.io.clock     := clock
-  csrReg.io.reset     := reset              
+  csrReg.io.reset     := reset
+  // exception
+  csrReg.io.exception := io.csrWrite.exception
+  csrReg.io.epc       := io.csrWrite.epc
+  csrReg.io.no        := io.csrWrite.no
 
   io.datasrc.pc       := io.fetch.pc
-  io.datasrc.src1     := rf.io.src1
-  io.datasrc.src2     := Mux(instrtype === InstrZ, csrReg.io.csrSrc, rf.io.src2)
+  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
   io.ctrl.rd          := rd
@@ -85,13 +90,11 @@ class IDU extends Module with HasInstrType {
   io.ctrl.wmask       := wmask
   io.ctrl.isCsr       := instrtype === InstrZ
   io.ctrl.csrWaddr    := csrRaddr
+  io.ctrl.sysInsType  := systemCtrl
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
-
-  // ebreak, todo
-  io.ctrl.break       := instrtype === InstrD
 
   io.lsType           := lsType
 }

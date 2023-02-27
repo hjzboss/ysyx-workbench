@@ -67,16 +67,23 @@ class EXU extends Module {
   io.regWrite.value    := Mux(io.ctrl.loadMem, lsuOut, Mux(io.ctrl.isCsr, opBPre, aluOut))
 
   // todo: branch addr
-  val brAddrOpA = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
-  io.redirect.brAddr   := brAddrOpA + io.datasrc.imm
-  io.redirect.valid    := Mux(io.ctrl.br && alu.io.brMark, true.B, false.B)
+  val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
+  val brAddr            = brAddrOpA + io.datasrc.imm
+
+  // ecall mret
+  io.redirect.brAddr   := Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType == System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 
   // csr
   io.csrWrite.waddr    := io.ctrl.csrWaddr
   io.csrWrite.wdata    := aluOut
   io.csrWrite.wen      := io.ctrl.isCsr
+  // exception
+  io.csrWrite.exception:= io.ctrl.sysInsType === System.ecall
+  io.csrWrite.epc      := io.datasrc.pc
+  io.csrWrite.no       := Mux(io.ctrl.sysInsType === System.ecall, "hb".U, 0.U)
 
   // ebreak
-  stop.io.valid        := Mux(io.ctrl.break, true.B, false.B)
+  stop.io.valid        := Mux(io.ctrl.sysInsType === System.ebreak, true.B, false.B)
   stop.io.haltRet      := io.datasrc.src1
 }

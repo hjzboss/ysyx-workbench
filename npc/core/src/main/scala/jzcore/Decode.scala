@@ -116,6 +116,15 @@ object CsrAddr {
   def apply() = UInt(2.W)
 }
 
+object System {
+  def ebreak = "b00".U
+  def mret   = "b01".U
+  def ecall  = "b10".U
+  def nop    = "b11".U
+
+  def apply() = UInt(2.W)
+}
+
 trait HasInstrType {
   def InstrN  = "b0000".U
   def InstrI  = "b0100".U

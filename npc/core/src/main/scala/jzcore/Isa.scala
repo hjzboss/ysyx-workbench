@@ -137,11 +137,6 @@ object RV64IM extends HasInstrType {
     SRLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srlw),
     SRAIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sraw),
 
-    // todo: ecall and mret
-    ECALL   -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
-    MRET    -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
-    EBREAK  -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
-
     AUIPC   -> List(InstrU, SrcType.pc, SrcType.imm, AluOp.add),
     LUI     -> List(InstrU, SrcType.nul, SrcType.imm, AluOp.add),
 
@@ -154,6 +149,10 @@ object RV64IM extends HasInstrType {
     BGE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bge),
     BLTU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bltu),
     BGEU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bgeu),
+
+    ECALL   -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
+    MRET    -> List(InstrD, SrcType.reg, SrcType.plus4, AluOp.add),
+    EBREAK  -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
 
     CSRRW   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrw),
     CSRRS   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrs),
@@ -182,6 +181,12 @@ object RV64IM extends HasInstrType {
     SB      -> List(LsType.sb, Wmask.byte, RegWrite.loadAlu),
   )
 
+  val systemCtrl = Array(
+    ECALL   -> System.ecall,
+    MRET    -> System.mret,
+    EBREAK  -> System.ebreak,
+  )
+
 /*
   val csrTable = Array(
     CSRRW   -> List(InstrZ, CsrOp.nul),
@@ -198,4 +203,5 @@ object Instruction extends HasInstrType {
   def NOP = 0x00000013.U
   val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul)
   val LsDefault     = List(LsType.nop, Wmask.nop, RegWrite.loadAlu)
+  val SystemDefault = List(System.nop)
 }

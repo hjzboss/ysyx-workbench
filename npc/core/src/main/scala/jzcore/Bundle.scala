@@ -14,9 +14,12 @@ class RFWriteIO extends Bundle {
 }
 
 class CSRWriteIO extends Bundle {
-  val wen   = Output(Bool())
-  val waddr = Output(UInt(2.W))
-  val wdata = Output(UInt(64.W))
+  val wen       = Output(Bool())
+  val waddr     = Output(UInt(2.W))
+  val wdata     = Output(UInt(64.W))
+  val exception = Output(Bool())
+  val epc       = Output(UInt(64.W))
+  val no        = Output(UInt(4.W))
 }
 
 class DataSrcIO extends Bundle {
@@ -36,7 +39,6 @@ class Ctrl extends Bundle {
   val br            = Output(Bool())
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
-  val break         = Output(Bool())
   val isJalr        = Output(Bool())
   val lsType        = Output(UInt(4.W))
   val wdata         = Output(UInt(64.W))
@@ -44,6 +46,7 @@ class Ctrl extends Bundle {
   val wmask         = Output(UInt(8.W))
   val isCsr         = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
+  val sysInsType    = Output(UInt(2.W))
 }
 
 class InstrFetch extends Bundle {
