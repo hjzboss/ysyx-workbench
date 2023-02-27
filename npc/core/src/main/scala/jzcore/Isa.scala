@@ -56,6 +56,8 @@ object RV64IM extends HasInstrType {
   def SRLIW   = BitPat("b0000000_?????_?????_101_?????_0011011")
   def SRAIW   = BitPat("b0100000_?????_?????_101_?????_0011011")
 
+  def ECALL   = BitPat("b0000000_00000_00000_000_00000_1110011")
+  def MRET    = BitPat("b0011000_00010_00000_000_00000_1110011") // mepc + 4
   def EBREAK  = BitPat("b0000000_00001_00000_000_00000_1110011")
 
   def AUIPC   = BitPat("b???????_?????_?????_???_?????_0010111")
@@ -135,6 +137,9 @@ object RV64IM extends HasInstrType {
     SRLIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.srlw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     SRAIW   -> List(InstrI, SrcType.reg, SrcType.imm, AluOp.sraw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
+    // todo: ecall and mret
+    ECALL   -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    MRET    -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     EBREAK  -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
     AUIPC   -> List(InstrU, SrcType.pc, SrcType.imm, AluOp.add, LsType.nop, RegWrite.loadAlu, Wmask.nop),
@@ -143,41 +148,41 @@ object RV64IM extends HasInstrType {
     JAL     -> List(InstrJ, SrcType.pc, SrcType.plus4, AluOp.jump, LsType.nop, RegWrite.loadAlu, Wmask.nop),
     JALR    -> List(InstrIJ, SrcType.pc, SrcType.plus4, AluOp.jump, LsType.nop, RegWrite.loadAlu, Wmask.nop),
 
-    BEQ     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.beq, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BNE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bne, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BLT     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.blt, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BGE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bge, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BLTU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bltu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    BGEU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bgeu, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    BEQ     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.beq),
+    BNE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bne),
+    BLT     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.blt),
+    BGE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bge),
+    BLTU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bltu),
+    BGEU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bgeu),
 
-    CSRRW   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    CSRRS   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrs, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    CSRRC   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrc, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    CSRRWI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrw, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    CSRRSI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrs, LsType.nop, RegWrite.loadAlu, Wmask.nop),
-    CSRRCI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrc, LsType.nop, RegWrite.loadAlu, Wmask.nop),
+    CSRRW   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrw),
+    CSRRS   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrs),
+    CSRRC   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrc),
+    CSRRWI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrw),
+    CSRRSI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrs),
+    CSRRCI  -> List(InstrZ, SrcType.reg, SrcType.imm, AluOp.csrrc),
 
-    SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sd, RegWrite.loadAlu, Wmask.double),
-    SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sw, RegWrite.loadAlu, Wmask.word),
-    SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sh, RegWrite.loadAlu, Wmask.half),
-    SB      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add, LsType.sb, RegWrite.loadAlu, Wmask.byte),
+    SD      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+    SB      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+  )
+
+  val lsTypeTable = Array(
+    LD      -> List(LsType.ld, Wmask.nop, RegWrite.loadMem),
+    LW      -> List(LsType.lw, Wmask.nop, RegWrite.loadMem),
+    LH      -> List(LsType.lh, Wmask.nop, RegWrite.loadMem),
+    LB      -> List(LsType.lb, Wmask.nop, RegWrite.loadMem),
+    LBU     -> List(LsType.lbu, Wmask.nop, RegWrite.loadMem),
+    LHU     -> List(LsType.lhu, Wmask.nop, RegWrite.loadMem),
+
+    SD      -> List(LsType.sd, Wmask.double, RegWrite.loadAlu),
+    SW      -> List(LsType.sw, Wmask.word, RegWrite.loadAlu),
+    SH      -> List(LsType.sh, Wmask.half, RegWrite.loadAlu),
+    SB      -> List(LsType.sb, Wmask.byte, RegWrite.loadAlu),
   )
 
 /*
-  val lsTable = Array(
-    LD      -> List(LsType.ld, true.B),
-    LW      -> List(LsType.lw, true.B),
-    LH      -> List(LsType.lh, true.B),
-    LB      -> List(LsType.lb, true.B),
-    LBU     -> List(LsType.lbu, true.B),
-    LHU     -> List(LsType.lhu, true.B),
-
-    SD      -> List(LsType.sd, false.B),
-    SW      -> List(LsType.sw, false.B),
-    SH      -> List(LsType.sh, false.B),
-    SB      -> List(LsType.sb, false.B),
-  )
-
   val csrTable = Array(
     CSRRW   -> List(InstrZ, CsrOp.nul),
     CSRRS   -> List(InstrZ, CsrOp.set),
@@ -192,5 +197,5 @@ object RV64IM extends HasInstrType {
 object Instruction extends HasInstrType {
   def NOP = 0x00000013.U
   val DecodeDefault = List(InstrN, AluOp.nop, SrcType.nul, SrcType.nul, LsType.nop, RegWrite.loadAlu, Wmask.nop)
-  //val LsDefault     = List(LsType.nop, false.B)
+  val LsDefault     = List(LsType.nop, Wmask.nop, RegWrite.loadAlu)
 }

@@ -18,7 +18,7 @@
 #include <difftest-def.h>
 #include <memory/paddr.h>
 
-#define REG_SIZE 264
+#define REG_SIZE (264 + (8 * CSR_NUM))
 
 void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
   if(direction == DIFFTEST_TO_REF) {

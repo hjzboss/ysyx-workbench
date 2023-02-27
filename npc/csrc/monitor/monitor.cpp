@@ -119,6 +119,8 @@ void init_monitor(int argc, char *argv[]) {
 
   IFDEF(CONFIG_ITRACE, init_iringbuf());
 
+  
+
   /* Display welcome message. */
   welcome();
 }

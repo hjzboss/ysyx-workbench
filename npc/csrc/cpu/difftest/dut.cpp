@@ -5,24 +5,25 @@
 #ifdef CONFIG_DIFFTEST
 
 extern const char *regs[];
+extern const char *csrs[];
 extern uint64_t *cpu_gpr;
+extern uint64_t *cpu_csr;
 
 static bool is_skip_ref = false;
 void isa_reg_display(bool *);
 uint8_t* guest_to_host(uint64_t paddr);
 uint64_t host_to_guest(uint8_t *haddr);
 
-/*
 void difftest_skip_ref() {
   is_skip_ref = true;
 }
-*/
 
 NEMUCPUState cpu_diff = {};
 
 static void checkregs(NEMUCPUState *ref) {
   bool same = true;
-  bool err_list[34] = {};
+  int list_len = 34 + CSR_NUM;
+  bool err_list[list_len] = {};
   // check next pc
   if(ref->pc != cpu.pc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
@@ -40,6 +41,17 @@ static void checkregs(NEMUCPUState *ref) {
       log_write("dut %s: 0x%016lx\n", regs[i], cpu_gpr[i]);
       same = false;
       err_list[i] = true;
+    }
+  }
+
+  // check csr
+  for(int i = 0; i < CSR_NUM; i++) {
+    if(ref->csr[i] != cpu_csr[i]) {
+      log_write(ANSI_FMT("csr[%d] %s error: \n", ANSI_FG_RED), i, csrs[i]);
+      log_write("ref %s: 0x%016lx\n", csrs[i], ref->csr[i]);
+      log_write("dut %s: 0x%016lx\n", csrs[i], cpu_csr[i]);
+      same = false;
+      err_list[i+34] = true;
     }
   }
 
@@ -83,7 +95,6 @@ void init_difftest(char *ref_so_file, long img_size) {
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
   ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-  //printf("init_pc=%016lx\n", cpu.pc);
 }
 
 void difftest_step() {

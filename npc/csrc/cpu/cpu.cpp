@@ -19,6 +19,7 @@ static struct timeval boot_time = {};
 CPUState cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
+IFDEF(CONFIG_DTRACE, void free_dtrace());
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -207,6 +208,9 @@ long init_cpu(char *dir) {
   // state is running
   npc_state.state = NPC_RUNNING;
 
+  // initial mstatus
+  cpu.csr[0] = 0xa00001800;
+
   return size;
 }
 
@@ -224,6 +228,7 @@ void delete_cpu() {
 
   IFDEF(CONFIG_FTRACE, free_ftrace());
   IFDEF(CONFIG_MTRACE, free_mtrace());
+  IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
 static void isa_exec_once() {

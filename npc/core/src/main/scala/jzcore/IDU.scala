@@ -28,13 +28,14 @@ class IDU extends Module with HasInstrType {
   val csr       = inst(31, 20)
 
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
+  val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
   val instrtype = ctrlList(0)
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = ctrlList(4)
-  val loadMem   = ctrlList(5)
-  val wmask     = ctrlList(6)
+  val lsType    = lsctrl(0)
+  val loadMem   = lsctrl(2)
+  val wmask     = lsctrl(1)
   val imm = LookupTree(instrtype, List(
     InstrZ    -> ZeroExt(inst(19, 15), 64),
     InstrI    -> SignExt(inst(31, 20), 64),
@@ -52,11 +53,6 @@ class IDU extends Module with HasInstrType {
     CsrId.mcause  -> CsrAddr.mcause
   ))
 
-/*
-  val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTable)
-  val lsType       = lsList(0)
-  val loadMem      = lsList(1)
-  */
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
@@ -94,7 +90,7 @@ class IDU extends Module with HasInstrType {
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
 
-  // ebreak
+  // ebreak, todo
   io.ctrl.break       := instrtype === InstrD
 
   io.lsType           := lsType

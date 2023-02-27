@@ -14,6 +14,7 @@ extern void (*ref_difftest_raise_intr)(uint64_t NO);
 
 typedef struct {
   uint64_t gpr[32];
+  uint64_t csr[CSR_NUM];
   uint64_t pc;
 } NEMUCPUState;
 
