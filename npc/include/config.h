@@ -6,7 +6,7 @@
 #define CSR_NUM 4
 
 #define MAX_SIM_TIME 1000 // max simulation time
-#define CONFIG_TRACE 1
+//#define CONFIG_TRACE 1
 #define CONFIG_MBASE 0x80000000
 #define CONFIG_MSIZE 0x8000000
 #define CONFIG_ITRACE 1
