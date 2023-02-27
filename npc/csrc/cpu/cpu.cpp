@@ -20,13 +20,12 @@ CPUState cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
 IFDEF(CONFIG_DTRACE, void free_dtrace());
+IFDEF(CONFIG_DIFFTEST, void difftest_step());
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
 static char* iringbuf[MAX_INST_TO_PRINT] = {};
 static int iring_ptr = -1;
-
-IFDEF(CONFIG_DIFFTEST, void difftest_step());
 
 void init_iringbuf() {
   for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
