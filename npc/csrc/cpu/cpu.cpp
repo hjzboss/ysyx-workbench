@@ -239,7 +239,7 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  cpu.pc = 1;
+  cpu.pc = 0x80000000;
   cpu.npc = top->io_nextPc;
   cpu.inst = paddr_read(cpu.pc, 4);
   isa_exec_once();
