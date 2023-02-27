@@ -239,13 +239,14 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  npc_cpu.pc = top->io_pc;
+  uint64_t pc = top->io_pc;
   npc_cpu.npc = top->io_nextPc;
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
+  npc_cpu.pc = top->io_pc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
-  p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", npc_cpu.pc);
+  p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
   int ilen = 4;
   int i;
   uint8_t *inst = (uint8_t *)&npc_cpu.inst;
@@ -259,13 +260,13 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, npc_cpu.logbuf + sizeof(npc_cpu.logbuf) - p, npc_cpu.pc, (uint8_t *)&npc_cpu.inst, ilen);
+  disassemble(p, npc_cpu.logbuf + sizeof(npc_cpu.logbuf) - p, pc, (uint8_t *)&npc_cpu.inst, ilen);
 
   insert_iringbuf();
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(npc_cpu.pc, npc_cpu.inst, npc_cpu.npc);
+  ftrace(pc, npc_cpu.inst, npc_cpu.npc);
 #endif
 }
 
