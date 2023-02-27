@@ -106,6 +106,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
+    IFDEF(CONFIG_DIFFTEST, difftest_skip_ref());
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
       gettimeofday(&boot_time, NULL);
@@ -131,6 +132,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0 || waddr < 0x80000000ull) return;
   if (waddr == CONFIG_SERIAL_MMIO) {
+    IFDEF(CONFIG_DIFFTEST, difftest_skip_ref());
     // uart
     putchar(wdata);
     return;
@@ -239,11 +241,10 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  uint64_t pc = top->io_pc;
-  npc_cpu.npc = top->io_nextPc;
+  uint64_t pc = top->io_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
-  npc_cpu.pc = top->io_pc;
+  npc_cpu.pc = top->io_pc; // 执行后的pc
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
@@ -266,7 +267,7 @@ static void cpu_exec_once() {
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(pc, npc_cpu.inst, npc_cpu.npc);
+  ftrace(pc, npc_cpu.inst, npc_cpu.pc);
 #endif
 }
 

@@ -110,13 +110,12 @@ void difftest_step() {
       npc_cpu.csr[i] = cpu_csr[i];
     }
 
-    
     ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
   }
 
-  // todo: 执行ref_difftest_exec过后，cpu.pc就变了
+  // todo: 执行ref_difftest_exec过后，cpu.pc就变了，原因是引用到了nemu中的cpu结构体了。。。。。
 
   // ref execute once
   ref_difftest_exec(1);
