@@ -208,7 +208,7 @@ long init_cpu(char *dir) {
   npc_state.state = NPC_RUNNING;
 
   // initial mstatus
-  cpu.csr[0] = 0xa00001800;
+  IFDEF(CONFIG_DIFFTEST, cpu.csr[0] = 0xa00001800);
 
   return size;
 }
