@@ -15,7 +15,6 @@ uint8_t* guest_to_host(uint64_t paddr);
 uint64_t host_to_guest(uint8_t *haddr);
 
 void difftest_skip_ref() {
-  printf("shit\n");
   is_skip_ref = true;
 }
 
@@ -102,15 +101,13 @@ void difftest_step() {
   NEMUCPUState ref_r;
 
   if (is_skip_ref) {
-    
+    // 只复制寄存器信息，不执行指令
     for (int i = 0; i < 32; i++) {
       npc_cpu.gpr[i] = cpu_gpr[i];
     }
-
     for (int i = 0; i < CSR_NUM; i++) {
       npc_cpu.csr[i] = cpu_csr[i];
     }
-
     ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;

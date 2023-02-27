@@ -16,6 +16,8 @@ uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 static struct timeval boot_time = {};
 
+IFDEF(CONFIG_DEVICE, static bool use_device = false;)
+
 CPUState npc_cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
@@ -106,7 +108,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
-    IFDEF(CONFIG_DIFFTEST, difftest_skip_ref());
+    use_device = true;
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
       gettimeofday(&boot_time, NULL);
@@ -132,7 +134,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0 || waddr < 0x80000000ull) return;
   if (waddr == CONFIG_SERIAL_MMIO) {
-    IFDEF(CONFIG_DIFFTEST, difftest_skip_ref());
+    use_device = true;
     // uart
     putchar(wdata);
     return;
@@ -245,6 +247,10 @@ static void cpu_exec_once() {
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
   npc_cpu.pc = top->io_pc; // 执行后的pc
+  if (use_device) {
+    difftest_skip_ref();
+    use_device = false;
+  }
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
