@@ -19,7 +19,7 @@ class Alu extends Module {
   val aluOp = io.aluOp
 
   val aluOut = LookupTree(io.aluOp, List(
-    AluOp.add       -> (opA - opB),
+    AluOp.add       -> (opA + opB),
     AluOp.jump      -> (opA + opB),
     AluOp.sub       -> (opA - opB),
     AluOp.beq       -> Mux(opA === opB, 1.U(64.W), 0.U(64.W)),
