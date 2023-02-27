@@ -5,6 +5,8 @@
 #ifdef CONFIG_FTRACE
 #define MAX_FUNC_NAME_WIDTH 50
 #define MAX_FUNC_NUM 5000
+#define ECALL 0x73
+#define MRET 0x30200073
 enum func_type {
   CALL, RET, OTHER
 };
@@ -173,7 +175,10 @@ void init_elf(const char *file) {
       }
       func_list[func_num].id = func_num;
       func_list[func_num].start_addr = sym->st_value;
-      func_list[func_num].size = sym->st_size;
+      if (strcmp(name, "__am_asm_trap") == 0)
+        func_list[func_num].size = 312; // todo
+      else
+        func_list[func_num].size = sym->st_size;
       strcpy(func_list[func_num].name, name);
       func_num++;
     }
@@ -199,12 +204,15 @@ static int find_func(paddr_t pc) {
     }
   }
   printf("0x%016x no funciton match!\n", pc);
+  print_ftrace(true);
   assert(0);
   return 0;
 }
 
 // check the function type
 static int check_func_type(uint32_t inst) {
+  if (inst == ECALL) return CALL;
+  if (inst == MRET) return RET;
   uint8_t op = inst & 0x07f;
   uint8_t rd = (inst >> 7) & 0x1f;
   uint8_t rs1 = (inst >> 15) & 0x1f;

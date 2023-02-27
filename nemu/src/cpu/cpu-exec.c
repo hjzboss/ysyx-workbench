@@ -36,6 +36,53 @@ bool scan_wp();
 void scan_watchpoint(Decode*);
 IFDEF(CONFIG_MTRACE, void print_mtrace());
 
+// todo
+#ifdef CONFIG_ETRACE1
+typedef struct node {
+  char cause[32];
+  word_t csr[4];
+  struct node *next;
+} etrace_node;
+
+static etrace_node *etrace_head = NULL;
+static etrace_node *etrace_tail = NULL;
+
+static void insert_etrace(char *cause) {
+  etrace_node *node = (etrace_node*)malloc(sizeof(etrace_node));
+  strcmp(node->cause, cause);
+  memcpy(node->csr, cpu.csr, sizeof(word_t) * CSR_NUM);
+  node->next = NULL;
+
+  if (etrace_head == NULL) {
+    etrace_head = node;
+    etrace_tail = node;
+  }
+  else {
+    etrace_tail->next = node;
+    etrace_tail = node;
+  }
+}
+
+void free_etrace() {
+  etrace_node *tmp;
+  while(etrace_head != NULL) {
+    tmp = etrace_head->next;
+    free(etrace_head);
+    etrace_head = tmp;
+  }
+}
+
+void print_etrace() {
+  log_write("---etrace message start---\n");
+  etrace_node *ptr = etrace_head;
+  while(ptr != NULL) {
+    log_write("excep instr:%s| mstatus=%lx, mtvec=%lx, mepc=%lx, mcause=%lx\n", ptr->cause, ptr->csr[0], ptr->csr[1], ptr->csr[2], ptr->csr[3]);
+    ptr = ptr->next;
+  }
+  log_write("---etrace message end---\n");
+}
+#endif
+
 #ifdef CONFIG_ITRACE
 // my change
 static char* iringbuf[MAX_INST_TO_PRINT] = {};

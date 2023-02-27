@@ -57,6 +57,10 @@ object AluOp {
   def divuw     = "b100010".U
   def remuw     = "b100011".U
 
+  def csrrw     = "b100100".U
+  def csrrs     = "b100101".U
+  def csrrc     = "b100110".U
+
   def apply() = UInt(6.W)
 }
 
@@ -94,6 +98,33 @@ object RegWrite {
   def apply() = Bool()
 }
 
+object CsrId {
+  def mstatus = "h300".U
+  def mtvec   = "h305".U
+  def mepc    = "h341".U
+  def mcause  = "h342".U
+
+  def apply() = UInt(12.W)
+}
+
+object CsrAddr {
+  def mstatus = "b00".U
+  def mtvec   = "b01".U
+  def mepc    = "b10".U
+  def mcause  = "b11".U
+
+  def apply() = UInt(2.W)
+}
+
+object System {
+  def ebreak = "b00".U
+  def mret   = "b01".U
+  def ecall  = "b10".U
+  def nop    = "b11".U
+
+  def apply() = UInt(2.W)
+}
+
 trait HasInstrType {
   def InstrN  = "b0000".U
   def InstrI  = "b0100".U
@@ -104,4 +135,5 @@ trait HasInstrType {
   def InstrJ  = "b0111".U
   def InstrIJ = "b1000".U
   def InstrD  = "b1001".U
+  def InstrZ  = "b1010".U
 }

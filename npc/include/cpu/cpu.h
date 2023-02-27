@@ -35,13 +35,14 @@ enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
 
 typedef struct {
   IFDEF(CONFIG_DIFFTEST, uint64_t gpr[32]); // 只是为了传给difftest一个初始的空寄存器组
+  IFDEF(CONFIG_DIFFTEST, uint64_t csr[CSR_NUM]);
   uint64_t pc;
   uint64_t npc;
   uint32_t inst;
   IFDEF(CONFIG_ITRACE, char logbuf[128]);
 } CPUState;
 
-extern CPUState cpu;
+extern CPUState npc_cpu;
 
 #define FMT_WORD "0x%016lx"
 

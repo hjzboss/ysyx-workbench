@@ -11,6 +11,7 @@ class EXU extends Module {
     val ctrl      = Flipped(new Ctrl)
     
     val regWrite  = new RFWriteIO
+    val csrWrite  = new CSRWriteIO
     val redirect  = new RedirectIO
   })
   
@@ -32,7 +33,6 @@ class EXU extends Module {
   val rdata   = lsu.io.rdata
   val wmask   = io.ctrl.wmask
   
-  // 此处有问题，lw，lbu,lhu出错
   val lsuOut  = LookupTree(lsType, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
@@ -64,14 +64,26 @@ class EXU extends Module {
   io.regWrite.wen      := io.ctrl.regWen
 
   // todo, mem
-  io.regWrite.value    := Mux(io.ctrl.loadMem, lsuOut, aluOut)
+  io.regWrite.value    := Mux(io.ctrl.loadMem, lsuOut, Mux(io.ctrl.isCsr, opAPre, aluOut))
 
   // todo: branch addr
-  val brAddrOpA = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
-  io.redirect.brAddr   := brAddrOpA + io.datasrc.imm
-  io.redirect.valid    := Mux(io.ctrl.br && alu.io.brMark, true.B, false.B)
+  val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
+  val brAddr            = brAddrOpA + io.datasrc.imm
+
+  // ecall mret
+  io.redirect.brAddr   := Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
+
+  // csr
+  io.csrWrite.waddr    := io.ctrl.csrWaddr
+  io.csrWrite.wdata    := aluOut
+  io.csrWrite.wen      := io.ctrl.isCsr
+  // exception
+  io.csrWrite.exception:= io.ctrl.sysInsType === System.ecall
+  io.csrWrite.epc      := io.datasrc.pc
+  io.csrWrite.no       := Mux(io.ctrl.sysInsType === System.ecall, "hb".U, 0.U)
 
   // ebreak
-  stop.io.valid        := Mux(io.ctrl.break, true.B, false.B)
+  stop.io.valid        := Mux(io.ctrl.sysInsType === System.ebreak, true.B, false.B)
   stop.io.haltRet      := io.datasrc.src1
 }

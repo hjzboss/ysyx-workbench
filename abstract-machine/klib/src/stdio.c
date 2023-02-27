@@ -6,18 +6,18 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
-char* num2str(int num, int base) {
-  static char str[16];
+void num2str(char* str, uint64_t num, int base) {
   char tmp[32];
   int len = 0;
   bool is_neg = false;
   if (num == 0) tmp[len++] = 0;
+  /*
   else if(num >> 31) {
     // 负数
     num = ((~num) + 1);
     str[0] = '-';
     is_neg = true;
-  }
+  }*/
   else while (num) {
     tmp[len++] = num % base;
     num = num / base;
@@ -30,14 +30,13 @@ char* num2str(int num, int base) {
     i++;
   }
   str[i] = '\0';
-  return str;
 }
 
 
 int printf(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  char buf[200];
+  char buf[20000];
   int arg_cnt = vsprintf(buf, fmt, ap);
   va_end(ap);
   putstr(buf);
@@ -47,8 +46,10 @@ int printf(const char *fmt, ...) {
 int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
+  unsigned long ptr;
   int len;
   int arg_cnt = 0;
+  char str[32];
   for (p = (char *)fmt; *p; p++) {
     if (*p != '%') {
       *out++ = *p;
@@ -84,7 +85,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'c':
       case 'd':
         ival = va_arg(ap, int);
-        char *str = num2str(ival, 10);
+        num2str(str, ival, 10);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
@@ -96,17 +97,32 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         out += len;
         arg_cnt += len;
         break;
+      case 'p':
+        ptr = va_arg(ap, unsigned long);
+        num2str(str, ptr, 16);
+        len = strlen(str);
+        *out++ = '0';
+        *out++ = 'x';
+        rem = 16 - len;
+        if (rem > 0) {
+          for (int i = 0; i < rem; i++) *out++ = '0';
+        }
+        // todo
+        strcpy(out, str);
+        out += len;
+        arg_cnt += len;
+        break;
       case 'x':
         ival = va_arg(ap, int);
-        char *string = num2str(ival, 16);
-        len = strlen(string);
+        num2str(str, ival, 16);
+        len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
           for (int i = 0; i < rem; i++) *out++ = fix_ch;
         }
         // todo
-        strcpy(out, string);
+        strcpy(out, str);
         out += len;
         arg_cnt += len;
         break;

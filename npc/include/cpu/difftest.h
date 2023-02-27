@@ -1,7 +1,8 @@
 #ifndef __DIFFTEST_H__
 #define __DIFFTEST_H__
 
-#include "cpu/cpu.h"
+#include <stdint.h>
+#include <config.h>
 
 #ifdef CONFIG_DIFFTEST
 
@@ -14,8 +15,10 @@ extern void (*ref_difftest_raise_intr)(uint64_t NO);
 
 typedef struct {
   uint64_t gpr[32];
+  uint64_t csr[CSR_NUM];
   uint64_t pc;
 } NEMUCPUState;
 
 #endif
+
 #endif

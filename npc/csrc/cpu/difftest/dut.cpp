@@ -5,29 +5,30 @@
 #ifdef CONFIG_DIFFTEST
 
 extern const char *regs[];
+extern const char *csrs[];
 extern uint64_t *cpu_gpr;
+extern uint64_t *cpu_csr;
 
 static bool is_skip_ref = false;
 void isa_reg_display(bool *);
 uint8_t* guest_to_host(uint64_t paddr);
 uint64_t host_to_guest(uint8_t *haddr);
 
-/*
 void difftest_skip_ref() {
   is_skip_ref = true;
 }
-*/
 
 NEMUCPUState cpu_diff = {};
 
 static void checkregs(NEMUCPUState *ref) {
   bool same = true;
-  bool err_list[34] = {};
+  int list_len = 34 + CSR_NUM;
+  bool err_list[list_len] = {};
   // check next pc
-  if(ref->pc != cpu.pc) {
+  if(ref->pc != npc_cpu.pc) {
     log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
     log_write("ref pc: 0x%016lx\n", ref->pc);
-    log_write("dut pc: 0x%016lx\n", cpu.pc);
+    log_write("dut pc: 0x%016lx\n", npc_cpu.pc);
     same = false;
     err_list[33] = true;
   }
@@ -43,11 +44,22 @@ static void checkregs(NEMUCPUState *ref) {
     }
   }
 
+  // check csr
+  for(int i = 0; i < CSR_NUM; i++) {
+    if(ref->csr[i] != cpu_csr[i]) {
+      log_write(ANSI_FMT("csr[%d] %s error: \n", ANSI_FG_RED), i, csrs[i]);
+      log_write("ref %s: 0x%016lx\n", csrs[i], ref->csr[i]);
+      log_write("dut %s: 0x%016lx\n", csrs[i], cpu_csr[i]);
+      same = false;
+      err_list[i+34] = true;
+    }
+  }
+
   if(!same) {
     // print all dut regs when error
     isa_reg_display(err_list);
     npc_state.state = NPC_ABORT;
-    npc_state.halt_pc = cpu.pc;
+    npc_state.halt_pc = npc_cpu.pc;
   }
 }
 
@@ -82,24 +94,27 @@ void init_difftest(char *ref_so_file, long img_size) {
   ref_difftest_init();// must behind of memcpy img
   // copy img instruction to ref
   ref_difftest_memcpy(CONFIG_MBASE, guest_to_host(CONFIG_MBASE), img_size, DIFFTEST_TO_REF);
-  ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-  //printf("init_pc=%016lx\n", cpu.pc);
+  ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
 }
 
 void difftest_step() {
   NEMUCPUState ref_r;
 
-  /*
   if (is_skip_ref) {
-    // to skip the checking of an instruction, just copy the reg state to reference design
-    // next pc
-    memcpy(&cpu_diff, &cpu, 32 * sizeof(cpu_diff.gpr[0]));
-    cpu_diff.pc = cpu.npc;
-    ref_difftest_regcpy(&cpu_diff., DIFFTEST_TO_REF);
+    // 只复制寄存器信息，不执行指令
+    for (int i = 0; i < 32; i++) {
+      npc_cpu.gpr[i] = cpu_gpr[i];
+    }
+    for (int i = 0; i < CSR_NUM; i++) {
+      npc_cpu.csr[i] = cpu_csr[i];
+    }
+    ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
   }
-  */
+
+  // todo: 执行ref_difftest_exec过后，cpu.pc就变了，原因是引用到了nemu中的cpu结构体了。。。。。
+
   // ref execute once
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);

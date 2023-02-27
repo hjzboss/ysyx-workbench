@@ -16,16 +16,19 @@ uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 static struct timeval boot_time = {};
 
-CPUState cpu = {};
+CPUState npc_cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
+IFDEF(CONFIG_DTRACE, void free_dtrace());
+#ifdef CONFIG_DIFFTEST
+void difftest_skip_ref();
+void difftest_step();
+#endif
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
 static char* iringbuf[MAX_INST_TO_PRINT] = {};
 static int iring_ptr = -1;
-
-IFDEF(CONFIG_DIFFTEST, void difftest_step());
 
 void init_iringbuf() {
   for (int i = 0; i < MAX_INST_TO_PRINT; ++i) {
@@ -35,7 +38,7 @@ void init_iringbuf() {
 
 static void insert_iringbuf() {
   iring_ptr = (iring_ptr + 1) % MAX_INST_TO_PRINT;
-  strcpy(iringbuf[iring_ptr], cpu.logbuf);
+  strcpy(iringbuf[iring_ptr], npc_cpu.logbuf);
 }
 
 static void print_iringbuf() {
@@ -73,9 +76,9 @@ double sc_time_stamp () {
 
 
 // todo: watchpoint
-static void trace_and_difftest(uint64_t dnpc) {
-  IFDEF(CONFIG_ITRACE, log_write("%s\n", cpu.logbuf));
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(cpu.logbuf)); }
+static void trace_and_difftest() {
+  IFDEF(CONFIG_ITRACE, log_write("%s\n", npc_cpu.logbuf));
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(npc_cpu.logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step());
 	// watchpoint
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
@@ -201,11 +204,14 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  cpu.pc = top->io_pc;
-  cpu.npc = top->io_nextPc;
+  npc_cpu.pc = top->io_pc;
+  npc_cpu.npc = top->io_nextPc;
 
   // state is running
   npc_state.state = NPC_RUNNING;
+
+  // initial mstatus
+  IFDEF(CONFIG_DIFFTEST, npc_cpu.csr[0] = 0xa00001800);
 
   return size;
 }
@@ -224,6 +230,7 @@ void delete_cpu() {
 
   IFDEF(CONFIG_FTRACE, free_ftrace());
   IFDEF(CONFIG_MTRACE, free_mtrace());
+  IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
 static void isa_exec_once() {
@@ -232,16 +239,16 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  cpu.pc = top->io_pc;
-  cpu.npc = top->io_nextPc;
-  cpu.inst = paddr_read(cpu.pc, 4);
+  uint64_t pc = top->io_pc; // 当前pc
+  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
+  npc_cpu.pc = top->io_pc; // 执行后的pc
 #ifdef CONFIG_ITRACE
-  char *p = cpu.logbuf;
-  p += snprintf(p, sizeof(cpu.logbuf), FMT_WORD ":", cpu.pc);
+  char *p = npc_cpu.logbuf;
+  p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
   int ilen = 4;
   int i;
-  uint8_t *inst = (uint8_t *)&cpu.inst;
+  uint8_t *inst = (uint8_t *)&npc_cpu.inst;
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -252,23 +259,22 @@ static void cpu_exec_once() {
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, cpu.logbuf + sizeof(cpu.logbuf) - p, cpu.pc, (uint8_t *)&cpu.inst, ilen);
+  disassemble(p, npc_cpu.logbuf + sizeof(npc_cpu.logbuf) - p, pc, (uint8_t *)&npc_cpu.inst, ilen);
 
   insert_iringbuf();
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(cpu.pc, cpu.inst, cpu.npc);
+  ftrace(pc, npc_cpu.inst, npc_cpu.pc);
 #endif
 }
 
 void execute(uint64_t n) {
   while (n--) {
-    // todo
     //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
-    trace_and_difftest(cpu.npc);
+    trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     //IFDEF(CONFIG_DEVICE, device_update());
   }
@@ -294,7 +300,7 @@ void assert_fail_msg() {
   statistic();
 }
 
-/* Simulate how the CPU works. */
+/* Simulate how the npc_cpu works. */
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (npc_state.state) {
@@ -322,7 +328,7 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           npc_state.halt_pc);
           printf("\n");
-      // fall through
+    // fall through
     case NPC_QUIT: statistic();
   }
 }

@@ -18,6 +18,7 @@ class JzCore extends Module {
 
   idu.io.fetch    := ifu.io.fetch
   idu.io.regWrite := exu.io.regWrite
+  idu.io.csrWrite := exu.io.csrWrite
 
   exu.io.datasrc  := idu.io.datasrc
   exu.io.aluCtrl  := idu.io.aluCtrl

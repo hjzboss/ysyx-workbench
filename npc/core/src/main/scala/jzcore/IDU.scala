@@ -8,6 +8,7 @@ class IDU extends Module with HasInstrType {
   val io = IO(new Bundle {
     val fetch     = Flipped(new InstrFetch)
     val regWrite  = Flipped(new RFWriteIO)
+    val csrWrite  = Flipped(new CSRWriteIO)
 
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
@@ -18,21 +19,25 @@ class IDU extends Module with HasInstrType {
   })
 
   val rf        = Module(new RF)
+  val csrReg    = Module(new CsrReg)
   val inst      = io.fetch.inst
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)
   val rd        = inst(11, 7)
+  val csr       = inst(31, 20)
 
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
+  val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
   val instrtype = ctrlList(0)
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = ctrlList(4)
-  val loadMem   = ctrlList(5)
-  val wmask     = ctrlList(6)
+  val lsType    = lsctrl(0)
+  val loadMem   = lsctrl(2)
+  val wmask     = lsctrl(1)
   val imm = LookupTree(instrtype, List(
+    InstrZ    -> ZeroExt(inst(19, 15), 64),
     InstrI    -> SignExt(inst(31, 20), 64),
     InstrIJ   -> SignExt(inst(31, 20), 64),
     InstrS    -> SignExt(Cat(inst(31, 25), inst(11, 7)), 64),
@@ -41,11 +46,14 @@ class IDU extends Module with HasInstrType {
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
 
-/*
-  val lsList       = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTable)
-  val lsType       = lsList(0)
-  val loadMem      = lsList(1)
-  */
+  val csrRaddr = LookupTree(csr, List(
+    CsrId.mstatus -> CsrAddr.mstatus,
+    CsrId.mtvec   -> CsrAddr.mtvec,
+    CsrId.mepc    -> CsrAddr.mepc,
+    CsrId.mcause  -> CsrAddr.mcause
+  ))
+
+  val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
@@ -55,27 +63,38 @@ class IDU extends Module with HasInstrType {
   rf.io.wdata         := io.regWrite.value
   rf.io.clock         := clock
   rf.io.reset         := reset
+  
+  csrReg.io.raddr     := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
+  csrReg.io.waddr     := io.csrWrite.waddr
+  csrReg.io.wen       := io.csrWrite.wen
+  csrReg.io.wdata     := io.csrWrite.wdata
+  csrReg.io.clock     := clock
+  csrReg.io.reset     := reset
+  // exception
+  csrReg.io.exception := io.csrWrite.exception
+  csrReg.io.epc       := io.csrWrite.epc
+  csrReg.io.no        := io.csrWrite.no
 
   io.datasrc.pc       := io.fetch.pc
-  io.datasrc.src1     := rf.io.src1
-  io.datasrc.src2     := rf.io.src2
+  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
   io.ctrl.rd          := rd
   io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
-  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
+  io.ctrl.isCsr       := instrtype === InstrZ
+  io.ctrl.csrWaddr    := csrRaddr
+  io.ctrl.sysInsType  := systemCtrl
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
-
-  // ebreak
-  io.ctrl.break       := instrtype === InstrD
 
   io.lsType           := lsType
 }

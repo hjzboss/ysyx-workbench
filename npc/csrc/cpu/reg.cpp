@@ -2,9 +2,14 @@
 #include <cpu/cpu.h>
 
 uint64_t *cpu_gpr = NULL;
+uint64_t *cpu_csr = NULL;
 
 extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
   cpu_gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+}
+
+extern "C" void set_csr_ptr(const svOpenArrayHandle r) {
+  cpu_csr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
 }
 
 const char *regs[] = {
@@ -14,18 +19,32 @@ const char *regs[] = {
   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
 
+const char *csrs[] = {
+  "mstatus", "mtvec", "mepc", "mcause"
+};
+
 void isa_reg_display(bool *err_list) {
   int i;
   printf(ANSI_FMT("CPU register state: \n", ANSI_FG_BLUE));
   printf("------------------------------\n");
   printf("reg \tvalue\n");
   printf("------------------------------\n");
-  if (err_list[33]) printf(ANSI_FMT("pc:\t0x%016lx\n", ANSI_FG_RED), cpu.pc);
-  else printf("pc:\t0x%016lx\n", cpu.pc);
+  if (err_list[33]) printf(ANSI_FMT("pc:\t0x%016lx\n", ANSI_FG_RED), npc_cpu.pc);
+  else printf("pc:\t0x%016lx\n", npc_cpu.pc);
 
   for (i=0; i<32; ++i) {
     if (err_list[i]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), regs[i], cpu_gpr[i]);
     else printf("%s:\t0x%016lx\n", regs[i], cpu_gpr[i]);
+  }
+
+  for (i=0; i<32; ++i) {
+    if (err_list[i]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), regs[i], cpu_gpr[i]);
+    else printf("%s:\t0x%016lx\n", regs[i], cpu_gpr[i]);
+  }
+
+  for (i=0; i<CSR_NUM; ++i) {
+    if (err_list[i+34]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), csrs[i], cpu_csr[i]);
+    else printf("%s:\t0x%016lx\n", csrs[i], cpu_csr[i]);
   }
   printf("------------------------------\n");
 }
@@ -35,6 +54,13 @@ uint64_t isa_reg_str2val(const char *s, bool *success) {
     if (strcmp(s, regs[i]) == 0) {
       *success = true;
       return cpu_gpr[i];
+    }
+  }
+
+  for (int i = 0; i < CSR_NUM; i++) {
+    if (strcmp(s, csrs[i]) == 0) {
+      *success = true;
+      return cpu_csr[i];
     }
   }
 
