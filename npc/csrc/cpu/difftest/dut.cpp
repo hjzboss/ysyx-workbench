@@ -118,6 +118,7 @@ void difftest_step() {
 
   // ref execute once
   ref_difftest_exec(1);
+  printf("%lx\n", cpu.pc);
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
   checkregs(&ref_r);
