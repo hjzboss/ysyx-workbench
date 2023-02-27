@@ -1,7 +1,8 @@
 #ifndef __DIFFTEST_H__
 #define __DIFFTEST_H__
 
-#include "cpu/cpu.h"
+#include <stdint.h>
+#include <config.h>
 
 #ifdef CONFIG_DIFFTEST
 
@@ -19,4 +20,5 @@ typedef struct {
 } NEMUCPUState;
 
 #endif
+
 #endif
