@@ -186,17 +186,6 @@ object RV64IM extends HasInstrType {
     MRET    -> List(System.mret),
     EBREAK  -> List(System.ebreak),
   )
-
-/*
-  val csrTable = Array(
-    CSRRW   -> List(InstrZ, CsrOp.nul),
-    CSRRS   -> List(InstrZ, CsrOp.set),
-    CSRRC   -> List(InstrZ, CsrOp.clear),
-    CSRRWI  -> List(InstrZ, CsrOp.),
-    CSRRSI  -> List(InstrZ, ),
-    CSRRCI  -> List(InstrZ, ),
-  )
-  */
 }
 
 object Instruction extends HasInstrType {
