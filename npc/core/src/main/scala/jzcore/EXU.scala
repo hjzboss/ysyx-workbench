@@ -64,7 +64,7 @@ class EXU extends Module {
   io.regWrite.wen      := io.ctrl.regWen
 
   // todo, mem
-  io.regWrite.value    := Mux(io.ctrl.loadMem, lsuOut, Mux(io.ctrl.isCsr, opBPre, aluOut))
+  io.regWrite.value    := Mux(io.ctrl.loadMem, lsuOut, Mux(io.ctrl.isCsr, opAPre, aluOut))
 
   // todo: branch addr
   val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
