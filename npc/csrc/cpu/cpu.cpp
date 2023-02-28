@@ -133,6 +133,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
+    difftest_skip_ref();
     return;
   }
   else {
