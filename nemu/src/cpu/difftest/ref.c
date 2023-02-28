@@ -31,7 +31,9 @@ void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
 
 void difftest_regcpy(void *dut, bool direction) {
   if(direction == DIFFTEST_TO_REF) {
+    //printf("dutpc=%lx\n", dut->pc);
     memcpy(&cpu, dut, REG_SIZE);
+    printf("dutpc=%lx\n", cpu->pc);
   }
   else {
     memcpy(dut, &cpu, REG_SIZE);

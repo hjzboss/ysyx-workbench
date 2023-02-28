@@ -108,7 +108,6 @@ void difftest_step() {
     for (int i = 0; i < CSR_NUM; i++) {
       npc_cpu.csr[i] = cpu_csr[i];
     }
-    printf("pc=%lx\n", npc_cpu.pc);
     ref_difftest_regcpy(&npc_cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
