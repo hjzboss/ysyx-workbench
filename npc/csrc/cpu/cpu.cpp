@@ -245,6 +245,7 @@ static void cpu_exec_once() {
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
   npc_cpu.pc = top->io_pc; // 执行后的pc
+  npc_cpu.npc = top->io_nextPc;
   printf("pc=%lx, next_pc=%lx\n", pc, npc_cpu.pc);
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
