@@ -15,6 +15,7 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 static struct timeval boot_time = {};
+// 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
 static bool visit_device = false;
 
 CPUState npc_cpu = {};
@@ -107,8 +108,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
-    //difftest_skip_ref();
-    visit_device = true;
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
       gettimeofday(&boot_time, NULL);
@@ -136,8 +136,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
-    //difftest_skip_ref();
-    visit_device = true;
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     return;
   }
   else {
@@ -245,16 +244,18 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
+#ifdef CONFIG_DIFFTEST
   if (visit_device) {
+    // 因为仿真器会提前一个周期把下一条指令的主存访问提出了，会提前访问到外设使visit_device设置为true，因此要延后一个周期来difftest_skip_ref
     difftest_skip_ref();
     visit_device = false;
   }
+#endif
   uint64_t pc = top->io_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
   npc_cpu.pc = top->io_pc; // 执行后的pc
   npc_cpu.npc = top->io_nextPc;
-  printf("pc=%lx, next_pc=%lx\n", pc, npc_cpu.pc);
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
