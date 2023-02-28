@@ -15,6 +15,7 @@ static uint64_t g_timer = 0; // unit: us
 uint64_t g_nr_guest_inst = 0;
 extern uint64_t* gpr;
 static struct timeval boot_time = {};
+static bool visit_device = false;
 
 CPUState npc_cpu = {};
 
@@ -106,7 +107,8 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
-    difftest_skip_ref();
+    //difftest_skip_ref();
+    visit_device = true;
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
       gettimeofday(&boot_time, NULL);
@@ -134,7 +136,8 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
-    difftest_skip_ref();
+    //difftest_skip_ref();
+    visit_device = true;
     return;
   }
   else {
@@ -230,6 +233,7 @@ void delete_cpu() {
   delete top; 
   top = NULL;
 
+  // Free trace node
   IFDEF(CONFIG_FTRACE, free_ftrace());
   IFDEF(CONFIG_MTRACE, free_mtrace());
   IFDEF(CONFIG_DTRACE, free_dtrace());
@@ -241,6 +245,10 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
+  if (visit_device) {
+    difftest_skip_ref();
+    visit_device = false;
+  }
   uint64_t pc = top->io_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
