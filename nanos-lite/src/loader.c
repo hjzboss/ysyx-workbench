@@ -1,5 +1,6 @@
 #include <proc.h>
 #include <elf.h>
+#include <klib.h>
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
@@ -20,7 +21,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
 
   // read phdr head
-  Elf64_Phdr *p_head = (Elf64_Phdr*)malloc(sizeof(Elf64_Phdr) * elf_head.e_phnum);
+  Elf64_Phdr *p_head = (Elf64_Phdr *)malloc(sizeof(Elf64_Phdr) * elf_head.e_phnum);
   ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf64_Phdr) * elf_head.e_phnum);
 
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
