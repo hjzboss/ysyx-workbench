@@ -18,12 +18,12 @@ void putch(char ch) {
 void halt(int code) {
   nemu_trap(code);
 
-  printf("fuck\n\n\n");
   // should not reach here
   while (1);
 }
 
 void _trm_init() {
   int ret = main(mainargs);
+  printf("\n\nfuck\n\n\n");
   halt(ret);
 }
