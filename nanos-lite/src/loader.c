@@ -1,6 +1,8 @@
 #include <proc.h>
 #include <elf.h>
 
+void init_ramdisk();
+
 #ifdef __LP64__
 # define Elf_Ehdr Elf64_Ehdr
 # define Elf_Phdr Elf64_Phdr
@@ -10,8 +12,7 @@
 #endif
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
-  Log("read img\n");
-  Log("read img end\n");
+  init_ramdisk();
   return 0;
 }
 
