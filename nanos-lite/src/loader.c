@@ -28,7 +28,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if (p_head->p_type != PT_LOAD) continue;;
     uint8_t *buf = (uint8_t *)malloc(p_head->p_filesz);
     ramdisk_read(buf, p_head->p_offset, p_head->p_filesz);
-    printf("%08x\n", *(uint64_t *)buf);
+    printf("%08x\n", buf);
     memcpy((uint8_t *)p_head->p_vaddr, buf, p_head->p_filesz);
     memset((uint8_t *)(p_head->p_vaddr + p_head->p_filesz), 0, p_head->p_memsz - p_head->p_filesz);
     free(buf);
