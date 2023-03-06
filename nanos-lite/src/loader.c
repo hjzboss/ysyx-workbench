@@ -15,14 +15,14 @@ size_t get_ramdisk_size();
 #endif
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
-  Elf64_Ehdr elf_head;
-  ramdisk_read(&elf_head, 0, sizeof(Elf64_Ehdr));
+  Elf_Ehdr elf_head;
+  ramdisk_read(&elf_head, 0, sizeof(Elf_Ehdr));
   // elf magic number assert
   assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
 
   // read phdr head
-  Elf64_Phdr *p_head = (Elf64_Phdr *)malloc(sizeof(Elf64_Phdr) * elf_head.e_phnum);
-  ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf64_Phdr) * elf_head.e_phnum);
+  Elf_Phdr *p_head = (Elf_Phdr *)malloc(sizeof(Elf_Phdr) * elf_head.e_phnum);
+  ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
     if (p_head->p_type != PT_LOAD) continue;
