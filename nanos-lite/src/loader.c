@@ -24,11 +24,13 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Phdr *p_head = (Elf_Phdr *)malloc(sizeof(Elf_Phdr) * elf_head.e_phnum);
   ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
+  // load and set
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
     if (p_head->p_type != PT_LOAD) continue;
     ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
     memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);
   }
+
   return elf_head.e_entry;
 }
 
