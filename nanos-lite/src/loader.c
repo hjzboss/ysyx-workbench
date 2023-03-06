@@ -11,9 +11,6 @@
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   Log("read img\n");
-  FILE *fp;
-  fp = fopen("/home/hjz/ysyx-workbench/nanos-lite/build/ramdisk.img", "r");
-  fclose(fp);
   Log("read img end\n");
   return 0;
 }
