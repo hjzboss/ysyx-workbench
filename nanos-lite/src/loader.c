@@ -26,16 +26,14 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
     if (p_head->p_type != PT_LOAD) continue;
-    printf("%d\n", p_head->p_filesz);
     uint8_t *buf = (uint8_t *)malloc(p_head->p_filesz);
     ramdisk_read(buf, p_head->p_offset, p_head->p_filesz);
-    printf("%x\n", buf[0]);
     memcpy((uint8_t *)p_head->p_vaddr, buf, p_head->p_filesz);
     memset((uint8_t *)(p_head->p_vaddr + p_head->p_filesz), 0, p_head->p_memsz - p_head->p_filesz);
     free(buf);
   }
   free(p_head);
-  return 0x83000000;
+  return elf_head.e_entry;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
