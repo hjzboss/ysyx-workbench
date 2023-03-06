@@ -99,16 +99,8 @@ void init_elf(const char *file) {
   // read elf head
   a = fread(&elf_head, sizeof(Elf64_Ehdr), 1, fp);
   assert(a != 0);
-
-  assert(*(uint32_t *)elf_head.e_ident != 0x464C457F);
   // elf magic number
-  if (elf_head.e_ident[0] != 0x7F ||
-    elf_head.e_ident[1] != 'E' ||
-    elf_head.e_ident[2] != 'L' ||
-    elf_head.e_ident[3] != 'F') {
-    printf("Not a ELF file\n");
-    assert(0);
-  }
+  assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
 
   // section header table指针，大小为表中的条目数
   Elf64_Shdr *start1 = (Elf64_Shdr*)malloc(sizeof(Elf64_Shdr) * elf_head.e_shnum);
