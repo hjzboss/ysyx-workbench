@@ -16,7 +16,7 @@ size_t get_ramdisk_size();
 static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf64_Ehdr elf_header;
   ramdisk_read(&elf_header, 0, sizeof(Elf64_Ehdr));
-  printf("%d\n", elf_header.e_shnum);
+  assert(1);
   TODO();
   return 0;
 }
