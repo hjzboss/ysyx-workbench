@@ -100,8 +100,7 @@ void init_elf(const char *file) {
   a = fread(&elf_head, sizeof(Elf64_Ehdr), 1, fp);
   assert(a != 0);
 
-  assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
-  printf("shit\n");
+  assert(*(uint32_t *)elf_head.e_ident != 0x464C457F);
   // elf magic number
   if (elf_head.e_ident[0] != 0x7F ||
     elf_head.e_ident[1] != 'E' ||
