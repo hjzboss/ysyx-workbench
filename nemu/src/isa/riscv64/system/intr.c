@@ -21,8 +21,8 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
    */
   //mcause
   switch (NO) {
+    case 1:
     case -1: cpu.csr[3] = 0xb; break;
-    case 1: cpu.csr[3] = 0xb; break; // todo, system call
     default: cpu.csr[3] = 0; // todo
   }
   cpu.csr[2] = epc;  // mepc
