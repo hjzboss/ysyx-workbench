@@ -19,11 +19,20 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   // elf magic number assert
   assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
 
+  // read phdr head
   Elf64_Phdr *p_head = (Elf64_Phdr*)malloc(sizeof(Elf64_Phdr) * elf_head.e_phnum);
   ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf64_Phdr) * elf_head.e_phnum);
-  printf("%d\n", elf_head.e_phnum);
-  TODO();
-  return 0;
+
+  for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
+    if (p_head->p_type != PT_LOAD) break;
+    uint8_t *buf = malloc(p_head->p_filesz);
+    ramdisk_read(buf, p_head->p_offset, p_head->p_filesz);
+    memcpy((uint8_t *)p_head->p_vaddr, buf, p_head->p_filesz);
+    memset((uint8_t *)(p_head->p_vaddr + p_head->p_filesz), 0, p_head->p_memsz - p_head->p_filesz);
+    free(buf);
+  }
+  free(p_head);
+  return 0x83000000;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
