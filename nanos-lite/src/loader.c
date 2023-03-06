@@ -14,9 +14,16 @@ size_t get_ramdisk_size();
 #endif
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
-  Elf64_Ehdr elf_header;
-  ramdisk_read(&elf_header, 0, sizeof(Elf64_Ehdr));
-  assert(1);
+  Elf64_Ehdr elf_head;
+  ramdisk_read(&elf_head, 0, sizeof(Elf64_Ehdr));
+  // elf magic number
+  if (elf_head.e_ident[0] != 0x7F ||
+    elf_head.e_ident[1] != 'E' ||
+    elf_head.e_ident[2] != 'L' ||
+    elf_head.e_ident[3] != 'F') {
+    printf("Not a ELF file\n");
+    assert(0);
+  }
   TODO();
   return 0;
 }
