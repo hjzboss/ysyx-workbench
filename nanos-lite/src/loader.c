@@ -33,7 +33,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     free(buf);
   }
   free(p_head);
-  return elf_head.e_entry;
+  return 0x83000000;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
