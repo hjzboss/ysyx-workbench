@@ -24,7 +24,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     printf("Not a ELF file\n");
     assert(0);
   }
-  printf("%p\n", *(uint32_t *)elf_head.e_ident);
+  printf("%x\n", *(uint32_t *)elf_head.e_ident);
   TODO();
   return 0;
 }
