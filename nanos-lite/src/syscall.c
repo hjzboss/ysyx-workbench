@@ -13,7 +13,7 @@ void do_syscall(Context *c) {
 
   switch (a[0]) {
     case 0x1: SYS_yield; break;
-    case 0x4: 
+    case 0x0: 
       printf("fuck\n\n");
       SYS_exit; 
       break;
