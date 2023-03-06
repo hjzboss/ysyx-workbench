@@ -32,6 +32,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     free(buf);
   }
   free(p_head);
+  Log("%016x\n", *(uint64_t *)0x83000000);
   return 0x83000000;
 }
 
