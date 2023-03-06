@@ -24,6 +24,5 @@ void halt(int code) {
 
 void _trm_init() {
   int ret = main(mainargs);
-  printf("\n\nfuck\n\n\n");
   halt(ret);
 }
