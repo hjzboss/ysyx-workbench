@@ -17,7 +17,7 @@ void do_syscall(Context *c) {
   switch (a[0]) {
     case SYS_yield: insert_strace("SYS_yield", a, c->GPRx); yield(); break;
     case SYS_exit: insert_strace("SYS_exit", a, c->GPRx); print_strace(); free_strace(); halt(0); break;
-    //case SYS_write: break;
+    case SYS_write: insert_strace("SYS_write", a, c->GPRx); print_strace(); free_strace(); halt(0); break; // todo
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
