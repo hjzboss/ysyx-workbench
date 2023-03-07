@@ -6,7 +6,7 @@ static Context* do_event(Event e, Context* c) {
   switch (e.event) {
     case EVENT_YIELD: 
       Log("event_type: yield"); break;
-    case EVENT_SYSCALL: 
+    case EVENT_SYSCALL:
       Log("event_type: system call"); 
       do_syscall(c);
       break;

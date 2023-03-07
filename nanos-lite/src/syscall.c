@@ -14,10 +14,9 @@ void do_syscall(Context *c) {
   a[2] = c->GPR3;
   a[3] = c->GPR4;
 
-  printf("%d\n", a[0]);
   switch (a[0]) {
     case SYS_yield: insert_strace("SYS_yield", a, c->GPRx); yield(); break;
-    case SYS_exit: insert_strace("SYS_exit", a, c->GPRx); print_strace(); free_strace(); halt(0); break;
+    //case SYS_exit: insert_strace("SYS_exit", a, c->GPRx); print_strace(); free_strace(); halt(0); break;
     //case SYS_write: break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
