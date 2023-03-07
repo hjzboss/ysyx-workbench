@@ -37,11 +37,11 @@ void free_strace() {
 }
 
 void print_strace() {
-  Log("---strace message start---\n");
+  Log("---strace message start---");
   snode *ptr = strace_head;
   while(ptr != NULL) {
-    Log("syscall: name=%s, args=%d %d %d %d, ret=%d\n", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret);
+    Log("syscall: name=%s, args=%d %d %d %d, ret=%d", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret);
     ptr = ptr->next;
   }
-  printf("---strace message end---\n");
+  Log("---strace message end---");
 }
