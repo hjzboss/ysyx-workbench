@@ -19,6 +19,13 @@ void syscall_yield(Context *c, uintptr_t *a) {
   yield();
 }
 
+void syscall_brk(Context *c, uintptr_t *a) {
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_brk", a, c->GPRx);
+#endif
+  
+}
+
 void syscall_write(Context *c, uintptr_t *a) {
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
