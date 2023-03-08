@@ -40,7 +40,7 @@ void print_strace() {
   Log("---strace message start---");
   snode *ptr = strace_head;
   while(ptr != NULL) {
-    Log("syscall: name=%s, args=%d %016x %d %d, ret=%d", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret);
+    Log("syscall: name=%s, args=%d %d %016x %d, ret=%d", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret);
     ptr = ptr->next;
   }
   Log("---strace message end---");
