@@ -16,9 +16,7 @@ void syscall_yield(Context *c, uintptr_t *a) {
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
-  insert_strace("SYS_write", a, c->GPRx);
   print_strace();
-  free_strace();
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
@@ -29,6 +27,7 @@ void syscall_write(Context *c, uintptr_t *a) {
     }
     c->GPRx = len;
   }
+  insert_strace("SYS_write", a, c->GPRx);
 }
 
 
