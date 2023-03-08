@@ -16,7 +16,7 @@ void syscall_yield(Context *c, uintptr_t *a) {
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
-  print_strace();
+  //print_strace();
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
