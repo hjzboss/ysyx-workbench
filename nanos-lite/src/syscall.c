@@ -4,19 +4,22 @@
 void putch(char ch);
 
 void syscall_exit(Context *c, uintptr_t *a) {
+#ifdef CONFIG_STRACE
   insert_strace("SYS_exit", a, c->GPRx);
   print_strace();
   free_strace();
+#endif
   halt(0);
 }
 
 void syscall_yield(Context *c, uintptr_t *a) {
+#ifdef CONFIG_STRACE
   insert_strace("SYS_yield", a, c->GPRx);
+#endif
   yield();
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
-  //print_strace();
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
@@ -27,7 +30,10 @@ void syscall_write(Context *c, uintptr_t *a) {
     }
     c->GPRx = len;
   }
-  //insert_strace("SYS_write", a, c->GPRx);
+#ifdef CONIF_STRACE
+  insert_strace("SYS_write", a, c->GPRx);
+  print_strace();
+#endif
 }
 
 
