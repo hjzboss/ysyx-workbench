@@ -1,6 +1,8 @@
 #include <common.h>
 #include "syscall.h"
 
+void putch(char ch);
+
 void syscall_exit(Context *c, uintptr_t *a) {
   insert_strace("SYS_exit", a, c->GPRx);
   print_strace();
@@ -17,7 +19,16 @@ void syscall_write(Context *c, uintptr_t *a) {
   insert_strace("SYS_write", a, c->GPRx);
   print_strace();
   free_strace();
-  halt(0);
+  int fd = a[1];
+  uint8_t *buf = (uint8_t *)a[2];
+  int len = a[3];
+  c->GPRx = 0;
+  if (fd == 1 || fd == 2) {
+    for (int i = 0; i < len; i++, buf++) {
+      putch(*buf);
+    }
+    c->GPRx = len;
+  }
 }
 
 
