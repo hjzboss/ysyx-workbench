@@ -1,6 +1,8 @@
 #include <common.h>
 #include "syscall.h"
 
+extern char end;
+
 void putch(char ch);
 
 void syscall_exit(Context *c, uintptr_t *a) {
@@ -23,7 +25,8 @@ void syscall_brk(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
   insert_strace("SYS_brk", a, c->GPRx);
 #endif
-  
+  // todo, 此时的返回值总是返回0，代表成功
+  c->GPRx = 0;
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
@@ -54,7 +57,8 @@ void do_syscall(Context *c) {
   switch (a[0]) {
     case SYS_yield: syscall_yield(c, a); break;
     case SYS_exit: syscall_exit(c, a); break;
-    case SYS_write: syscall_write(c, a); break; // todo
+    case SYS_write: syscall_write(c, a); break;
+    case SYS_brk: syscall_brk(c, a); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }

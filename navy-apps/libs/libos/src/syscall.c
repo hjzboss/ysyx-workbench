@@ -16,6 +16,10 @@
 #define _arg4(a0, a1, a2, a3, a4, ...) a4
 #define _arg5(a0, a1, a2, a3, a4, a5, ...) a5
 
+extern char end;
+
+static intptr_t old_brk = -1;
+
 // extract an argument from the macro array
 #define SYSCALL  _args(0, ARGS_ARRAY)
 #define GPR1 _args(1, ARGS_ARRAY)
@@ -62,12 +66,19 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int _write(int fd, void *buf, size_t count) {
-  return _syscall_(SYS_write, fd, (__uint64_t)buf, count);;
+  return _syscall_(SYS_write, fd, (__uint64_t)buf, count);
 }
 
 void *_sbrk(intptr_t increment) {
-  _syscall_(SYS_brk, 0, 0, 0);
-  return (void *)-1;
+  if (old_brk == -1) {
+    old_brk = end;
+  }
+  intptr_t new_brk = old_brk + increment;
+  assert(_syscall_(SYS_brk, new_brk, 0, 0) == 0);
+  intptr_t old_brk_tmp = old_brk;
+  // 更新program break，返回旧的program break
+  old_brk = new_brk;
+  return (void *)old_brk_tmp;
 }
 
 int _read(int fd, void *buf, size_t count) {
