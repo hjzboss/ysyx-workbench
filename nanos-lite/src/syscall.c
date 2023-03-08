@@ -30,7 +30,7 @@ void syscall_write(Context *c, uintptr_t *a) {
     }
     c->GPRx = len;
   }
-#ifdef CONIF_STRACE
+#ifdef CONFIG_STRACE
   insert_strace("SYS_write", a, c->GPRx);
   print_strace();
 #endif
