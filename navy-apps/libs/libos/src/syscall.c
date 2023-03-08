@@ -73,7 +73,7 @@ int _write(int fd, void *buf, size_t count) {
 void *_sbrk(intptr_t increment) {
   if (old_brk == -1) {
     char buf[32];
-    sprintf(buf, "%016x\n", _end);
+    sprintf(buf, "%p\n", &_end);
     _write(1, buf, 32);
     old_brk = _end;
   }
