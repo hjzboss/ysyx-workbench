@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <time.h>
 #include "syscall.h"
+#include <stdio.h>
 
 // helper macros
 #define _concat(x, y) x ## y
@@ -71,6 +72,9 @@ int _write(int fd, void *buf, size_t count) {
 
 void *_sbrk(intptr_t increment) {
   if (old_brk == -1) {
+    char buf[32];
+    sprintf(buf, "%016x\n", _end);
+    _write(1, buf, 32);
     old_brk = _end;
   }
   intptr_t new_brk = old_brk + increment;
