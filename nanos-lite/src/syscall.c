@@ -2,7 +2,7 @@
 #include "syscall.h"
 #include "klib.h"
 
-extern char end;
+extern char _end;
 
 void putch(char ch);
 
@@ -27,7 +27,7 @@ void syscall_brk(Context *c, uintptr_t *a) {
   insert_strace("SYS_brk", a, c->GPRx);
 #endif
   // todo, 此时的返回值总是返回0，代表成功
-  printf("%016x\n", end);
+  printf("end=%016x\n", _end);
   c->GPRx = 0;
 }
 
