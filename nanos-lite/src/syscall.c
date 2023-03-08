@@ -20,11 +20,11 @@ void syscall_yield(Context *c, uintptr_t *a) {
 }
 
 void syscall_brk(Context *c, uintptr_t *a) {
+  // todo, 此时的返回值总是返回0，代表成功
+  c->GPRx = 0;
 #ifdef CONFIG_STRACE
   insert_strace("SYS_brk", a, c->GPRx);
 #endif
-  // todo, 此时的返回值总是返回0，代表成功
-  c->GPRx = 0;
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
