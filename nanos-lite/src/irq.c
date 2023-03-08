@@ -7,7 +7,6 @@ static Context* do_event(Event e, Context* c) {
     case EVENT_YIELD: 
       Log("event_type: yield"); break;
     case EVENT_SYSCALL:
-      Log("event_type: system call"); 
       do_syscall(c);
       break;
     default: panic("Unhandled event ID = %d", e.event);
