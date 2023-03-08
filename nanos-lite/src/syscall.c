@@ -1,8 +1,6 @@
 #include <common.h>
 #include "syscall.h"
 
-void halt(int code);
-void yield();
 void insert_strace(char *name, uint64_t *args, uint64_t ret);
 void free_strace();
 void print_strace();
