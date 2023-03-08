@@ -72,10 +72,7 @@ int _write(int fd, void *buf, size_t count) {
 
 void *_sbrk(intptr_t increment) {
   if (old_brk == -1) {
-    char buf[32];
-    sprintf(buf, "%p\n", &_end);
-    _write(1, buf, 32);
-    old_brk = _end;
+    old_brk = (intptr_t)&_end;
   }
   intptr_t new_brk = old_brk + increment;
   assert(_syscall_(SYS_brk, new_brk, 0, 0) == 0);
