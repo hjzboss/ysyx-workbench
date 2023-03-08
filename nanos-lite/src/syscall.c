@@ -1,9 +1,25 @@
 #include <common.h>
 #include "syscall.h"
 
-void insert_strace(char *name, uint64_t *args, uint64_t ret);
-void free_strace();
-void print_strace();
+void syscall_exit(Context *c, uintptr_t *a) {
+  insert_strace("SYS_exit", a, c->GPRx);
+  print_strace();
+  free_strace();
+  halt(0);
+}
+
+void syscall_yield(Context *c, uintptr_t *a) {
+  insert_strace("SYS_yield", a, c->GPRx);
+  yield();
+}
+
+void syscall_write(Context *c, uintptr_t *a) {
+  insert_strace("SYS_write", a, c->GPRx);
+  print_strace();
+  free_strace();
+  halt(0);
+}
+
 
 void do_syscall(Context *c) {
   uintptr_t a[4];
@@ -13,9 +29,9 @@ void do_syscall(Context *c) {
   a[3] = c->GPR4;
 
   switch (a[0]) {
-    case SYS_yield: insert_strace("SYS_yield", a, c->GPRx); yield(); break;
-    case SYS_exit: insert_strace("SYS_exit", a, c->GPRx); print_strace(); free_strace(); halt(0); break;
-    case SYS_write: insert_strace("SYS_write", a, c->GPRx); print_strace(); free_strace(); halt(0); break; // todo
+    case SYS_yield: syscall_yield(c, a); break;
+    case SYS_exit: syscall_exit(c, a); break;
+    case SYS_write: syscall_write(c, a); break; // todo
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
