@@ -16,7 +16,7 @@
 #define _arg4(a0, a1, a2, a3, a4, ...) a4
 #define _arg5(a0, a1, a2, a3, a4, a5, ...) a5
 
-extern char end;
+extern char _end;
 
 static intptr_t old_brk = -1;
 
@@ -71,7 +71,7 @@ int _write(int fd, void *buf, size_t count) {
 
 void *_sbrk(intptr_t increment) {
   if (old_brk == -1) {
-    old_brk = end;
+    old_brk = _end;
   }
   intptr_t new_brk = old_brk + increment;
   assert(_syscall_(SYS_brk, new_brk, 0, 0) == 0);
