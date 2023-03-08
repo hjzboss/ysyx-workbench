@@ -27,7 +27,7 @@ void syscall_write(Context *c, uintptr_t *a) {
     }
     c->GPRx = len;
   }
-  insert_strace("SYS_write", a, c->GPRx);
+  //insert_strace("SYS_write", a, c->GPRx);
 }
 
 
