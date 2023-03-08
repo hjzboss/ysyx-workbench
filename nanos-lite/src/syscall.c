@@ -1,5 +1,6 @@
 #include <common.h>
 #include "syscall.h"
+#include "klib.h"
 
 extern char end;
 
@@ -26,6 +27,7 @@ void syscall_brk(Context *c, uintptr_t *a) {
   insert_strace("SYS_brk", a, c->GPRx);
 #endif
   // todo, 此时的返回值总是返回0，代表成功
+  printf("%016x\n", end);
   c->GPRx = 0;
 }
 
