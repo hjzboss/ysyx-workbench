@@ -15,12 +15,21 @@ void print_strace();
 #define panic(format, ...) \
   do { \
     Log("\33[1;31msystem panic: " format, ## __VA_ARGS__); \
-    print_strace(); \
     halt(1); \
   } while (0)
 
+#ifdef CONFIG_STRACE
+#undef panic
+#define panic(format, ...) \
+  do { \
+    Log("\33[1;31msystem panic: " format, ## __VA_ARGS__); \
+    print_strace(); \
+    halt(1); \
+  } while (0)
+#endif
+
 #ifdef assert
-# undef assert
+#undef assert
 #endif
 
 #define assert(cond) \
