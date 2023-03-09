@@ -56,6 +56,7 @@ int fs_close(int fd) {
 
 size_t fs_read(int fd, void *buf, size_t len) {
   size_t size = file_table[fd].size;
+  printf("%d\n", size);
   assert(len < size);
   size_t offset = file_table[fd].disk_offset;
   ramdisk_read(buf, offset, len);
