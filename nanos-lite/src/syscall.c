@@ -51,7 +51,7 @@ void syscall_write(Context *c, uintptr_t *a) {
   }
   else
     assert(0);
-#ifdef CONFIG_STRACE
+#ifdef CONFIG_STRACE1
   insert_strace("SYS_write", a, c->GPRx);
   print_strace();
 #endif
