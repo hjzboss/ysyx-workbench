@@ -47,12 +47,13 @@ void init_fs() {
 int fs_open(const char *pathname, int flags, int mode) {
   int n = sizeof(file_table) / sizeof(Finfo);
   for (int i = 3; i < n-1; i++) {
-    printf("shit\n");
     if (strcmp(file_table[i].name, pathname) == 0) {
       return i;
     }
   }
-  panic("Failed to open file!");
+  printf("shit\n");
+  return -1;
+  //panic("Failed to open file!");
 }
 
 int fs_close(int fd) {
