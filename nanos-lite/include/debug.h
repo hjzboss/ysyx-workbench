@@ -3,6 +3,10 @@
 
 #include <common.h>
 
+#ifdef CONFIG_STRACE
+void print_strace();
+#endif
+
 #define Log(format, ...) \
   printf("\33[1;35m[%s,%d,%s] " format "\33[0m\n", \
       __FILE__, __LINE__, __func__, ## __VA_ARGS__)
@@ -14,8 +18,18 @@
     halt(1); \
   } while (0)
 
+#ifdef CONFIG_STRACE
+#undef panic
+#define panic(format, ...) \
+  do { \
+    Log("\33[1;31msystem panic: " format, ## __VA_ARGS__); \
+    print_strace(); \
+    halt(1); \
+  } while (0)
+#endif
+
 #ifdef assert
-# undef assert
+#undef assert
 #endif
 
 #define assert(cond) \

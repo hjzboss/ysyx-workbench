@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <time.h>
 #include "syscall.h"
+#include <stdio.h>
 
 // helper macros
 #define _concat(x, y) x ## y
@@ -15,6 +16,10 @@
 #define _arg3(a0, a1, a2, a3, ...) a3
 #define _arg4(a0, a1, a2, a3, a4, ...) a4
 #define _arg5(a0, a1, a2, a3, a4, a5, ...) a5
+
+extern char _end;
+
+static intptr_t old_brk = -1;
 
 // extract an argument from the macro array
 #define SYSCALL  _args(0, ARGS_ARRAY)
@@ -57,32 +62,35 @@ void _exit(int status) {
 }
 
 int _open(const char *path, int flags, mode_t mode) {
-  _exit(SYS_open);
-  return 0;
+  return _syscall_(SYS_open, (__uint64_t)path, flags, mode);
 }
 
 int _write(int fd, void *buf, size_t count) {
-  _exit(SYS_write);
-  return 0;
+  return _syscall_(SYS_write, fd, (__uint64_t)buf, count);
 }
 
 void *_sbrk(intptr_t increment) {
-  return (void *)-1;
+  if (old_brk == -1) {
+    old_brk = (intptr_t)&_end;
+  }
+  intptr_t new_brk = old_brk + increment;
+  assert(_syscall_(SYS_brk, new_brk, 0, 0) == 0);
+  intptr_t old_brk_tmp = old_brk;
+  // 更新program break，返回旧的program break
+  old_brk = new_brk;
+  return (void *)old_brk_tmp;
 }
 
 int _read(int fd, void *buf, size_t count) {
-  _exit(SYS_read);
-  return 0;
+  return _syscall_(SYS_read, fd, (__uint64_t)buf, count);
 }
 
 int _close(int fd) {
-  _exit(SYS_close);
-  return 0;
+  return _syscall_(SYS_close, fd, 0, 0);
 }
 
 off_t _lseek(int fd, off_t offset, int whence) {
-  _exit(SYS_lseek);
-  return 0;
+  return _syscall_(SYS_lseek, fd, offset, whence);
 }
 
 int _gettimeofday(struct timeval *tv, struct timezone *tz) {
