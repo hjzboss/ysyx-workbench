@@ -101,7 +101,6 @@ void syscall_open(Context *c, uintptr_t *a) {
 }
 
 void syscall_close(Context *c, uintptr_t *a) {
-  assert(0);
   int fd = a[1];
   c->GPRx = fs_close(fd);
 #ifdef CONFIG_STRACE
