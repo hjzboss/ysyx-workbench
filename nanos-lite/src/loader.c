@@ -21,7 +21,6 @@ size_t get_ramdisk_size();
 #endif
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
-  printf("bitch\n");
   int fd = fs_open(filename, 0, 0);
   Elf_Ehdr elf_head;
   fs_read(fd, &elf_head, sizeof(Elf_Ehdr));
@@ -29,11 +28,13 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   // elf magic number assert
   assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
-
+  printf("bitch\n");
   // read phdr head
   Elf_Phdr *p_head = (Elf_Phdr *)malloc(sizeof(Elf_Phdr) * elf_head.e_phnum);
   fs_lseek(fd, elf_head.e_phoff, 0);
+  printf("bitch1\n");
   fs_read(fd, p_head, sizeof(Elf_Phdr) * elf_head.e_phnum);
+  printf("bitch2\n");
   //ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
   // load and set
@@ -49,7 +50,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   fs_close(fd);
 
-  printf("bitch\n");
   return elf_head.e_entry;
 }
 
