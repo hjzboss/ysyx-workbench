@@ -48,6 +48,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   fs_close(fd);
 
+  printf("bitch\n");
   return elf_head.e_entry;
 }
 
