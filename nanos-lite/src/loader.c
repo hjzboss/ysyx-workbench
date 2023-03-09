@@ -26,7 +26,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   fs_read(fd, &elf_head, sizeof(Elf_Ehdr));
   //ramdisk_read(&elf_head, 0, sizeof(Elf_Ehdr));
   // elf magic number assert
-  assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
+  assert(*(uint32_t *)elf_head.e_ident != 0x464C457F);
 
   // read phdr head
   Elf_Phdr *p_head = (Elf_Phdr *)malloc(sizeof(Elf_Phdr) * elf_head.e_phnum);
