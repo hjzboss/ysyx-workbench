@@ -10,9 +10,10 @@ size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 
+
 void syscall_exit(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
-  insert_strace("SYS_exit", a, c->GPRx);
+  insert_strace("SYS_exit", a, c->GPRx, -1);
   print_strace();
   free_strace();
 #endif
@@ -21,7 +22,7 @@ void syscall_exit(Context *c, uintptr_t *a) {
 
 void syscall_yield(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
-  insert_strace("SYS_yield", a, c->GPRx);
+  insert_strace("SYS_yield", a, c->GPRx, -1);
 #endif
   yield();
 }
@@ -30,7 +31,7 @@ void syscall_brk(Context *c, uintptr_t *a) {
   // todo, 此时的返回值总是返回0，代表总是分配成功
   c->GPRx = 0;
 #ifdef CONFIG_STRACE
-  insert_strace("SYS_brk", a, c->GPRx);
+  insert_strace("SYS_brk", a, c->GPRx, -1);
 #endif
 }
 
@@ -44,13 +45,18 @@ void syscall_write(Context *c, uintptr_t *a) {
       putch(*buf);
     }
     c->GPRx = len;
+#ifdef CONFIG_STRACE1
+  insert_strace("SYS_write", a, c->GPRx, -1);
+#endif 
   }
   else {
     // file
     c->GPRx = fs_write(fd, buf, len);
+#ifdef CONFIG_STRACE
+    insert_strace("SYS_write", a, c->GPRx, fd);
+#endif
   }
-#ifdef CONFIG_STRACE1
-  insert_strace("SYS_write", a, c->GPRx);
+#ifdef CONFIG_STRACE
   print_strace();
 #endif
 }
@@ -65,9 +71,12 @@ void syscall_read(Context *c, uintptr_t *a) {
   }
   else {
     c->GPRx = fs_read(fd, buf, len);
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_read", a, c->GPRx, fd);
+#endif
   }
 #ifdef CONFIG_STRACE
-  insert_strace("SYS_read", a, c->GPRx);
+  //insert_strace("SYS_read", a, c->GPRx, -1);
   print_strace();
 #endif
 }
@@ -76,8 +85,10 @@ void syscall_lseek(Context *c, uintptr_t *a) {
   int fd = a[1];
   size_t offset = a[2];
   int whence = a[3];
-  printf("%d\n", whence);
   c->GPRx = fs_lseek(fd, offset, whence);
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_lseek", a, c->GPRx, fd);
+#endif
 }
 
 void syscall_open(Context *c, uintptr_t *a) {
@@ -85,11 +96,17 @@ void syscall_open(Context *c, uintptr_t *a) {
   int flags = a[2];
   unsigned int mode = a[3];
   c->GPRx = fs_open(path, flags, mode);
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_open", a, c->GPRx, c->GPRx);
+#endif
 }
 
 void syscall_close(Context *c, uintptr_t *a) {
   int fd = a[1];
   c->GPRx = fs_close(fd);
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_close", a, c->GPRx, fd);
+#endif
 }
 
 

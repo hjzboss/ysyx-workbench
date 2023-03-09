@@ -1,5 +1,5 @@
 #include <fs.h>
-
+#include <syscall.h>
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
@@ -36,18 +36,27 @@ static Finfo file_table[] __attribute__((used)) = {
 #include "files.h"
 };
 
+static size_t file_num = 0;
+
+char *get_name_by_fd(int fd) {
+  for (int i = 0; i < file_num; i++) {
+    if (i == fd) {
+      return file_table[i].name;
+    }
+  }
+  assert(0);
+}
 
 void init_fs() {
   // TODO: initialize the size of /dev/fb
-  int n = sizeof(file_table) / sizeof(Finfo);
-  for (int i = 0; i < n; i++) {
+  file_num = sizeof(file_table) / sizeof(Finfo);
+  for (int i = 0; i < file_num; i++) {
     file_table[i].open_offset = 0;
   }
 }
 
 int fs_open(const char *pathname, int flags, int mode) {
-  int n = sizeof(file_table) / sizeof(Finfo);
-  for (int i = 3; i < n-1; i++) {
+  for (int i = 3; i < file_num; i++) {
     if (strcmp(file_table[i].name, pathname) == 0) {
       return i;
     }
