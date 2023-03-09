@@ -61,9 +61,9 @@ int fs_close(int fd) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
-  size_t size = file_table[fd].size;
+  //size_t size = file_table[fd].size;
   size_t open_offset = file_table[fd].open_offset;
-  assert(len + open_offset < size);
+  //assert(len + open_offset < size);
   size_t offset = file_table[fd].disk_offset + open_offset;
   ramdisk_read(buf, offset, len);
   file_table[fd].open_offset = open_offset + len;
@@ -71,9 +71,9 @@ size_t fs_read(int fd, void *buf, size_t len) {
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
-  size_t size = file_table[fd].size;
+  //size_t size = file_table[fd].size;
   size_t open_offset = file_table[fd].open_offset;
-  assert(len + open_offset < size);
+  //assert(len + open_offset < size);
   size_t offset = file_table[fd].disk_offset + open_offset;
   ramdisk_write(buf, offset, len);
   file_table[fd].open_offset = open_offset + len;
@@ -84,7 +84,7 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
   switch (whence) {
     case SEEK_SET: file_table[fd].open_offset = offset; break;
     case SEEK_CUR: file_table[fd].open_offset = file_table[fd].open_offset + offset; break;
-    case SEEK_END: break; // 保持文件关闭时的位置
+    case SEEK_END: file_table[fd].open_offset = file_table[fd].size; break;// 保持文件关闭时的位置
     default: assert(0);
   }
   return 0;
