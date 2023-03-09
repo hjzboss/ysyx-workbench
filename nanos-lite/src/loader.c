@@ -35,11 +35,17 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   // load and set
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
-    if (p_head->p_type != PT_LOAD) continue;
-    printf("p_head->p_filesz=%u\n", p_head->p_filesz);
-    fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
+    if (p_head->p_type == PT_LOAD) {
+      printf("p_head->p_filesz=%u\n", p_head->p_filesz);
+      fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
+      //ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
+      memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);      
+    }
+    else continue;
+    //printf("p_head->p_filesz=%u\n", p_head->p_filesz);
+    //fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
     //ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
-    memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);
+    //memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);
   }
 
   fs_close(fd);
