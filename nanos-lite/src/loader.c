@@ -43,7 +43,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       //ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
       memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);      
     }
-    else continue;
   }
 
   printf("bitch\n");
