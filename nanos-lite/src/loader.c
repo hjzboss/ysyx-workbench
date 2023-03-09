@@ -28,13 +28,10 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   // elf magic number assert
   assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
-  printf("bitch\n");
   // read phdr head
   Elf_Phdr *p_head = (Elf_Phdr *)malloc(sizeof(Elf_Phdr) * elf_head.e_phnum);
   fs_lseek(fd, elf_head.e_phoff, 0);
-  printf("bitch1\n");
   fs_read(fd, p_head, sizeof(Elf_Phdr) * elf_head.e_phnum);
-  printf("bitch2\n");
   //ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
   // load and set
@@ -42,6 +39,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if (p_head->p_type == PT_LOAD) {
       fs_lseek(fd, p_head->p_offset, 0);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
+      printf("bitch\n");
       //ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
       memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);      
     }
