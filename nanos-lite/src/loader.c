@@ -25,6 +25,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Ehdr elf_head;
   fs_read(fd, &elf_head, sizeof(Elf_Ehdr));
   //ramdisk_read(&elf_head, 0, sizeof(Elf_Ehdr));
+
   // elf magic number assert
   assert(*(uint32_t *)elf_head.e_ident == 0x464C457F);
 
@@ -36,9 +37,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   // load and set
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
-    printf("p_head->p_filesz=%p, offset=%p\n", p_head->p_filesz, p_head->p_offset);
     if (p_head->p_type == PT_LOAD) {
-      //printf("p_head->p_filesz=%u\n", p_head->p_filesz);
       fs_lseek(fd, p_head->p_offset, 0);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
       //ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
