@@ -45,12 +45,10 @@ void syscall_write(Context *c, uintptr_t *a) {
     }
     c->GPRx = len;
   }
-  else if (fd == 3) {
+  else {
     // file
     c->GPRx = fs_write(fd, buf, len);
   }
-  else
-    assert(0);
 #ifdef CONFIG_STRACE1
   insert_strace("SYS_write", a, c->GPRx);
   print_strace();
@@ -65,11 +63,9 @@ void syscall_read(Context *c, uintptr_t *a) {
   if (fd == 1 || fd == 2) {
     panic("doesn't implement");
   }
-  else if (fd == 3) {
+  else {
     c->GPRx = fs_read(fd, buf, len);
   }
-  else 
-    assert(0);
 #ifdef CONFIG_STRACE
   insert_strace("SYS_read", a, c->GPRx);
   print_strace();
