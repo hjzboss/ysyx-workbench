@@ -66,7 +66,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
   assert(len + open_offset <= size);
   size_t offset = file_table[fd].disk_offset + open_offset;
   size_t rem = offset + len > size ? (size - offset) : len;
-  ramdisk_read(buf, offset, len);
+  ramdisk_read(buf, offset, rem);
   file_table[fd].open_offset = open_offset + rem;
   return rem;
 }
