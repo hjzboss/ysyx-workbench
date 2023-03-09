@@ -47,7 +47,6 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
   unsigned long ptr;
-  unsigned uval;
   int len;
   int arg_cnt = 0;
   char str[32];
@@ -87,20 +86,6 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       case 'd':
         ival = va_arg(ap, int);
         num2str(str, ival, 10);
-        len = strlen(str);
-        rem = fix_num - len;
-        if (rem > 0) {
-          fix_ch = fix_zero ? '0' : ' ';
-          for (int i = 0; i < rem; i++) *out++ = fix_ch;
-        }
-        // todo
-        strcpy(out, str);
-        out += len;
-        arg_cnt += len;
-        break;
-      case 'u':
-        uval = va_arg(ap, unsigned);
-        num2str(str, uval, 10);
         len = strlen(str);
         rem = fix_num - len;
         if (rem > 0) {
