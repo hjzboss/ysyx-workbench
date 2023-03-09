@@ -87,7 +87,7 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
   switch (whence) {
     case SEEK_SET: file_table[fd].open_offset = offset; return offset;
     case SEEK_CUR: file_table[fd].open_offset = file_table[fd].open_offset + offset; return file_table[fd].open_offset;
-    case SEEK_END: file_table[fd].open_offset = file_table[fd].size; return file_table[fd].open_offset;// 保持文件关闭时的位置
+    case SEEK_END: file_table[fd].open_offset = file_table[fd].size + offset; return file_table[fd].open_offset;// 保持文件关闭时的位置
     default: assert(0);
   }
   return -1;
