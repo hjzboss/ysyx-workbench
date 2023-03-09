@@ -1,6 +1,14 @@
 #ifndef __SYSCALL_H__
 #define __SYSCALL_H__
 
+#define CONFIG_STRACE
+
+#ifdef CONFIG_STRACE
+void insert_strace(char *name, uint64_t *args, uint64_t ret);
+void free_strace();
+void print_strace();
+#endif
+
 enum {
   SYS_exit,
   SYS_yield,

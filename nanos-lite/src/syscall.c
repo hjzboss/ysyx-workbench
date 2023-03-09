@@ -1,6 +1,8 @@
 #include <common.h>
 #include "syscall.h"
 
+void halt(int code);
+void yield();
 void putch(char ch);
 int fs_open(const char *pathname, int flags, int mode);
 size_t fs_read(int fd, void *buf, size_t len);
