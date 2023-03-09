@@ -3,7 +3,9 @@
 
 #include <common.h>
 
+#ifdef CONFIG_STRACE
 void print_strace();
+#endif
 
 #define Log(format, ...) \
   printf("\33[1;35m[%s,%d,%s] " format "\33[0m\n", \
