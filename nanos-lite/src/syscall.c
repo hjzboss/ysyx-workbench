@@ -1,6 +1,12 @@
 #include <common.h>
 #include "syscall.h"
 
+#ifdef CONFIG_STRACE
+void insert_strace(char *name, uint64_t *args, uint64_t ret, int fd);
+void free_strace();
+void print_strace();
+#endif
+
 void halt(int code);
 void yield();
 void putch(char ch);
