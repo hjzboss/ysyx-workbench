@@ -34,6 +34,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   fs_read(fd, p_head, sizeof(Elf_Phdr) * elf_head.e_phnum);
   //ramdisk_read(p_head, elf_head.e_phoff, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
+  printf("%d\n", elf_head.e_phnum);
+
   // load and set
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
     printf("bitch\n");
