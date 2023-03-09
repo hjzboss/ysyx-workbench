@@ -39,14 +39,13 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if (p_head->p_type == PT_LOAD) {
       fs_lseek(fd, p_head->p_offset, 0);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
-      printf("bitch\n");
       //ramdisk_read((uint8_t *)p_head->p_vaddr, p_head->p_offset, p_head->p_filesz);
       memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);      
-      printf("bitch\n");
     }
     else continue;
   }
 
+  printf("bitch\n");
   fs_close(fd);
 
   return elf_head.e_entry;
