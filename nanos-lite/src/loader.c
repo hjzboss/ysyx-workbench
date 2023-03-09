@@ -36,6 +36,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   // load and set
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
+    printf("bitch\n");
     if (p_head->p_type == PT_LOAD) {
       fs_lseek(fd, p_head->p_offset, 0);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
