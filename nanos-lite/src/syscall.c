@@ -45,23 +45,11 @@ void syscall_write(Context *c, uintptr_t *a) {
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
-  c->GPRx = -1;
-  if (fd == 1 || fd == 2) {
-    for (int i = 0; i < len; i++, buf++) {
-      putch(*buf);
-    }
-    c->GPRx = len;
+  // file
+  c->GPRx = fs_write(fd, buf, len);
 #ifdef CONFIG_STRACE
-  insert_strace("SYS_write", a, c->GPRx, -1);
-#endif 
-  }
-  else {
-    // file
-    c->GPRx = fs_write(fd, buf, len);
-#ifdef CONFIG_STRACE
-    insert_strace("SYS_write", a, c->GPRx, fd);
+  insert_strace("SYS_write", a, c->GPRx, fd);
 #endif
-  }
 }
 
 void syscall_read(Context *c, uintptr_t *a) {
