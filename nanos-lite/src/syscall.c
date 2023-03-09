@@ -57,7 +57,7 @@ void syscall_write(Context *c, uintptr_t *a) {
 #endif
   }
 #ifdef CONFIG_STRACE
-  print_strace();
+  //print_strace();
 #endif
 }
 
@@ -77,7 +77,7 @@ void syscall_read(Context *c, uintptr_t *a) {
   }
 #ifdef CONFIG_STRACE
   //insert_strace("SYS_read", a, c->GPRx, -1);
-  print_strace();
+  //print_strace();
 #endif
 }
 
