@@ -1,5 +1,4 @@
 #include <fs.h>
-#include <klib.h>
 
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
@@ -58,7 +57,6 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 int fs_close(int fd) {
   // todo
-  file_table[fd].open_offset = 0;
   return 0;
 }
 
@@ -84,9 +82,9 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
   switch (whence) {
-    case 0: file_table[fd].open_offset = offset; break;
-    case 1: file_table[fd].open_offset = file_table[fd].open_offset + offset; break;
-    case 2: TODO(); break;
+    case SEEK_SET: file_table[fd].open_offset = offset; break;
+    case SEEK_CUR: file_table[fd].open_offset = file_table[fd].open_offset + offset; break;
+    case SEEK_END: break; // 保持文件关闭时的位置
     default: assert(0);
   }
   return 0;
