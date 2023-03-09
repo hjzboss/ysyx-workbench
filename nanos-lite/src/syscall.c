@@ -45,7 +45,7 @@ void syscall_write(Context *c, uintptr_t *a) {
       putch(*buf);
     }
     c->GPRx = len;
-#ifdef CONFIG_STRACE1
+#ifdef CONFIG_STRACE
   insert_strace("SYS_write", a, c->GPRx, -1);
 #endif 
   }
@@ -56,9 +56,6 @@ void syscall_write(Context *c, uintptr_t *a) {
     insert_strace("SYS_write", a, c->GPRx, fd);
 #endif
   }
-#ifdef CONFIG_STRACE
-  //print_strace();
-#endif
 }
 
 void syscall_read(Context *c, uintptr_t *a) {
@@ -75,10 +72,6 @@ void syscall_read(Context *c, uintptr_t *a) {
   insert_strace("SYS_read", a, c->GPRx, fd);
 #endif
   }
-#ifdef CONFIG_STRACE
-  //insert_strace("SYS_read", a, c->GPRx, -1);
-  //print_strace();
-#endif
 }
 
 void syscall_lseek(Context *c, uintptr_t *a) {

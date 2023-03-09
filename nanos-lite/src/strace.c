@@ -45,10 +45,10 @@ void print_strace() {
   snode *ptr = strace_head;
   while(ptr != NULL) {
     if (ptr->fd != -1) {
-      Log("syscall: name=%s, args=%d %d %d %d, ret=%d, file=%s\n", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret, get_name_by_fd(ptr->fd));
+      Log("syscall: name=%s, args=%d %d %d %d, ret=%d, file=%s", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret, get_name_by_fd(ptr->fd));
     }
     else {
-      Log("syscall: name=%s, args=%d %d %d %d, ret=%d\n", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret);
+      Log("syscall: name=%s, args=%d %d %d %d, ret=%d", ptr->name, ptr->args[0], ptr->args[1], ptr->args[2], ptr->args[3], ptr->ret);
     }
     ptr = ptr->next;
   }
