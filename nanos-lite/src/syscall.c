@@ -2,6 +2,11 @@
 #include "syscall.h"
 
 void putch(char ch);
+int fs_open(const char *pathname, int flags, int mode);
+size_t fs_read(int fd, void *buf, size_t len);
+size_t fs_write(int fd, const void *buf, size_t len);
+size_t fs_lseek(int fd, size_t offset, int whence);
+int fs_close(int fd);
 
 void syscall_exit(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
@@ -31,17 +36,61 @@ void syscall_write(Context *c, uintptr_t *a) {
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
-  c->GPRx = 0;
+  c->GPRx = -1;
   if (fd == 1 || fd == 2) {
     for (int i = 0; i < len; i++, buf++) {
       putch(*buf);
     }
     c->GPRx = len;
   }
+  else if (fd == 3) {
+    // file
+    c->GPRx = fs_write(fd, buf, len);
+  }
+  else
+    assert(0);
 #ifdef CONFIG_STRACE
   insert_strace("SYS_write", a, c->GPRx);
   print_strace();
 #endif
+}
+
+void syscall_read(Context *c, uintptr_t *a) {
+  int fd = a[1];
+  uint8_t *buf = (uint8_t *)a[2];
+  int len = a[3];
+  c->GPRx = -1;
+  if (fd == 1 || fd == 2) {
+    panic("doesn't implement");
+  }
+  else if (fd == 3) {
+    c->GPRx = fs_read(fd, buf, len);
+  }
+  else 
+    assert(0);
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_read", a, c->GPRx);
+  print_strace();
+#endif
+}
+
+void syscall_lseek(Context *c, uintptr_t *a) {
+  int fd = a[1];
+  size_t offset = a[2];
+  int whence = a[3];
+  c->GPRx = fs_lseek(fd, offset, whence);
+}
+
+void syscall_open(Context *c, uintptr_t *a) {
+  char *path = (char *)a[1];
+  int flags = a[2];
+  unsigned int mode = a[3];
+  c->GPRx = fs_open(path, flags, mode);
+}
+
+void syscall_close(Context *c, uintptr_t *a) {
+  int fd = a[1];
+  c->GPRx = fs_close(fd);
 }
 
 
@@ -57,6 +106,10 @@ void do_syscall(Context *c) {
     case SYS_exit: syscall_exit(c, a); break;
     case SYS_write: syscall_write(c, a); break;
     case SYS_brk: syscall_brk(c, a); break;
+    case SYS_read: syscall_read(c, a); break;
+    case SYS_lseek: syscall_lseek(c, a); break;
+    case SYS_open: syscall_open(c, a); break;
+    case SYS_close: syscall_close(c, a); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
