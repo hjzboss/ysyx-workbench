@@ -12,6 +12,7 @@ typedef struct {
   size_t disk_offset;
   ReadFn read;
   WriteFn write;
+  size_t open_offset; // 当前读写的位置
 } Finfo;
 
 enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_FB};
@@ -28,15 +29,19 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
 
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {
-  [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
-  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
-  [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
+  [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write, 0},
+  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write, 0},
+  [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write, 0},
 #include "files.h"
 };
 
 
 void init_fs() {
   // TODO: initialize the size of /dev/fb
+  int n = sizeof(file_table) / sizeof(Finfo);
+  for (int i = 0; i < n; i++) {
+    file_table[i].open_offset = 0;
+  }
 }
 
 int fs_open(const char *pathname, int flags, int mode) {
@@ -51,27 +56,37 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 int fs_close(int fd) {
   // todo
+  file_table[fd].open_offset = 0;
   return 0;
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
   size_t size = file_table[fd].size;
-  printf("size=%d, len=%u\n", size, len);
-  assert(len < size);
-  size_t offset = file_table[fd].disk_offset;
+  size_t open_offset = file_table[fd].open_offset;
+  assert(len + open_offset < size);
+  size_t offset = file_table[fd].disk_offset + open_offset;
   ramdisk_read(buf, offset, len);
+  file_table[fd].open_offset = open_offset + len;
   return len;
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
   size_t size = file_table[fd].size;
-  assert(len < size);
-  size_t offset = file_table[fd].disk_offset;
+  size_t open_offset = file_table[fd].open_offset;
+  assert(len + open_offset < size);
+  size_t offset = file_table[fd].disk_offset + open_offset;
   ramdisk_write(buf, offset, len);
+  file_table[fd].open_offset = open_offset + len;
   return len;
 }
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
-  panic("fs_lseek todo");
+  switch (whence) {
+    case 0: file_table[fd].open_offset = offset; break;
+    case 1: file_table[fd].open_offset = file_table[fd].open_offset + offset; break;
+    case 2: TODO(); break;
+    default: assert(0);
+  }
+  return 0;
 }
 
