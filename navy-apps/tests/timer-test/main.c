@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 int main() {
+  /*
   struct timeval *tv;
   uint64_t old_usec = 0;
   while (gettimeofday(tv, NULL) == 0) {
@@ -13,5 +14,6 @@ int main() {
       old_usec = usec;
     }
   }
+  */
   return 0;
 }
