@@ -1,5 +1,6 @@
 #include <common.h>
 #include "syscall.h"
+#include <sys/time.h>
 
 #ifdef CONFIG_STRACE
 void insert_strace(char *name, uint64_t *args, uint64_t ret, int fd);
@@ -96,6 +97,15 @@ void syscall_close(Context *c, uintptr_t *a) {
 #endif
 }
 
+void syscall_gettimeofday(Context *c, uintptr_t *a) {
+  // 此处返回的是系统启动的时间，todo
+  uint64_t us = io_read(AM_TIMER_UPTIME).us;
+  ((struct timeval *)a[1])->tv_usec = us;
+  ((struct timeval *)a[1])->tv_sec = us / 1000000;
+  // todo: timezone
+  c->GPRx = 0;
+}
+
 
 void do_syscall(Context *c) {
   uintptr_t a[4];
@@ -113,6 +123,7 @@ void do_syscall(Context *c) {
     case SYS_lseek: syscall_lseek(c, a); break;
     case SYS_open: syscall_open(c, a); break;
     case SYS_close: syscall_close(c, a); break;
+    case SYS_gettimeofday: syscall_gettimeofday(c, a); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
