@@ -9,6 +9,7 @@ int main() {
   uint64_t old_usec = 0;
   while (gettimeofday(tv, NULL) == 0) {
     uint64_t usec = tv->tv_usec;
+    printf("%d\n", usec);
     if (usec - old_usec == 500000) {
       printf("test\n");
       old_usec = usec;
