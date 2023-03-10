@@ -6,7 +6,6 @@
 int main() {
   struct timeval *tv;
   uint64_t old_usec = 0;
-  printf("shit\n");
   while (gettimeofday(tv, NULL) == 0) {
     uint64_t usec = tv->tv_usec;
     if (usec - old_usec == 500000) {
