@@ -3,6 +3,7 @@
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 size_t serial_write(const void *buf, size_t offset, size_t len);
+size_t events_read(void *buf, size_t offset, size_t len);
 
 typedef size_t (*ReadFn) (void *buf, size_t offset, size_t len);
 typedef size_t (*WriteFn) (const void *buf, size_t offset, size_t len);
@@ -33,6 +34,7 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write, 0},
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write, 0},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write, 0},
+  {"/dev/events", 0, 0, events_read, invalid_write, 0},
 #include "files.h"
 };
 
@@ -71,6 +73,9 @@ int fs_close(int fd) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
+  if (fd == 3) {
+    return file_table[fd].read(buf, 0, len);
+  }
   size_t size = file_table[fd].size;
   size_t open_offset = file_table[fd].open_offset;
   size_t offset = file_table[fd].disk_offset + open_offset;

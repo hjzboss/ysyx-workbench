@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+int _read(int fd, void *buf, size_t count);
+
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
@@ -16,8 +18,7 @@ uint32_t NDL_GetTicks() {
 }
 
 int NDL_PollEvent(char *buf, int len) {
-  
-  return 0;
+  return _read(3, buf, len) == 0 ? 0 : 1;
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
