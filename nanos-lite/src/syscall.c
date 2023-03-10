@@ -100,10 +100,9 @@ void syscall_close(Context *c, uintptr_t *a) {
 void syscall_gettimeofday(Context *c, uintptr_t *a) {
   // 此处返回的是系统启动的时间，todo
   uint64_t us = io_read(AM_TIMER_UPTIME).us;
+  printf("%p\n", a[1]);
   ((struct timeval *)a[1])->tv_usec = us;
-  printf("shit\n");
   ((struct timeval *)a[1])->tv_sec = us / 1000000;
-  printf("shit1\n");
   // todo: timezone
   c->GPRx = 0;
 }
