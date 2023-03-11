@@ -83,7 +83,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
   size_t upper_bound = file_table[fd].disk_offset + size;
   size_t rem = offset + len > upper_bound ? (upper_bound - offset) : len;
   if (file_table[fd].read != NULL) {
-    file_table[fd].read(buf, offset, rem);
+    return file_table[fd].read(buf, offset, rem);
   }
   else {
     ramdisk_read(buf, offset, rem);
