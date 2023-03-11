@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <assert.h>
 
 int _read(int fd, void *buf, size_t count);
 int _open(const char *path, int flags, mode_t mode);
@@ -42,10 +43,22 @@ void NDL_OpenCanvas(int *w, int *h) {
     }
     close(fbctl);
   }
-  int fd = _open("/proc/disinfo", 0, 0);
+  // 获取屏幕大小
   char buf[50];
+  int fd = _open("/proc/disinfo", 0, 0);
   size_t len = _read(fd, buf, 32);
-  
+  // 将字符串进行分割，获取width和height
+  char *first_item = strtok(buf, "\n");
+  char *second_item = strtok(NULL, "\n");
+  strtok(first_item, " ");
+  char *width_s = strtok(NULL, " ");
+  assert(width_s != NULL);
+  strtok(second_item, " ");
+  char *height_s = strtok(NULL, " ");
+  assert(height_s != NULL);
+  int width = atoi(width_s);
+  int height = atoi(height_s);
+  printf("width=%d, height=%d\n", width, height);
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
