@@ -77,12 +77,20 @@ int fs_close(int fd) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
+  if (fd == FD_EVENTS) {
+    return file_table[fd].read(buf, 0, len);
+  }
   size_t size = file_table[fd].size;
   size_t open_offset = file_table[fd].open_offset;
   size_t offset = file_table[fd].disk_offset + open_offset;
   size_t upper_bound = file_table[fd].disk_offset + size;
   size_t rem = offset + len > upper_bound ? (upper_bound - offset) : len;
-  ramdisk_read(buf, offset, rem);
+  if (file_table[fd].read != NULL) {
+    file_table[fd].read(buf, offset, rem);
+  }
+  else {
+    ramdisk_read(buf, offset, rem);
+  }
   file_table[fd].open_offset = open_offset + rem;
   return rem;
 }
