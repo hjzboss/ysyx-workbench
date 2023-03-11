@@ -50,6 +50,7 @@ size_t fb_write(const void *buf, size_t offset, size_t len) {
   assert(y <= h);
   // 向(x, y)处写入len个字节，由于是按像素大小(32位)写入，因此写入的长度是len / 4
   io_write(AM_GPU_FBDRAW, x, y, (char *)buf, len / 4, 1, true);
+  printf("shit");
   return len;
 }
 
