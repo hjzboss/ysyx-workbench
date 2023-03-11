@@ -6,7 +6,6 @@
 #include <sys/time.h>
 #include <assert.h>
 
-int _read(int fd, void *buf, size_t count);
 int _open(const char *path, int flags, mode_t mode);
 
 static int evtdev = -1;
@@ -22,7 +21,7 @@ uint32_t NDL_GetTicks() {
 int NDL_PollEvent(char *buf, int len) {
   // 获取键盘输入事件
   int fd = _open("/dev/events", 0, 0);
-  return _read(fd, buf, len) == 0 ? 0 : 1;
+  return read(fd, buf, len) == 0 ? 0 : 1;
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
@@ -46,8 +45,8 @@ void NDL_OpenCanvas(int *w, int *h) {
   // 获取屏幕大小
   char buf[50];
   int fd = _open("/proc/disinfo", 0, 0);
-  size_t len = _read(fd, buf, 32);
-  // 将字符串进行分割，获取width和height
+  size_t len = read(fd, buf, 32);
+  // 将字符串进行分割，获取屏幕的width和height
   char *first_item = strtok(buf, "\n");
   char *second_item = strtok(NULL, "\n");
   strtok(first_item, " ");
@@ -59,11 +58,24 @@ void NDL_OpenCanvas(int *w, int *h) {
 
   int width = atoi(width_s);
   int height = atoi(height_s);
-  *w = width;
-  *h = height;
+  assert(width > 0 && height > 0);
+  
+  // 判断画布的大小是否正常
+  int canvas_w = *w;
+  int canvas_h = *h;
+  if (canvas_w > width || canvas_w == 0)
+    screen_w = width;
+  if (canvas_h > height || canvas_h == 0)
+    screen_h = height;
+
+  *w = screen_w;
+  *h = screen_h;
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  int fd = _open("/dev/fb", 0, 0);
+  lseek(fd, (y * screen_w + x) * 4, SEEK_SET);
+  write(fd, pixels, w * h * 4);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
