@@ -77,9 +77,6 @@ int fs_close(int fd) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
-  if (fd == 3) {
-    return file_table[fd].read(buf, 0, len);
-  }
   size_t size = file_table[fd].size;
   size_t open_offset = file_table[fd].open_offset;
   size_t offset = file_table[fd].disk_offset + open_offset;

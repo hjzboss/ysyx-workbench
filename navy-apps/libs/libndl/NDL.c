@@ -42,7 +42,10 @@ void NDL_OpenCanvas(int *w, int *h) {
     }
     close(fbctl);
   }
-  printf("shit\n");
+  int fd = _open("/proc/disinfo", 0, 0);
+  char buf[50];
+  size_t len = _read(fd, buf, 32);
+  
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
