@@ -19,12 +19,14 @@ uint32_t NDL_GetTicks() {
 }
 
 int NDL_PollEvent(char *buf, int len) {
+  // 获取键盘输入事件
   int fd = _open("/dev/events", 0, 0);
   return _read(fd, buf, len) == 0 ? 0 : 1;
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
   if (getenv("NWM_APP")) {
+    printf("shit\n");
     int fbctl = 4;
     fbdev = 5;
     screen_w = *w; screen_h = *h;
