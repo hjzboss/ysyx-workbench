@@ -112,9 +112,9 @@ size_t fs_write(int fd, const void *buf, size_t len) {
     assert(len + open_offset <= size);
   size_t offset = file_table[fd].disk_offset + open_offset;
   size_t upper_bound = file_table[fd].disk_offset + size;
-  size_t rem = offset + len >= upper_bound ? (upper_bound - offset) : len;
+  size_t rem = offset + len > upper_bound ? (upper_bound - offset) : len;
   if (file_table[fd].write != NULL) {
-    file_table[fd].write(buf, offset, rem);
+    file_table[fd].write(buf, offset, len);
   }
   else {
     ramdisk_write(buf, offset, rem);
