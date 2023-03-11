@@ -11,6 +11,7 @@ int _open(const char *path, int flags, mode_t mode);
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
+static int fb_fd;
 
 uint32_t NDL_GetTicks() {
   struct timeval *tv = (struct timeval *)malloc(sizeof(struct timeval));
@@ -73,9 +74,9 @@ void NDL_OpenCanvas(int *w, int *h) {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  int fd = _open("/dev/fb", 0, 0);
-  lseek(fd, (y * screen_w + x) * 4, SEEK_SET);
-  write(fd, pixels, w * h * 4);
+  int fb_fd = _open("/dev/fb", 0, 0);
+  lseek(fb_fd, (y * screen_w + x) * 4, SEEK_SET);
+  write(fb_fd, pixels, w * h * 4);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
@@ -100,4 +101,5 @@ int NDL_Init(uint32_t flags) {
 }
 
 void NDL_Quit() {
+  close(fb_fd);
 }
