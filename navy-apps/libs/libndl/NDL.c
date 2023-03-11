@@ -11,6 +11,7 @@ int _open(const char *path, int flags, mode_t mode);
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
+static int fb_w = 0, fb_h = 0;
 static int fb_fd;
 
 uint32_t NDL_GetTicks() {
@@ -57,24 +58,28 @@ void NDL_OpenCanvas(int *w, int *h) {
   char *height_s = strtok(NULL, " ");
   assert(height_s != NULL);
 
-  int width = atoi(width_s);
-  int height = atoi(height_s);
-  assert(width > 0 && height > 0);
+  fb_w = atoi(width_s);
+  fb_h = atoi(height_s);
+  assert(fb_w > 0 && fb_h > 0);
   
   // 判断画布的大小是否正常
   int canvas_w = *w;
   int canvas_h = *h;
-  if (canvas_w > width || canvas_w == 0)
-    screen_w = width;
-  if (canvas_h > height || canvas_h == 0)
-    screen_h = height;
+  if (canvas_w > fb_w || canvas_w == 0)
+    screen_w = fb_w;
+  else
+    screen_w = canvas_w;
+
+  if (canvas_h > fb_h || canvas_h == 0)
+    screen_h = fb_h;
+  else
+    screen_h = canvas_h;
 
   *w = screen_w;
   *h = screen_h;
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  printf("NDL: x=%d, y=%d\n", x, y);
   int fb_fd = _open("/dev/fb", 0, 0);
   lseek(fb_fd, (y * screen_w + x) * 4, SEEK_SET);
   write(fb_fd, pixels, w * h * 4);
