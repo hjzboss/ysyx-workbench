@@ -10,7 +10,7 @@ int _open(const char *path, int flags, mode_t mode);
 
 static int evtdev = -1;
 static int fbdev = -1;
-static int screen_w = 0, screen_h = 0;
+static int screen_w = 0, screen_h = 0, screen_x = 0, screen_y = 0;
 static int fb_w = 0, fb_h = 0;
 static int fb_fd;
 
@@ -77,12 +77,18 @@ void NDL_OpenCanvas(int *w, int *h) {
 
   *w = screen_w;
   *h = screen_h;
+
+  screen_x = fb_w / 2 - screen_w / 2;
+  screen_y = fb_h / 2 - screen_h / 2;
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int fb_fd = _open("/dev/fb", 0, 0);
-  lseek(fb_fd, (y * screen_w + x) * 4, SEEK_SET);
-  write(fb_fd, pixels, w * h * 4);
+
+  for(int i = 0; i < h; i++) {  
+    lseek(fb_fd, ((y + screen_y + i) * fb_w + x + screen_x) * 4, SEEK_SET);
+    write(fb_fd, pixels + i * w, w * 4);
+  }
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
