@@ -56,9 +56,11 @@ void NDL_OpenCanvas(int *w, int *h) {
   strtok(second_item, " ");
   char *height_s = strtok(NULL, " ");
   assert(height_s != NULL);
+
   int width = atoi(width_s);
   int height = atoi(height_s);
-  printf("width=%d, height=%d\n", width, height);
+  *w = width;
+  *h = height;
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {

@@ -58,6 +58,12 @@ void init_fs() {
   file_num = sizeof(file_table) / sizeof(Finfo);
   for (int i = 0; i < file_num; i++) {
     file_table[i].open_offset = 0;
+    if (i == FD_FB) {
+      AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
+      // 初始化显存的大小，每个像素32位(4字节)
+      // 每个像素是`00rrggbb`的形式, 8位颜色
+      file_table[i].size = cfg.width * cfg.height * 4;
+    }
   }
 }
 
@@ -94,17 +100,25 @@ size_t fs_read(int fd, void *buf, size_t len) {
 
 size_t fs_write(int fd, const void *buf, size_t len) {
   // todo
+  /*
   if (file_table[fd].write != NULL) {
     file_table[fd].write(buf, 0, len);
     return len;
   }
+  */
   size_t size = file_table[fd].size;
   size_t open_offset = file_table[fd].open_offset;
-  assert(len + open_offset <= size);
+  if (fd != FD_STDOUT && fd != FD_STDERR)
+    assert(len + open_offset <= size);
   size_t offset = file_table[fd].disk_offset + open_offset;
   size_t upper_bound = file_table[fd].disk_offset + size;
   size_t rem = offset + len > upper_bound ? (upper_bound - offset) : len;
-  ramdisk_write(buf, offset, rem);
+  if (file_table[fd].write != NULL) {
+    file_table[fd].write(buf, offset, rem);
+  }
+  else {
+    ramdisk_write(buf, offset, rem);
+  }
   file_table[fd].open_offset = open_offset + rem;
   return rem;
 }
