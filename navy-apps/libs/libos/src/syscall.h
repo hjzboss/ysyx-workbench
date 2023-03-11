@@ -1,6 +1,5 @@
 #ifndef __SYSCALL_H__
 #define __SYSCALL_H__
-#include <common.h>
 
 enum {
   SYS_exit,

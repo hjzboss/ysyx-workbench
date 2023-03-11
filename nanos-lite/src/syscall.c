@@ -1,5 +1,6 @@
 #include <common.h>
 #include "syscall.h"
+#include <sys/time.h>
 
 #ifdef CONFIG_STRACE
 void insert_strace(char *name, uint64_t *args, uint64_t ret, int fd);
@@ -45,23 +46,11 @@ void syscall_write(Context *c, uintptr_t *a) {
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
-  c->GPRx = -1;
-  if (fd == 1 || fd == 2) {
-    for (int i = 0; i < len; i++, buf++) {
-      putch(*buf);
-    }
-    c->GPRx = len;
+  // file
+  c->GPRx = fs_write(fd, buf, len);
 #ifdef CONFIG_STRACE
-  insert_strace("SYS_write", a, c->GPRx, -1);
-#endif 
-  }
-  else {
-    // file
-    c->GPRx = fs_write(fd, buf, len);
-#ifdef CONFIG_STRACE
-    insert_strace("SYS_write", a, c->GPRx, fd);
+  insert_strace("SYS_write", a, c->GPRx, fd);
 #endif
-  }
 }
 
 void syscall_read(Context *c, uintptr_t *a) {
@@ -108,6 +97,15 @@ void syscall_close(Context *c, uintptr_t *a) {
 #endif
 }
 
+void syscall_gettimeofday(Context *c, uintptr_t *a) {
+  // 此处返回的是系统启动的时间，todo，时钟不精确
+  uint64_t us = io_read(AM_TIMER_UPTIME).us;
+  ((struct timeval *)a[1])->tv_usec = us;
+  ((struct timeval *)a[1])->tv_sec = us / 1000000;
+  // todo: timezone
+  c->GPRx = 0;
+}
+
 
 void do_syscall(Context *c) {
   uintptr_t a[4];
@@ -125,6 +123,7 @@ void do_syscall(Context *c) {
     case SYS_lseek: syscall_lseek(c, a); break;
     case SYS_open: syscall_open(c, a); break;
     case SYS_close: syscall_close(c, a); break;
+    case SYS_gettimeofday: syscall_gettimeofday(c, a); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
