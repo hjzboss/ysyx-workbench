@@ -34,7 +34,7 @@ SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
   s->flags = flags;
   s->format = malloc(sizeof(SDL_PixelFormat));
   assert(s->format);
-  if (depth == 8) {
+  if (depth == 32) {
     s->format->palette = malloc(sizeof(SDL_Palette));
     assert(s->format->palette);
     s->format->palette->colors = malloc(sizeof(SDL_Color) * 256);
@@ -42,7 +42,6 @@ SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
     memset(s->format->palette->colors, 0, sizeof(SDL_Color) * 256);
     s->format->palette->ncolors = 256;
   } else {
-    printf("shit\n");
     s->format->palette = NULL;
     s->format->Rmask = Rmask; s->format->Rshift = maskToShift(Rmask); s->format->Rloss = 0;
     s->format->Gmask = Gmask; s->format->Gshift = maskToShift(Gmask); s->format->Gloss = 0;
