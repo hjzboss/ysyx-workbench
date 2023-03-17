@@ -212,7 +212,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     uint32_t *ABGRdata = malloc(h * w * 4);
     assert(ABGRdata);
     uint32_t *temp = ABGRdata;
-
+    printf("shit\n");
     uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
     for (int j = 0; j < h; j++) {
       for (int i = 0; i < w; i++) {
@@ -221,15 +221,17 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
       }
       palette_data += s->w - w;
     }
-
+    printf("shit1\n");
     uint32_t *ARGBdata = malloc(h * w * 4);
     assert(ARGBdata);
     // color中保存的像素形式为00GGBBRR的形式，需要转变为00RRGGBB的形式
     ConvertPixelsARGB_ABGR(ARGBdata, ABGRdata, h * w);
+    printf("shit2\n");
     NDL_DrawRect((uint32_t*)ARGBdata, x, y, w, h);
+    printf("shit3\n");
     free(ABGRdata);
     free(ARGBdata);
-    printf("shit\n");
+    printf("shit4\n");
     return;
   }
   NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
