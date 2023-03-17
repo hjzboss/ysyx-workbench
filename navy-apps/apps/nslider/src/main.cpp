@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#define W 200
-#define H 100
+#define W 400
+#define H 300
 
 // USAGE:
 //   j/down - page down
