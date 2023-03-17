@@ -24,10 +24,12 @@ void render() {
     SDL_FreeSurface(slide);
   }
   char fname[256];
-  sprintf(fname, path, cur);
-  slide = SDL_LoadBMP(fname);
-  assert(slide);
   printf("shit\n");
+  sprintf(fname, path, cur);
+  printf("shit1\n");
+  slide = SDL_LoadBMP(fname);
+  printf("shit2\n");
+  assert(slide);
   SDL_UpdateRect(slide, 0, 0, 0, 0);
 }
 
