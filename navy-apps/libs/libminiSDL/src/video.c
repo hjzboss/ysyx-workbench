@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
@@ -202,6 +203,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   The colors values of a SDL_Surfaces palette can be set with the SDL_SetColors.
   */
   if(s->format->BytesPerPixel == 1) {
+    printf("shit\n");
     // 如果都为0，画整个屏幕
     if(x == 0 && y == 0 && w == 0 && h == 0) {
       w = s->w;
