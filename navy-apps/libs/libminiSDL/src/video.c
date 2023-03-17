@@ -202,6 +202,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   A SDL_Palette should never need to be created manually. It is automatically created when SDL allocates a SDL_PixelFormat for a surface. 
   The colors values of a SDL_Surfaces palette can be set with the SDL_SetColors.
   */
+  printf("shit\n");
   if(s->format->BytesPerPixel == 1) {
     // 如果都为0，画整个屏幕
     if(x == 0 && y == 0 && w == 0 && h == 0) {
@@ -212,7 +213,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     uint32_t *ABGRdata = malloc(h * w * 4);
     assert(ABGRdata);
     uint32_t *temp = ABGRdata;
-    printf("shit\n");
     uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
     for (int j = 0; j < h; j++) {
       for (int i = 0; i < w; i++) {
@@ -221,17 +221,13 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
       }
       palette_data += s->w - w;
     }
-    printf("shit1\n");
     uint32_t *ARGBdata = malloc(h * w * 4);
     assert(ARGBdata);
     // color中保存的像素形式为00GGBBRR的形式，需要转变为00RRGGBB的形式
     ConvertPixelsARGB_ABGR(ARGBdata, ABGRdata, h * w);
-    printf("shit2\n");
     NDL_DrawRect((uint32_t*)ARGBdata, x, y, w, h);
-    printf("shit3\n");
     free(ABGRdata);
     free(ARGBdata);
-    printf("shit4\n");
     return;
   }
   NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
