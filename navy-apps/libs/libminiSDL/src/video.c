@@ -212,8 +212,8 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     uint32_t *ABGRdata = malloc(h * w * 4);
     assert(ABGRdata);
     uint32_t *temp = ABGRdata;
-    printf("%x\n", temp);
     uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
+    printf("%x\n", palette_data);
     for (int j = 0; j < h; j++) {
       for (int i = 0; i < w; i++) {
         // surface中的pixels是palete中color中的索引，此时temp中的形式为00GGBBRR
