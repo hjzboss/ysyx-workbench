@@ -52,7 +52,6 @@ int main() {
 
   render();
 
-  printf("sjhi\n");
   while (1) {
     SDL_Event e;
     SDL_WaitEvent(&e);
