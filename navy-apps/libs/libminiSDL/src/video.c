@@ -202,7 +202,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   A SDL_Palette should never need to be created manually. It is automatically created when SDL allocates a SDL_PixelFormat for a surface. 
   The colors values of a SDL_Surfaces palette can be set with the SDL_SetColors.
   */
-  if(s->format->BytesPerPixel == 1) {
+  if(s->format->BytesPerPixel == 4) {
     // 如果都为0，画整个屏幕
     if(x == 0 && y == 0 && w == 0 && h == 0) {
       w = s->w;
@@ -224,6 +224,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     assert(ARGBdata);
     // color中保存的像素形式为00GGBBRR的形式，需要转变为00RRGGBB的形式
     ConvertPixelsARGB_ABGR(ARGBdata, ABGRdata, h * w);
+    printf("shit\n");
     NDL_DrawRect((uint32_t*)ARGBdata, x, y, w, h);
     free(ABGRdata);
     free(ARGBdata);
