@@ -34,7 +34,7 @@ SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
   s->flags = flags;
   s->format = malloc(sizeof(SDL_PixelFormat));
   assert(s->format);
-  if (depth == 32) {
+  if (depth == 8) {
     s->format->palette = malloc(sizeof(SDL_Palette));
     assert(s->format->palette);
     s->format->palette->colors = malloc(sizeof(SDL_Color) * 256);
@@ -202,7 +202,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   A SDL_Palette should never need to be created manually. It is automatically created when SDL allocates a SDL_PixelFormat for a surface. 
   The colors values of a SDL_Surfaces palette can be set with the SDL_SetColors.
   */
-  if(s->format->BytesPerPixel == 4) {
+  if(s->format->BytesPerPixel == 1) {
     // 如果都为0，画整个屏幕
     if(x == 0 && y == 0 && w == 0 && h == 0) {
       w = s->w;
@@ -229,6 +229,20 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     free(ABGRdata);
     free(ARGBdata);
     return;
+  }
+  else if (s->format->BytesPerPixel == 4) {
+    uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
+    assert(pixels);
+    uint32_t *src = (uint32_t *)s->pixels;
+    for (int i = 0; i < h; ++i){
+      memcpy(&pixels[i * w], &src[(y + i) * s->w + x], sizeof(uint32_t) * w);
+    }
+    NDL_DrawRect(pixels, x, y, w, h);
+
+    free(pixels);
+  }
+  else {
+    assert(0);
   }
   NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
 }
