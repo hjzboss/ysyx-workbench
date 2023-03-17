@@ -213,6 +213,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     assert(ABGRdata);
     uint32_t *temp = ABGRdata;
     uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
+    printf("shit\n");
     for (int j = 0; j < h; j++) {
       for (int i = 0; i < w; i++) {
         // surface中的pixels是palete中color中的索引，此时temp中的形式为00GGBBRR
@@ -224,7 +225,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     assert(ARGBdata);
     // color中保存的像素形式为00GGBBRR的形式，需要转变为00RRGGBB的形式
     ConvertPixelsARGB_ABGR(ARGBdata, ABGRdata, h * w);
-    printf("shit\n");
     NDL_DrawRect((uint32_t*)ARGBdata, x, y, w, h);
     free(ABGRdata);
     free(ARGBdata);
