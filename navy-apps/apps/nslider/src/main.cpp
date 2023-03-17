@@ -47,11 +47,12 @@ void next(int rep) {
 int main() {
   SDL_Init(0);
   SDL_Surface *screen = SDL_SetVideoMode(W, H, 32, SDL_HWSURFACE);
-  printf("shit\n");
+
   int rep = 0, g = 0;
 
   render();
 
+  printf("sjhi\n");
   while (1) {
     SDL_Event e;
     SDL_WaitEvent(&e);
