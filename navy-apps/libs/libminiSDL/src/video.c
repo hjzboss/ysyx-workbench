@@ -202,8 +202,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   A SDL_Palette should never need to be created manually. It is automatically created when SDL allocates a SDL_PixelFormat for a surface. 
   The colors values of a SDL_Surfaces palette can be set with the SDL_SetColors.
   */
-  printf("s->format->BytesPerPixel=%d\n", s->format->BytesPerPixel);
-  if(s->format->BytesPerPixel == 1) {
+  if(s->format->BytesPerPixel == 4) {
     // 如果都为0，画整个屏幕
     if(x == 0 && y == 0 && w == 0 && h == 0) {
       w = s->w;
