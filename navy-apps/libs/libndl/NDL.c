@@ -90,12 +90,13 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
 
   assert(x + screen_x >= 0 && x + screen_x + w <= fb_w);
   assert(y + screen_y >= 0 && y + screen_y + h <= fb_h);
-  printf("shit\n");
+  
   for(int i = 0; i < h; i++) {
     // 逐行绘制
     lseek(fb_fd, ((y + screen_y + i) * fb_w + x + screen_x) * 4, SEEK_SET);
     write(fb_fd, pixels + i * w, w * 4);
   }
+  printf("shit\n");
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
