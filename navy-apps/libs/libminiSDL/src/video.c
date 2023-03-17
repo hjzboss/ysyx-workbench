@@ -213,7 +213,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     assert(ABGRdata);
     uint32_t *temp = ABGRdata;
     uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
-    printf("%x\n", s->format->palette);
     for (int j = 0; j < h; j++) {
       for (int i = 0; i < w; i++) {
         // surface中的pixels是palete中color中的索引，此时temp中的形式为00GGBBRR
@@ -229,20 +228,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     free(ABGRdata);
     free(ARGBdata);
     return;
-  }
-  else if (s->format->BytesPerPixel == 4) {
-    uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
-    assert(pixels);
-    uint32_t *src = (uint32_t *)s->pixels;
-    for (int i = 0; i < h; ++i){
-      memcpy(&pixels[i * w], &src[(y + i) * s->w + x], sizeof(uint32_t) * w);
-    }
-    NDL_DrawRect(pixels, x, y, w, h);
-
-    free(pixels);
-  }
-  else {
-    assert(0);
   }
   NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
 }
