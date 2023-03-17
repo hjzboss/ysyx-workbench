@@ -43,7 +43,9 @@ void* BMP_Load(const char *filename, int *width, int *height) {
       uint8_t g = *(((uint8_t*)&pixels[w * i]) + 3 * j + 1);
       uint8_t r = *(((uint8_t*)&pixels[w * i]) + 3 * j + 2);
       pixels[w * i + j] = (r << 16) | (g << 8) | b;
-      printf("j=%d\n", j);
+      if (i == 299) {
+        printf("j=%d\n", j);
+      }
     }
   }
 
