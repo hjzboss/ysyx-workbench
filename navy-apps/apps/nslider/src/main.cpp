@@ -45,10 +45,9 @@ void next(int rep) {
 }
 
 int main() {
-  printf("shit\n");
   SDL_Init(0);
   SDL_Surface *screen = SDL_SetVideoMode(W, H, 32, SDL_HWSURFACE);
-
+  printf("shit\n");
   int rep = 0, g = 0;
 
   render();
