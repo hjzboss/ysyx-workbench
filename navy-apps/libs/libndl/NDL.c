@@ -94,6 +94,9 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   for(int i = 0; i < h; i++) {
     // 逐行绘制
     lseek(fb_fd, ((y + screen_y + i) * fb_w + x + screen_x) * 4, SEEK_SET);
+    for (int j = 0; j < 4; j++) {
+      printf("%x ", *(pixels + i * w + j));
+    }
     write(fb_fd, pixels + i * w, w * 4);
   }
 }
