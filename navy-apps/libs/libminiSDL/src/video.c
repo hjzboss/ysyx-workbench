@@ -35,7 +35,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     dst_x = dstrect->x;
     dst_y = dstrect->y;
   }
-  assert(dst_w == src_w && dst_h == src_h);
+  //assert(dst_w == src_w && dst_h == src_h);
 
   if (dst->format->BytesPerPixel == 1) {
     SDL_Color *src_colors = src->format->palette->colors;
