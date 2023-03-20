@@ -77,9 +77,7 @@ int main(int argc, char *argv[], char *envp[]) {
   set_i_max();
 
   while (1) {
-    printf("shit\n");
     display_menu(i_max);
-    printf("shit1\n");
 
     SDL_Event e;
     do {
@@ -143,8 +141,10 @@ static void draw_text_row(char *s, int r) {
 
 static void display_menu(int n) {
   clear_display();
+  printf("shit\n");
   SDL_Rect rect = { .x = screen->w - logo_sf->w, .y = 0 };
   SDL_BlitSurface(logo_sf, NULL, screen, &rect);
+  printf("shit1\n");
   printf("Available applications:\n");
   char buf[80];
   int i;
