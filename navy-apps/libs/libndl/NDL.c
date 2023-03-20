@@ -87,14 +87,21 @@ void NDL_OpenCanvas(int *w, int *h) {
 // 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int fb_fd = _open("/dev/fb", 0, 0);
-
+  int dw = w, dh = h;
   assert(x + screen_x >= 0 && x + screen_x + w <= fb_w);
   assert(y + screen_y >= 0 && y + screen_y + h <= fb_h);
 
-  for(int i = 0; i < h; i++) {
+  /*
+  if (x == 0 & y == 0 & w == 0 & h == 0) {
+    dw = screen_w;
+    dh = screen_h;
+  }
+  */
+
+  for(int i = 0; i < dh; i++) {
     // 逐行绘制
     lseek(fb_fd, ((y + screen_y + i) * fb_w + x + screen_x) * 4, SEEK_SET);
-    write(fb_fd, pixels + i * w, w * 4);
+    write(fb_fd, pixels + i * dw, dw * 4);
   }
 }
 

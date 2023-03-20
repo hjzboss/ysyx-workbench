@@ -3,16 +3,16 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
+
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
-}
-
-void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  
 }
 
 // APIs below are already implemented.
@@ -143,6 +143,7 @@ void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor
   }
 }
 
+// SDL_Color的操作，将SDL_Color中的ABGR格式转换为像素的ARGB格式
 static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
   int i;
   uint8_t (*pdst)[4] = dst;
@@ -168,6 +169,75 @@ static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
   for (; i < len; i ++) {
     macro(i);
   }
+}
+
+// 功能是将surface中(x, y)处的矩形区域同步到屏幕上，其中像素在color中，需要用pixels和x,y来定位到指定的color
+void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  /*
+    typedef union {
+      struct {
+        uint8_t r, g, b, a; // 小端序，r位于最低地址，a位于最高地址，此处val的格式为abgr
+      };
+      uint32_t val;
+    } SDL_Color;
+
+    typedef struct {
+      SDL_Palette *palette;
+      uint8_t BitsPerPixel;
+      uint8_t BytesPerPixel;
+      uint8_t Rloss, Gloss, Bloss, Aloss;
+      uint8_t Rshift, Gshift, Bshift, Ashift;
+      uint32_t Rmask, Gmask, Bmask, Amask;
+    } SDL_PixelFormat;
+
+    typedef struct {
+      uint32_t flags;
+      SDL_PixelFormat *format;
+      int w, h;
+      uint16_t pitch;
+      uint8_t *pixels;
+    } SDL_Surface;
+  */
+
+  /*
+  Each pixel in an 8-bit surface is an index into the colors field of the SDL_Palette structure store in SDL_PixelFormat. 
+  A SDL_Palette should never need to be created manually. It is automatically created when SDL allocates a SDL_PixelFormat for a surface. 
+  The colors values of a SDL_Surfaces palette can be set with the SDL_SetColors.
+  */
+  // 如果都为0，画整个屏幕
+  if(x == 0 && y == 0 && w == 0 && h == 0) {
+    w = s->w;
+    h = s->h;
+  }
+  
+  if(s->format->BytesPerPixel == 1) {
+    // 如果都为0，画整个屏幕
+    if(x == 0 && y == 0 && w == 0 && h == 0) {
+      w = s->w;
+      h = s->h;
+    }
+
+    uint32_t *ABGRdata = malloc(h * w * 4);
+    assert(ABGRdata);
+    uint32_t *temp = ABGRdata;
+    uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
+    for (int j = 0; j < h; j++) {
+      for (int i = 0; i < w; i++) {
+        // surface中的pixels是palete中color中的索引，此时temp中的形式为00GGBBRR
+        *temp++ = s->format->palette->colors[*(palette_data++)].val;
+      }
+      palette_data += s->w - w;
+    }
+    uint32_t *ARGBdata = malloc(h * w * 4);
+    assert(ARGBdata);
+    // color中保存的像素形式为00GGBBRR的形式，需要转变为00RRGGBB的形式
+    ConvertPixelsARGB_ABGR(ARGBdata, ABGRdata, h * w);
+    NDL_DrawRect((uint32_t*)ARGBdata, x, y, w, h);
+    free(ABGRdata);
+    free(ARGBdata);
+    return;
+  }
+  NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
 }
 
 SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t flags) {
