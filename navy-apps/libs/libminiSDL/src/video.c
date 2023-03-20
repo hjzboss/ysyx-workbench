@@ -32,6 +32,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   else {
     dst_w = dstrect->w ? dstrect->w : dst->w;
     dst_h = dstrect->h ? dstrect->h : dst->h;
+    printf("dst_w=%d, dst_h=%d\n", dst_w, dst_h);
     dst_x = dstrect->x;
     dst_y = dstrect->y;
   }
