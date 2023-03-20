@@ -5,14 +5,115 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// 一张画布中的指定矩形区域复制到另一张画布的指定位置
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
 
+  int src_w, src_h, src_x, src_y;
+  int dst_w, dst_h, dst_x, dst_y;
+
+  if (srcrect == NULL) {
+    src_w = src->w;
+    src_h = src->h;
+    src_x = src_y = 0;
+  }
+  else {
+    src_w = srcrect->w ? srcrect->w : src->w;
+    src_h = srcrect->h ? srcrect->h : src->h;
+    src_x = srcrect->x;
+    src_y = srcrect->y;
+  }
+
+  if (dstrect == NULL) {
+    dst_w = dst->w;
+    dst_h = dst->h;
+    dst_x = dst_y = 0;
+  }
+  else {
+    dst_w = dstrect->w ? dstrect->w : dst->w;
+    dst_h = dstrect->h ? dstrect->h : dst->h;
+    dst_x = dstrect->x;
+    dst_y = dstrect->y;
+  }
+
+  if (dst->format->BytesPerPixel == 1) {
+    SDL_Color *src_colors = src->format->palette->colors;
+    SDL_Color *dst_colors = dst->format->palette->colors;
+    uint8_t *src_pixel = src->pixels + src_y * src->w + src_x;
+    uint8_t *dst_pixel = dst->pixels + dst_y * dst->w + dst_x;
+    assert(src_pixel && dst_pixel && src_colors && dst_colors);
+
+    for (int i = 0; i < src_w; i++) {
+      for (int j = 0; j < src_h; j++) {
+        dst_colors[*dst_pixel++] = src_colors[*src_pixel++];
+      }
+      src_pixel += src->w - src_w;
+      dst_pixel += dst->w - src_w;
+    }
+  }
+  else {
+    uint32_t *src_pixels = (uint32_t *)src->pixels;
+    uint32_t *dst_pixels = (uint32_t *)dst->pixels;
+    assert(src_pixels && dst_pixels);
+
+    src_pixels += src_y * src->w + src_x;
+    dst_pixels += dst_y * dst->w + dst_x;
+    for(int i = 0; i < src_h; i++) {
+      for(int j = 0; j < src_w; j++) {
+        *dst_pixels++ = *src_pixels++;
+      }
+      src_pixels += src->w - src_w;
+      dst_pixels += dst->w - src_w; // 注意此处是src_w，不是dst_w，因为画了的宽度是src_w
+    }
+  }
 }
 
+// 往画布的指定矩形区域中填充指定的颜色
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
-  
+  assert(dst);
+
+  int w, h, x, y;
+  if (dstrect == NULL) {
+    w = dst->w;
+    h = dst->h;
+    x = 0;
+    y = 0;
+  }
+  else {
+    w = dstrect->w;
+    h = dstrect->h;
+    x = dstrect->x;
+    y = dstrect->y;
+  }
+
+  if (dst->format->BytesPerPixel == 1) {
+    SDL_Color *colors = dst->format->palette->colors;
+    assert(colors && dst->pixels);
+
+    uint8_t *palette_data = dst->pixels + y * dst->w + x;
+    uint8_t *color_ptr;
+    for (int i = 0; i < h; i++) {
+      color_ptr = &color;
+      for (int j = 0; i < w; j++) {
+        colors[*palette_data].b = *color_ptr++;
+        colors[*palette_data].g = *color_ptr++;
+        colors[*palette_data].r = *color_ptr++;
+        colors[*palette_data].a = *color_ptr;
+      }
+      palette_data += dst->w - w;
+    }
+  }
+  else {
+    uint32_t *pixels = (uint32_t *)dst->pixels;
+    pixels += y * dst->w + x;
+    for (int i = 0; i < h; i++) {
+      for (int j = 0; j < w; j++) {
+        *pixels++ = color;
+      }
+      pixels += dst->w - w;
+    }
+  }
 }
 
 // APIs below are already implemented.
@@ -211,12 +312,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   }
   
   if(s->format->BytesPerPixel == 1) {
-    // 如果都为0，画整个屏幕
-    if(x == 0 && y == 0 && w == 0 && h == 0) {
-      w = s->w;
-      h = s->h;
-    }
-
     uint32_t *ABGRdata = malloc(h * w * 4);
     assert(ABGRdata);
     uint32_t *temp = ABGRdata;
