@@ -91,10 +91,12 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   assert(x + screen_x >= 0 && x + screen_x + w <= fb_w);
   assert(y + screen_y >= 0 && y + screen_y + h <= fb_h);
 
+  /*
   if (x == 0 & y == 0 & w == 0 & h == 0) {
     dw = screen_w;
     dh = screen_h;
   }
+  */
 
   for(int i = 0; i < dh; i++) {
     // 逐行绘制

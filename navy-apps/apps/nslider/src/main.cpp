@@ -52,7 +52,6 @@ int main() {
 
   render();
 
-  /*
   while (1) {
     SDL_Event e;
     SDL_WaitEvent(&e);
@@ -82,7 +81,7 @@ int main() {
           break;
       }
     }
-  }*/
+  }
 
   return 0;
 }
