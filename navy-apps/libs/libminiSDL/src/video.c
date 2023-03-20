@@ -18,8 +18,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     src_x = src_y = 0;
   }
   else {
-    src_w = srcrect->w;
-    src_h = srcrect->h;
+    src_w = srcrect->w ? srcrect->w : src->w;
+    src_h = srcrect->h ? srcrect->h : src->h;
     src_x = srcrect->x;
     src_y = srcrect->y;
   }
@@ -30,8 +30,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     dst_x = dst_y = 0;
   }
   else {
-    dst_w = dstrect->w;
-    dst_h = dstrect->h;
+    dst_w = dstrect->w ? dstrect->w : dst->w;
+    dst_h = dstrect->h ? dstrect->h : dst->h;
     dst_x = dstrect->x;
     dst_y = dstrect->y;
   }
@@ -61,7 +61,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
         *dst_pixels++ = *src_pixels++;
       }
       src_pixels += srcrect->w - src_w;
-      dst_pixels += dstrect->w - src_w;
+      dst_pixels += dstrect->w - dst_w;
     }
   }
 }
