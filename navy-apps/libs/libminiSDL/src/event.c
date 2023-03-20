@@ -14,11 +14,13 @@ int SDL_PushEvent(SDL_Event *ev) {
 }
 
 int SDL_PollEvent(SDL_Event *ev) {
+  printf("shit\n");
   return 0;
 }
 
 int SDL_WaitEvent(SDL_Event *event) {
   char buf[64];
+  /*
   if (NDL_PollEvent(buf, sizeof(buf)) == 1) {
     char *keyname = strtok(buf, " ");
     int keycode = atoi(strtok(NULL, " "));
@@ -32,7 +34,7 @@ int SDL_WaitEvent(SDL_Event *event) {
     else {
       event->type = SDL_KEYUP;
     }
-  }
+  }*/
   
   return 1;
 }
