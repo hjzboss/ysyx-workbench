@@ -75,6 +75,8 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     h = dst->h;
     x = 0;
     y = 0;
+    printf("dst_w=%d, dst_h=%d\n", dst->w, dst->h);
+    printf("w=%d, h=%d\n", w, h);
   }
   else {
     w = dstrect->w;
