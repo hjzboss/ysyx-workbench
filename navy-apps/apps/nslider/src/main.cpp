@@ -50,7 +50,10 @@ int main() {
 
   int rep = 0, g = 0;
 
-  render();
+  while (1) {
+    render();
+  }
+  //render();
   
   /*
   while (1) {
