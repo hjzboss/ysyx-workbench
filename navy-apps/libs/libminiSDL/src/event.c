@@ -15,21 +15,27 @@ int SDL_PushEvent(SDL_Event *ev) {
 }
 
 int SDL_PollEvent(SDL_Event *ev) {
-  printf("shit\n");
-  return 0;
-}
-
-int SDL_WaitEvent(SDL_Event *event) {
   char buf[64];
   if (NDL_PollEvent(buf, sizeof(buf)) == 1) {
     char *keyname = strtok(buf, " ");
     int keycode = strtol(strtok(NULL, " "), NULL, 10);
     int keydown = strtol(strtok(NULL, " "), NULL, 10);
-    event->key.keysym.sym = keycode;
-    event->type = keydown == 1 ? SDL_KEYDOWN : SDL_KEYUP;
+    ev->key.keysym.sym = keycode;
+    ev->type = keydown == 1 ? SDL_KEYDOWN : SDL_KEYUP;
     return 1;
   }
   return 0;
+}
+
+int SDL_WaitEvent(SDL_Event *event) {
+  char buf[64];
+  while (NDL_PollEvent(buf, sizeof(buf)) == 0);
+  char *keyname = strtok(buf, " ");
+  int keycode = strtol(strtok(NULL, " "), NULL, 10);
+  int keydown = strtol(strtok(NULL, " "), NULL, 10);
+  event->key.keysym.sym = keycode;
+  event->type = keydown == 1 ? SDL_KEYDOWN : SDL_KEYUP;
+  return 1;
 }
 
 int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {

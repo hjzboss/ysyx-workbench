@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// 一张画布中的指定矩形区域复制到另一张画布的指定位置
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
@@ -47,8 +48,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
       for (int j = 0; j < src_h; j++) {
         dst_colors[*dst_pixel++] = src_colors[*src_pixel++];
       }
-      src_pixel += srcrect->w - src_w;
-      dst_pixel += dstrect->w - dst_w;
+      src_pixel += src->w - src_w;
+      dst_pixel += dst->w - src_w;
     }
   }
   else {
@@ -63,11 +64,12 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
         *dst_pixels++ = *src_pixels++;
       }
       src_pixels += src->w - src_w;
-      dst_pixels += dst->w - src_w;
+      dst_pixels += dst->w - src_w; // 注意此处是src_w，不是dst_w，因为画了的宽度是src_w
     }
   }
 }
 
+// 往画布的指定矩形区域中填充指定的颜色
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
   assert(dst);
 
