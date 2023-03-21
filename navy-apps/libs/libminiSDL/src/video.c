@@ -38,16 +38,13 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   }
 
   if (dst->format->BytesPerPixel == 1) {
-    printf("shit\n");
-    SDL_Color *src_colors = src->format->palette->colors;
-    SDL_Color *dst_colors = dst->format->palette->colors;
     uint8_t *src_pixel = src->pixels + src_y * src->w + src_x;
     uint8_t *dst_pixel = dst->pixels + dst_y * dst->w + dst_x;
-    assert(src_pixel && dst_pixel && src_colors && dst_colors);
+    assert(src_pixel && dst_pixel);
 
     for (int i = 0; i < src_w; i++) {
       for (int j = 0; j < src_h; j++) {
-        dst_colors[*dst_pixel++] = src_colors[*src_pixel++];
+        *dst_pixel++ = *src_pixel++;
       }
       src_pixel += src->w - src_w;
       dst_pixel += dst->w - src_w;
