@@ -5,6 +5,8 @@
 
 #define keyname(k) #k,
 
+static uint8_t key_state[83];
+
 static const char *keyname[] = {
   "NONE",
   _KEYS(keyname)
@@ -22,6 +24,12 @@ int SDL_PollEvent(SDL_Event *ev) {
     int keydown = strtol(strtok(NULL, " "), NULL, 10);
     ev->key.keysym.sym = keycode;
     ev->type = keydown == 1 ? SDL_KEYDOWN : SDL_KEYUP;
+    if(ev->type == SDL_KEYDOWN) {
+      key_state[keycode] = 1;
+    }
+    else {
+      key_state[keycode] = 0;
+    }
     return 1;
   }
   return 0;
@@ -43,5 +51,5 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
-  return NULL;
+  return key_state;
 }
