@@ -15,5 +15,6 @@ init:;
 
 install-file:
 	ln -sf -T $(abspath $(REPO_PATH)/data) $(NAVY_HOME)/fsimg/share/games/pal
+	@echo $(abspath $(REPO_PATH)/data)
 
 .PHONY: install-file init
