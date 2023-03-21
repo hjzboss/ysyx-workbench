@@ -45,7 +45,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   }
 
   fs_close(fd);
-  printf("shit\n");
+
   return elf_head.e_entry;
 }
 
@@ -53,5 +53,6 @@ void naive_uload(PCB *pcb, const char *filename) {
   uintptr_t entry = loader(pcb, filename);
   Log("Jump to entry = %p", entry);
   ((void(*)())entry) ();
+  printf("shit\n");
 }
 
