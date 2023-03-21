@@ -73,6 +73,7 @@ int fs_open(const char *pathname, int flags, int mode) {
       return i;
     }
   }
+  printf("%s\n", pathname);
   panic("Failed to open file!");
 }
 
