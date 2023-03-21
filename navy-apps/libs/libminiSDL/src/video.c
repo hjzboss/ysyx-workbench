@@ -86,7 +86,6 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
   }
 
   if (dst->format->BytesPerPixel == 1) {
-    printf("shit\n");
     SDL_Color *colors = dst->format->palette->colors;
     assert(colors && dst->pixels);
 
