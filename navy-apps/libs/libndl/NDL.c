@@ -16,7 +16,9 @@ static int fb_fd;
 uint32_t NDL_GetTicks() {
   struct timeval *tv = (struct timeval *)malloc(sizeof(struct timeval));
   gettimeofday(tv, NULL);
-  return tv->tv_usec / 1000;
+  uint32_t res = tv->tv_usec / 1000;
+  free(tv);
+  return res;
 }
 
 int NDL_PollEvent(char *buf, int len) {
