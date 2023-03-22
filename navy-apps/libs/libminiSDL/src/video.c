@@ -42,8 +42,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     uint8_t *dst_pixel = dst->pixels + dst_y * dst->w + dst_x;
     assert(src_pixel && dst_pixel);
 
-    for (int i = 0; i < src_w; i++) {
-      for (int j = 0; j < src_h; j++) {
+    for (int i = 0; i < src_h; i++) {
+      for (int j = 0; j < src_w; j++) {
         *dst_pixel++ = *src_pixel++;
       }
       src_pixel += src->w - src_w;
@@ -64,6 +64,11 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
       src_pixels += src->w - src_w;
       dst_pixels += dst->w - src_w; // 注意此处是src_w，不是dst_w，因为画了的宽度是src_w
     }
+  }
+
+  if(dstrect != NULL) {
+    dstrect->w = src_w;
+    dstrect->h = src_h;
   }
 }
 
@@ -272,32 +277,6 @@ static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
 
 // 功能是将surface中(x, y)处的矩形区域同步到屏幕上，其中像素在color中，需要用pixels和x,y来定位到指定的color
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
-  /*
-    typedef union {
-      struct {
-        uint8_t r, g, b, a; // 小端序，r位于最低地址，a位于最高地址，此处val的格式为abgr
-      };
-      uint32_t val;
-    } SDL_Color;
-
-    typedef struct {
-      SDL_Palette *palette;
-      uint8_t BitsPerPixel;
-      uint8_t BytesPerPixel;
-      uint8_t Rloss, Gloss, Bloss, Aloss;
-      uint8_t Rshift, Gshift, Bshift, Ashift;
-      uint32_t Rmask, Gmask, Bmask, Amask;
-    } SDL_PixelFormat;
-
-    typedef struct {
-      uint32_t flags;
-      SDL_PixelFormat *format;
-      int w, h;
-      uint16_t pitch;
-      uint8_t *pixels;
-    } SDL_Surface;
-  */
-
   /*
   Each pixel in an 8-bit surface is an index into the colors field of the SDL_Palette structure store in SDL_PixelFormat. 
   A SDL_Palette should never need to be created manually. It is automatically created when SDL allocates a SDL_PixelFormat for a surface. 
