@@ -13,10 +13,15 @@ static int screen_w = 0, screen_h = 0, screen_x = 0, screen_y = 0; // canvas siz
 static int fb_w = 0, fb_h = 0; // frame buffer size
 static int fb_fd;
 
+static uint64_t begin_time_ms;
+
 uint32_t NDL_GetTicks() {
-  struct timeval *tv = (struct timeval *)malloc(sizeof(struct timeval));
-  gettimeofday(tv, NULL);
-  return tv->tv_usec / 1000;
+  uint64_t now;
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  
+  now = tv.tv_sec * 1000 + tv.tv_usec/1000 - begin_time_ms;
+  return now;
 }
 
 int NDL_PollEvent(char *buf, int len) {
