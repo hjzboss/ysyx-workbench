@@ -20,6 +20,7 @@ uint32_t NDL_GetTicks() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
   
+  // printf("s: %ld\n", tv.tv_sec * 1000 + tv.tv_usec/1000);
   now = tv.tv_sec * 1000 + tv.tv_usec/1000 - begin_time_ms;
   return now;
 }
@@ -126,6 +127,10 @@ int NDL_QueryAudio() {
 }
 
 int NDL_Init(uint32_t flags) {
+  // init time ms
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  begin_time_ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
