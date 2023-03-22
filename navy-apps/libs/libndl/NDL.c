@@ -13,16 +13,10 @@ static int screen_w = 0, screen_h = 0, screen_x = 0, screen_y = 0; // canvas siz
 static int fb_w = 0, fb_h = 0; // frame buffer size
 static int fb_fd;
 
-static uint64_t begin_time_ms;
-
 uint32_t NDL_GetTicks() {
-  uint64_t now;
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  
-  // printf("s: %ld\n", tv.tv_sec * 1000 + tv.tv_usec/1000);
-  now = tv.tv_sec * 1000 + tv.tv_usec/1000 - begin_time_ms;
-  return now;
+  struct timeval *tv = (struct timeval *)malloc(sizeof(struct timeval));
+  gettimeofday(tv, NULL);
+  return tv->tv_usec / 1000;
 }
 
 int NDL_PollEvent(char *buf, int len) {
@@ -127,10 +121,6 @@ int NDL_QueryAudio() {
 }
 
 int NDL_Init(uint32_t flags) {
-  // init time ms
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  begin_time_ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
