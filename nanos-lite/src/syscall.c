@@ -98,12 +98,12 @@ void syscall_close(Context *c, uintptr_t *a) {
 }
 
 void syscall_gettimeofday(Context *c, uintptr_t *a) {
-  // 此处返回的是系统启动的时间，todo，时钟不精确
-  uint64_t us = io_read(AM_TIMER_UPTIME).us;
-  ((struct timeval *)a[1])->tv_usec = us;
-  ((struct timeval *)a[1])->tv_sec = us / 1000000;
-  // todo: timezone
+  uint64_t time_us = io_read(AM_TIMER_UPTIME).us;
+  uint64_t time_s = time_us / 1000000;
+  *(uint64_t *) c->GPR2 = time_s;
+  *(((uint64_t *) c->GPR2) + 1) = time_us - time_s * 1000000;
   c->GPRx = 0;
+  return;
 }
 
 
