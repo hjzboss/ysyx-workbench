@@ -6,7 +6,6 @@
 #include <sys/time.h>
 #include <assert.h>
 
-int _open(const char *path, int flags, mode_t mode);
 
 static int evtdev = -1;
 static int fbdev = -1;
@@ -17,12 +16,14 @@ static int fb_fd;
 uint32_t NDL_GetTicks() {
   struct timeval *tv = (struct timeval *)malloc(sizeof(struct timeval));
   gettimeofday(tv, NULL);
-  return tv->tv_usec / 1000;
+  uint32_t res = tv->tv_usec / 1000;
+  free(tv);
+  return res;
 }
 
 int NDL_PollEvent(char *buf, int len) {
   // keyboard input
-  int fd = _open("/dev/events", 0, 0);
+  int fd = open("/dev/events", 0, 0);
   return read(fd, buf, len) == 0 ? 0 : 1;
 }
 
@@ -47,8 +48,10 @@ void NDL_OpenCanvas(int *w, int *h) {
     close(fbctl);
   }
   char buf[50];
-  int fd = _open("/proc/disinfo", 0, 0);
+  int fd = open("/proc/disinfo", 0, 0);
   size_t len = read(fd, buf, 32);
+  assert(len != -1);
+  
   // get frame buffer size
   char *first_item = strtok(buf, "\n");
   char *second_item = strtok(NULL, "\n");
@@ -86,7 +89,7 @@ void NDL_OpenCanvas(int *w, int *h) {
 // 向画布`(x, y)`坐标处绘制`w*h`的矩形图像, 并将该绘制区域同步到屏幕上
 // 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  int fb_fd = _open("/dev/fb", 0, 0);
+  int fb_fd = open("/dev/fb", 0, 0);
   int dw = w, dh = h;
   assert(x + screen_x >= 0 && x + screen_x + w <= fb_w);
   assert(y + screen_y >= 0 && y + screen_y + h <= fb_h);
