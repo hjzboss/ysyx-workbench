@@ -10,5 +10,8 @@
 #define KBD_ADDR        (DEVICE_BASE + 0x0000080) // different form nemu
 #define VGACTL_ADDR     (DEVICE_BASE + 0x0000100)
 #define FB_ADDR         (MMIO_BASE   + 0x1000000)
+#define RTC_INIT        (DEVICE_BASE + 0x0000050)
+
+inline uint64_t inl(uint64_t addr) { return *(volatile uint64_t *)addr; }
 
 #endif
