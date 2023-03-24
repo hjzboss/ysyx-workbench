@@ -4,7 +4,6 @@
 #include <debug.h>
 
 FILE *log_fp = NULL;
-static char buff[1000];
 
 void init_log(const char *log_file) {
   printf("log: %s\n", log_file);
