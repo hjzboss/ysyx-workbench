@@ -1,7 +1,7 @@
 #include <cpu/cpu.h>
 #include <memory/paddr.h>
 
-static uint8_t i_cache[10000000] = {};
+static uint8_t i_cache[100000000000] = {};
 
 uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
 uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
@@ -117,11 +117,11 @@ long load_img(char *dir) {
 
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
-  printf("shit\n\n\n\n");
+
   fseek(fp, 0, SEEK_SET);
   int ret = fread(i_cache, size, 1, fp);
   assert(ret == 1);
-  printf("shit1\n\n\n\n");
+
   fclose(fp);
   return size;
 }
