@@ -121,7 +121,7 @@ long load_img(char *dir) {
   fseek(fp, 0, SEEK_SET);
   int ret = fread(i_cache, size, 1, fp);
   assert(ret == 1);
-
+  printf("shit1\n\n\n\n");
   fclose(fp);
   return size;
 }
