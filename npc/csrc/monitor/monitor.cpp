@@ -98,7 +98,7 @@ void init_monitor(int argc, char *argv[]) {
 
   IFDEF(CONFIG_FTRACE, init_elf(elf_file));
 
-  //init_log(log_file);
+  init_log(log_file);
 
   /* Perform ISA dependent initialization. */
   //init_isa();
