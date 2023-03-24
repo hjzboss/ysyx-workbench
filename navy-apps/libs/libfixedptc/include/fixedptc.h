@@ -138,17 +138,16 @@ static inline fixedpt fixedpt_div(fixedpt A, fixedpt B) {
 
 /* Multiplies a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_muli(fixedpt A, int B) {
-  return fixedpt_mul(A, fixedpt_fromint(B));
+  return A * B;
 }
 
 /* Divides a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_divi(fixedpt A, int B) {
-  return fixedpt_div(A, fixedpt_fromint(B));
+  return A / B;
 }
 
 static inline fixedpt fixedpt_abs(fixedpt A) {
-  //return (A & (fixedpt)(1 << FIXEDPT_BITS - 1)) ? (~A + (fixedpt)1) : A;
-  return A < (fixedpt)0 ? (~A + (fixedpt)1) : A;
+  return A > 0 ? A : -A;
 }
 
 static inline fixedpt fixedpt_floor(fixedpt A) {

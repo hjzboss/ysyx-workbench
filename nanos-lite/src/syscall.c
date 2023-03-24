@@ -1,12 +1,15 @@
 #include <common.h>
 #include "syscall.h"
 #include <sys/time.h>
+#include <proc.h>
 
 #ifdef CONFIG_STRACE
 void insert_strace(char *name, uint64_t *args, uint64_t ret, int fd);
 void free_strace();
 void print_strace();
 #endif
+
+void naive_uload(PCB *pcb, const char *filename);
 
 void halt(int code);
 void yield();
@@ -18,11 +21,26 @@ size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 
 
+void syscall_execve(Context *c, uintptr_t *a) {
+  char *fname = (char *)a[1];
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_execve", a, c->GPRx, -1);
+#endif
+  assert(fname);
+  naive_uload(NULL, fname);
+}
+
+
 void syscall_exit(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
   insert_strace("SYS_exit", a, c->GPRx, -1);
   print_strace();
   free_strace();
+#endif
+#ifdef CONFIG_MENU
+  uintptr_t a_[4];
+  a_[1] = (uintptr_t)"/bin/nterm";
+  syscall_execve(c, a_);
 #endif
   halt(0);
 }
@@ -102,6 +120,9 @@ void syscall_gettimeofday(Context *c, uintptr_t *a) {
   uint64_t us = io_read(AM_TIMER_UPTIME).us;
   ((struct timeval *)a[1])->tv_usec = us;
   ((struct timeval *)a[1])->tv_sec = us / 1000000;
+#ifdef CONFIG_STRACE
+  insert_strace("SYS_gettimeofday", a, c->GPRx, -1);
+#endif
   // todo: timezone
   c->GPRx = 0;
 }
@@ -124,6 +145,7 @@ void do_syscall(Context *c) {
     case SYS_open: syscall_open(c, a); break;
     case SYS_close: syscall_close(c, a); break;
     case SYS_gettimeofday: syscall_gettimeofday(c, a); break;
+    case SYS_execve: syscall_execve(c, a); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }

@@ -73,8 +73,7 @@ int fs_open(const char *pathname, int flags, int mode) {
       return i;
     }
   }
-  printf("%s\n", pathname);
-  panic("Failed to open file!");
+  panic("Failed to open file: %s", pathname);
 }
 
 int fs_close(int fd) {
@@ -100,7 +99,6 @@ size_t fs_read(int fd, void *buf, size_t len) {
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
-  // todo
   if (fd == FD_STDOUT || fd == FD_STDERR) {
     file_table[fd].write(buf, 0, len);
     return len;
