@@ -36,7 +36,6 @@ static void checkregs(NEMUCPUState *ref) {
   // check reg
   for(int i = 0; i < 32; i++) {
     if(ref->gpr[i] != cpu_gpr[i]) {
-      printf("shit\n\n\n");
       log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
       log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
       log_write("dut %s: 0x%016lx\n", regs[i], cpu_gpr[i]);
