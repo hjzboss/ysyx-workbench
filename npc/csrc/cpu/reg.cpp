@@ -37,11 +37,6 @@ void isa_reg_display(bool *err_list) {
     else printf("%s:\t0x%016lx\n", regs[i], cpu_gpr[i]);
   }
 
-  for (i=0; i<32; ++i) {
-    if (err_list[i]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), regs[i], cpu_gpr[i]);
-    else printf("%s:\t0x%016lx\n", regs[i], cpu_gpr[i]);
-  }
-
   for (i=0; i<CSR_NUM; ++i) {
     if (err_list[i+34]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), csrs[i], cpu_csr[i]);
     else printf("%s:\t0x%016lx\n", csrs[i], cpu_csr[i]);
