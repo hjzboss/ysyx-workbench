@@ -174,6 +174,7 @@ object RV64IM extends HasInstrType {
     LB      -> List(LsType.lb, Wmask.nop, RegWrite.loadMem),
     LBU     -> List(LsType.lbu, Wmask.nop, RegWrite.loadMem),
     LHU     -> List(LsType.lhu, Wmask.nop, RegWrite.loadMem),
+    LWU     -> List(LsType.lwu, Wmask.nop, RegWrite.loadMem),
 
     SD      -> List(LsType.sd, Wmask.double, RegWrite.loadAlu),
     SW      -> List(LsType.sw, Wmask.word, RegWrite.loadAlu),
