@@ -61,6 +61,15 @@ void print_ftrace(bool);
 void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
 #endif
 
+
+// vga
+bool check_vmem_bound(uint64_t addr);
+uint32_t get_vga_config();
+uint64_t fb_read(uint64_t addr, int len);
+void fb_write(uint64_t addr, int len, uint64_t data);
+void init_vga();
+
+
 NPCState npc_state = { .state = NPC_STOP };
 
 uint64_t get_time();
@@ -124,7 +133,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
   }
   else if (raddr == CONFIG_VGA_CTL_MMIO) {
     // VGA_CTRL, 返回屏幕大小，可在config.h中配置
-    uint32_t data = SCREEN_W << 16 | SCREEN_H;
+    uint32_t data = get_vga_config();
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
   }
   else {
@@ -145,7 +154,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     return;
   }
   else {
-    uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
+    uint64_t rdata; 
     uint64_t wmask_64 = 0;
     uint8_t *index = (uint8_t*)&wmask_64;
     // 将8位的掩码转换为64位的掩码
@@ -163,8 +172,20 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       shift_cnt++;
       tmp = tmp >> 1;
     }
-    rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-    paddr_write(waddr & ~0x7ull, 8, rdata);
+
+    if (check_vmem_bound(waddr)) {
+      // vga显存
+      IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+      rdata = fb_read(waddr & ~0x7ull, 8);
+      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      fb_write(waddr & ~0x7ull, 8, rdata);
+    }
+    else {
+      // 物理内存
+      rdata = paddr_read(waddr & ~0x7ull, 8);
+      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      paddr_write(waddr & ~0x7ull, 8, rdata);      
+    }
   }
 }
 
@@ -221,6 +242,9 @@ long init_cpu(char *dir) {
 
   // initial mstatus
   IFDEF(CONFIG_DIFFTEST, npc_cpu.csr[0] = 0xa00001800);
+
+  // initial vga
+  init_vga();
 
   return size;
 }
