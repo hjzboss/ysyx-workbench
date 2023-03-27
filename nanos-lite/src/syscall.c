@@ -61,6 +61,7 @@ void syscall_brk(Context *c, uintptr_t *a) {
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
+  printf("a[1]=%d, a[2]=%d, a[3]=%d\n", a[1], a[2], a[3]);
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
