@@ -65,6 +65,7 @@ void syscall_write(Context *c, uintptr_t *a) {
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
   // file
+  printf("fd=%d\n", fd);
   c->GPRx = fs_write(fd, buf, len);
 #ifdef CONFIG_STRACE
   insert_strace("SYS_write", a, c->GPRx, fd);
