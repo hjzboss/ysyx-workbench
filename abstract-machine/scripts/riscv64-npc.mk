@@ -26,4 +26,4 @@ image: $(IMAGE).elf
 	@$(OBJCOPY) -S --set-section-flags .bss=alloc,contents -O binary $(IMAGE).elf $(IMAGE).bin
 
 run: image sim
-	echo $(IMAGE).bin
+	@echo $(IMAGE).bin
