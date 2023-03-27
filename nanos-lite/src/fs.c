@@ -27,13 +27,7 @@ size_t invalid_read(void *buf, size_t offset, size_t len) {
 }
 
 size_t invalid_write(const void *buf, size_t offset, size_t len) {
-  panic("should not reach here");
-  return 0;
-}
-
-
-size_t fuck_write(const void *buf, size_t offset, size_t len) {
-  panic("should not reach here");
+  //panic("should not reach here");
   return 0;
 }
 
