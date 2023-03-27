@@ -21,6 +21,7 @@ size_t get_ramdisk_size();
 #endif
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
+  Log("load %s begin", filename);
   int fd = fs_open(filename, 0, 0);
   //printf("filename=%s, fd=%d\n", filename, fd);
   Elf_Ehdr elf_head;
@@ -44,7 +45,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   }
 
   fs_close(fd);
-
+  Log("log %s end", filename);
   return elf_head.e_entry;
 }
 
