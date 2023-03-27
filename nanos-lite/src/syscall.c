@@ -61,7 +61,6 @@ void syscall_brk(Context *c, uintptr_t *a) {
 }
 
 void syscall_write(Context *c, uintptr_t *a) {
-  printf("a[1]=%d, a[2]=%d, a[3]=%d\n", a[1], a[2], a[3]);
   int fd = a[1];
   uint8_t *buf = (uint8_t *)a[2];
   int len = a[3];
@@ -136,6 +135,7 @@ void do_syscall(Context *c) {
   a[2] = c->GPR3;
   a[3] = c->GPR4;
 
+  printf("a[0]=%d\n", a[0]);
   switch (a[0]) {
     case SYS_yield: syscall_yield(c, a); break;
     case SYS_exit: syscall_exit(c, a); break;
