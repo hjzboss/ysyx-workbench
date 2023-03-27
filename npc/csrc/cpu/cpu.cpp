@@ -139,6 +139,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     // VGA_CTRL, 返回屏幕大小，可在config.h中配置
     uint32_t data = get_vga_config();
     printf("config_data=%d\n", data);
+    *rdata = data;
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
   }
   else {
