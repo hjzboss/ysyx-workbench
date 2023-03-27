@@ -4,10 +4,10 @@
 
 void init_vga();
 void vga_update_screen();
-//void init_i8042();
+void init_i8042();
 
 
-//void send_key(uint8_t, bool);
+void send_key(uint8_t, bool);
 void vga_update_screen();
 
 void device_update() {
@@ -19,7 +19,6 @@ void device_update() {
       case SDL_QUIT:
         npc_state.state = NPC_QUIT;
         break;
-#ifdef CONFIG_HAS_KEYBOARD
       // If a key was pressed
       case SDL_KEYDOWN:
       case SDL_KEYUP: {
@@ -28,7 +27,6 @@ void device_update() {
         send_key(k, is_keydown);
         break;
       }
-#endif
       default: break;
     }
   }
@@ -41,5 +39,5 @@ void sdl_clear_event_queue() {
 
 void init_device() {
   init_vga();
-  //init_i8042();
+  init_i8042();
 }

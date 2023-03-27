@@ -68,6 +68,9 @@ uint32_t get_vga_config();
 uint64_t vga_read(uint64_t addr, int len);
 void vga_write(uint64_t addr, int len, uint64_t data);
 
+// keyboard
+uint32_t i8042_data_io_handler();
+
 #ifdef CONFIG_DEVICE
 void init_device();
 void device_update();
@@ -136,10 +139,15 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_VGA_CTL_MMIO) {
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // VGA_CTRL, 返回屏幕大小，可在config.h中配置
     uint32_t data = get_vga_config();
     *rdata = data;
+  }
+  else if (raddr == CONFIG_I8042_DATA_MMIO) {
+    // 返回键盘码
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+    *rdata = i8042_data_io_handler();
   }
   else {
     *rdata = paddr_read(raddr & ~0x7ull, 8);

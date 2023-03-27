@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <macro.h>
+#include <assert.h>
 //#include <utils.h>
 
 #define Log(format, ...) \
