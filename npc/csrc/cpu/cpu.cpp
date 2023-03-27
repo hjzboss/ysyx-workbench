@@ -122,6 +122,11 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     }
     return;
   }
+  else if (raddr == CONFIG_VGA_CTL_MMIO) {
+    // VGA_CTRL, 返回屏幕大小，可在config.h中配置
+    uint32_t data = SCREEN_W << 16 | SCREEN_H;
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+  }
   else {
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
