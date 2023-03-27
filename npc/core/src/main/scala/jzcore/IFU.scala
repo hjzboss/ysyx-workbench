@@ -31,7 +31,7 @@ class IFU extends Module with HasResetVector{
 
   npc               := Mux(io.redirect.valid, dnpc, snpc)
   instFetch.io.pc   := pc
-  
+
   pc                := npc
 
   io.inst           := inst
