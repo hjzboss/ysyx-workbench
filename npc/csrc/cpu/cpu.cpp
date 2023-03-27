@@ -65,10 +65,13 @@ void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
 // vga
 bool check_vmem_bound(uint64_t addr);
 uint32_t get_vga_config();
-uint64_t fb_read(uint64_t addr, int len);
-void fb_write(uint64_t addr, int len, uint64_t data);
-void init_vga();
+uint64_t vga_read(uint64_t addr, int len);
+void vga_write(uint64_t addr, int len, uint64_t data);
 
+#ifdef CONFIG_DEVICE
+void init_device();
+void device_update()
+#endif
 
 NPCState npc_state = { .state = NPC_STOP };
 
@@ -79,6 +82,7 @@ void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 void print_mtrace();
+void syn_update();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -152,6 +156,11 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     putchar(wdata);
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     return;
+  }
+  else if (waddr == SYNC_ADDR) {
+    // 设置同步位
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+    syn_update();
   }
   else {
     uint64_t rdata; 
@@ -243,8 +252,8 @@ long init_cpu(char *dir) {
   // initial mstatus
   IFDEF(CONFIG_DIFFTEST, npc_cpu.csr[0] = 0xa00001800);
 
-  // initial vga
-  init_vga();
+  // initial device
+  init_device();
 
   return size;
 }
@@ -318,7 +327,7 @@ void execute(uint64_t n) {
     g_nr_guest_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
-    //IFDEF(CONFIG_DEVICE, device_update());
+    IFDEF(CONFIG_DEVICE, device_update());
   }
 }
 

@@ -61,14 +61,18 @@ uint32_t get_vga_config() {
   return vgactl_port_base[0];
 }
 
-uint64_t fb_read(uint64_t addr, int len) {
+uint64_t vga_read(uint64_t addr, int len) {
   uint64_t offset = addr - CONFIG_FB_ADDR;
   return *(uint64_t *)(vmem + offset);
 }
 
-void fb_write(uint64_t addr, int len, uint64_t data) {
+void vga_write(uint64_t addr, int len, uint64_t data) {
   uint64_t offset = addr - CONFIG_FB_ADDR;
   *(uint64_t *)(vmem + offset) = data;
+}
+
+void syn_update() {
+  vgactl_port_base[1] = 1;
 }
 
 void init_vga() {

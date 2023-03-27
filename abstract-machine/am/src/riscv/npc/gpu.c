@@ -4,7 +4,7 @@
 #include <riscv/riscv.h>
 #include <klib.h>
 
-#define SYNC_ADDR (VGACTL_ADDR + 4)
+#define SYNC_ADDR (VGACTL_ADDR + 8)
 
 void __am_gpu_init() {
 }
