@@ -70,7 +70,7 @@ void vga_write(uint64_t addr, int len, uint64_t data);
 
 #ifdef CONFIG_DEVICE
 void init_device();
-void device_update()
+void device_update();
 #endif
 
 NPCState npc_state = { .state = NPC_STOP };
