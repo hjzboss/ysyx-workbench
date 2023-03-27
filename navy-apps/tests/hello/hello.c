@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 int main() {
-/*
   if(write(1, "Hello World!\n", 13) != 13) {
     return 0;
   } 
@@ -15,6 +14,5 @@ int main() {
       j = 0;
     }
   }
-*/
   return 0;
 }
