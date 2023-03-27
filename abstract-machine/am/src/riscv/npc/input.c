@@ -1,6 +1,7 @@
 #include <am.h>
 #include "npc.h"
 #include <klib.h>
+#include <riscv/riscv.h>
 
 #define KEYDOWN_MASK 0x8000
 

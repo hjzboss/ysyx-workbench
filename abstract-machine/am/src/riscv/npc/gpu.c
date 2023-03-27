@@ -2,18 +2,11 @@
 #include <klib-macros.h>
 #include "npc.h"
 #include <riscv/riscv.h>
+#include <klib.h>
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
-int printf(const char *fmt, ...);
+
 void __am_gpu_init() {
-  // only for test initial
-  // uint32_t data = (uint32_t) inl(VGACTL_ADDR);
-  // int width = data >> 16;
-  // int height = data & 0x0000ffff;
-  // int i;
-  // uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
-  // for (i = 0; i < width * height; i ++) fb[i] = i;
-  // outl(SYNC_ADDR, 1);
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
