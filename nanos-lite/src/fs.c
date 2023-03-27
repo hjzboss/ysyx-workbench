@@ -70,7 +70,6 @@ void init_fs() {
 int fs_open(const char *pathname, int flags, int mode) {
   for (int i = 3; i < file_num; i++) {
     if (strcmp(file_table[i].name, pathname) == 0) {
-      printf("filename=%s, fd=%d\n", pathname, i);
       return i;
     }
   }
@@ -100,6 +99,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
+  printf("fd=%d\n", fd);
   if (fd == FD_STDOUT || fd == FD_STDERR) {
     file_table[fd].write(buf, 0, len);
     return len;
