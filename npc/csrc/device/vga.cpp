@@ -16,7 +16,7 @@ static uint32_t screen_height() {
   return SCREEN_H;
 }
 
-static void *vmem = NULL;
+static uint8_t *vmem = NULL;
 static uint32_t *vgactl_port_base = NULL;
 
 static SDL_Renderer *renderer = NULL;
@@ -75,7 +75,7 @@ void init_vga() {
   vgactl_port_base[0] = (screen_width() << 16) | screen_height();
   vmem_size = screen_width() * screen_height() * sizeof(uint32_t);
   vmem_upper_bound = CONFIG_FB_ADDR + vmem_size;
-  vmem = malloc(vmem_size);
+  vmem = (uint8_t *)malloc(vmem_size);
   init_screen();
   memset(vmem, 0, vmem_size);
 }
