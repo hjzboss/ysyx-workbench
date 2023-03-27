@@ -46,6 +46,7 @@ static void checkregs(NEMUCPUState *ref) {
 
   // check csr
   for(int i = 0; i < CSR_NUM; i++) {
+    printf("csr\n");
     if(ref->csr[i] != cpu_csr[i]) {
       log_write(ANSI_FMT("csr[%d] %s error: \n", ANSI_FG_RED), i, csrs[i]);
       log_write("ref %s: 0x%016lx\n", csrs[i], ref->csr[i]);
