@@ -185,9 +185,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
-      rdata = fb_read(waddr & ~0x7ull, 8);
+      rdata = vga_read(waddr & ~0x7ull, 8);
       rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-      fb_write(waddr & ~0x7ull, 8, rdata);
+      vga_write(waddr & ~0x7ull, 8, rdata);
     }
     else {
       // 物理内存
