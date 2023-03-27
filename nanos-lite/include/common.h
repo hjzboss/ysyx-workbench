@@ -3,7 +3,7 @@
 
 /* Uncomment these macros to enable corresponding functionality. */
 #define HAS_CTE
-//#define CONFIG_MENU
+#define CONFIG_MENU
 //#define CONFIG_STRACE
 //#define HAS_VME
 //#define MULTIPROGRAM
