@@ -53,9 +53,6 @@ static void checkregs(NEMUCPUState *ref) {
       same = false;
       err_list[i+34] = true;
     }
-    else {
-      printf("csr[%d]=%x\n", i, cpu_csr[i]);
-    }
   }
 
   if(!same) {
