@@ -1,6 +1,8 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
+#include <macro.h>
+
 //#define CONFIG_WAVE 1 // 启动波形仿真
 
 #define CSR_NUM 4
@@ -21,7 +23,7 @@
 #define CONFIG_FB_ADDR 0xa1000000
 #define CONFIG_VGA_CTL_MMIO 0xa0000100
 
-#define SCREEN_W 400
-#define SCREEN_H 300
+#define SCREEN_W (MUXDEF(CONFIG_VGA_SIZE_800x600, 800, 400))
+#define SCREEN_H (MUXDEF(CONFIG_VGA_SIZE_800x600, 600, 300))
 
 #endif

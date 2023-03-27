@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <assert.h>
 
+
 static uint32_t vmem_size;
 static uint64_t vmem_upper_bound;
 
