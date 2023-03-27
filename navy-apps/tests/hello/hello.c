@@ -2,9 +2,11 @@
 #include <stdio.h>
 
 int main() {
+/*
   if(write(1, "Hello World!\n", 13) != 13) {
     return 0;
   }
+  */
   int i = 2;
   volatile int j = 0;
   while (1) {
