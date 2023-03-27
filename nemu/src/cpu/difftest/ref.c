@@ -21,6 +21,7 @@
 #define REG_SIZE (264 + (8 * CSR_NUM))
 
 void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
+  printf("shit\n");
   if(direction == DIFFTEST_TO_REF) {
     memcpy(guest_to_host(addr), buf, n);
   }
@@ -30,6 +31,7 @@ void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
 }
 
 void difftest_regcpy(void *dut, bool direction) {
+  printf("shit\n");
   if(direction == DIFFTEST_TO_REF) {
     memcpy(&cpu, dut, REG_SIZE);
   }
@@ -39,7 +41,6 @@ void difftest_regcpy(void *dut, bool direction) {
 }
 
 void difftest_exec(uint64_t n) {
-  printf("shit\n");
   cpu_exec(n);
 }
 
