@@ -116,7 +116,6 @@ void difftest_step() {
   // todo: 执行ref_difftest_exec过后，cpu.pc就变了，原因是引用到了nemu中的cpu结构体了。。。。。
 
   // ref execute once
-  printf("difftest\n");
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
