@@ -68,7 +68,7 @@ class Alu extends Module {
   val opBw = opB(31, 0)
   val aluW = LookupTree(io.aluOp, List(
     AluOp.addw      -> (opAw + opBw),
-    AluOp.subw      -> (opAw.asSInt() - opBw.asSInt()),
+    AluOp.subw      -> (opAw.asSInt() - opBw.asSInt()).asUInt(),
     AluOp.mulw      -> (opAw * opBw),
     AluOp.divw      -> (opAw.asSInt() / opBw.asSInt()).asUInt(), // todo
     AluOp.divuw     -> (opAw / opBw),
