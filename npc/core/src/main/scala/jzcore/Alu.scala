@@ -14,10 +14,11 @@ class Alu extends Module {
     val brMark  = Output(Bool())
   })
 
-  val opA = io.opA
-  val opB = io.opB
   val aluOp = io.aluOp
 
+  // xlen computation
+  val opA = io.opA
+  val opB = io.opB
   val aluOut = LookupTree(io.aluOp, List(
     AluOp.add       -> (opA + opB),
     AluOp.jump      -> (opA + opB),
@@ -44,26 +45,44 @@ class Alu extends Module {
     AluOp.rem       -> (opA.asSInt() % opB.asSInt()).asUInt(),
     AluOp.remu      -> (opA % opB),
 
+/*
     AluOp.addw      -> (opA + opB),
     AluOp.subw      -> (opA - opB),
     AluOp.mulw      -> (opA * opB),
-    AluOp.divw      -> (opA.asSInt() / opB.asSInt()).asUInt(),
+    AluOp.divw      -> (SignExt(opA(31, 0), 64).asSInt() / SignExt(opB(31, 0), 64).asSInt()).asUInt(), // todo
     AluOp.divuw     -> (opA / opB),
     AluOp.sllw      -> (opA << opB(4, 0)),
     AluOp.srlw      -> (ZeroExt(opA(31, 0), 64) >> opB(4, 0)),
     AluOp.sraw      -> (SignExt(opA(31, 0), 64).asSInt() >> opB(4, 0)).asUInt(),
     AluOp.remw      -> (SignExt(opA(31, 0), 64).asSInt() % SignExt(opB(31, 0), 64).asSInt()).asUInt(),
     AluOp.remuw     -> (ZeroExt(opA(31, 0), 64) % ZeroExt(opB(31, 0), 64)),
+*/
 
     AluOp.csrrw     -> opB,
     AluOp.csrrs     -> (opA | opB),
     AluOp.csrrc     -> (opA & ~opB)
   ))
 
+  // word computation
+  val opAw = opA(31, 0)
+  val opBw = opB(31, 0)
+  val aluW = LookupTree(io.aluOp, List(
+    AluOp.addw      -> (opAw + opBw),
+    AluOp.subw      -> (opAw - opBw),
+    AluOp.mulw      -> (opAw * opBw),
+    AluOp.divw      -> (opAw.asSInt() / opBw.asSInt()).asUInt(), // todo
+    AluOp.divuw     -> (opAw / opBw),
+    AluOp.sllw      -> (opAw << opBw(4, 0)),
+    AluOp.srlw      -> (opAw >> opBw(4, 0)),
+    AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0).asSInt()).asUInt(),
+    AluOp.remw      -> (opAw.asSInt() % opBw.asSInt()).asUInt(),
+    AluOp.remuw     -> (opAw % opBw),
+  ))
+  val aluOutw = SignExt(aluW, 64)
+
+
   val isOne = aluOut.asUInt() === 1.U(64.W)
   val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.mulw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw || aluOp === AluOp.divuw || aluOp === AluOp.remuw
-  
-  val aluOutw = SignExt(aluOut(31, 0), 64)
   io.aluOut := Mux(isWop, aluOutw, aluOut)
   io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(aluOp === AluOp.beq || aluOp === AluOp.bne || aluOp === AluOp.blt || aluOp === AluOp.bltu || aluOp === AluOp.bge || aluOp === AluOp.bgeu, isOne, false.B))
 }
