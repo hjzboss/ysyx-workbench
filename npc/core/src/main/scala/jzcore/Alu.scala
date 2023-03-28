@@ -74,7 +74,7 @@ class Alu extends Module {
     AluOp.divuw     -> (opAw / opBw),
     AluOp.sllw      -> (opAw << opBw(4, 0)),
     AluOp.srlw      -> (opAw >> opBw(4, 0)),
-    AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0).asSInt()).asUInt(),
+    AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0)).asUInt(),
     AluOp.remw      -> (opAw.asSInt() % opBw.asSInt()).asUInt(),
     AluOp.remuw     -> (opAw % opBw),
   ))
