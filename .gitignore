@@ -13,3 +13,6 @@
 /fceux-am
 /nvboard
 /am-kernels
+/target
+.vscode
+.bsp
