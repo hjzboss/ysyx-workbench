@@ -61,6 +61,21 @@ void print_ftrace(bool);
 void ftrace(uint64_t addr, uint32_t inst, uint64_t next_pc);
 #endif
 
+
+// vga
+bool check_vmem_bound(uint64_t addr);
+uint32_t get_vga_config();
+uint64_t vga_read(uint64_t addr, int len);
+void vga_write(uint64_t addr, int len, uint64_t data);
+
+// keyboard
+uint32_t i8042_data_io_handler();
+
+#ifdef CONFIG_DEVICE
+void init_device();
+void device_update();
+#endif
+
 NPCState npc_state = { .state = NPC_STOP };
 
 uint64_t get_time();
@@ -70,6 +85,7 @@ void paddr_write(uint64_t addr, int len, uint64_t data);
 long load_img(char *dir);
 void isa_reg_display(bool*);
 void print_mtrace();
+void syn_update();
 
 // Called by $time in Verilog
 double sc_time_stamp () {
@@ -122,6 +138,17 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     }
     return;
   }
+  else if (raddr == CONFIG_VGA_CTL_MMIO) {
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+    // VGA_CTRL, 返回屏幕大小，可在config.h中配置
+    uint32_t data = get_vga_config();
+    *rdata = data;
+  }
+  else if (raddr == CONFIG_I8042_DATA_MMIO) {
+    // 返回键盘码
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+    *rdata = i8042_data_io_handler();
+  }
   else {
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
@@ -139,8 +166,13 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     return;
   }
+  else if (waddr == SYNC_ADDR) {
+    // 设置同步位
+    IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+    syn_update();
+  }
   else {
-    uint64_t rdata = paddr_read(waddr & ~0x7ull, 8);
+    uint64_t rdata; 
     uint64_t wmask_64 = 0;
     uint8_t *index = (uint8_t*)&wmask_64;
     // 将8位的掩码转换为64位的掩码
@@ -158,8 +190,20 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       shift_cnt++;
       tmp = tmp >> 1;
     }
-    rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-    paddr_write(waddr & ~0x7ull, 8, rdata);
+
+    if (check_vmem_bound(waddr)) {
+      // vga显存
+      IFDEF(CONFIG_DIFFTEST, visit_device = true;)
+      rdata = vga_read(waddr & ~0x7ull, 8);
+      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      vga_write(waddr & ~0x7ull, 8, rdata);
+    }
+    else {
+      // 物理内存
+      rdata = paddr_read(waddr & ~0x7ull, 8);
+      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      paddr_write(waddr & ~0x7ull, 8, rdata);      
+    }
   }
 }
 
@@ -216,6 +260,9 @@ long init_cpu(char *dir) {
 
   // initial mstatus
   IFDEF(CONFIG_DIFFTEST, npc_cpu.csr[0] = 0xa00001800);
+
+  // initial device
+  init_device();
 
   return size;
 }
@@ -289,7 +336,7 @@ void execute(uint64_t n) {
     g_nr_guest_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
-    //IFDEF(CONFIG_DEVICE, device_update());
+    IFDEF(CONFIG_DEVICE, device_update());
   }
 }
 
@@ -317,7 +364,7 @@ void assert_fail_msg() {
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (npc_state.state) {
-    case NPC_END: case NPC_ABORT:
+    case NPC_END: case NPC_ABORT: case NPC_QUIT:
       printf("Program execution has ended. To restart the program, exit NPC and run again.\n");
       return;
     default: npc_state.state = NPC_RUNNING;

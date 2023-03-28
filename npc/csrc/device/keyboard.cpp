@@ -1,24 +1,7 @@
-/***************************************************************************************
-* Copyright (c) 2014-2022 Zihao Yu, Nanjing University
-*
-* NEMU is licensed under Mulan PSL v2.
-* You can use this software according to the terms and conditions of the Mulan PSL v2.
-* You may obtain a copy of Mulan PSL v2 at:
-*          http://license.coscl.org.cn/MulanPSL2
-*
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-* MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-*
-* See the Mulan PSL v2 for more details.
-***************************************************************************************/
-/*
-#include "device/map.h"
-#include "device/mmio.h"
+#include <macro.h>
+#define KEYDOWN_MASK 0x8000
 #include <SDL2/SDL.h>
 #include <cpu/cpu.h>
-
-#define KEYDOWN_MASK 0x8000
 
 // Note that this is not the standard
 #define _KEYS(f) \
@@ -31,7 +14,6 @@ f(LCTRL) f(APPLICATION) f(LALT) f(SPACE) f(RALT) f(RCTRL) \
 f(UP) f(DOWN) f(LEFT) f(RIGHT) f(INSERT) f(DELETE) f(HOME) f(END) f(PAGEUP) f(PAGEDOWN)
 
 #define _KEY_NAME(k) _KEY_##k,
-int tmp = 1;
 
 enum {
   _KEY_NONE = 0,
@@ -45,8 +27,6 @@ static void init_keymap() {
   MAP(_KEYS, SDL_KEYMAP)
 }
 
-static uint32_t *i8042_data_port_base = NULL;
-
 #define KEY_QUEUE_LEN 1024
 static int key_queue[KEY_QUEUE_LEN] = {};
 static int key_f = 0, key_r = 0;
@@ -54,8 +34,7 @@ static int key_f = 0, key_r = 0;
 static void key_enqueue(uint32_t am_scancode) {
   key_queue[key_r] = am_scancode;
   key_r = (key_r + 1) % KEY_QUEUE_LEN;
-  // if ker_r catched key_f, key queue overflow
-  assert(key_r != key_f);
+  Assert(key_r != key_f, "key queue overflow!");
 }
 
 static uint32_t key_dequeue() {
@@ -67,7 +46,6 @@ static uint32_t key_dequeue() {
   return key;
 }
 
-// detect key by SDL
 void send_key(uint8_t scancode, bool is_keydown) {
   if (npc_state.state == NPC_RUNNING && keymap[scancode] != _KEY_NONE) {
     uint32_t am_scancode = keymap[scancode] | (is_keydown ? KEYDOWN_MASK : 0);
@@ -75,16 +53,13 @@ void send_key(uint8_t scancode, bool is_keydown) {
   }
 }
 
-static void i8042_data_io_handler(uint32_t offset, uint8_t mask, bool is_write) {
-  assert(!is_write);
-  assert(offset == 0);
-  i8042_data_port_base[0] = key_dequeue();
+
+static uint32_t *i8042_data_port_base = NULL;
+
+uint32_t i8042_data_io_handler() {
+  return key_dequeue();
 }
 
 void init_i8042() {
-  i8042_data_port_base = (uint32_t *)new_space(8);
-  i8042_data_port_base[0] = _KEY_NONE;
-  add_mmio_map("keyboard", CONFIG_I8042_DATA_MMIO, i8042_data_port_base, 8, (io_callback_t)i8042_data_io_handler);
   init_keymap();
 }
-*/
