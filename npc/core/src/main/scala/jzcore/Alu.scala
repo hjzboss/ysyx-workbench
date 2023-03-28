@@ -11,7 +11,6 @@ class Alu extends Module {
     val aluOp   = Input(UInt(6.W))
     
     val aluOut  = Output(UInt(64.W))
-    val aluOutw = Output(UInt(64.W))
     val brMark  = Output(Bool())
   })
 
@@ -79,10 +78,10 @@ class Alu extends Module {
     AluOp.remw      -> (opAw.asSInt() % opBw.asSInt()).asUInt(),
     AluOp.remuw     -> (opAw % opBw),
   ))
-  val aluOutw = SignExt(aluW, 64)
-  io.aluOutw := aluOutw
+
+
   val isOne = aluOut.asUInt() === 1.U(64.W)
   val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.mulw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw || aluOp === AluOp.divuw || aluOp === AluOp.remuw
-  io.aluOut := Mux(isWop, aluOutw, aluOut)
+  io.aluOut := Mux(isWop, SignExt(aluW, 64), aluOut)
   io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(aluOp === AluOp.beq || aluOp === AluOp.bne || aluOp === AluOp.blt || aluOp === AluOp.bltu || aluOp === AluOp.bge || aluOp === AluOp.bgeu, isOne, false.B))
 }
