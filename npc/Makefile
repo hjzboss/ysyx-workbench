@@ -38,16 +38,16 @@ help:
 	./mill -i __.test.runMain Elaborate --help
 
 compile:
-	mill -i __.compile
+	./mill -i __.compile
 
 bsp:
-	mill -i mill.bsp.BSP/install
+	./mill -i mill.bsp.BSP/install
 
 reformat:
-	mill -i __.reformat
+	./mill -i __.reformat
 
 checkformat:
-	mill -i __.checkFormat
+	./mill -i __.checkFormat
 
 clean:
 	-rm -rf $(BUILD_DIR)

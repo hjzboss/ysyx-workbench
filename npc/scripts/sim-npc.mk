@@ -15,7 +15,7 @@ WAVE = wave.vcd
 
 VERILATOR_SIMFLAG = 
 # build
-VERILATOR_SIMFLAG += --cc --exe --build -MMD
+VERILATOR_SIMFLAG += --cc --exe --build -MMD -j 0
 # C++ compiler arguments for makefile
 VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/include -std=c++14 -fno-exceptions -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS"
 # open trace
