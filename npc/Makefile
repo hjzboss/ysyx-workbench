@@ -54,22 +54,22 @@ clean:
 
 .PHONY: test verilog help compile bsp reformat checkformat clean
 
-fpga: $(BIN)
-	@$^
+#fpga: $(BIN)
+#	@$^
 
-$(BIN): $(NVBOARD_ARCHIVE) $(FPGA_CSRC) $(VSRC)
-	$(call git_commit, "sim RTL")
-	@rm -rf $(FPGA_OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
-		$(addprefix -CFLAGS , $(CFLAGS)) \
-	 	$(addprefix -LDFLAGS , $(LDFLAGS)) \
-		-top $(TOPNAME) \
-		--exe -o $(abspath $(BIN))
+#$(BIN): $(NVBOARD_ARCHIVE) $(FPGA_CSRC) $(VSRC)
+#	$(call git_commit, "sim RTL")
+#	@rm -rf $(FPGA_OBJ_DIR)
+#	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
+#		$(addprefix -CFLAGS , $(CFLAGS)) \
+#	 	$(addprefix -LDFLAGS , $(LDFLAGS)) \
+#		-top $(TOPNAME) \
+#		--exe -o $(abspath $(BIN))
 
 # 将引脚映射转为cpp
-$(SRC_AUTO_BIND): $(NXDC_FILES)
-	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+#$(SRC_AUTO_BIND): $(NXDC_FILES)
+#	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
-$(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
+#$(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
 
 include ../Makefile
