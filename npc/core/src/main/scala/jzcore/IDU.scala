@@ -29,7 +29,7 @@ class IDU extends Module with HasInstrType {
 
   val ok :: wait :: Nil = Enum(2)
   val state = RegInit(ok)
-  state := MuxLookup(state, start, List(
+  state := MuxLookup(state, ok, List(
     ok         -> Mux(fire, ok, wait),
     wait       -> Mux(fire, ok, wait)
   ))
@@ -83,8 +83,8 @@ class IDU extends Module with HasInstrType {
   rf.io.rs1               := Mux(instrtype === InstrD, 10.U(5.W), rs1)
   rf.io.rs2               := rs2
   rf.io.wen               := io.regWrite.valid && fire // 只有在阻塞的最后才写入寄存器文件
-  rf.io.waddr             := io.regWrite.rd
-  rf.io.wdata             := io.regWrite.value
+  rf.io.waddr             := io.regWrite.bits.rd
+  rf.io.wdata             := io.regWrite.bits.value
   rf.io.clock             := clock
   rf.io.reset             := reset
   io.regWrite.ready       := fire
