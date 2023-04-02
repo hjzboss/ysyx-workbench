@@ -90,7 +90,7 @@ class EXU extends Module {
   lsu.io.waddr                 := aluOut
   lsu.io.wdata                 := io.in.bits.wdata
   lsu.io.wmask                 := wmask
-  lsu.io.wvalid                := io.redirect.ready
+  lsu.io.wvalid                := io.redirect.ready // todo
 
   // regfile
   // todo, mem
