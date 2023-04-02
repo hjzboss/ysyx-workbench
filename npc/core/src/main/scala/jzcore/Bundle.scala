@@ -20,6 +20,7 @@ class CSRWriteIO extends Bundle {
   val no        = Output(UInt(4.W))
 }
 
+/*
 class DataSrcIO extends Bundle {
   val pc    = Output(UInt(64.W))
   val src1  = Output(UInt(64.W))
@@ -46,6 +47,7 @@ class Ctrl extends Bundle {
   val csrWaddr      = Output(UInt(2.W))
   val sysInsType    = Output(UInt(2.W))
 }
+*/
 
 class CtrlFlow extends Bundle {
   // ctrl

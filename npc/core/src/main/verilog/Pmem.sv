@@ -1,6 +1,6 @@
 module Pmem (
   input[63:0] raddr,
-  output reg[31:0] rdata,
+  output reg[63:0] rdata,
   input rvalid
 );
 
