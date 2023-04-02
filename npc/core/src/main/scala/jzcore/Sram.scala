@@ -20,7 +20,7 @@ class Sram extends Module {
   rvalid                := raddrFire
   io.rdataIO.valid       := rvalid
 
-  val dataFire           = rvalid && io.dataIO.ready
+  val dataFire           = rvalid && io.rdataIO.ready
 
   pmem.io.raddr         := io.raddrIO.bits.addr
   pmem.io.rvalid        := dataFire
