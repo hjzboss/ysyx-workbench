@@ -18,7 +18,7 @@ class Sram extends Module {
 
   val rvalid             = RegInit(false.B)
   rvalid                := raddrFire
-  io.dataIO.valid       := rvalid
+  io.rdataIO.valid       := rvalid
 
   val dataFire           = rvalid && io.dataIO.ready
 

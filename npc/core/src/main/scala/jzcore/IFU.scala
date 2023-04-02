@@ -33,7 +33,7 @@ class IFU extends Module with HasResetVector{
   val state = RegInit(fetch)
   state := MuxLookup(state, start, List(
     start         -> Mux(io.addrIO.valid && io.addrIO.ready, fetch, start), // 开始取指
-    fetch         -> Mux(fire && io.out.ready, start, Mux(!fire, fetch, wait)) // 取指完成，当取指阻塞时保持状态
+    fetch         -> Mux(fire && io.out.ready, start, Mux(!fire, fetch, wait)), // 取指完成，当取指阻塞时保持状态
     wait          -> Mux(io.out.ready, start, wait) // idu阻塞，但当前的设计中idu不会阻塞
   ))
 
