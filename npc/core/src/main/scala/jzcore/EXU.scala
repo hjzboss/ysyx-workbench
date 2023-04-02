@@ -26,7 +26,7 @@ class EXU extends Module {
   // 寄存器文件写状态机
   val regState = RegInit(idle)
   regState := MuxLookup(regState, idle, List(
-    idle       -> Mux(io.regWrite.valid && io.regWrite.ready, idle, Mux(!io.regWrite.valid, idle, wait))
+    idle       -> Mux(io.regWrite.valid && io.regWrite.ready, idle, Mux(!io.regWrite.valid, idle, wait)),
     wait       -> Mux(io.regWrite.ready, idle, wait)
   ))
 
