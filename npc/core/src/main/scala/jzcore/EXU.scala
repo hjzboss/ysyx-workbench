@@ -103,10 +103,10 @@ class EXU extends Module {
 
   // todo: branch addr
   val brAddrOpA                 = Mux(io.in.bits.isJalr, opAPre, io.in.bits.pc)
-  val brAddr                    = brAddrOpA + io.in.bits.imm
+  val brAddrPre                  = brAddrOpA + io.in.bits.imm
 
   // ecall mret
-  val brAddr                    = Mux(io.in.bits.sysInsType === System.ecall, opAPre, Mux(io.in.bits.sysInsType === System.mret, aluOut, brAddr))
+  val brAddr                    = Mux(io.in.bits.sysInsType === System.ecall, opAPre, Mux(io.in.bits.sysInsType === System.mret, aluOut, brAddrPre))
   val redirectReg               = RegEnable(brAddr, redirectState === idle && io.redirect.valid)
   io.redirect.bits.brAddr      := Mux(redirectState === idle, brAddr, redirectReg)
   io.redirect.valid            := Mux((io.in.bits.br && alu.io.brMark) || io.in.bits.sysInsType === System.ecall || io.in.bits.sysInsType === System.mret, true.B, false.B) // todo
