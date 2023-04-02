@@ -33,14 +33,14 @@ class EXU extends Module {
   // csr写状态机
   val csrState = RegInit(idle)
   csrState := MuxLookup(csrState, idle, List(
-    idle       -> Mux(io.csrWrite.valid && io.csrWrite.ready, idle, Mux(!io.csrWrite.valid, idle, wait))
+    idle       -> Mux(io.csrWrite.valid && io.csrWrite.ready, idle, Mux(!io.csrWrite.valid, idle, wait)),
     wait       -> Mux(io.csrWrite.ready, idle, wait)
   ))
 
   // 重定向状态机
   val redirectState = RegInit(idle)
   redirectState := MuxLookup(redirectState, idle, List(
-    idle       -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, wait))
+    idle       -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, wait)),
     wait       -> Mux(io.redirect.ready, idle, wait)
   ))
 
