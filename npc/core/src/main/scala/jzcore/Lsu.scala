@@ -9,6 +9,7 @@ class Lsu extends BlackBox {
     val raddr = Input(UInt(64.W))
     val rdata = Output(UInt(64.W))
 
+    val wvalid= Input(Bool())
     val waddr = Input(UInt(64.W))
     val wdata = Input(UInt(64.W))
     val wmask = Input(UInt(8.W))

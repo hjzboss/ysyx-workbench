@@ -2,6 +2,7 @@ module Lsu (
   input [63:0]    raddr,
   output [63:0]   rdata,
 
+  input           wvalid,
   input [63:0]    waddr,
   input [63:0]    wdata,
   input [7:0]     wmask
@@ -21,6 +22,7 @@ import "DPI-C" function void pmem_write(
 
 always @(*) begin
   pmem_read(raddr, rdata_full);
-  pmem_write(waddr, wdata, mask);
+  if (wvalid)
+    pmem_write(waddr, wdata, mask);
 end
 endmodule
