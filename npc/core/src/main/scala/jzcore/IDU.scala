@@ -27,11 +27,11 @@ class IDU extends Module with HasInstrType {
 
   val fire = io.out.valid && io.out.ready
 
-  val ok :: wait :: Nil = Enum(2)
+  val ok :: d_wait :: Nil = Enum(2)
   val state = RegInit(ok)
   state := MuxLookup(state, ok, List(
-    ok         -> Mux(fire, ok, wait),
-    wait       -> Mux(fire, ok, wait)
+    ok         -> Mux(fire, ok, d_wait),
+    d_wait     -> Mux(fire, ok, d_wait)
   ))
 
   // 当exu阻塞时锁存数据

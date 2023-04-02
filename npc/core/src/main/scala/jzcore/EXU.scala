@@ -21,27 +21,27 @@ class EXU extends Module {
     val redirect  = Decoupled(new RedirectIO)
   })
 
-  val idle :: wait :: Nil = Enum(2)
+  val idle :: e_wait :: Nil = Enum(2)
 
   // 寄存器文件写状态机
   val regState = RegInit(idle)
   regState := MuxLookup(regState, idle, List(
-    idle       -> Mux(io.regWrite.valid && io.regWrite.ready, idle, Mux(!io.regWrite.valid, idle, wait)),
-    wait       -> Mux(io.regWrite.ready, idle, wait)
+    idle       -> Mux(io.regWrite.valid && io.regWrite.ready, idle, Mux(!io.regWrite.valid, idle, e_wait)),
+    e_wait     -> Mux(io.regWrite.ready, idle, e_wait)
   ))
 
   // csr写状态机
   val csrState = RegInit(idle)
   csrState := MuxLookup(csrState, idle, List(
-    idle       -> Mux(io.csrWrite.valid && io.csrWrite.ready, idle, Mux(!io.csrWrite.valid, idle, wait)),
-    wait       -> Mux(io.csrWrite.ready, idle, wait)
+    idle       -> Mux(io.csrWrite.valid && io.csrWrite.ready, idle, Mux(!io.csrWrite.valid, idle, e_wait)),
+    e_wait     -> Mux(io.csrWrite.ready, idle, e_wait)
   ))
 
   // 重定向状态机
   val redirectState = RegInit(idle)
   redirectState := MuxLookup(redirectState, idle, List(
-    idle       -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, wait)),
-    wait       -> Mux(io.redirect.ready, idle, wait)
+    idle       -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, e_wait)),
+    e_wait     -> Mux(io.redirect.ready, idle, e_wait)
   ))
 
   val alu   = Module(new Alu)
@@ -98,7 +98,7 @@ class EXU extends Module {
   val rdReg = RegEnable(io.in.bits.rd, regState === idle && io.regWrite.valid)
   val regValueReg = RegEnable(regValue, regState === idle && io.regWrite.valid)
   io.regWrite.bits.value       := Mux(regState === idle, regValue, regValueReg)
-  io.regWrite.valid            := io.in.bits.regWen || regState === wait
+  io.regWrite.valid            := io.in.bits.regWen || regState === e_wait
   io.regWrite.bits.rd          := Mux(regState === idle, io.in.bits.rd, rdReg)
 
   // todo: branch addr
@@ -121,9 +121,9 @@ class EXU extends Module {
   val noReg       = RegEnable(no, csrState === idle && exception)
   io.csrWrite.bits.waddr       := Mux(csrState === idle, io.in.bits.csrWaddr, csrWaddrReg)
   io.csrWrite.bits.wdata       := Mux(csrState === idle, aluOut, csrWdataReg)
-  io.csrWrite.valid            := io.in.bits.isCsr || csrState === wait
+  io.csrWrite.valid            := io.in.bits.isCsr || csrState === e_wait
   // exception
-  io.csrWrite.bits.exception   := exception || csrState === wait
+  io.csrWrite.bits.exception   := exception || csrState === e_wait
   io.csrWrite.bits.epc         := Mux(csrState === idle, io.in.bits.pc, epcReg)
   io.csrWrite.bits.no          := Mux(csrState === idle, no, noReg)
 
