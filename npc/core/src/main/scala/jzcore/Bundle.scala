@@ -8,13 +8,11 @@ class RFReadIO extends Bundle {
 }
 
 class RFWriteIO extends Bundle {
-  val wen   = Output(Bool())
   val rd    = Output(UInt(5.W))
   val value = Output(UInt(64.W))
 }
 
 class CSRWriteIO extends Bundle {
-  val wen       = Output(Bool())
   val waddr     = Output(UInt(2.W))
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
@@ -49,6 +47,30 @@ class Ctrl extends Bundle {
   val sysInsType    = Output(UInt(2.W))
 }
 
+class CtrlFlow extends Bundle {
+  // ctrl
+  val br            = Output(Bool())
+  val rd            = Output(UInt(5.W))
+  val regWen        = Output(Bool())
+  val isJalr        = Output(Bool())
+  val lsType        = Output(UInt(4.W))
+  val wdata         = Output(UInt(64.W))
+  val loadMem       = Output(Bool())
+  val wmask         = Output(UInt(8.W))
+  val isCsr         = Output(Bool())
+  val csrWaddr      = Output(UInt(2.W))
+  val sysInsType    = Output(UInt(2.W))
+  // alu ctrl
+  val aluSrc1       = Output(UInt(3.W))
+  val aluSrc2       = Output(UInt(3.W))
+  val aluOp         = Output(UInt(6.W))
+  // data
+  val pc            = Output(UInt(64.W))
+  val src1          = Output(UInt(64.W))
+  val src2          = Output(UInt(64.W))
+  val imm           = Output(UInt(64.W))
+}
+
 class InstrFetch extends Bundle {
   val pc        = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
@@ -56,5 +78,12 @@ class InstrFetch extends Bundle {
 
 class RedirectIO extends Bundle {
   val brAddr    = Output(UInt(64.W))
-  val valid     = Output(Bool())
+}
+
+class AddrIO extends Bundle {
+  val addr      = Output(UInt(64.W))
+}
+
+class DataIO extends Bundle {
+  val data      = Output(UInt(64.W))
 }

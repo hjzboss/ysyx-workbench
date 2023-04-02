@@ -110,10 +110,6 @@ extern "C" void c_break(long long halt_ret) {
 }
 
 extern "C" void inst_read(long long raddr, int *rdata) {
-  if (raddr < 0x80000000ull) {
-    *rdata = 0x00000013;
-    return;
-  }
   *rdata = paddr_read(raddr, 4);
 }
 

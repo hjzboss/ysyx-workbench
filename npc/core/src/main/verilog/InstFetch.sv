@@ -1,3 +1,4 @@
+/*
 module InstFetch (
   input [63:0]    pc,
   output [31:0]   inst
@@ -13,3 +14,4 @@ always @(*) begin
   //$display("v: pc=%x, inst=%x", pc, inst);
 end
 endmodule
+*/
