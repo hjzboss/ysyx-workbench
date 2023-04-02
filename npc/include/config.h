@@ -3,8 +3,7 @@
 
 #include <macro.h>
 
-#define CONFIG_WAVE 1 // 启动波形仿真
-
+//#define CONFIG_WAVE 1 // 启动波形仿真
 
 #define CSR_NUM 4
 
@@ -14,7 +13,7 @@
 #define CONFIG_MSIZE 0x8000000
 //#define CONFIG_ITRACE 1
 //#define CONFIG_FTRACE 1
-//#define CONFIG_DIFFTEST 1
+#define CONFIG_DIFFTEST 1
 //#define CONFIG_MTRACE 1
 
 #define CONFIG_DEVICE 1
