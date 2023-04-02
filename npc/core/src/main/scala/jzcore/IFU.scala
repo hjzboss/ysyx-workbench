@@ -30,7 +30,7 @@ class IFU extends Module with HasResetVector{
 
   // 取指状态机
   val start :: fetch :: f_wait :: Nil = Enum(3)
-  val state = RegInit(fetch)
+  val state = RegInit(start)
   state := MuxLookup(state, start, List(
     start         -> Mux(io.addrIO.valid && io.addrIO.ready, fetch, start), // 开始取指
     fetch         -> Mux(fire && io.out.ready, start, Mux(!fire, fetch, f_wait)), // 取指完成，当取指阻塞时保持状态
