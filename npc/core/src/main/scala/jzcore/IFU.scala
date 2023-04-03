@@ -23,7 +23,7 @@ class IFU extends Module with HasResetVector{
 
     // axi总线接口：取指
     val addrIO    = Decoupled(new AddrIO)
-    val dataIO    = Flipped(Decoupled(new DataIO))
+    val dataIO    = Flipped(Decoupled(new RdataIO))
   })
 
   val fire = io.dataIO.valid && io.dataIO.ready

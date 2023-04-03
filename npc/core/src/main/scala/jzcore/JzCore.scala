@@ -6,15 +6,15 @@ import chisel3.util._
 class JzCore extends Module {
   val io = IO(new Bundle {
     // 仿真环境
-    val pc      = Output(UInt(64.W))
-    val nextPc  = Output(UInt(64.W))
-    val inst    = Output(UInt(32.W))
-    val difftest= Output(Bool())
+    val pc        = Output(UInt(64.W))
+    val nextPc    = Output(UInt(64.W))
+    val inst      = Output(UInt(32.W))
+    val difftest  = Output(Bool())
 
     // axi接口
     // read channel
-    val raddrIO = Decoupled(new AddrIO)
-    val rdataIO = Flipped(Decoupled(new DataIO))
+    val raddrIO   = Decoupled(new AddrIO)
+    val rdataIO   = Flipped(Decoupled(new RdataIO))
     // write channel
   })
 
