@@ -28,6 +28,6 @@ class Sram extends Module {
   io.rdataIO.bits.rresp := 0.U(2.W)
 
   pmem.io.raddr         := io.raddrIO.bits.addr
-  pmem.io.rvalid        := rState === fetch
+  pmem.io.rvalid        := rState === ar_wait && raddrFire
   io.rdataIO.bits.data  := pmem.io.rdata
 }
