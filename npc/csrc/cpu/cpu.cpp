@@ -244,7 +244,7 @@ static void init_wave() {
 
 
 long init_cpu(char *dir) {
-  // Construct the Verilated model, from Vsoc.h generated from Verilating "jzcore.v"
+  // Construct the Verilated model, from VSoc.h generated from Verilating "Soc.v"
   top = new VSoc; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
   IFDEF(CONFIG_WAVE, init_wave());
