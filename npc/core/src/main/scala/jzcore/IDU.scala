@@ -30,7 +30,7 @@ class IDU extends Module with HasInstrType {
   val ok :: d_wait :: Nil = Enum(2)
   val state = RegInit(ok)
   state := MuxLookup(state, ok, List(
-    ok         -> Mux(io.in.valid && io.out.ready, ok, d_wait),
+    ok         -> Mux(io.in.valid, ok, d_wait),
     d_wait     -> Mux(fire, ok, d_wait)
   ))
 
