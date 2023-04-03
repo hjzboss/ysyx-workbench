@@ -27,6 +27,6 @@ end
 
 always @(*) begin
   if (wvalid)
-    $$display("shit");
+    $display("shit");
 end
 endmodule
