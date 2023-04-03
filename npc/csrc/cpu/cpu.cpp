@@ -213,7 +213,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask, unsigne
 
 static void reset(int time) {
   top->reset = 1;
-  while (time > 0) {
+  while (time >= 0) {
     top->clock = !top->clock;
     top->eval();
 #ifdef CONFIG_WAVE
@@ -222,13 +222,7 @@ static void reset(int time) {
     main_time++;
     time--;  
   }
-  top->reset = 1;
-  top->clock = !top->clock;
-  top->eval();
-#ifdef CONFIG_WAVE
-  tfp->dump(main_time);
-#endif
-  main_time++;
+  top->reset = 0;
 }
 
 
