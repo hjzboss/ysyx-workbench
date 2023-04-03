@@ -10,6 +10,8 @@ import "DPI-C" function void pmem_read(
 always @(*) begin
   if (rvalid)
     pmem_read(raddr, rdata);
+  else
+    rdata = 64'd0;
 end
 
 endmodule
