@@ -17,7 +17,6 @@ extern uint64_t* gpr;
 static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
 static bool visit_device = false;
-static bool difftest = false; // npc中是否写会了一条指令
 
 CPUState npc_cpu = {};
 
