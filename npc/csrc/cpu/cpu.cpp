@@ -17,6 +17,7 @@ extern uint64_t* gpr;
 static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
 static bool visit_device = false;
+static bool difftest = false; // npc中是否写会了一条指令
 
 CPUState npc_cpu = {};
 
@@ -298,16 +299,15 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
+  uint64_t pc = top->io_pc; // 当前pc
+  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
+  isa_exec_once();
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
-    // 因为仿真器会提前一个周期把下一条指令的主存访问提出了，会提前访问到外设使visit_device设置为true，因此要延后一个周期来difftest_skip_ref
     difftest_skip_ref();
     visit_device = false;
   }
 #endif
-  uint64_t pc = top->io_pc; // 当前pc
-  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once();
   npc_cpu.pc = top->io_pc; // 执行后的pc
   npc_cpu.npc = top->io_nextPc;
 #ifdef CONFIG_ITRACE
