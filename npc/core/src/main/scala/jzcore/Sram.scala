@@ -11,7 +11,7 @@ class Sram extends Module {
   })
 
   // read state
-  val ar_wait :: fetch :: Nil = Enum(3)
+  val ar_wait :: fetch :: Nil = Enum(2)
   val rState = RegInit(ar_wait)
   rState := MuxLookup(rState, ar_wait, List(
     ar_wait       -> Mux(io.raddrIO.valid && io.raddrIO.ready, fetch, ar_wait), // 等待地址信息
