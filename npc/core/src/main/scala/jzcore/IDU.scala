@@ -30,18 +30,18 @@ class IDU extends Module with HasInstrType {
   val ok :: d_wait :: Nil = Enum(2)
   val state = RegInit(ok)
   state := MuxLookup(state, ok, List(
-    ok         -> Mux(io.in.valid, ok, d_wait),
+    ok         -> Mux(fire, ok, d_wait), // todo, 逻辑有问题
     d_wait     -> Mux(fire, ok, d_wait)
   ))
 
   // 当exu阻塞时锁存数据
-  val instReg  = Reg(UInt(32.W))
-  val pcReg    = Reg(UInt(64.W))
-  instReg      := Mux(state === ok && io.in.valid, io.in.bits.inst, instReg)
+  val instReg   = Reg(UInt(32.W))
+  val pcReg     = Reg(UInt(64.W))
+  instReg      := Mux(state === ok, io.in.bits.inst, instReg)
   pcReg        := Mux(state === ok, io.in.bits.pc, pcReg)
 
   // 译码
-  val inst      = Mux(state === ok, io.in.bits.inst, instReg)
+  val inst      = Mux(state === ok && io.in.valid, io.in.bits.inst, instReg)
   val pc        = Mux(state === ok, io.in.bits.pc, pcReg)
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
