@@ -118,10 +118,10 @@ class EXU extends Module {
   // csr数据锁存
   val exception                 = io.in.bits.sysInsType === System.ecall
   val no                        = Mux(io.in.bits.sysInsType === System.ecall, "hb".U, 0.U)
-  val csrWaddrReg = RegEnable(io.in.bits.csrWaddr, csrState === idle && io.csrWrite.valid)
-  val csrWdataReg = RegEnable(aluOut, csrState === idle && io.csrWrite.valid)
-  val epcReg      = RegEnable(io.in.bits.pc, csrState === idle && exception)
-  val noReg       = RegEnable(no, csrState === idle && exception)
+  val csrWaddrReg               = RegEnable(io.in.bits.csrWaddr, csrState === idle && io.csrWrite.valid)
+  val csrWdataReg               = RegEnable(aluOut, csrState === idle && io.csrWrite.valid)
+  val epcReg                    = RegEnable(io.in.bits.pc, csrState === idle && exception)
+  val noReg                     = RegEnable(no, csrState === idle && exception)
   io.csrWrite.bits.waddr       := Mux(csrState === idle, io.in.bits.csrWaddr, csrWaddrReg)
   io.csrWrite.bits.wdata       := Mux(csrState === idle, aluOut, csrWdataReg)
   io.csrWrite.valid            := io.in.bits.isCsr || csrState === e_wait

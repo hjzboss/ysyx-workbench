@@ -1,7 +1,7 @@
 module Pmem (
   input[63:0] raddr,
   output reg[63:0] rdata,
-  input rvalid
+  input rvalid,
 );
 
 import "DPI-C" function void pmem_read(
@@ -10,8 +10,6 @@ import "DPI-C" function void pmem_read(
 always @(*) begin
   if (rvalid)
     pmem_read(raddr, rdata);
-  else
-    rdata = 0;
 end
 
 endmodule
