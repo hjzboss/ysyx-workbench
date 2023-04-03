@@ -25,7 +25,7 @@ class Sram extends Module {
   val raddrFire          = io.raddrIO.valid && io.raddrIO.ready
 
   io.rdataIO.valid      := rState === fetch
-  io.rdataIO.bits.rresp := .U(2.W)
+  io.rdataIO.bits.rresp := 0.U(2.W)
 
   pmem.io.raddr         := io.raddrIO.bits.addr
   pmem.io.rvalid        := rState === fetch

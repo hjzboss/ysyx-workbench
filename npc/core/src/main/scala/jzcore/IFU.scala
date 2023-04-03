@@ -56,7 +56,7 @@ class IFU extends Module with HasResetVector{
   val inst = Mux(pc(2) === 1.U(1.W), instPre(63, 32), instPre(31, 0))
   val instReg = Reg(UInt(32.W))
   instReg             := Mux(state === fetch, inst, instReg) // 取出指令后锁存指令，当idu未准备好时有用
-  io.dataIO.ready     := true.B // todo
+  io.dataIO.ready     := true.B // todo，忽略了rresp
 
   // ifu -> idu
   io.out.valid        := state =/= start
