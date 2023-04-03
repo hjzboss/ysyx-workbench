@@ -2,6 +2,7 @@ module Lsu (
   input [63:0]    raddr,
   output [63:0]   rdata,
 
+  input           wvalid,
   input [63:0]    waddr,
   input [63:0]    wdata,
   input [7:0]     wmask
@@ -17,10 +18,10 @@ assign mask = wmask << waddr[2:0];
 import "DPI-C" function void pmem_read(
   input longint raddr, output longint rdata);
 import "DPI-C" function void pmem_write(
-  input longint waddr, input longint wdata, input byte wmask);
+  input longint waddr, input longint wdata, input byte wmask, input bit wvalid);
 
 always @(*) begin
   pmem_read(raddr, rdata_full);
-  pmem_write(waddr, wdata, mask);
+  pmem_write(waddr, wdata, mask, wvalid);
 end
 endmodule
