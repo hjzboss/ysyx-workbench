@@ -289,13 +289,10 @@ void delete_cpu() {
 }
 
 static void isa_exec_once() {
-  /*
   while (!top->io_difftest) {
     eval_wave();
     eval_wave();
-  }*/
-  eval_wave();
-  eval_wave();
+  }
   eval_wave();
   eval_wave();
 }
