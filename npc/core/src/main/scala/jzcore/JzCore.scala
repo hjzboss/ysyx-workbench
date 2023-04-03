@@ -8,6 +8,7 @@ class JzCore extends Module {
     val pc      = Output(UInt(64.W))
     val nextPc  = Output(UInt(64.W))
     val inst    = Output(UInt(32.W))
+    val difftest= Output(Bool())
   })
 
   val ifu   = Module(new IFU)
@@ -40,4 +41,5 @@ class JzCore extends Module {
   io.inst         := ifu.io.inst
   io.pc           := ifu.io.pc
   io.nextPc       := ifu.io.nextPc
+  io.difftest     := exu.io.difftest
 }

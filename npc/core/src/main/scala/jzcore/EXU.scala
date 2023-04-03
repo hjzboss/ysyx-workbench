@@ -6,6 +6,8 @@ import utils._
 
 class EXU extends Module {
   val io = IO(new Bundle {
+    val difftest  = Output(Bool())
+
     // 来自idu
     val in        = Flipped(Decoupled(new CtrlFlow))
 /*
@@ -131,4 +133,7 @@ class EXU extends Module {
   // ebreak
   stop.io.valid                := Mux(io.in.bits.sysInsType === System.ebreak, true.B, false.B)
   stop.io.haltRet              := io.in.bits.src1
+
+  // difftest
+  io.difftest                  := io.redirect.ready
 }
