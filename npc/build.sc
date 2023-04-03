@@ -6,7 +6,7 @@ import mill.scalalib.TestModule.Utest
 // support BSP
 import mill.bsp._
 
-object Soc extends ScalaModule with ScalafmtModule { m =>
+object core extends ScalaModule with ScalafmtModule { m =>
   override def scalaVersion = "2.13.8"
   override def scalacOptions = Seq(
     "-language:reflectiveCalls",
