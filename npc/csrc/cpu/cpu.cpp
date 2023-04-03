@@ -222,7 +222,7 @@ static void reset(int time) {
     main_time++;
     time--;  
   }
-  top->reset = 0;
+  top->reset = 1;
   top->clock = !top->clock;
   top->eval();
 #ifdef CONFIG_WAVE
