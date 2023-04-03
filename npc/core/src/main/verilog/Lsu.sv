@@ -24,4 +24,9 @@ always @(*) begin
   pmem_read(raddr, rdata_full);
   pmem_write(waddr, wdata, mask, wvalid);
 end
+
+always @(*) begin
+  if (wvalid)
+    $$display("shit");
+end
 endmodule
