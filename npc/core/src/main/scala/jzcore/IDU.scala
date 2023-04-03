@@ -98,7 +98,7 @@ class IDU extends Module with HasInstrType {
   csrReg.io.clock         := clock
   csrReg.io.reset         := reset
   // exception
-  csrReg.io.exception     := io.csrWrite.valid && io.csrWrite.bits.exception && fire // todo
+  csrReg.io.exception     := io.csrWrite.bits.exception && fire // todo
   csrReg.io.epc           := io.csrWrite.bits.epc
   csrReg.io.no            := io.csrWrite.bits.no
   io.csrWrite.ready       := fire
