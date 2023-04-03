@@ -30,7 +30,7 @@ class IDU extends Module with HasInstrType {
   val ok :: d_wait :: Nil = Enum(2)
   val state = RegInit(ok)
   state := MuxLookup(state, ok, List(
-    ok         -> Mux(io.in.valid, ok, d_wait),
+    ok         -> Mux(fire, ok, d_wait),
     d_wait     -> Mux(fire, ok, d_wait)
   ))
 
@@ -41,7 +41,8 @@ class IDU extends Module with HasInstrType {
   pcReg        := Mux(state === ok, io.in.bits.pc, pcReg)
 
   // 译码
-  val inst      = Mux(state === ok, io.in.bits.inst, instReg)
+  //val inst      = Mux(state === ok, io.in.bits.inst, instReg)
+  val inst      = io.in.bits.inst
   val pc        = Mux(state === ok, io.in.bits.pc, pcReg)
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
@@ -106,7 +107,7 @@ class IDU extends Module with HasInstrType {
   io.in.ready             := true.B // idu不会阻塞
 
   // idu out
-  io.out.valid            := true.B // todo
+  io.out.valid            := io.in.valid && io.in.ready // todo
   // data
   io.out.bits.pc          := pc
   io.out.bits.src1        := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
