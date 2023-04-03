@@ -32,7 +32,7 @@ class IFU extends Module with HasResetVector{
   val start :: fetch :: f_wait :: Nil = Enum(3)
   val state = RegInit(start)
   state := MuxLookup(state, start, List(
-    start         -> Mux(io.addrIO.valid && io.addrIO.ready, fetch, start), // 开始取指
+    start         -> Mux(io.addrIO.ready, fetch, start), // 开始取指
     fetch         -> Mux(fire && io.out.ready, start, Mux(!fire, fetch, f_wait)), // 取指完成，当取指阻塞时保持状态
     f_wait        -> Mux(io.out.ready, start, f_wait) // idu阻塞，但当前的设计中idu不会阻塞
   ))
@@ -50,7 +50,7 @@ class IFU extends Module with HasResetVector{
 
   // 取指
   io.addrIO.bits.addr := pc
-  io.addrIO.valid     := state =/= f_wait
+  io.addrIO.valid     := state === start // todo，什么时候有效？
   // 指令对齐
   val instPre = io.dataIO.bits.data
   val inst = Mux(pc(2) === 1.U(1.W), instPre(63, 32), instPre(31, 0))

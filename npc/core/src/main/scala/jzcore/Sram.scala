@@ -21,6 +21,7 @@ class Sram extends Module {
   val pmem               = Module(new Pmem)
 
   io.raddrIO.ready      := true.B // todo
+  io.raddrIO.bits.rresp := 0.U(2.W)
 
   val raddrFire          = io.raddrIO.valid && io.raddrIO.ready
 
