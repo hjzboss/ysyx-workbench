@@ -13,7 +13,7 @@ class Sram extends Module {
   // read state
   val ar_wait :: fetch :: Nil = Enum(3)
   val rState = RegInit(ar_wait)
-  rState := MuxLookup(state, ar_wait, List(
+  rState := MuxLookup(rState, ar_wait, List(
     ar_wait       -> Mux(io.raddrIO.valid && io.raddrIO.ready, fetch, ar_wait), // 等待地址信息
     fetch         -> Mux(io.rdataIO.valid && io.rdataIO.ready, ar_wait, fetch), // 取指完成，当取指阻塞时保持状态
   ))
