@@ -135,5 +135,5 @@ class EXU extends Module {
   stop.io.haltRet              := io.in.bits.src1
 
   // difftest
-  io.difftest                  := io.redirect.ready
+  io.difftest                  := io.regWrite.ready && io.csrWrite.ready && io.redirect.ready
 }
