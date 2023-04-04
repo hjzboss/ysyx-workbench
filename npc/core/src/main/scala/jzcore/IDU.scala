@@ -132,6 +132,8 @@ class IDU extends Module with HasInstrType {
   io.out.bits.aluSrc2     := aluSrc2
   io.out.bits.aluOp       := aluOp
 
+  io.out.bits.inst        := inst
+
   // 防止信号被优化
   io.lsType               := lsType
 }
