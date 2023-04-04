@@ -24,7 +24,10 @@ assign src1 = rf[rs1];
 assign src2 = rf[rs2];
 
 always @(posedge clock) begin
-  if (wen && waddr != 5'd0) rf[waddr] <= wdata;
+  if (wen && waddr != 5'd0) begin
+    rf[waddr] <= wdata;
+    $strobe("%h", rf[waddr]);
+  end
 end
 
 endmodule
