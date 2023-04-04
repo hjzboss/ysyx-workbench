@@ -8,8 +8,11 @@ class JzCore extends Module {
     // 仿真环境
     val pc        = Output(UInt(64.W))
     val nextPc    = Output(UInt(64.W))
-    val inst      = Output(UInt(32.W))
+    val inst  = Output(UInt(32.W))
     val difftest  = Output(Bool())
+
+    val idu_inst  = Output(UInt(32.W))
+    val exu_inst  = Output(UInt(32.W))
 
     // axi接口
     // read channel
@@ -39,4 +42,6 @@ class JzCore extends Module {
   io.pc           := ifu.io.pc
   io.nextPc       := ifu.io.nextPc
   io.difftest     := exu.io.difftest
+  io.idu_inst     := idu.io.inst
+  io.exu_inst     := exu.io.inst
 }

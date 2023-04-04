@@ -7,6 +7,7 @@ import utils._
 class EXU extends Module {
   val io = IO(new Bundle {
     val difftest  = Output(Bool())
+    val inst      = Output(UInt(32.W))
 
     // 来自idu
     val in        = Flipped(Decoupled(new CtrlFlow))
@@ -136,4 +137,5 @@ class EXU extends Module {
 
   // difftest
   io.difftest                  := io.regWrite.ready && io.csrWrite.ready && io.redirect.ready
+  io.inst                      := io.in.bits.inst
 }

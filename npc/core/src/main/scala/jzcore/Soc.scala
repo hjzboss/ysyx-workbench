@@ -7,10 +7,13 @@ import utils._
 class Soc extends Module {
   val io = IO(new Bundle {
     // 传给仿真环境
-    val pc      = Output(UInt(64.W))
-    val nextPc  = Output(UInt(64.W))
-    val inst    = Output(UInt(32.W))
-    val difftest= Output(Bool())
+    val pc        = Output(UInt(64.W))
+    val nextPc    = Output(UInt(64.W))
+    val inst      = Output(UInt(32.W))
+    val difftest  = Output(Bool())
+
+    val idu_inst  = Output(UInt(32.W))
+    val exu_inst  = Output(UInt(32.W))
   })
 
   val sram  = Module(new Sram)
@@ -24,4 +27,6 @@ class Soc extends Module {
   io.pc           := core.io.pc
   io.nextPc       := core.io.nextPc
   io.difftest     := core.io.difftest
+  io.idu_inst     := core.io.inst
+  io.exu_inst     := core.io.inst
 }

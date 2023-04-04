@@ -21,6 +21,9 @@ class IDU extends Module with HasInstrType {
     val out.bits      = new out.bits
     */
 
+    // 传给仿真环境
+    val inst      = Output(UInt(32.W))
+
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
   })
@@ -136,4 +139,7 @@ class IDU extends Module with HasInstrType {
 
   // 防止信号被优化
   io.lsType               := lsType
+
+  // 仿真环境
+  io.inst                 := inst
 }
