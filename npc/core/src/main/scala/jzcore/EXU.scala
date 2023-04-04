@@ -99,7 +99,9 @@ class EXU extends Module {
   // todo, mem
   val regValue                  = Mux(io.in.bits.loadMem, lsuOut, Mux(io.in.bits.isCsr, opAPre, aluOut))
   // 寄存器文件的地址和数据锁存（未ready时）
-  val rdReg = RegEnable(io.in.bits.rd, regState === idle && io.regWrite.valid)
+  //val rdReg = RegEnable(io.in.bits.rd, regState === idle && io.regWrite.valid)
+  val rdReg = Reg(UInt(5.W))
+  rdReg := Mux(regState === idle, io.in.bits.rd, rdReg)
   val regValueReg = RegEnable(regValue, regState === idle && io.regWrite.valid)
   io.regWrite.bits.value       := Mux(regState === idle, regValue, regValueReg)
   io.regWrite.valid            := io.in.bits.regWen || regState === e_wait
