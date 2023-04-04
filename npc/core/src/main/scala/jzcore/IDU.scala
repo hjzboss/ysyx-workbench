@@ -27,22 +27,25 @@ class IDU extends Module with HasInstrType {
 
   val fire = io.out.valid && io.out.ready
 
-  val ok :: d_wait :: Nil = Enum(2)
-  val state = RegInit(ok)
-  state := MuxLookup(state, ok, List(
-    ok         -> Mux(fire, ok, d_wait), // todo, 逻辑有问题
-    d_wait     -> Mux(fire, ok, d_wait)
+/*
+  val idle :: decode :: Nil = Enum(2)
+  val state = RegInit(idle)
+  state := MuxLookup(state, idle, List(
+    idle       -> Mux(io.in.valid, decode, idle), // 没有任务处理
+    decode     -> Mux(!fire || (fire && io.in.valid), decode, idle), // todo, 逻辑有问题
   ))
+*/
 
   // 当exu阻塞时锁存数据
   val instReg   = Reg(UInt(32.W))
   val pcReg     = Reg(UInt(64.W))
-  instReg      := Mux(state === ok, io.in.bits.inst, instReg)
-  pcReg        := Mux(state === ok, io.in.bits.pc, pcReg)
+  instReg      := Mux(io.in.valid && fire, io.in.bits.inst, instReg)
+  pcReg        := Mux(io.in.valid && fire, io.in.bits.pc, pcReg)
 
   // 译码
-  val inst      = Mux(state === ok && io.in.valid, io.in.bits.inst, instReg)
-  val pc        = Mux(state === ok, io.in.bits.pc, pcReg)
+  val inst      = Mux(io.out.valid && !io.out.ready, instReg, io.in.bits.inst)
+  val pc        = Mux(io.out.valid && !io.out.ready, pcReg, io.in.bits.pc)
+
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
   val op        = inst(6, 0)
