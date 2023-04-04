@@ -55,8 +55,8 @@ class EXU extends Module {
   // 重定向状态机, todo
   val redirectState = RegInit(idle)
   redirectState := MuxLookup(redirectState, idle, List(
-    idle      -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, e_wait)),
-    busy      -> Mux(io.redirect.ready, idle, e_wait)
+    idle      -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, busy)),
+    busy      -> Mux(io.redirect.ready, idle, busy)
   ))
 
 
