@@ -25,7 +25,7 @@ assign src2 = rf[rs2];
 
 always @(posedge clock) begin
   if (wen) 
-    $display("shit");
+    $display("waddr=%h", waddr);
   if (wen && waddr != 5'd0) begin
     rf[waddr] <= wdata;
     $strobe("%h", rf[waddr]);
