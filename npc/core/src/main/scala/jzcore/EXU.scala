@@ -24,28 +24,41 @@ class EXU extends Module {
     val redirect  = Decoupled(new RedirectIO)
   })
 
-  val idle :: e_wait :: Nil = Enum(2)
+  val inFire                    = io.in.valid && io.in.ready
+  val regFire                   = io.regWrite.valid && io.regWrite.ready
+  val csrFire                   = io.csrWrite.valid && io.csrWrite.ready
+  val exception                 = io.in.bits.sysInsType === System.ecall
 
+  val idle :: busy :: Nil = Enum(2)
   // 寄存器文件写状态机
   val regState = RegInit(idle)
   regState := MuxLookup(regState, idle, List(
-    idle       -> Mux(io.regWrite.valid && io.regWrite.ready, idle, Mux(!io.regWrite.valid, idle, e_wait)),
-    e_wait     -> Mux(io.regWrite.ready, idle, e_wait)
+    idle      -> Mux(inFire && io.in.bits.regWen, busy, idle),
+    busy      -> Mux(regFire, idle, busy)
   ))
 
   // csr写状态机
   val csrState = RegInit(idle)
   csrState := MuxLookup(csrState, idle, List(
-    idle       -> Mux(io.csrWrite.valid && io.csrWrite.ready, idle, Mux(!io.csrWrite.valid, idle, e_wait)),
-    e_wait     -> Mux(io.csrWrite.ready, idle, e_wait)
+    idle      -> Mux(inFire && io.in.bits.isCsr, busy, idle),
+    busy      -> Mux(csrFire, idle, busy)
   ))
 
-  // 重定向状态机
+  // ecall状态机
+  val excepState = RegInit(idle)
+  excepState := MuxLookup(excepState, idle, List(
+    idle      -> Mux(inFire && exception, busy, idle),
+    busy      -> Mux(csrFire, idle, busy)
+  ))
+
+
+  // 重定向状态机, todo
   val redirectState = RegInit(idle)
   redirectState := MuxLookup(redirectState, idle, List(
-    idle       -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, e_wait)),
-    e_wait     -> Mux(io.redirect.ready, idle, e_wait)
+    idle      -> Mux(io.redirect.valid && io.redirect.ready, idle, Mux(!io.redirect.valid, idle, e_wait)),
+    busy      -> Mux(io.redirect.ready, idle, e_wait)
   ))
+
 
   val alu   = Module(new Alu)
   val lsu   = Module(new Lsu)
@@ -98,18 +111,20 @@ class EXU extends Module {
   // regfile
   // todo, mem
   val regValue                  = Mux(io.in.bits.loadMem, lsuOut, Mux(io.in.bits.isCsr, opAPre, aluOut))
-  // 寄存器文件的地址和数据锁存（未ready时）
+  // 寄存器文件的地址和数据锁存（未ready时)
   //val rdReg = RegEnable(io.in.bits.rd, regState === idle && io.regWrite.valid)
-  val rdReg = Reg(UInt(5.W))
-  rdReg := Mux(regState === idle, io.in.bits.rd, rdReg)
-  val regValueReg = RegEnable(regValue, regState === idle && io.regWrite.valid)
+  //val regValueReg = RegEnable(regValue, regState === idle && io.regWrite.valid)
+  val regValueReg               = Reg(UInt(64.W))
+  regValueReg                  := Mux(regState === idle, regValue, regValueReg)
+  val rdReg                     = Reg(UInt(64.W))
+  rdReg                        := Mux(regState === idle, io.in.bits.rd, rdReg)
   io.regWrite.bits.value       := Mux(regState === idle, regValue, regValueReg)
-  io.regWrite.valid            := io.in.bits.regWen || regState === e_wait
+  io.regWrite.valid            := (regState === idle && inFire && io.in.bits.regWen) || regState === busy
   io.regWrite.bits.rd          := Mux(regState === idle, io.in.bits.rd, rdReg)
 
   // todo: branch addr
   val brAddrOpA                 = Mux(io.in.bits.isJalr, opAPre, io.in.bits.pc)
-  val brAddrPre                  = brAddrOpA + io.in.bits.imm
+  val brAddrPre                 = brAddrOpA + io.in.bits.imm
 
   // ecall mret
   val brAddr                    = Mux(io.in.bits.sysInsType === System.ecall, opAPre, Mux(io.in.bits.sysInsType === System.mret, aluOut, brAddrPre))
@@ -119,19 +134,28 @@ class EXU extends Module {
 
   // csr
   // csr数据锁存
-  val exception                 = io.in.bits.sysInsType === System.ecall
   val no                        = Mux(io.in.bits.sysInsType === System.ecall, "hb".U, 0.U)
+/*
   val csrWaddrReg               = RegEnable(io.in.bits.csrWaddr, csrState === idle && io.csrWrite.valid)
   val csrWdataReg               = RegEnable(aluOut, csrState === idle && io.csrWrite.valid)
   val epcReg                    = RegEnable(io.in.bits.pc, csrState === idle && exception)
   val noReg                     = RegEnable(no, csrState === idle && exception)
+*/
+  val csrWaddrReg               = Reg(UInt(2.W))
+  val csrWdataReg               = Reg(UInt(64.W))
+  val epcReg                    = Reg(UInt(64.W))
+  val noReg                     = Reg(UInt(4.W))
+  csrWaddrReg                  := Mux(csrState === idle, io.in.bits.csrWaddr, csrWaddrReg)
+  csrWdataReg                  := Mux(csrState === idle, aluOut, csrWdataReg)
+  epcReg                       := Mux(excepState === idle, io.in.bits.pc, epcReg)
+  noReg                        := Mux(excepState === idle, no, noReg)
   io.csrWrite.bits.waddr       := Mux(csrState === idle, io.in.bits.csrWaddr, csrWaddrReg)
   io.csrWrite.bits.wdata       := Mux(csrState === idle, aluOut, csrWdataReg)
-  io.csrWrite.valid            := io.in.bits.isCsr || csrState === e_wait
+  io.csrWrite.valid            := (csrState === idle && io.in.bits.isCsr) || csrState === busy
   // exception
-  io.csrWrite.bits.exception   := exception || csrState === e_wait
-  io.csrWrite.bits.epc         := Mux(csrState === idle, io.in.bits.pc, epcReg)
-  io.csrWrite.bits.no          := Mux(csrState === idle, no, noReg)
+  io.csrWrite.bits.exception   := (excepState === idle && exception) || excepState === busy
+  io.csrWrite.bits.epc         := Mux(excepState === idle, io.in.bits.pc, epcReg)
+  io.csrWrite.bits.no          := Mux(excepState === idle, no, noReg)
 
   // ebreak
   stop.io.valid                := Mux(io.in.bits.sysInsType === System.ebreak, true.B, false.B)
