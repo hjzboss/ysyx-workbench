@@ -8,11 +8,13 @@ class RFReadIO extends Bundle {
 }
 
 class RFWriteIO extends Bundle {
+  val wen   = Output(Bool())
   val rd    = Output(UInt(5.W))
   val value = Output(UInt(64.W))
 }
 
 class CSRWriteIO extends Bundle {
+  val wen       = Output(Bool())
   val waddr     = Output(UInt(2.W))
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
@@ -20,8 +22,20 @@ class CSRWriteIO extends Bundle {
   val no        = Output(UInt(4.W))
 }
 
-class CtrlFlow extends Bundle {
-  // ctrl
+class DataSrcIO extends Bundle {
+  val pc    = Output(UInt(64.W))
+  val src1  = Output(UInt(64.W))
+  val src2  = Output(UInt(64.W))
+  val imm   = Output(UInt(64.W))
+}
+
+class AluIO extends Bundle {
+  val aluSrc1 = Output(UInt(3.W))
+  val aluSrc2 = Output(UInt(3.W))
+  val aluOp   = Output(UInt(6.W))
+}
+
+class Ctrl extends Bundle {
   val br            = Output(Bool())
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
@@ -33,16 +47,6 @@ class CtrlFlow extends Bundle {
   val isCsr         = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
   val sysInsType    = Output(UInt(2.W))
-  // alu ctrl
-  val aluSrc1       = Output(UInt(3.W))
-  val aluSrc2       = Output(UInt(3.W))
-  val aluOp         = Output(UInt(6.W))
-  // data
-  val pc            = Output(UInt(64.W))
-  val src1          = Output(UInt(64.W))
-  val src2          = Output(UInt(64.W))
-  val imm           = Output(UInt(64.W))
-  val inst          = Output(UInt(32.W))
 }
 
 class InstrFetch extends Bundle {
@@ -52,24 +56,5 @@ class InstrFetch extends Bundle {
 
 class RedirectIO extends Bundle {
   val brAddr    = Output(UInt(64.W))
-}
-
-class AddrIO extends Bundle {
-  val addr      = Output(UInt(64.W))
-}
-
-class RdataIO extends Bundle {
-  val data      = Output(UInt(64.W))
-  val rresp     = Output(UInt(2.W))
-}
-
-// axi 写数据通道
-class WdataIO extends Bundle {
-  val data      = Output(UInt(64.W))
-  val wstrb     = Output(UInt(8.W))
-}
-
-// axi 写回应通道
-class BIO extends Bundle {
-  val bresp     = Output(UInt(2.W))
+  val valid     = Output(Bool())
 }

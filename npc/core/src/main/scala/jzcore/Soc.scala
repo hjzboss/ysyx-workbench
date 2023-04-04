@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -30,3 +31,4 @@ class Soc extends Module {
   io.idu_inst     := core.io.inst
   io.exu_inst     := core.io.inst
 }
+*/

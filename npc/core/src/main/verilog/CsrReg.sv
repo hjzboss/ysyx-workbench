@@ -34,8 +34,8 @@ end
 // todo
 always @(posedge clock) begin
   if (exception) begin
-    csr[2] <= epc; // mtvec
-    csr[3] <= {{60{1'b0}}, no}; // mcause
+    csr[2] <= epc;
+    csr[3] <= {{60{1'b0}}, no};
   end
 end
 endmodule

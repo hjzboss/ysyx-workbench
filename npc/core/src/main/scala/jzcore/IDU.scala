@@ -6,57 +6,27 @@ import utils._
 
 class IDU extends Module with HasInstrType {
   val io = IO(new Bundle {
-    //val fetch     = Flipped(new InstrFetch)
-    // ifu输入
-    val in        = Flipped(Decoupled(new InstrFetch))
-    val out       = Decoupled(new CtrlFlow)
+    val fetch     = Flipped(new InstrFetch)
+    val regWrite  = Flipped(new RFWriteIO)
+    val csrWrite  = Flipped(new CSRWriteIO)
 
-    // exu回写
-    val regWrite  = Flipped(Decoupled(new RFWriteIO))
-    val csrWrite  = Flipped(Decoupled(new CSRWriteIO))
-
-    /*
     val datasrc   = new DataSrcIO
-    val out.bits   = new AluIO
-    val out.bits      = new out.bits
-    */
-
-    // 传给仿真环境
-    val inst      = Output(UInt(32.W))
+    val aluCtrl   = new AluIO
+    val ctrl      = new Ctrl
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
   })
 
-  val fire = io.out.valid && io.out.ready
-
-/*
-  val idle :: decode :: Nil = Enum(2)
-  val state = RegInit(idle)
-  state := MuxLookup(state, idle, List(
-    idle       -> Mux(io.in.valid, decode, idle), // 没有任务处理
-    decode     -> Mux(!fire || (fire && io.in.valid), decode, idle), // todo, 逻辑有问题
-  ))
-*/
-
-  // 当exu阻塞时锁存数据
-  val instReg   = Reg(UInt(32.W))
-  val pcReg     = Reg(UInt(64.W))
-  instReg      := Mux(io.in.valid && fire, io.in.bits.inst, instReg)
-  pcReg        := Mux(io.in.valid && fire, io.in.bits.pc, pcReg)
-
-  // 译码
-  val inst      = Mux(io.out.valid && !io.out.ready, instReg, io.in.bits.inst)
-  val pc        = Mux(io.out.valid && !io.out.ready, pcReg, io.in.bits.pc)
-
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
+  val inst      = io.fetch.inst
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)
   val rd        = inst(11, 7)
   val csr       = inst(31, 20)
-  // 产生控制信号
+
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
   val instrtype = ctrlList(0)
@@ -75,71 +45,56 @@ class IDU extends Module with HasInstrType {
     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
   ))
-  // csr寄存器读取
+
   val csrRaddr = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
     CsrId.mepc    -> CsrAddr.mepc,
     CsrId.mcause  -> CsrAddr.mcause
   ))
-  // 系统指令类型
+
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
   // registerfile
-  rf.io.rs1               := Mux(instrtype === InstrD, 10.U(5.W), rs1)
-  rf.io.rs2               := rs2
-  rf.io.wen               := io.regWrite.valid && fire // 只有在阻塞的最后才写入寄存器文件
-  rf.io.waddr             := io.regWrite.bits.rd
-  rf.io.wdata             := io.regWrite.bits.value
-  rf.io.clock             := clock
-  rf.io.reset             := reset
-  io.regWrite.ready       := fire
-
-  // csr regfile
-  csrReg.io.raddr         := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
-  csrReg.io.waddr         := io.csrWrite.bits.waddr
-  //csrReg.io.wen           := io.csrWrite.wen
-  csrReg.io.wen           := io.csrWrite.valid && fire // 只有在阻塞的最后才写入寄存器文件
-  csrReg.io.wdata         := io.csrWrite.bits.wdata
-  csrReg.io.clock         := clock
-  csrReg.io.reset         := reset
+  rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
+  rf.io.rs2           := rs2
+  rf.io.wen           := io.regWrite.wen
+  rf.io.waddr         := io.regWrite.rd
+  rf.io.wdata         := io.regWrite.value
+  rf.io.clock         := clock
+  rf.io.reset         := reset
+  
+  csrReg.io.raddr     := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
+  csrReg.io.waddr     := io.csrWrite.waddr
+  csrReg.io.wen       := io.csrWrite.wen
+  csrReg.io.wdata     := io.csrWrite.wdata
+  csrReg.io.clock     := clock
+  csrReg.io.reset     := reset
   // exception
-  csrReg.io.exception     := io.csrWrite.bits.exception && fire // todo
-  csrReg.io.epc           := io.csrWrite.bits.epc
-  csrReg.io.no            := io.csrWrite.bits.no
-  io.csrWrite.ready       := fire
+  csrReg.io.exception := io.csrWrite.exception
+  csrReg.io.epc       := io.csrWrite.epc
+  csrReg.io.no        := io.csrWrite.no
 
-  io.in.ready             := true.B // idu不会阻塞
+  io.datasrc.pc       := io.fetch.pc
+  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
+  io.datasrc.imm      := imm
 
-  // idu out
-  io.out.valid            := io.in.valid && io.in.ready // todo
-  // data
-  io.out.bits.pc          := pc
-  io.out.bits.src1        := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
-  io.out.bits.src2        := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
-  io.out.bits.imm         := imm
-  // ctrl
-  io.out.bits.rd          := rd
-  io.out.bits.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
-  io.out.bits.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD
-  io.out.bits.isJalr      := instrtype === InstrIJ
-  io.out.bits.lsType      := lsType
-  io.out.bits.wdata       := rf.io.src2
-  io.out.bits.loadMem     := loadMem
-  io.out.bits.wmask       := wmask
-  io.out.bits.isCsr       := instrtype === InstrZ
-  io.out.bits.csrWaddr    := csrRaddr
-  io.out.bits.sysInsType  := systemCtrl
-  // alu ctrl
-  io.out.bits.aluSrc1     := aluSrc1
-  io.out.bits.aluSrc2     := aluSrc2
-  io.out.bits.aluOp       := aluOp
+  io.ctrl.rd          := rd
+  io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD
+  io.ctrl.isJalr      := instrtype === InstrIJ
+  io.ctrl.lsType      := lsType
+  io.ctrl.wdata       := rf.io.src2
+  io.ctrl.loadMem     := loadMem
+  io.ctrl.wmask       := wmask
+  io.ctrl.isCsr       := instrtype === InstrZ
+  io.ctrl.csrWaddr    := csrRaddr
+  io.ctrl.sysInsType  := systemCtrl
 
-  io.out.bits.inst        := inst
+  io.aluCtrl.aluSrc1  := aluSrc1
+  io.aluCtrl.aluSrc2  := aluSrc2
+  io.aluCtrl.aluOp    := aluOp
 
-  // 防止信号被优化
-  io.lsType               := lsType
-
-  // 仿真环境
-  io.inst                 := inst
+  io.lsType           := lsType
 }

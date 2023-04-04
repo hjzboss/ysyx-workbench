@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -31,3 +32,4 @@ class Sram extends Module {
   pmem.io.rvalid        := rState === fetch
   io.rdataIO.bits.data  := pmem.io.rdata
 }
+*/

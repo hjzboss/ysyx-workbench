@@ -1,3 +1,4 @@
+/*
 module Pmem (
   input[63:0] raddr,
   output reg[63:0] rdata,
@@ -15,3 +16,4 @@ always @(*) begin
 end
 
 endmodule
+*/

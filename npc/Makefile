@@ -22,7 +22,7 @@ INCFLAGS = $(addprefix -I, $(INC_PATH))
 #传递给g++的编译参数，包括包含路径和TOP_NAME的定义
 CFLAGS += $(INCFLAGS)  -DTOP_NAME="\"V$(TOPNAME)\""
 
-#include $(NVBOARD_HOME)/scripts/nvboard.mk
+include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 export PATH := $(PATH):$(abspath ./utils)
 
@@ -54,22 +54,22 @@ clean:
 
 .PHONY: test verilog help compile bsp reformat checkformat clean
 
-#fpga: $(BIN)
-#	@$^
+fpga: $(BIN)
+	@$^
 
-#$(BIN): $(NVBOARD_ARCHIVE) $(FPGA_CSRC) $(VSRC)
-#	$(call git_commit, "sim RTL")
-#	@rm -rf $(FPGA_OBJ_DIR)
-#	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
+$(BIN): $(NVBOARD_ARCHIVE) $(FPGA_CSRC) $(VSRC)
+	$(call git_commit, "sim RTL")
+	@rm -rf $(FPGA_OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_FPGAFLAG) $^ \
 		$(addprefix -CFLAGS , $(CFLAGS)) \
 	 	$(addprefix -LDFLAGS , $(LDFLAGS)) \
 		-top $(TOPNAME) \
 		--exe -o $(abspath $(BIN))
 
 # 将引脚映射转为cpp
-#$(SRC_AUTO_BIND): $(NXDC_FILES)
-#	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+$(SRC_AUTO_BIND): $(NXDC_FILES)
+	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
-#$(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
+$(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
 
 include ../Makefile

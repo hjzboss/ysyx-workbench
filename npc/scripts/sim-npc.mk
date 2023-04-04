@@ -2,7 +2,7 @@ BUILD_DIR = ${NPC_HOME}/build
 
 BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
-TOPNAME = Soc
+TOPNAME = JzCore
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
@@ -15,7 +15,7 @@ WAVE = wave.vcd
 
 VERILATOR_SIMFLAG = 
 # build
-VERILATOR_SIMFLAG += --cc --exe --build -MMD -j 0
+VERILATOR_SIMFLAG += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
 VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/include -std=c++14 -fno-exceptions -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS"
 # open trace
@@ -43,5 +43,5 @@ sim: $(SIM_CSRC) $(VSRC)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG)
-	@echo "wave"
-	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
+#@echo "wave"
+#gtkwave $(SIM_OBJ_DIR)/$(WAVE)
