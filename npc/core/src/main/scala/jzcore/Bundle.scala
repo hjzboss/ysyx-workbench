@@ -42,6 +42,7 @@ class CtrlFlow extends Bundle {
   val src1          = Output(UInt(64.W))
   val src2          = Output(UInt(64.W))
   val imm           = Output(UInt(64.W))
+  val inst          = Output(UInt(32.W))
 }
 
 class InstrFetch extends Bundle {
