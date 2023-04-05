@@ -28,7 +28,7 @@ class IDU extends Module with HasInstrType{
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
 
-  val inst      = Mux(io.stall, Instruction.nop, io.in.inst) // 如果是停顿信号则产生空指令
+  val inst      = Mux(io.stall, Instruction.NOP, io.in.inst) // 如果是停顿信号则产生空指令
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)
