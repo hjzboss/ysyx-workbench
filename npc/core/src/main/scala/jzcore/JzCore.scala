@@ -32,7 +32,5 @@ class JzCore extends Module {
   exu.io.aluCtrl    <> idu.io.aluCtrl
   exu.io.ctrl       <> idu.io.ctrl
 
-  io.debug.inst           := ifu.io.inst
-  io.debug.pc             := ifu.io.pc
-  io.debug.nextPc         := ifu.io.nextPc
+  io.debug          <> ifu.io.debug
 }
