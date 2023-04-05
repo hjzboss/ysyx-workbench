@@ -5,7 +5,7 @@ module Pmem (
 
   input[63:0] waddr,
   input[63:0] wdata,
-  input[8:0] mask
+  input[7:0] mask
 );
 
 import "DPI-C" function void pmem_read(
