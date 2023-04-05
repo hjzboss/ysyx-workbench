@@ -42,7 +42,7 @@ class AluIO extends Bundle {
   val aluOp   = Output(UInt(6.W))
 }
 
-class Ctrl extends Bundle {
+class CtrlFlow extends Bundle {
   val br            = Output(Bool())
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())

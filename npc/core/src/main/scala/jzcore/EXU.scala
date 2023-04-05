@@ -9,7 +9,7 @@ class EXU extends Module {
     // 来自idu
     val datasrc   = Flipped(new DataSrcIO)
     val aluCtrl   = Flipped(new AluIO)
-    val ctrl      = Flipped(new Ctrl)
+    val ctrl      = Flipped(new CtrlFlow)
     
     // 写回idu
     val regWrite  = new RFWriteIO

@@ -16,7 +16,7 @@ class IDU extends Module with HasInstrType{
     // 送给exu的控制信号
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
-    val ctrl      = new Ctrl
+    val ctrl      = new CtrlFlow
     
     // 来自控制模块的停顿信号
     val stall     = Input(Bool())
