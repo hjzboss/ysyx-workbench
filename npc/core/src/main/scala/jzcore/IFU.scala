@@ -25,7 +25,7 @@ class IFU extends Module with HasResetVector{
 
     // 控制模块
     val fetchReady  = Output(Bool()) // 取指完成
-    //val stall       = Input(Bool()) // 停顿信号,lsu
+    val stall       = Input(Bool()) // 停顿信号
   })
 
   val dataFire = io.axiDataIO.valid && io.axiDataIO.ready
@@ -46,9 +46,9 @@ class IFU extends Module with HasResetVector{
   val dnpc = io.redirect.brAddr
 
   // 取指接口，todo：停顿信号也要发挥作用
-  io.axiAddrIO.valid      := state === addr
+  io.axiAddrIO.valid      := state === addr && !io.stall
   io.axiAddrIO.bits.addr  := pc
-  io.axiDataIO.ready      := state === data
+  io.axiDataIO.ready      := state === data && !io.stall
   // 数据选择
   val instPre              = io.axiDataIO.bits.rdata
   val inst                 = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
@@ -57,7 +57,7 @@ class IFU extends Module with HasResetVector{
   pc                      := MuxLookup(state, pc, List(
                               addr  -> pc,
                               // 如果rresp不是okay，则pc保持原值重新取指，todo
-                              data  -> Mux(dataFire && io.axiDataIO.bits.rresp === okay, Mux(io.redirect.valid, dnpc, snpc), pc)
+                              data  -> Mux(io.stall, pc, Mux(dataFire && io.axiDataIO.bits.rresp === okay, Mux(io.redirect.valid, dnpc, snpc), pc))
                             ))
 
   // 仿真环境

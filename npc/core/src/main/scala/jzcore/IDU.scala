@@ -44,6 +44,7 @@ class IDU extends Module with HasInstrType{
   val lsType    = lsctrl(0)
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
+  val memEn     = lsctrl(3)
   val imm = LookupTree(instrtype, List(
     InstrZ    -> ZeroExt(inst(19, 15), 64),
     InstrI    -> SignExt(inst(31, 20), 64),
@@ -99,6 +100,8 @@ class IDU extends Module with HasInstrType{
   io.ctrl.isCsr       := instrtype === InstrZ
   io.ctrl.csrWaddr    := csrRaddr
   io.ctrl.sysInsType  := systemCtrl
+  io.ctrl.memWen      := memEn === MemEn.store
+  io.ctrl.memRen      := memEn === MemEn.load
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2

@@ -54,6 +54,41 @@ class CtrlFlow extends Bundle {
   val isCsr         = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
   val sysInsType    = Output(UInt(2.W))
+  val memWen        = Output(Bool())
+  val memRen        = Output(Bool())
+}
+
+class MemCtrl extends Bundle {
+  val lsType        = Output(UInt(4.W))
+  val wmask         = Output(UInt(8.W))
+  val wen           = Output(Bool())
+  val ren           = Output(Bool())
+  val addr          = Output(UInt(64.W))
+  val wdata         = Output(UInt(64.W))
+  val loadMem       = Output(Bool())
+
+  val exuOut        = Output(UInt(64.W))
+  val rd            = Output(UInt(5.W))
+  val regWen        = Output(Bool())
+
+  val pc            = Output(UInt(64.W))
+  val no            = Output(UInt(4.W))
+  val exception     = Output(Bool())
+  val csrWaddr      = Output(UInt(2.W))
+  val csrWen        = Output(Bool())
+}
+
+class LsuOut extends Bundle {
+  val exuOut        = Output(UInt(64.W)) // exu的计算结果
+  val lsuOut        = Output(UInt(64.W)) // lsu访存结果
+  val loadMem       = Output(Bool())
+  val rd            = Output(UInt(5.W))
+  val regWen        = Output(Bool())
+  val pc            = Output(UInt(64.W))
+  val no            = Output(UInt(4.W))
+  val exception     = Output(Bool())
+  val csrWaddr      = Output(UInt(2.W))
+  val csrWen        = Output(Bool())
 }
 
 class InstrFetch extends Bundle {

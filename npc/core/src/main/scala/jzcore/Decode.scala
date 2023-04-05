@@ -125,6 +125,14 @@ object System {
   def apply() = UInt(2.W)
 }
 
+object MemEn {
+  def load    = "b00".U
+  def store   = "b01".U
+  def nop     = "b10".U
+
+  def apply() = UInt(2.W)
+}
+
 trait HasInstrType {
   def InstrN  = "b0000".U
   def InstrI  = "b0100".U
