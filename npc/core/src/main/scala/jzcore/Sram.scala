@@ -39,7 +39,7 @@ class Sram extends Module {
   io.rdataIO.bits.rresp := okay // ok
   pmem.io.raddr         := io.raddrIO.bits.addr
   pmem.io.rvalid        := rState === fetch
-  io.rdataIO.bits.data  := pmem.io.rdata
+  io.rdataIO.bits.rdata := pmem.io.rdata
 
   val waddrFire          = io.waddrIO.valid && io.waddrIO.ready
   val wdataFire          = io.wdataIO.valid && io.wdataIO.ready
@@ -57,8 +57,8 @@ class Sram extends Module {
   // 写事务
   io.waddrIO.ready      := wState === w_wait
   io.wdataIO.ready      := wState === w_wait
-  pmem.io.waddr         := io.waddrIO.bits.waddr
-  pmem.io.mask          := Mux(wState === w_wait && raddrFire && wdataFire, io.wdataIO.wstrb, 0.U(8.W))
+  pmem.io.waddr         := io.waddrIO.bits.addr
+  pmem.io.mask          := Mux(wState === w_wait && raddrFire && wdataFire, io.wdataIO.bits.wstrb, 0.U(8.W))
   pmem.io.wdata         := io.wdataIO.bits.wdata
   io.brespIO.valid      := wState === w_resp
   io.brespIO.bits.bresp := okay // ok
