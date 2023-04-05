@@ -34,7 +34,7 @@ class IFU extends Module with HasResetVector{
   // 取指状态机
   val addr :: data :: Nil = Enum(2)
   val state = RegInit(addr)
-  state := MuxLookup(state, idle, List(
+  state := MuxLookup(state, addr, List(
     addr    -> Mux(addrFire, data, addr),
     data    -> Mux(dataFire, addr, data)
   ))
