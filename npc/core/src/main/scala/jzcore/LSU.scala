@@ -38,7 +38,7 @@ class LSU extends Module {
   val addr               = io.in.addr
 
   // load状态机
-  val idle :: wait_data :: Nil = Enum(2)
+  val idle :: wait_data :: wait_resp ::Nil = Enum(3)
   val rState = RegInit(idle)
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(raddrFire, wait_data, idle),
@@ -53,7 +53,6 @@ class LSU extends Module {
   io.rdataIO.ready      := rState === wait_data && !io.stall
 
   // store状态机
-  val idle :: wait_resp :: Nil = Enum(2)
   val wState = RegInit(addr)
   wState := MuxLookup(wState, idle, List(
     idle        -> Mux(waddrFire && wdataFire, wait_resp, idle),
