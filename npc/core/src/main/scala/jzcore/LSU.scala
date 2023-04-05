@@ -64,6 +64,7 @@ class LSU extends Module {
   io.wdataIO.valid      := wState === idle && !io.stall && io.in.wen
   io.wdataIO.bits.wdata := io.in.wdata
   io.wdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
+  io.brespIO.ready      := wState === wait_resp
   
   // 数据对齐
   val rdata              = io.rdataIO.bits.rdata >> (Cat(0.U(3.W), addr(2, 0)) << 3.U)
