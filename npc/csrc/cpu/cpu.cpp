@@ -105,7 +105,7 @@ static void trace_and_difftest() {
 // for ebreak instruction
 extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
-  npc_state.halt_pc = top->io_pc;
+  npc_state.halt_pc = top->io_debug_pc;
   npc_state.halt_ret = halt_ret;
 }
 
@@ -254,8 +254,8 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  npc_cpu.pc = top->io_pc;
-  npc_cpu.npc = top->io_nextPc;
+  npc_cpu.pc = top->io_debug_pc;
+  npc_cpu.npc = top->io_debug_nextPc;
 
   // state is running
   npc_state.state = NPC_RUNNING;
@@ -297,7 +297,7 @@ static void isa_exec_once() {
 }
 
 static void cpu_exec_once() {
-  uint64_t pc = top->io_pc; // 当前pc
+  uint64_t pc = top->io_debug_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_DIFFTEST
@@ -306,8 +306,8 @@ static void cpu_exec_once() {
     visit_device = false;
   }
 #endif
-  npc_cpu.pc = top->io_pc; // 执行后的pc
-  npc_cpu.npc = top->io_nextPc;
+  npc_cpu.pc = top->io_debug_pc; // 执行后的pc
+  npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
