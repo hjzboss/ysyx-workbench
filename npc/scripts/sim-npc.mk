@@ -2,7 +2,7 @@ BUILD_DIR = ${NPC_HOME}/build
 
 BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
-TOPNAME = JzCore
+TOPNAME = Soc
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
