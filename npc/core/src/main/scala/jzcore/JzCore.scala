@@ -9,7 +9,7 @@ class JzCore extends Module {
     val debug       = new DebugIO
 
     // axi访存接口
-    val axiRaddrIO  = new Decoupled(new AddrIO)
+    val axiRaddrIO  = Decoupled(new AddrIO)
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
   })
 
