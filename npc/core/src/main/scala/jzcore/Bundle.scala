@@ -67,7 +67,7 @@ class RedirectIO extends Bundle {
 }
 
 // axi接口
-class RaddrIO extends Bundle {
+class AddrIO extends Bundle {
   val addr      = Output(UInt(64.W))
 }
 

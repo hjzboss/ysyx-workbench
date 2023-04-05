@@ -20,7 +20,7 @@ class IFU extends Module with HasResetVector{
     val out         = new InstrFetch
 
     // axi取指接口
-    val axiAddrIO   = Decoupled(new RaddrIO)
+    val axiAddrIO   = Decoupled(new AddrIO)
     val axiDataIO   = Flipped(Decoupled(new RdataIO))
 
     // 控制模块
