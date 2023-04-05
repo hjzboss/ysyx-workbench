@@ -250,7 +250,7 @@ long init_cpu(char *dir) {
   long size = load_img(dir);
 
   top->clock = 0;
-  reset(4);
+  reset(3);
 
   npc_cpu.pc = top->io_pc;
   npc_cpu.npc = top->io_nextPc;
