@@ -6,12 +6,16 @@ import utils._
 
 class EXU extends Module {
   val io = IO(new Bundle {
+    // 来自idu
     val datasrc   = Flipped(new DataSrcIO)
     val aluCtrl   = Flipped(new AluIO)
     val ctrl      = Flipped(new Ctrl)
     
+    // 写回idu
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
+
+    // 写回ifu
     val redirect  = new RedirectIO
   })
   

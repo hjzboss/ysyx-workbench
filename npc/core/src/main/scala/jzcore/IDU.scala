@@ -4,15 +4,22 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-class IDU extends Module with HasInstrType {
+class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
-    val fetch     = Flipped(new InstrFetch)
+    // 来自ifu
+    val in        = Flipped(new InstrFetch)
+
+    // 来自exu
     val regWrite  = Flipped(new RFWriteIO)
     val csrWrite  = Flipped(new CSRWriteIO)
 
+    // 送给exu的控制信号
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new Ctrl
+    
+    // 来自控制模块的停顿信号
+    val stall     = Input(Bool())
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
@@ -20,7 +27,8 @@ class IDU extends Module with HasInstrType {
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
-  val inst      = io.fetch.inst
+
+  val inst      = Mux(io.stall, Instruction.nop, io.in.inst) // 如果是停顿信号则产生空指令
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)
@@ -75,7 +83,7 @@ class IDU extends Module with HasInstrType {
   csrReg.io.epc       := io.csrWrite.epc
   csrReg.io.no        := io.csrWrite.no
 
-  io.datasrc.pc       := io.fetch.pc
+  io.datasrc.pc       := io.in.pc
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm

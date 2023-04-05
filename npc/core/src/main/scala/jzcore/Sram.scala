@@ -1,4 +1,3 @@
-/*
 package jzcore
 
 import chisel3._
@@ -12,13 +11,14 @@ class Sram extends Module {
   })
 
   val raddrFire          = io.raddrIO.valid && io.raddrIO.ready
+  val rdataFire          = io.rdataIO.valid && io.rdataIO.ready
 
   // read state
   val ar_wait :: fetch :: Nil = Enum(2)
   val rState = RegInit(ar_wait)
   rState := MuxLookup(rState, ar_wait, List(
     ar_wait       -> Mux(raddrFire, fetch, ar_wait), // 等待地址信息
-    fetch         -> Mux(io.rdataIO.valid && io.rdataIO.ready, ar_wait, fetch), // 取指完成，当取指阻塞时保持状态
+    fetch         -> Mux(rdataFire, ar_wait, fetch), // 取指完成，当取指阻塞时保持状态
   ))
 
   val pmem               = Module(new Pmem)
@@ -32,4 +32,3 @@ class Sram extends Module {
   pmem.io.rvalid        := rState === fetch
   io.rdataIO.bits.data  := pmem.io.rdata
 }
-*/

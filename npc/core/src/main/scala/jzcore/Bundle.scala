@@ -2,6 +2,13 @@ package jzcore
 
 import chisel3._
 
+class DebugIO extends Bundle {
+  val pc        = Output(UInt(64.W))
+  val nextPc    = Output(UInt(64.W))
+  val inst      = Output(UInt(32.W))
+  val execonce  = Output(Bool())
+}
+
 class RFReadIO extends Bundle {
   val rs1   = Output(UInt(5.W))
   val rs2   = Output(UInt(5.W))
@@ -57,4 +64,14 @@ class InstrFetch extends Bundle {
 class RedirectIO extends Bundle {
   val brAddr    = Output(UInt(64.W))
   val valid     = Output(Bool())
+}
+
+// axi接口
+class RaddrIO extends Bundle {
+  val addr      = Output(UInt(64.W))
+}
+
+class RdataIO extends Bundle {
+  val data      = Output(UInt(64.W))
+  val rresp     = Output(UInt(2.W))
 }

@@ -11,33 +11,61 @@ trait HasResetVector {
 class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
     // 用于仿真环境
-    val pc        = Output(UInt(64.W))
-    val nextPc    = Output(UInt(64.W))
-    val inst      = Output(UInt(32.W))
+    val debug       = new DebugIO
 
-    val redirect  = Flipped(new RedirectIO)
-    val fetch     = new InstrFetch
+    // 来自exu
+    val redirect    = Flipped(new RedirectIO)
+
+    // 送给idu
+    val out         = new InstrFetch
+
+    // axi取指接口
+    val axiAddrIO   = Decoupled(new RaddrIO)
+    val axiDataIO   = Flipped(Decoupled(new RdataIO))
+
+    // 控制模块
+    val fetchReady  = Output(Bool()) // 取指完成
+    //val stall       = Input(Bool()) // 停顿信号,lsu
   })
 
-  val instFetch = Module(new InstFetch)
+  val dataFire = io.axiDataIO.valid && io.axiDataIO.ready
+  val addrFire = io.axiAddrIO.ready && io.axiAddrIO.valid
+
+  // 取指状态机
+  val addr :: data :: Nil = Enum(2)
+  val state = RegInit(addr)
+  state := MuxLookup(state, idle, List(
+    addr    -> Mux(addrFire, data, addr),
+    data    -> Mux(dataFire, addr, data)
+  ))
 
   // pc
   val pc  = RegInit(resetVector.U(64.W))
-  val npc = Wire(UInt(64.W))
-
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
-  val inst = instFetch.io.inst
 
-  npc               := Mux(io.redirect.valid, dnpc, snpc)
-  instFetch.io.pc   := pc
+  // 取指接口，todo：停顿信号也要发挥作用
+  io.axiAddrIO.valid      := state === addr
+  io.axiAddrIO.bits.addr  := pc
+  io.axiDataIO.ready      := state === data
+  // 数据选择
+  val instPre              = io.axiDataIO.bits.data
+  val inst                 = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
-  pc                := npc
+  // 更新pc值
+  pc                      := MuxLookup(state, pc, List(
+                              addr  -> pc,
+                              data  -> Mux(dataFire, Mux(io.redirect.valid, dnpc, snpc), pc)
+                            ))
 
-  io.inst           := inst
-  io.nextPc         := npc
-  io.pc             := pc
+  // 仿真环境
+  io.debug.inst           := inst
+  io.debug.nextPc         := npc
+  io.debug.pc             := pc
+  io.debug.execonce       := state === data && dataFire
 
-  io.fetch.pc       := pc
-  io.fetch.inst     := inst
+  io.out.pc               := pc
+  io.out.inst             := inst
+
+  io.fetchReady           := state === data && dataFire
 }
