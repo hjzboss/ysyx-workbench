@@ -41,9 +41,9 @@ class Sram extends Module {
   pmem.io.rvalid        := rState === fetch
   io.rdataIO.bits.data  := pmem.io.rdata
 
-  val waddrFire         := io.waddrIO.valid && io.waddrIO.ready
-  val wdataFire         := io.wdataIO.valid && io.wdataIO.ready
-  val brespFire         := io.brespIO.valid && io.brespIO.ready
+  val waddrFire          = io.waddrIO.valid && io.waddrIO.ready
+  val wdataFire          = io.wdataIO.valid && io.wdataIO.ready
+  val brespFire          = io.brespIO.valid && io.brespIO.ready
 
 
   // write state
