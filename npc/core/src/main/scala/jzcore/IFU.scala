@@ -60,7 +60,7 @@ class IFU extends Module with HasResetVector{
 
   // 仿真环境
   io.debug.inst           := inst
-  io.debug.nextPc         := npc
+  io.debug.nextPc         := Mux(io.redirect.valid, dnpc, snpc)
   io.debug.pc             := pc
   io.debug.execonce       := state === data && dataFire
 
