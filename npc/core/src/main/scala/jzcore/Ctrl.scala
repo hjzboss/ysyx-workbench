@@ -16,6 +16,6 @@ class Ctrl extends Module {
 
   //todo:lsu的停顿信号
   //io.stallIfu := false.B 
-  io.stallIdu := io.fetchReady
+  io.stallIdu := !io.fetchReady
   //io.stallExu := io.fetchReady
 }
