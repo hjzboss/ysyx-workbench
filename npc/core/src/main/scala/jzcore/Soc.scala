@@ -20,7 +20,7 @@ class Soc extends Module {
   sram.io.waddrIO.bits.addr := "0x80000000".U
   sram.io.wdataIO.valid := false.B
   sram.io.wdataIO.bits.wdata := 0.U
-  sram.io.wdataIO.bits.wstrb := 0.u
+  sram.io.wdataIO.bits.wstrb := 0.U
   sram.io.brespIO.ready := false.B
 
   // 仿真环境
