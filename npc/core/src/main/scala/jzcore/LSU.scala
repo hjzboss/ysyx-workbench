@@ -66,7 +66,7 @@ class LSU extends Module {
   io.wdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
   
   // 数据对齐
-  val rdata              = io.raddrIO.bits.rdata >> (Cat(0.U(3.W), addr(2, 0)) << 3.U)
+  val rdata              = io.rdataIO.bits.rdata >> (Cat(0.U(3.W), addr(2, 0)) << 3.U)
   val lsuOut  = LookupTree(io.in.lsType, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
