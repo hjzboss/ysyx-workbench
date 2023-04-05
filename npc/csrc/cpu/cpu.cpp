@@ -109,6 +109,7 @@ extern "C" void c_break(long long halt_ret) {
   npc_state.halt_ret = halt_ret;
 }
 
+/*
 extern "C" void inst_read(long long raddr, int *rdata) {
   if (raddr < 0x80000000ull) {
     *rdata = 0x00000013;
@@ -116,6 +117,7 @@ extern "C" void inst_read(long long raddr, int *rdata) {
   }
   *rdata = paddr_read(raddr, 4);
 }
+*/
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
@@ -210,7 +212,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
 
 static void reset(int time) {
   top->reset = 1;
-  while (time > 0) {
+  while (time >= 0) {
     top->clock = !top->clock;
     top->eval();
 #ifdef CONFIG_WAVE
@@ -241,7 +243,7 @@ static void init_wave() {
 
 
 long init_cpu(char *dir) {
-  // Construct the Verilated model, from VSoc.h generated from Verilating "jzcore.v"
+  // Construct the Verilated model, from VSoc.h generated from Verilating "Soc.v"
   top = new VSoc; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
   IFDEF(CONFIG_WAVE, init_wave());
@@ -250,7 +252,7 @@ long init_cpu(char *dir) {
   long size = load_img(dir);
 
   top->clock = 0;
-  reset(3);
+  reset(4);
 
   npc_cpu.pc = top->io_pc;
   npc_cpu.npc = top->io_nextPc;
@@ -286,21 +288,24 @@ void delete_cpu() {
 }
 
 static void isa_exec_once() {
+  while (!top->io_debug_execonce) {
+    eval_wave();
+    eval_wave();
+  }
   eval_wave();
   eval_wave();
 }
 
 static void cpu_exec_once() {
+  uint64_t pc = top->io_pc; // 当前pc
+  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
+  isa_exec_once();
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
-    // 因为仿真器会提前一个周期把下一条指令的主存访问提出了，会提前访问到外设使visit_device设置为true，因此要延后一个周期来difftest_skip_ref
     difftest_skip_ref();
     visit_device = false;
   }
 #endif
-  uint64_t pc = top->io_pc; // 当前pc
-  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once();
   npc_cpu.pc = top->io_pc; // 执行后的pc
   npc_cpu.npc = top->io_nextPc;
 #ifdef CONFIG_ITRACE
@@ -331,7 +336,6 @@ static void cpu_exec_once() {
 
 void execute(uint64_t n) {
   while (n--) {
-    //if (Verilated::gotFinish() || (main_time > MAX_SIM_TIME)) npc_state.state = NPC_QUIT;
     cpu_exec_once();
     g_nr_guest_inst ++;
     trace_and_difftest();
@@ -345,10 +349,10 @@ static void statistic() {
   IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
-  printf("host time spent = " NUMBERIC_FMT " us", g_timer);
-  printf("\ntotal guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
-  if (g_timer > 0) printf("\nsimulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
-  else printf("\nFinish running in less than 1 us and can not calculate the simulation frequency\n");
+  Log("host time spent = " NUMBERIC_FMT " us", g_timer);
+  Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
+  if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
+  else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }
 
 void assert_fail_msg() {

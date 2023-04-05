@@ -68,7 +68,7 @@ clean:
 
 # 将引脚映射转为cpp
 #$(SRC_AUTO_BIND): $(NXDC_FILES)
-	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+#	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
 #$(shell mkdir -p $(SIM_OBJ_DIR) $(FPGA_OBJ_DIR))
 
