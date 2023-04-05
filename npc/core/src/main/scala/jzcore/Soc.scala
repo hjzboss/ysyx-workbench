@@ -17,7 +17,7 @@ class Soc extends Module {
   core.io.axiRdataIO <> sram.io.rdataIO
 
   sram.io.waddrIO.valid := false.B
-  sram.io.waddrIO.bits.addr := "0x80000000".U
+  sram.io.waddrIO.bits.addr := "h80000000".U
   sram.io.wdataIO.valid := false.B
   sram.io.wdataIO.bits.wdata := 0.U
   sram.io.wdataIO.bits.wstrb := 0.U
