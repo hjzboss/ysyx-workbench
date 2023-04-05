@@ -33,6 +33,7 @@ class IFU extends Module with HasResetVector{
 
   // 取指状态机
   val addr :: data :: Nil = Enum(2)
+  val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
     addr    -> Mux(addrFire, data, addr),
@@ -49,13 +50,14 @@ class IFU extends Module with HasResetVector{
   io.axiAddrIO.bits.addr  := pc
   io.axiDataIO.ready      := state === data
   // 数据选择
-  val instPre              = io.axiDataIO.bits.data
+  val instPre              = io.axiDataIO.bits.rdata
   val inst                 = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   // 更新pc值
   pc                      := MuxLookup(state, pc, List(
                               addr  -> pc,
-                              data  -> Mux(dataFire, Mux(io.redirect.valid, dnpc, snpc), pc)
+                              // 如果rresp不是okay，则pc保持原值重新取指，todo
+                              data  -> Mux(dataFire && io.axiDataIO.bits.rresp === okay, Mux(io.redirect.valid, dnpc, snpc), pc)
                             ))
 
   // 仿真环境

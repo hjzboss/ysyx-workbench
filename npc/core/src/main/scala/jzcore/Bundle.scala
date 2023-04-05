@@ -72,6 +72,15 @@ class AddrIO extends Bundle {
 }
 
 class RdataIO extends Bundle {
-  val data      = Output(UInt(64.W))
+  val rdata     = Output(UInt(64.W))
   val rresp     = Output(UInt(2.W))
+}
+
+class WdataIO extends Bundle {
+  val wdata     = Output(UInt(64.W))
+  val wstrb     = Output(UInt(8.W))
+}
+
+class BrespIO extends Bundle {
+  val bresp     = Output(UInt(2.W))
 }
