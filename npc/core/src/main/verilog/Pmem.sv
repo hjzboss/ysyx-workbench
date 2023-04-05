@@ -3,8 +3,8 @@ module Pmem (
   output reg[63:0] rdata,
   input rvalid,
 
-  input[64:0] waddr,
-  input[64:0] wdata,
+  input[63:0] waddr,
+  input[63:0] wdata,
   input[8:0] mask
 );
 
