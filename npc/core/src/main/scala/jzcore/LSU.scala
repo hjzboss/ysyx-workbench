@@ -87,12 +87,12 @@ class LSU extends Module {
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
-  io.out.regWen         := Mux(io.lsuReady, io.in.regWen, false.B)
+  io.out.regWen         := Mux(io.lsuReady && !io.stall, io.in.regWen, false.B)
   io.out.pc             := io.in.pc
   io.out.no             := io.in.no
-  io.out.exception      := Mux(io.lsuReady, io.in.exception, false.B)
+  io.out.exception      := Mux(io.lsuReady && !io.stall, io.in.exception, false.B)
   io.out.csrWaddr       := io.in.csrWaddr
-  io.out.csrWen         := Mux(io.lsuReady, io.in.csrWen, false.B)
+  io.out.csrWen         := Mux(io.lsuReady && !io.stall, io.in.csrWen, false.B)
 
   io.lsuReady           := (!io.in.ren && !io.in.wen) || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
 }

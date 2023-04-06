@@ -19,7 +19,7 @@ class IDU extends Module with HasInstrType{
     val ctrl      = new CtrlFlow
     
     // 来自控制模块的停顿信号
-    val stall     = Input(Bool())
+    //val stall     = Input(Bool())
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
@@ -28,7 +28,7 @@ class IDU extends Module with HasInstrType{
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
 
-  val inst      = Mux(io.stall, Instruction.NOP, io.in.inst) // 如果是停顿信号则产生空指令
+  val inst      = io.in.inst
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)

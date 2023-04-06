@@ -10,14 +10,9 @@ class CTRL extends Module {
     val lsuReady   = Input(Bool())
 
     val stallIfu   = Output(Bool())
-    val stallIdu   = Output(Bool())
     val stallLsu   = Output(Bool())
-    //val stallExu   = Output(Bool())
   })
 
-  //todo:lsu的停顿信号
   io.stallIfu := !io.lsuReady
-  io.stallIdu := !io.fetchReady || !io.lsuReady
   io.stallLsu := !io.fetchReady
-  //io.stallExu := io.fetchReady
 }
