@@ -43,7 +43,7 @@ class JzCore extends Module {
   exu.io.ctrl       <> idu.io.ctrl
 
   lsu.io.in         <> exu.io.out
-  lsu.io.lsuReady   <> ctrl.io.lsuReady
+  lsu.io.lsuTrans   <> ctrl.io.lsuTrans
   lsu.io.stall      <> ctrl.io.stallLsu
   lsu.io.raddrIO    <> io.raddrIO
   lsu.io.rdataIO    <> io.rdataIO
