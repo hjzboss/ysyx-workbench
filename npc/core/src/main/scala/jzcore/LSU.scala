@@ -68,7 +68,7 @@ class LSU extends Module {
   io.brespIO.ready      := wState === wait_resp
   
   val lsTypeReg          = RegInit(LsType.nop)
-  lsTypeReg             := Mux(hasTrans, io.in.lsType, lsTypeReg)
+  lsTypeReg             := Mux(rState === idle && io.in.ren, io.in.lsType, lsTypeReg)
 
   // 数据对齐
   val rdata              = io.rdataIO.bits.rdata >> (Cat(0.U(3.W), addr(2, 0)) << 3.U)
