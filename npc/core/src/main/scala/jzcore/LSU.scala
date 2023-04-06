@@ -98,7 +98,7 @@ class LSU extends Module {
   val csrWenreg          = RegInit(false.B)
   val noreg              = RegInit(0.U(4.W))
   exuOutreg             := Mux(hasTrans, io.in.exuOut, exuOutreg)
-  loadMemreg            := Mux(hasTrans, io.in.exuOut, loadMemreg)
+  loadMemreg            := Mux(hasTrans, io.in.loadMem, loadMemreg)
   rdreg                 := Mux(hasTrans, io.in.rd, rdreg)
   regWenreg             := Mux(hasTrans, io.in.regWen, regWenreg)
   exceptionreg          := Mux(hasTrans, io.in.exception, exceptionreg)
