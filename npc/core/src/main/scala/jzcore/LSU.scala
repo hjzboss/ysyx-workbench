@@ -50,7 +50,7 @@ class LSU extends Module {
 
   io.raddrIO.valid      := rState === idle && !io.stall && io.in.ren
   io.raddrIO.bits.addr  := addr
-  io.rdataIO.ready      := rState === wait_data && !io.stall
+  io.rdataIO.ready      := rState === wait_data
 
   // store状态机
   val wState = RegInit(addr)
@@ -94,5 +94,5 @@ class LSU extends Module {
   io.out.csrWaddr       := io.in.csrWaddr
   io.out.csrWen         := Mux(io.lsuReady && !io.stall, io.in.csrWen, false.B)
 
-  io.lsuReady           := (!io.in.ren && !io.in.wen) || (((rState === wait_data) || (wState === wait_resp)) && (rresp === okay || bresp === okay))
+  io.lsuReady           := (!io.in.ren && !io.in.wen) || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
 }
