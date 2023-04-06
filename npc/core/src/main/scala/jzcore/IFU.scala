@@ -26,6 +26,9 @@ class IFU extends Module with HasResetVector{
     // 控制模块
     val fetchReady  = Output(Bool()) // 取指完成
     val stall       = Input(Bool()) // 停顿信号
+
+    // 来自lsu，临时的信号
+    val lsuReady    = Input(Bool())
   })
 
   val dataFire = io.axiDataIO.valid && io.axiDataIO.ready
@@ -37,7 +40,7 @@ class IFU extends Module with HasResetVector{
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
     addr    -> Mux(addrFire, data, addr),
-    data    -> Mux(dataFire, addr, data)
+    data    -> Mux(dataFire && io.lsuReady, addr, data) // 当lsu阶段执行完后才回到addr状态，开始取指
   ))
 
   // pc
@@ -61,14 +64,14 @@ class IFU extends Module with HasResetVector{
   pc                      := MuxLookup(state, pc, List(
                               addr  -> pc,
                               // 如果rresp不是okay，则pc保持原值重新取指，todo，当lsu取指成功后再更新pc
-                              data  -> Mux(io.stall, pc, Mux(dataFire && io.axiDataIO.bits.rresp === okay, Mux(io.redirect.valid, dnpc, snpc), pc))
+                              data  -> Mux(!(dataFire && io.lsuReady), pc, Mux(io.axiDataIO.bits.rresp === okay, Mux(io.redirect.valid, dnpc, snpc), pc))
                             ))
 
   // 仿真环境
   io.debug.inst           := inst
   io.debug.nextPc         := Mux(io.redirect.valid, dnpc, snpc)
   io.debug.pc             := pc
-  io.debug.execonce       := state === data && dataFire && !io.stall
+  io.debug.execonce       := state === data && dataFire && io.lsuReady
 
   io.out.pc               := pc
   io.out.inst             := Mux(io.stall, instReg, inst)

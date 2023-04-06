@@ -15,7 +15,8 @@ class LSU extends Module {
 
     // 送给ctrl模块，用于停顿
     val lsuReady  = Output(Bool())
-    
+    val lsuTrans  = Output(Bool())
+
     val stall     = Input(Bool())
 
     // axi总线访存接口
@@ -94,8 +95,9 @@ class LSU extends Module {
   io.out.csrWaddr       := io.in.csrWaddr
   io.out.csrWen         := Mux(io.lsuReady && !io.stall, io.in.csrWen, false.B)
 
-  //io.lsuReady           := (!io.in.ren && !io.in.wen) || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
-  val lsuReady           = RegInit(true.B)
-  lsuReady              := ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
-  io.lsuReady           := Mux(!io.in.ren && !io.in.wen, true.B, lsuReady)
+  io.lsuTrans           := io.in.ren || io.in.wen
+  io.lsuReady           := (!io.in.ren && !io.in.wen) || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
+  //val lsuReady           = RegInit(true.B)
+  //lsuReady              := ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
+  //io.lsuReady           := Mux(!io.in.ren && !io.in.wen, true.B, lsuReady)
 }
