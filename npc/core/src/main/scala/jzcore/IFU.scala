@@ -48,7 +48,7 @@ class IFU extends Module with HasResetVector{
   // 取指接口，todo：停顿信号也要发挥作用
   io.axiAddrIO.valid      := state === addr && !io.stall
   io.axiAddrIO.bits.addr  := pc
-  io.axiDataIO.ready      := state === data && !io.stall
+  io.axiDataIO.ready      := state === data
   // 数据选择
   val instPre              = io.axiDataIO.bits.rdata
   val inst                 = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
