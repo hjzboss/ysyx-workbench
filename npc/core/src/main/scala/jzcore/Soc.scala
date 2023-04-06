@@ -8,6 +8,11 @@ class Soc extends Module {
   val io = IO(new Bundle {
     // 传给仿真环境
     val debug     = new DebugIO
+
+    // 防止被优化
+    val valid1     = Output(Bool())
+    val valid2     = Output(Bool())
+    //val valid3     = Output(Bool())
   })
 
   val rsram = Module(new Sram)
@@ -33,4 +38,6 @@ class Soc extends Module {
 
   // 仿真环境
   io.debug        := core.io.debug
+  io.valid1       := core.io.axiWaddrIO.valid
+  io.valid2       := wsram.io.waddrIO.valid
 }
