@@ -77,7 +77,7 @@ class LSU extends Module {
   val align              = addr(2, 0) << 3.U
   val alignReg           = RegInit(0.U(5.W))
   alignReg              := Mux(readTrans, align, alignReg)
-  io.align              := align
+  io.align              := alignReg
   val rdata              = io.rdataIO.bits.rdata >> alignReg
   val lsuOut             = LookupTree(lsTypeReg, Seq(
     LsType.ld   -> rdata,
