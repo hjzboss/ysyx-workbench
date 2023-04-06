@@ -48,6 +48,7 @@ class LSU extends Module {
     wait_data   -> Mux(rdataFire, idle, wait_data)
   ))
 
+  val readTrans          = rState === idle && io.in.ren
   val rresp              = io.rdataIO.bits.rresp // todo
   val bresp              = io.brespIO.bits.bresp
 
@@ -70,12 +71,14 @@ class LSU extends Module {
   io.brespIO.ready      := wState === wait_resp
   
   val lsTypeReg          = RegInit(LsType.nop)
-  lsTypeReg             := Mux(rState === idle && io.in.ren, io.in.lsType, lsTypeReg)
+  lsTypeReg             := Mux(readTrans, io.in.lsType, lsTypeReg)
 
   // 数据对齐
   val align              = addr(2, 0) << 3.U
+  val alignReg           = RegInit(0.U(5.W))
+  alignReg              := Mux(readTrans, align, alignReg)
   io.align              := align
-  val rdata              = io.rdataIO.bits.rdata >> align
+  val rdata              = io.rdataIO.bits.rdata >> alignReg
   val lsuOut             = LookupTree(lsTypeReg, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
@@ -91,7 +94,6 @@ class LSU extends Module {
     LsType.nop  -> rdata
   ))
 
-  val readTrans          = rState === idle && io.in.ren
   val writeTrans         = wState === idle && io.in.wen
   val hasTrans           = readTrans || writeTrans
 
