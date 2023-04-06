@@ -40,9 +40,7 @@ class LSU extends Module {
   val writeTrans         = wState === idle && io.in.wen
   val hasTrans           = readTrans || writeTrans
 
-  val addr               = io.in.addr        
-  val addrReg            = RegInit(0.U(64.W))
-  addrReg               := Mux(hasTrans, addr, addrReg)
+  val addr               = io.in.addr
 
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
@@ -56,7 +54,7 @@ class LSU extends Module {
   val bresp              = io.brespIO.bits.bresp
 
   io.raddrIO.valid      := rState === idle && !io.stall && io.in.ren
-  io.raddrIO.bits.addr  := Mux(rState === idle, addr, addrReg)
+  io.raddrIO.bits.addr  := addr
   io.rdataIO.ready      := rState === wait_data
 
   // store状态机
@@ -67,7 +65,7 @@ class LSU extends Module {
   ))
 
   io.waddrIO.valid      := wState === idle && !io.stall && io.in.wen
-  io.waddrIO.bits.addr  := Mux(wState === idle, addr, addrReg)
+  io.waddrIO.bits.addr  := addr
   io.wdataIO.valid      := wState === idle && !io.stall && io.in.wen
   io.wdataIO.bits.wdata := io.in.wdata
   io.wdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo

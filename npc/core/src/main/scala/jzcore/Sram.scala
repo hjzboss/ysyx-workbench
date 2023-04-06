@@ -18,10 +18,15 @@ class Sram extends Module {
     val brespIO   = Decoupled(new BrespIO)
   })
 
+  val pmem               = Module(new Pmem)
+
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // resp
 
   val raddrFire          = io.raddrIO.valid && io.raddrIO.ready
   val rdataFire          = io.rdataIO.valid && io.rdataIO.ready
+
+  val raddrReg            = RegInit(0.U(64.W))
+  //val waddrReg            = RegInit(0.U(64.W))
 
   // read state
   val ar_wait :: fetch :: Nil = Enum(2)
@@ -31,13 +36,13 @@ class Sram extends Module {
     fetch         -> Mux(rdataFire, ar_wait, fetch), // 取指完成，当取指阻塞时保持状态
   ))
 
-  val pmem               = Module(new Pmem)
+  raddrReg              := Mux(rState === ar_wait, io.raddrIO.bits.addr)
 
   // 读事务
   io.raddrIO.ready      := rState === ar_wait
   io.rdataIO.valid      := rState === fetch
   io.rdataIO.bits.rresp := okay // ok
-  pmem.io.raddr         := io.raddrIO.bits.addr
+  pmem.io.raddr         := raddrReg
   pmem.io.rvalid        := rState === fetch
   io.rdataIO.bits.rdata := pmem.io.rdata
 
