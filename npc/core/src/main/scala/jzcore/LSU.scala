@@ -36,10 +36,6 @@ class LSU extends Module {
   val wdataFire          = io.wdataIO.valid && io.wdataIO.ready
   val brespFire          = io.brespIO.valid && io.brespIO.ready
 
-  val readTrans          = rState === idle && io.in.ren
-  val writeTrans         = wState === idle && io.in.wen
-  val hasTrans           = readTrans || writeTrans
-
   val addr               = io.in.addr
 
   // load状态机
@@ -87,6 +83,11 @@ class LSU extends Module {
     LsType.sb   -> rdata,
     LsType.nop  -> rdata
   ))
+
+  val readTrans          = rState === idle && io.in.ren
+  val writeTrans         = wState === idle && io.in.wen
+  val hasTrans           = readTrans || writeTrans
+
 
   // 当lsu访存未结束时锁存控制信号
   val exuOutreg          = RegInit(0.U(64.W))
