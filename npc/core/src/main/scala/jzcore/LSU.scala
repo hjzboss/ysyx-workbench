@@ -42,7 +42,7 @@ class LSU extends Module {
 
   val addr               = io.in.addr        
   val addrReg            = RegInit(0.U(64.W))
-  addrReg               := Mux(hasTrans, io.in.addr, addrReg)
+  addrReg               := Mux(hasTrans, addr, addrReg)
 
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
