@@ -73,8 +73,8 @@ class LSU extends Module {
   val lsTypeReg          = RegInit(LsType.nop)
   lsTypeReg             := Mux(readTrans, io.in.lsType, lsTypeReg)
 
-  // 数据对齐
-  val align              = Cat(addr(2, 0), 0.U(3.W))
+  // 数据对齐,todo,此处有问题
+  val align              = Cat(addr(3, 0), 0.U(3.W))
   val alignReg           = RegInit(0.U(5.W))
   alignReg              := Mux(readTrans, align, alignReg)
   io.align              := alignReg
