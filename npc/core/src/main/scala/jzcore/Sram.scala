@@ -49,7 +49,7 @@ class Sram extends Module {
   val w_wait :: w_resp :: Nil = Enum(2)
   val wState = RegInit(w_wait)
   wState := MuxLookup(wState, w_wait, List(
-    w_wait       -> Mux(raddrFire && wdataFire, w_resp, w_wait), // 等待地址信息
+    w_wait       -> Mux(waddrFire && wdataFire, w_resp, w_wait), // 等待地址信息
     w_resp       -> Mux(brespFire, w_wait, w_resp)
   ))
 
