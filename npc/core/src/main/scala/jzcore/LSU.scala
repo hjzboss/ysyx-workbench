@@ -98,7 +98,7 @@ class LSU extends Module {
   val csrWenreg          = RegInit(false.B)
   val noreg              = RegInit(0.U(4.W))
   exuOutreg             := Mux(hasTrans, io.in.exuOut, exuOutreg)
-  loadMemreg            := Mux(hasTrans, io.in.exuOut, exuOutreg)
+  loadMemreg            := Mux(hasTrans, io.in.exuOut, loadMemreg)
   rdreg                 := Mux(hasTrans, io.in.rd, rdreg)
   regWenreg             := Mux(hasTrans, io.in.regWen, regWenreg)
   exceptionreg          := Mux(hasTrans, io.in.exception, exceptionreg)
@@ -107,18 +107,18 @@ class LSU extends Module {
   noreg                 := Mux(hasTrans, io.in.no, noreg)
 
   io.out.lsuOut         := lsuOut
-  io.out.loadMem        := Mux(!hasTrans, io.in.loadMem, loadMemreg)
-  io.out.exuOut         := Mux(!hasTrans, io.in.exuOut, exuOutreg)
-  io.out.rd             := Mux(!hasTrans, io.in.rd, rdreg)
-  io.out.regWen         := Mux(io.lsuReady && !io.stall, Mux(!hasTrans, io.in.regWen, regWenreg), false.B)
+  io.out.loadMem        := Mux(rState === idle && wState === idle, io.in.loadMem, loadMemreg)
+  io.out.exuOut         := Mux(rState === idle && wState === idle, io.in.exuOut, exuOutreg)
+  io.out.rd             := Mux(rState === idle && wState === idle, io.in.rd, rdreg)
+  io.out.regWen         := Mux(rState === idle && wState === idle && !io.in.wen && !io.in.ren, io.in.regWen, Mux(io.lsuReady && !io.stall, regWenreg, false.B))
   io.out.pc             := io.in.pc
-  io.out.no             := Mux(!hasTrans, io.in.no, noreg)
-  io.out.exception      := Mux(io.lsuReady && !io.stall, Mux(!hasTrans, io.in.exception, exceptionreg), false.B)
-  io.out.csrWaddr       := Mux(!hasTrans, io.in.csrWaddr, csrWaddrreg)
+  io.out.no             := Mux(rState === idle && wState === idle, io.in.no, noreg)
+  io.out.exception      := Mux(rState === idle && wState === idle && !io.in.wen && !io.in.ren, io.in.exception, Mux(io.lsuReady && !io.stall, exceptionreg, false.B))
+  io.out.csrWaddr       := Mux(rState === idle && wState === idle, io.in.csrWaddr, csrWaddrreg)
   io.out.csrWen         := Mux(io.lsuReady && !io.stall, Mux(!hasTrans, io.in.csrWen, csrWenreg), false.B)
 
   io.lsuTrans           := (rState === idle && raddrFire) || (wState === idle && waddrFire) || rState === wait_data || wState === wait_resp
-  io.lsuReady           := (!io.in.ren && !io.in.wen) || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
+  io.lsuReady           := !hasTrans || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
   //val lsuReady           = RegInit(true.B)
   //lsuReady              := ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
   //io.lsuReady           := Mux(!io.in.ren && !io.in.wen, true.B, lsuReady)
