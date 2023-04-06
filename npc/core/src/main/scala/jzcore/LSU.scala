@@ -41,7 +41,7 @@ class LSU extends Module {
   val hasTrans           = readTrans || writeTrans
 
   val addr               = io.in.addr        
-  val addrReg            = RegInit(0.u(64.W))
+  val addrReg            = RegInit(0.U(64.W))
   addrReg               := Mux(hasTrans, io.in.addr, addrReg)
 
   // load状态机
