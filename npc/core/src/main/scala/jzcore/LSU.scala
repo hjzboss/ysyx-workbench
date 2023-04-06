@@ -88,7 +88,6 @@ class LSU extends Module {
   val writeTrans         = wState === idle && io.in.wen
   val hasTrans           = readTrans || writeTrans
 
-
   // 当lsu访存未结束时锁存控制信号
   val exuOutreg          = RegInit(0.U(64.W))
   val loadMemreg         = RegInit(false.B)
