@@ -292,8 +292,6 @@ static void isa_exec_once() {
   while (!top->io_debug_execonce) {
     eval_wave();
     eval_wave();
-    cnt += 1;
-    if (cnt == 16) break;
   }
   eval_wave();
   eval_wave();
