@@ -36,7 +36,13 @@ class LSU extends Module {
   val wdataFire          = io.wdataIO.valid && io.wdataIO.ready
   val brespFire          = io.brespIO.valid && io.brespIO.ready
 
-  val addr               = io.in.addr
+  val readTrans          = rState === idle && io.in.ren
+  val writeTrans         = wState === idle && io.in.wen
+  val hasTrans           = readTrans || writeTrans
+
+  val addr               = io.in.addr        
+  val addrReg            = RegInit(0.u(64.W))
+  addrReg               := Mux(hasTrans, io.in.addr, addrReg)
 
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
@@ -50,18 +56,18 @@ class LSU extends Module {
   val bresp              = io.brespIO.bits.bresp
 
   io.raddrIO.valid      := rState === idle && !io.stall && io.in.ren
-  io.raddrIO.bits.addr  := addr
+  io.raddrIO.bits.addr  := Mux(rState === idle, addr, addrReg)
   io.rdataIO.ready      := rState === wait_data
 
   // store状态机
-  val wState = RegInit(addr)
+  val wState = RegInit(idle)
   wState := MuxLookup(wState, idle, List(
     idle        -> Mux(waddrFire && wdataFire, wait_resp, idle),
     wait_resp   -> Mux(brespFire, idle, wait_resp)
   ))
 
   io.waddrIO.valid      := wState === idle && !io.stall && io.in.wen
-  io.waddrIO.bits.addr  := addr
+  io.waddrIO.bits.addr  := Mux(wState === idle, addr, addrReg)
   io.wdataIO.valid      := wState === idle && !io.stall && io.in.wen
   io.wdataIO.bits.wdata := io.in.wdata
   io.wdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
@@ -83,10 +89,6 @@ class LSU extends Module {
     LsType.sb   -> rdata,
     LsType.nop  -> rdata
   ))
-
-  val readTrans          = rState === idle && io.in.ren
-  val writeTrans         = wState === idle && io.in.wen
-  val hasTrans           = readTrans || writeTrans
 
   // 当lsu访存未结束时锁存控制信号
   val exuOutreg          = RegInit(0.U(64.W))
