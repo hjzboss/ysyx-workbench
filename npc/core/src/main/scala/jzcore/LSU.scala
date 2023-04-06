@@ -74,7 +74,7 @@ class LSU extends Module {
   lsTypeReg             := Mux(readTrans, io.in.lsType, lsTypeReg)
 
   // 数据对齐
-  val align              = addr(2, 0) << 3.U
+  val align              = Cat(addr(2, 0), 0.U(3.W))
   val alignReg           = RegInit(0.U(5.W))
   alignReg              := Mux(readTrans, align, alignReg)
   io.align              := alignReg
