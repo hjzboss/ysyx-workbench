@@ -40,7 +40,7 @@ class IFU extends Module with HasResetVector{
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
     addr    -> Mux(addrFire, data, addr),
-    data    -> Mux(dataFire && (!io,stall || io.stall && io.lsuReady), addr, data) // 当lsu阶段执行完后才回到addr状态，开始取指,todo
+    data    -> Mux(dataFire && (!io.stall || io.stall && io.lsuReady), addr, data) // 当lsu阶段执行完后才回到addr状态，开始取指,todo
   ))
 
   // pc
