@@ -20,10 +20,10 @@ class LSU extends Module {
     val stall     = Input(Bool())
 
     // axi总线访存接口
-    val raddrIO   = Decoupled(new AddrIO)
+    val raddrIO   = Decoupled(new RaddrIO)
     val rdataIO   = Flipped(Decoupled(new RdataIO))
 
-    val waddrIO   = Decoupled(new AddrIO)
+    val waddrIO   = Decoupled(new WaddrIO)
     val wdataIO   = Decoupled(new WdataIO)
     val brespIO   = Flipped(Decoupled(new BrespIO))
   })

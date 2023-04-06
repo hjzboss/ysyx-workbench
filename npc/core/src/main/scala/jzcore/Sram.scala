@@ -7,11 +7,11 @@ import utils._
 class Sram extends Module {
   val io = IO(new Bundle {
     // 读通道
-    val raddrIO   = Flipped(Decoupled(new AddrIO))
+    val raddrIO   = Flipped(Decoupled(new RaddrIO))
     val rdataIO   = Decoupled(new RdataIO)
 
     // 写通道
-    val waddrIO   = Flipped(Decoupled(new AddrIO))
+    val waddrIO   = Flipped(Decoupled(new WaddrIO))
     val wdataIO   = Flipped(Decoupled(new WdataIO))
 
     // 写回应通道
@@ -44,7 +44,6 @@ class Sram extends Module {
   val waddrFire          = io.waddrIO.valid && io.waddrIO.ready
   val wdataFire          = io.wdataIO.valid && io.wdataIO.ready
   val brespFire          = io.brespIO.valid && io.brespIO.ready
-
 
   // write state
   val w_wait :: w_resp :: Nil = Enum(2)
