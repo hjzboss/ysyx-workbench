@@ -57,8 +57,8 @@ class IFU extends Module with HasResetVector{
   val inst                 = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   // 取指成功后锁存指令
-  val instReg              = RegInit(Instruction.NOP)
-  instReg                 := Mux(state === data && dataFire, inst, instReg)
+  //val instReg              = RegInit(Instruction.NOP)
+  //instReg                 := Mux(state === data && dataFire, inst, instReg)
 
   // 更新pc值
   pc                      := MuxLookup(state, pc, List(
@@ -74,7 +74,7 @@ class IFU extends Module with HasResetVector{
   io.debug.execonce       := state === data && dataFire && io.lsuReady
 
   io.out.pc               := pc
-  io.out.inst             := Mux(io.stall, instReg, inst)
+  io.out.inst             := inst
 
   io.fetchReady           := state === data && dataFire
 }
