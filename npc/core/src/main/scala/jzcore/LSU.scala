@@ -84,6 +84,18 @@ class LSU extends Module {
     LsType.nop  -> rdata
   ))
 
+/*
+  val exuOutreg          = RegInit(0.U(64.W))
+  val loadMemreg         = RegInit(false.B)
+  val rdreg              = RegInit(0.U(5.W))
+  val regWenreg          = RegInit(false.B)
+  val exceptionreg       = RegInit(false.B)
+  val csrWaddrreg        = RegInit(0.U(2.W))
+  val csrWenreg          = RegInit(false.B)
+
+  exuOutreg             := Mux() 
+*/
+
   io.out.lsuOut         := lsuOut
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
