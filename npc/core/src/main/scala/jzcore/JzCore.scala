@@ -36,7 +36,6 @@ class JzCore extends Module {
   idu.io.in         <> ifu.io.out
   idu.io.regWrite   <> wbu.io.regWrite
   idu.io.csrWrite   <> wbu.io.csrWrite
-  idu.io.stall      <> ctrl.io.stallIdu
 
   exu.io.datasrc    <> idu.io.datasrc
   exu.io.aluCtrl    <> idu.io.aluCtrl
