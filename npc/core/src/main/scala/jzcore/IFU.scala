@@ -64,7 +64,7 @@ class IFU extends Module with HasResetVector{
   pc                      := MuxLookup(state, pc, List(
                               addr  -> pc,
                               // 如果rresp不是okay，则pc保持原值重新取指，todo，当lsu取指成功后再更新pc
-                              data  -> Mux(!((dataFire && !io.stall) || (io.stall && io.lsuReady)), pc, Mux(io.redirect.valid, dnpc, snpc), pc)
+                              data  -> Mux(!((dataFire && !io.stall) || (io.stall && io.lsuReady)), pc, Mux(io.redirect.valid, dnpc, snpc))
                             ))
 
   // 仿真环境
