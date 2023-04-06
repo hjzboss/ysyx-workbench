@@ -76,5 +76,5 @@ class IFU extends Module with HasResetVector{
   io.out.pc               := pc
   io.out.inst             := inst
 
-  io.fetchReady           := state === data && dataFire
+  io.fetchReady           := (state === data && dataFire) || (state === data && io.stall) 
 }
