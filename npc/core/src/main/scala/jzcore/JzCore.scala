@@ -32,6 +32,7 @@ class JzCore extends Module {
   ifu.io.axiAddrIO  <> io.axiRaddrIO
   ifu.io.axiDataIO  <> io.axiRdataIO
   ifu.io.stall      <> ctrl.io.stallIfu
+  ifu.io.lsuReady   <> lsu.io.lsuReady
 
   idu.io.in         <> ifu.io.out
   idu.io.regWrite   <> wbu.io.regWrite
