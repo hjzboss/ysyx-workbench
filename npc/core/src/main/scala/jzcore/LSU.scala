@@ -111,14 +111,14 @@ class LSU extends Module {
   io.out.exuOut         := Mux(rState === idle && wState === idle, io.in.exuOut, exuOutreg)
   io.out.rd             := Mux(rState === idle && wState === idle, io.in.rd, rdreg)
   //io.out.regWen         := Mux(rState === idle && !io.in.ren && wState === idle && !io.in.wen, io.in.regWen, Mux(io.lsuReady && !io.stall, regWenreg, false.B))
-  io.out.regWen         := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, regWenreg, regWen))
+  io.out.regWen         := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, regWenreg, io.in.regWen))
   io.out.pc             := io.in.pc
   io.out.no             := Mux(rState === idle && wState === idle, io.in.no, noreg)
   //io.out.exception      := Mux(rState === idle && wState === idle && !io.in.wen && !io.in.ren, io.in.exception, Mux(io.lsuReady && !io.stall, exceptionreg, false.B))
-  io.out.exception      := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, exceptionreg, exception))
+  io.out.exception      := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, exceptionreg, io.in.exception))
   io.out.csrWaddr       := Mux(rState === idle && wState === idle, io.in.csrWaddr, csrWaddrreg)
   //io.out.csrWen         := Mux(io.lsuReady && !io.stall, Mux(!hasTrans, io.in.csrWen, csrWenreg), false.B)
-  io.out.csrWen         := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, csrWenreg, csrWen))
+  io.out.csrWen         := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, csrWenreg, io.in.csrWen))
 
   io.lsuTrans           := (rState === idle && raddrFire) || (wState === idle && waddrFire) || rState === wait_data || wState === wait_resp
   io.lsuReady           := !hasTrans || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
