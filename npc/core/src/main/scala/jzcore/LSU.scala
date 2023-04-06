@@ -26,6 +26,8 @@ class LSU extends Module {
     val waddrIO   = Decoupled(new WaddrIO)
     val wdataIO   = Decoupled(new WdataIO)
     val brespIO   = Flipped(Decoupled(new BrespIO))
+
+    val align     = Output(UInt(6.W))
   })
 
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // resp
@@ -71,7 +73,9 @@ class LSU extends Module {
   lsTypeReg             := Mux(rState === idle && io.in.ren, io.in.lsType, lsTypeReg)
 
   // 数据对齐
-  val rdata              = io.rdataIO.bits.rdata >> (Cat(0.U(3.W), addr(2, 0)) << 3.U)
+  val align              = addr(2, 0) << 3.U
+  io.align              := align
+  val rdata              = io.rdataIO.bits.rdata >> align
   val lsuOut             = LookupTree(lsTypeReg, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
