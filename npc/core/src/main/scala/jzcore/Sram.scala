@@ -36,7 +36,7 @@ class Sram extends Module {
     fetch         -> Mux(rdataFire, ar_wait, fetch), // 取指完成，当取指阻塞时保持状态
   ))
 
-  raddrReg              := Mux(rState === ar_wait, io.raddrIO.bits.addr)
+  raddrReg              := Mux(rState === ar_wait, io.raddrIO.bits.addr, raddrReg)
 
   // 读事务
   io.raddrIO.ready      := rState === ar_wait
