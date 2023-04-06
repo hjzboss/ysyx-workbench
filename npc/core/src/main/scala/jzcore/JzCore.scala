@@ -18,6 +18,8 @@ class JzCore extends Module {
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
+
+    val align     = Output(UInt(6.W))
   })
 
   val ifu = Module(new IFU)
@@ -54,4 +56,5 @@ class JzCore extends Module {
   wbu.io.in         <> lsu.io.out
 
   io.debug          <> ifu.io.debug
+  io.align          <> lsu.io.align
 }
