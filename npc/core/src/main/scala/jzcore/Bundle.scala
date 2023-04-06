@@ -92,30 +92,30 @@ class LsuOut extends Bundle {
 }
 
 class InstrFetch extends Bundle {
-  val pc        = Output(UInt(64.W))
-  val inst      = Output(UInt(32.W))
+  val pc            = Output(UInt(64.W))
+  val inst          = Output(UInt(32.W))
 }
 
 class RedirectIO extends Bundle {
-  val brAddr    = Output(UInt(64.W))
-  val valid     = Output(Bool())
+  val brAddr        = Output(UInt(64.W))
+  val valid         = Output(Bool())
 }
 
 // axi接口
 class AddrIO extends Bundle {
-  val addr      = Output(UInt(64.W))
+  val addr          = Output(UInt(64.W))
 }
 
 class RdataIO extends Bundle {
-  val rdata     = Output(UInt(64.W))
-  val rresp     = Output(UInt(2.W))
+  val rdata         = Output(UInt(64.W))
+  val rresp         = Output(UInt(2.W))
 }
 
 class WdataIO extends Bundle {
-  val wdata     = Output(UInt(64.W))
-  val wstrb     = Output(UInt(8.W))
+  val wdata         = Output(UInt(64.W))
+  val wstrb         = Output(UInt(8.W))
 }
 
 class BrespIO extends Bundle {
-  val bresp     = Output(UInt(2.W))
+  val bresp         = Output(UInt(2.W))
 }
