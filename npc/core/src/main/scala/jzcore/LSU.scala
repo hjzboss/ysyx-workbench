@@ -120,7 +120,7 @@ class LSU extends Module {
   //io.out.csrWen         := Mux(io.lsuReady && !io.stall, Mux(!hasTrans, io.in.csrWen, csrWenreg), false.B)
   io.out.csrWen         := Mux(!io.lsuReady || io.stall, false.B, Mux(rState === wait_data || wState === wait_resp, csrWenreg, io.in.csrWen))
 
-  io.lsuTrans           := (rState === idle && raddrFire) || (wState === idle && waddrFire) || rState === wait_data || wState === wait_resp
+  io.lsuTrans           := hasTrans
   //io.lsuReady           := !hasTrans || (((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay))
   io.lsuReady           := true.B
   //val lsuReady           = RegInit(true.B)
