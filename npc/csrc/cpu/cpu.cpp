@@ -293,7 +293,7 @@ static void isa_exec_once() {
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 4) break;
+    if (cnt == 16) break;
   }
   eval_wave();
   eval_wave();
