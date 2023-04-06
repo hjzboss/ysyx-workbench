@@ -57,7 +57,7 @@ class Sram extends Module {
   io.waddrIO.ready      := wState === w_wait
   io.wdataIO.ready      := wState === w_wait
   pmem.io.waddr         := io.waddrIO.bits.addr
-  pmem.io.mask          := Mux(wState === w_wait && raddrFire && wdataFire, io.wdataIO.bits.wstrb, 0.U(8.W))
+  pmem.io.mask          := Mux(wState === w_wait && waddrFire && wdataFire, io.wdataIO.bits.wstrb, 0.U(8.W))
   pmem.io.wdata         := io.wdataIO.bits.wdata
   io.brespIO.valid      := wState === w_resp
   io.brespIO.bits.bresp := okay // ok
