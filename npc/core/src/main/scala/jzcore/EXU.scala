@@ -6,22 +6,31 @@ import utils._
 
 class EXU extends Module {
   val io = IO(new Bundle {
+    // 来自idu
     val datasrc   = Flipped(new DataSrcIO)
     val aluCtrl   = Flipped(new AluIO)
-    val ctrl      = Flipped(new Ctrl)
+    val ctrl      = Flipped(new CtrlFlow)
     
+    // 传给Lsu
+    val out       = new MemCtrl
+
+/*
+    // 写回idu
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
+*/
+
+    // 写回ifu
     val redirect  = new RedirectIO
   })
-  
+
   val alu   = Module(new Alu)
-  val lsu   = Module(new Lsu)
+  //val lsu   = Module(new Lsu)
   val stop  = Module(new Stop)
 
   val aluSrc1 = io.aluCtrl.aluSrc1
   val aluSrc2 = io.aluCtrl.aluSrc2
-  
+
   // todo: forward
   val opAPre = io.datasrc.src1
   val opBPre = io.datasrc.src2
@@ -29,10 +38,11 @@ class EXU extends Module {
   val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
-  val lsType  = io.ctrl.lsType
-  val rdata   = lsu.io.rdata
-  val wmask   = io.ctrl.wmask
-  
+  //val lsType  = io.ctrl.lsType
+  //val rdata   = lsu.io.rdata
+  //val wmask   = io.ctrl.wmask
+
+/*
   val lsuOut  = LookupTree(lsType, Seq(
     LsType.ld   -> rdata,
     LsType.lw   -> SignExt(rdata(31, 0), 64),
@@ -47,6 +57,7 @@ class EXU extends Module {
     LsType.sb   -> rdata,
     LsType.nop  -> rdata
   ))
+*/
 
   val aluOut  = alu.io.aluOut
 
@@ -54,6 +65,7 @@ class EXU extends Module {
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
 
+/*
   // todo
   lsu.io.raddr         := Mux(io.ctrl.loadMem, aluOut, 0.U(64.W))
   lsu.io.waddr         := aluOut
@@ -62,9 +74,8 @@ class EXU extends Module {
 
   io.regWrite.rd       := io.ctrl.rd
   io.regWrite.wen      := io.ctrl.regWen
-
-  // todo, mem
   io.regWrite.value    := Mux(io.ctrl.loadMem, lsuOut, Mux(io.ctrl.isCsr, opAPre, aluOut))
+*/
 
   // todo: branch addr
   val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
@@ -74,6 +85,7 @@ class EXU extends Module {
   io.redirect.brAddr   := Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 
+/*
   // csr
   io.csrWrite.waddr    := io.ctrl.csrWaddr
   io.csrWrite.wdata    := aluOut
@@ -82,6 +94,23 @@ class EXU extends Module {
   io.csrWrite.exception:= io.ctrl.sysInsType === System.ecall
   io.csrWrite.epc      := io.datasrc.pc
   io.csrWrite.no       := Mux(io.ctrl.sysInsType === System.ecall, "hb".U, 0.U)
+*/
+
+  io.out.lsType        := io.ctrl.lsType
+  io.out.wmask         := io.ctrl.wmask
+  io.out.wen           := io.ctrl.memWen
+  io.out.ren           := io.ctrl.memRen
+  io.out.addr          := aluOut
+  io.out.wdata         := io.ctrl.wdata
+  io.out.loadMem       := io.ctrl.loadMem
+  io.out.exuOut        := aluOut
+  io.out.rd            := io.ctrl.rd
+  io.out.regWen        := io.ctrl.regWen
+  io.out.pc            := io.datasrc.pc
+  io.out.no            := Mux(io.ctrl.sysInsType === System.ecall, "hb".U, 0.U)
+  io.out.exception     := io.ctrl.sysInsType === System.ecall
+  io.out.csrWaddr      := io.ctrl.csrWaddr
+  io.out.csrWen        := io.ctrl.isCsr
 
   // ebreak
   stop.io.valid        := Mux(io.ctrl.sysInsType === System.ebreak, true.B, false.B)

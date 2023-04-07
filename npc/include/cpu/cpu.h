@@ -4,7 +4,7 @@
 #include <verilated.h>
 
 // Include model header, generated from Verilating "jzcore.v"
-#include "VJzCore.h"
+#include "VSoc.h"
 
 // If "verilator --trace" is used, include the tracing class
 #include <verilated_vcd_c.h>

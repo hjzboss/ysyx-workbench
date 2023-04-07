@@ -44,7 +44,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   }
 
   fs_close(fd);
-  Log("log %s end", filename);
+  Log("load %s end", filename);
   return elf_head.e_entry;
 }
 
