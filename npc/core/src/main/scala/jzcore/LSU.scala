@@ -75,10 +75,10 @@ class LSU extends Module {
 
   // 数据对齐,todo,此处有问题
   //val align              = Cat(addr(2, 0), 0.U(3.W)) // 此处变成了0，原因未知
-  val align              = addr(2, 0), 0.U(3.W) // 此处变成了0，原因未知
+  val align              = addr(2, 0) // 此处变成了0，原因未知
   val alignReg           = RegInit(0.U(5.W))
   alignReg              := Mux(readTrans, align, alignReg)
-  io.align              := alignReg
+  io.align              := align
 
   val rdata              = io.rdataIO.bits.rdata >> alignReg
   val lsuOut             = LookupTree(lsTypeReg, Seq(
