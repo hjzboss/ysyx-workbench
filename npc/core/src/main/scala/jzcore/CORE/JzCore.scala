@@ -40,7 +40,7 @@ class JzCore extends Module {
     is ("b00.U") {
       // 没有请求
       io.axiRaddrIO.valid       := false.B
-      io.axiRdataIO.bits.data    := 0.U
+      io.axiRdataIO.bits.rdata    := 0.U
       io.axiRdataIO.ready       := false.B
       io.axiWaddrIO.valid       := false.B
       io.axiWdataIO.bits.wdata  := 0.U
