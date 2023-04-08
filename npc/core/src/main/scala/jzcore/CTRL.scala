@@ -23,5 +23,5 @@ class CTRL extends Module {
 
   io.pcEnable := io.iduReady && io.exuReady && io.lsuReady && io.wbuReady
 
-  io.finish   := pcEnable && io.ifuReady
+  io.finish   := io.pcEnable && io.ifuReady
 }
