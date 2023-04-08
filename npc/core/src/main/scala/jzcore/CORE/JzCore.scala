@@ -80,6 +80,7 @@ class JzCore extends Module {
 
     ifu.io.axiRaddrIO.ready   := false.B
     ifu.io.axiRdataIO.valid   := false.B
+    
     ifu.io.axiRdataIO.bits.rresp   := 0.U
     ifu.io.axiWaddrIO.ready   := false.B
     ifu.io.axiWdataIO.ready   := false.B
