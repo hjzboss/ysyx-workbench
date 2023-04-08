@@ -4,10 +4,6 @@ import chisel3._
 import top.Settings
 import chisel3.util._
 
-trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
-}
-
 class IFU extends Module with HasResetVector{
   val io = IO(new Bundle {
     // 用于仿真环境
@@ -19,28 +15,36 @@ class IFU extends Module with HasResetVector{
     // 送给idu
     val out         = new InstrFetch
 
-    // axi取指接口
-    val axiAddrIO   = Decoupled(new RaddrIO)
-    val axiDataIO   = Flipped(Decoupled(new RdataIO))
+    // axi接口
+    val axiRaddrIO  = Decoupled(new RaddrIO)
+    val axiRdataIO  = Flipped(Decoupled(new RdataIO))
+    val axiWaddrIO  = Decoupled(new WaddrIO)
+    val axiWdataIO  = Decoupled(new WdataIO)
+    val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
+
+    // 仲裁信号
+    val axiReq      = Output(Bool())
+    val axiGrant    = Input(Bool())
+    val axiReady    = Output(Bool())
 
     // 控制模块
-    val fetchReady  = Output(Bool()) // 取指完成
-    val stall       = Input(Bool()) // 停顿信号
+    val ready       = Output(Bool()) // 取指完成
+    //val stall       = Input(Bool()) // 停顿信号
 
-    // 来自lsu，临时的信号
-    val lsuReady    = Input(Bool())
+    // 来自wbu，当前指令已执行完毕
+    val pcEnable    = Input(Bool())
   })
 
-  val dataFire = io.axiDataIO.valid && io.axiDataIO.ready
-  val addrFire = io.axiAddrIO.ready && io.axiAddrIO.valid
+  val dataFire = io.axiRdataIO.valid && io.axiRdataIO.ready
+  val addrFire = io.axiRaddrIO.ready && io.axiRaddrIO.valid
 
   // 取指状态机
   val addr :: data :: Nil = Enum(2)
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
-    addr    -> Mux(addrFire, data, addr),
-    data    -> Mux((dataFire && !io.stall) || (io.stall && io.lsuReady), addr, data) // 当lsu阶段执行完后才回到addr状态，开始取指,todo
+    addr    -> Mux(addrFire && io.axiGrant, data, addr),
+    data    -> Mux(dataFire, addr, data)
   ))
 
   // pc
@@ -49,32 +53,46 @@ class IFU extends Module with HasResetVector{
   val dnpc = io.redirect.brAddr
 
   // 取指接口，todo：停顿信号也要发挥作用
-  io.axiAddrIO.valid      := state === addr && !io.stall
-  io.axiAddrIO.bits.addr  := pc
-  io.axiDataIO.ready      := state === data
-  // 数据选择
-  val instPre              = io.axiDataIO.bits.rdata
-  val inst                 = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
+  //io.axiRaddrIO.valid       := state === addr && !io.stall
+  io.axiRaddrIO.valid       := state === addr
+  io.axiRaddrIO.bits.addr   := pc
+  io.axiRdataIO.ready       := state === data
 
-  // 取指成功后锁存指令
-  val instReg              = RegInit(Instruction.NOP)
-  instReg                 := Mux(state === data && dataFire, inst, instReg)
+  // 始终没有写请求
+  io.axiWaddrIO.valid       := false.B
+  io.axiWaddrIO.bits.addr   := "h80000000".U
+  io.axiWdataIO.valid       := false.B
+  io.axiWdataIO.bits.wdata  := 0.U
+  io.axiWdataIO.bits.wstrb  := 0.U
+  io.axiBrespIO.ready       := false.B
+
+  // 数据选择
+  val instPre                = io.axiDataIO.bits.rdata
+  val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
+
+  val instReg                = RegInit(Instruction.NOP)
+  instReg                   := Mux(state === data, inst, instReg)
 
   // 更新pc值
-  pc                      := MuxLookup(state, pc, List(
-                              addr  -> pc,
-                              // 如果rresp不是okay，则pc保持原值重新取指，todo，当lsu取指成功后再更新pc
-                              data  -> Mux(!((dataFire && !io.stall) || (io.stall && io.lsuReady)), pc, Mux(io.redirect.valid, dnpc, snpc))
-                            ))
+  pc                        := MuxLookup(state, pc, List(
+                                  addr  -> pc,
+                                  // 如果rresp不是okay，则pc保持原值重新取指，todo，当lsu取指成功后再更新pc
+                                  //data  -> Mux(!((dataFire && !io.stall) || (io.stall && io.lsuReady)), pc, Mux(io.redirect.valid, dnpc, snpc))
+                                  // 单周期时，wbu执行完毕才更新pc
+                                  data  -> Mux(io.pcEnable, Mux(io.redirect.valid, dnpc, snpc), pc)
+                                ))
 
   // 仿真环境
-  io.debug.inst           := inst
-  io.debug.nextPc         := Mux(io.redirect.valid, dnpc, snpc)
-  io.debug.pc             := pc
-  io.debug.execonce       := state === data && ((dataFire && !io.stall) || (io.stall && io.lsuReady))
+  io.debug.inst             := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
+  io.debug.nextPc           := Mux(io.redirect.valid, dnpc, snpc)
+  io.debug.pc               := pc
+  //io.debug.execonce         := state === data && ((dataFire && !io.stall) || (io.stall && io.lsuReady))
 
-  io.out.pc               := pc
-  io.out.inst             := inst
+  io.out.pc                 := pc
+  io.out.inst               := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
 
-  io.fetchReady           := (state === data && dataFire) || (state === data && io.stall) 
+  io.axiReq                 := state === addr
+  io.axiReady               := dataFire
+
+  io.ready                  := (state === data && dataFire) || (state === data && io.stall) 
 }

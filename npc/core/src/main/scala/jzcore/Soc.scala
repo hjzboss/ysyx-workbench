@@ -12,9 +12,6 @@ class Soc extends Module {
     // 防止被优化
     val valid1     = Output(Bool())
     val valid2     = Output(Bool())
-    //val valid3     = Output(Bool())
-
-    val align     = Output(UInt(6.W))
   })
 
   val rsram = Module(new Sram)
@@ -42,6 +39,4 @@ class Soc extends Module {
   io.debug        := core.io.debug
   io.valid1       := core.io.axiWaddrIO.valid
   io.valid2       := wsram.io.waddrIO.valid
-
-  io.align           <> core.io.align
 }

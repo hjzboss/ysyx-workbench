@@ -21,9 +21,13 @@ class IDU extends Module with HasInstrType{
     // 来自控制模块的停顿信号
     //val stall     = Input(Bool())
 
+    val ready     = Output(Bool()) // todo：暂时一直为true
+
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
   })
+
+  io.ready     := true.B
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
