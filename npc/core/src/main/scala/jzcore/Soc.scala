@@ -27,5 +27,5 @@ class Soc extends Module {
   // 仿真环境
   io.debug        := core.io.debug
   io.valid1       := core.io.axiWaddrIO.valid
-  io.valid2       := wsram.io.waddrIO.valid
+  io.valid2       := sram.io.waddrIO.valid
 }
