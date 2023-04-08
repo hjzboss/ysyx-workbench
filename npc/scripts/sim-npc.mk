@@ -2,7 +2,7 @@ BUILD_DIR = ${NPC_HOME}/build
 
 BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
-TOPNAME = JzCore
+TOPNAME = Soc
 
 VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
@@ -43,5 +43,5 @@ sim: $(SIM_CSRC) $(VSRC)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG)
-#@echo "wave"
-#gtkwave $(SIM_OBJ_DIR)/$(WAVE)
+	@echo "wave"
+	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
