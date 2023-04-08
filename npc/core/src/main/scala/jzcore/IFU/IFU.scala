@@ -98,5 +98,5 @@ class IFU extends Module with HasResetVector{
   io.axiReq                 := state === addr
   io.axiReady               := dataFire
 
-  io.ready                  := (state === data && dataFire) || (state === data && io.stall) 
+  io.ready                  := state === data && dataFire
 }
