@@ -40,7 +40,7 @@ class JzCore extends Module {
     is ("b00.U") {
       // 没有请求
       io.axiRaddrIO.valid       := false.B
-      io.axiRdatIO.bits.data    := 0.U
+      io.axiRdataIO.bits.data    := 0.U
       io.axiRdataIO.ready       := false.B
       io.axiWaddrIO.valid       := false.B
       io.axiWdataIO.bits.wdata  := 0.U
@@ -49,19 +49,19 @@ class JzCore extends Module {
 
       ifu.io.axiRaddrIO.ready   := false.B
       ifu.io.axiRdataIO.valid   := false.B
-      ifu.io.axiRdataIO.rresp   := 0.U
+      ifu.io.axiRdataIO.bits.rresp   := 0.U
       ifu.io.axiWaddrIO.ready   := false.B
       ifu.io.axiWdataIO.ready   := false.B
       ifu.io.axiBrespIO.valid   := false.B
-      ifu.io.axiBrespIO.bresp   := false.B
+      ifu.io.axiBrespIO.bits.bresp   := false.B
 
       lsu.io.axiRaddrIO.ready   := false.B
       lsu.io.axiRdataIO.valid   := false.B
-      lsu.io.axiRdataIO.rresp   := 0.U
+      lsu.io.axiRdataIO.bits.rresp   := 0.U
       lsu.io.axiWaddrIO.ready   := false.B
       lsu.io.axiWdataIO.ready   := false.B
       lsu.io.axiBrespIO.valid   := false.B
-      lsu.io.axiBrespIO.bresp   := false.B
+      lsu.io.axiBrespIO.bits.bresp   := false.B
     }
     is ("b10".U) {
       io.axiRaddrIO <> ifu.io.axiRaddrIO
@@ -72,11 +72,11 @@ class JzCore extends Module {
 
       lsu.io.axiRaddrIO.ready   := false.B
       lsu.io.axiRdataIO.valid   := false.B
-      lsu.io.axiRdataIO.rresp   := 0.U
+      lsu.io.axiRdataIO.bits.rresp   := 0.U
       lsu.io.axiWaddrIO.ready   := false.B
       lsu.io.axiWdataIO.ready   := false.B
       lsu.io.axiBrespIO.valid   := false.B
-      lsu.io.axiBrespIO.bresp   := false.B
+      lsu.io.axiBrespIO.bits.bresp   := false.B
     }
     is ("b01".U) {
       io.axiRaddrIO <> lsu.io.axiRaddrIO
@@ -87,11 +87,11 @@ class JzCore extends Module {
 
       ifu.io.axiRaddrIO.ready   := false.B
       ifu.io.axiRdataIO.valid   := false.B
-      ifu.io.axiRdataIO.rresp   := 0.U
+      ifu.io.axiRdataIO.bits.rresp   := 0.U
       ifu.io.axiWaddrIO.ready   := false.B
       ifu.io.axiWdataIO.ready   := false.B
       ifu.io.axiBrespIO.valid   := false.B
-      ifu.io.axiBrespIO.bresp   := false.B
+      ifu.io.axiBrespIO.bits.bresp   := false.B
     }
     is ("b11".U) {
       io.axiRaddrIO <> lsu.io.axiRaddrIO
@@ -102,11 +102,11 @@ class JzCore extends Module {
 
       ifu.io.axiRaddrIO.ready   := false.B
       ifu.io.axiRdataIO.valid   := false.B
-      ifu.io.axiRdataIO.rresp   := 0.U
+      ifu.io.axiRdataIO.bits.rresp   := 0.U
       ifu.io.axiWaddrIO.ready   := false.B
       ifu.io.axiWdataIO.ready   := false.B
       ifu.io.axiBrespIO.valid   := false.B
-      ifu.io.axiBrespIO.bresp   := false.B
+      ifu.io.axiBrespIO.bits.bresp   := false.B
     }
   }
 
