@@ -35,7 +35,7 @@ class AxiArbiter extends Module {
   // lsu的请求优先
   val ifuReq = RegInit(false.B)
   val lsuReq = RegInit(false.B)
-  ifuReq := Mux(state === idle && !io.lsuReq, io.ifuReq, true.B, false.B)
+  ifuReq := Mux(state === idle && !io.lsuReq && io.ifuReq, true.B, false.B)
   lsuReq := Mux(state === idle && io.lsuReq, true.B, false.B)
 
   // 仲裁
