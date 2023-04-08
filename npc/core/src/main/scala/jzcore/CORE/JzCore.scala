@@ -37,7 +37,7 @@ class JzCore extends Module {
   // axi访问接口
   val grant = Cat(arbiter.io.grantIfu, arbiter.io.grantLsu)
   switch (grant) {
-    is ("b00.U") {
+    is (0.U) {
       // 没有请求
       io.axiRaddrIO.valid       := false.B
       io.axiRdataIO.bits.rdata    := 0.U
@@ -63,7 +63,7 @@ class JzCore extends Module {
       lsu.io.axiBrespIO.valid   := false.B
       lsu.io.axiBrespIO.bits.bresp   := false.B
     }
-    is ("b10".U) {
+    is (2.U) {
       io.axiRaddrIO <> ifu.io.axiRaddrIO
       io.axiRdataIO <> ifu.io.axiRdataIO
       io.axiWaddrIO <> ifu.io.axiWaddrIO
@@ -78,7 +78,7 @@ class JzCore extends Module {
       lsu.io.axiBrespIO.valid   := false.B
       lsu.io.axiBrespIO.bits.bresp   := false.B
     }
-    is ("b01".U) {
+    is (1.U) {
       io.axiRaddrIO <> lsu.io.axiRaddrIO
       io.axiRdataIO <> lsu.io.axiRdataIO
       io.axiWaddrIO <> lsu.io.axiWaddrIO
@@ -93,7 +93,7 @@ class JzCore extends Module {
       ifu.io.axiBrespIO.valid   := false.B
       ifu.io.axiBrespIO.bits.bresp   := false.B
     }
-    is ("b11".U) {
+    is (3.U) {
       io.axiRaddrIO <> lsu.io.axiRaddrIO
       io.axiRdataIO <> lsu.io.axiRdataIO
       io.axiWaddrIO <> lsu.io.axiWaddrIO
