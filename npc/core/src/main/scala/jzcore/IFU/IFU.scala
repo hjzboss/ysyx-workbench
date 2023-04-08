@@ -71,7 +71,7 @@ class IFU extends Module with HasResetVector{
   io.axiBrespIO.ready       := false.B
 
   // 数据选择
-  val instPre                = io.axiDataIO.bits.rdata
+  val instPre                = io.axiRdataIO.bits.rdata
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   val instReg                = RegInit(Instruction.NOP)
