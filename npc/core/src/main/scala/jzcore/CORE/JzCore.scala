@@ -24,7 +24,7 @@ class JzCore extends Module {
   val lsu = Module(new LSU)
   val wbu = Module(new WBU)
   val ctrl= Module(new CTRL)
-  val arbiter = Module(new Arbiter) // todo:仲裁器
+  val arbiter = Module(new AxiArbiter) // todo:仲裁器
 
   // 仲裁
   arbiter.io.ifuReq   <> ifu.io.axiReq

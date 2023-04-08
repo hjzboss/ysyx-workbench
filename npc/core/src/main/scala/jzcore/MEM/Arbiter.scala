@@ -8,7 +8,7 @@ import utils._
   * axi请求仲裁器，仲裁策略是lsu优先
   */
 
-class Arbiter extends Module {
+class AxiArbiter extends Module {
   val io = IO(new Bundle {
     // ifu仲裁信号
     val ifuReq    = Input(Bool())
