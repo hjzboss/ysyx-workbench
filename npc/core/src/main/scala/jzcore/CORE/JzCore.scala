@@ -50,7 +50,7 @@ class JzCore extends Module {
     lsu.io.axiWdataIO.ready   := false.B
     lsu.io.axiBrespIO.valid   := false.B
     lsu.io.axiBrespIO.bits.bresp   := false.B
-  }.otherwhen (grant === 1.U || grant === 3.U) {
+  }.elsewhen (grant === 1.U || grant === 3.U) {
     io.axiRaddrIO <> lsu.io.axiRaddrIO
     io.axiRdataIO <> lsu.io.axiRdataIO
     io.axiWaddrIO <> lsu.io.axiWaddrIO
