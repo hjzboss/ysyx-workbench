@@ -50,7 +50,7 @@ class JzCore extends Module {
     lsu.io.axiWaddrIO.ready   := false.B
     lsu.io.axiWdataIO.ready   := false.B
     lsu.io.axiBrespIO.valid   := false.B
-    lsu.io.axiBrespIO.bits.bresp   := false.B
+    lsu.io.axiBrespIO.bits.bresp   := 0.U
   }
   .elsewhen (grant === 1.U || grant === 3.U) {
     io.axiRaddrIO <> lsu.io.axiRaddrIO
@@ -66,7 +66,7 @@ class JzCore extends Module {
     ifu.io.axiWaddrIO.ready   := false.B
     ifu.io.axiWdataIO.ready   := false.B
     ifu.io.axiBrespIO.valid   := false.B
-    ifu.io.axiBrespIO.bits.bresp   := false.B
+    ifu.io.axiBrespIO.bits.bresp   := 0.U
   }
   .otherwise {
     // 没有请求
@@ -87,7 +87,7 @@ class JzCore extends Module {
     ifu.io.axiWaddrIO.ready   := false.B
     ifu.io.axiWdataIO.ready   := false.B
     ifu.io.axiBrespIO.valid   := false.B
-    ifu.io.axiBrespIO.bits.bresp   := false.B
+    ifu.io.axiBrespIO.bits.bresp   := 0.U
 
     lsu.io.axiRaddrIO.ready   := false.B
     lsu.io.axiRdataIO.valid   := false.B
@@ -96,7 +96,7 @@ class JzCore extends Module {
     lsu.io.axiWaddrIO.ready   := false.B
     lsu.io.axiWdataIO.ready   := false.B
     lsu.io.axiBrespIO.valid   := false.B
-    lsu.io.axiBrespIO.bits.bresp   := false.B
+    lsu.io.axiBrespIO.bits.bresp   0.U
   }
   
   
