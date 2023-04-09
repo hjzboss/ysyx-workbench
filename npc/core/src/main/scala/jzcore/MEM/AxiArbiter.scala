@@ -33,10 +33,13 @@ class AxiArbiter extends Module {
 
   // 保存请求状态，用于state为grant状态时的判断
   // lsu的请求优先
-  val ifuReq = RegInit(false.B)
-  val lsuReq = RegInit(false.B)
-  ifuReq := Mux(state === idle && !io.lsuReq && io.ifuReq, true.B, false.B)
-  lsuReq := Mux(state === idle && io.lsuReq, true.B, false.B)
+  val ifuReq = io.ifuReq && !io.lsuReq
+  val lsuReq = io.lsuReq
+
+  val ifuReqReg = RegInit(false.B)
+  val lsuReqReg = RegInit(false.B)
+  ifuReqReg := Mux(state === idle, ifuReq, ifuReqReg)
+  lsuReqReg := Mux(state === idle, lsuReq, lsuReqReg)
 
   // 仲裁
   /*
@@ -44,9 +47,9 @@ class AxiArbiter extends Module {
   val grantLsu = (state === idle && io.lsuReq) || (state === grant && lsuReq)
   io.grantIfu := grantIfu
   io.grantLsu := grantLsu
-  */
   val grantIfu = state === grant && ifuReq
   val grantLsu = state === grant && lsuReq
-  io.grantIfu := grantIfu
-  io.grantLsu := grantLsu
+  */
+  io.grantIfu := state === grant && ifuReqReg
+  io.grantLsu := state === grant && lsuReqReg
 }
