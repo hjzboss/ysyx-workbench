@@ -304,7 +304,7 @@ static void cpu_exec_once() {
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_DIFFTEST
-  if (visit_device) { && dataFire
+  if (visit_device) {
     difftest_skip_ref();
     visit_device = false;
   }
