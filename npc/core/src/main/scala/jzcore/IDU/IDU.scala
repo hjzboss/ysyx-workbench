@@ -21,9 +21,14 @@ class IDU extends Module with HasInstrType{
     // 来自控制模块的停顿信号
     //val stall     = Input(Bool())
 
+    val ready     = Output(Bool()) // todo：暂时一直为true
+    val finish    = Input(Bool()) // todo: 结束时才更新存储器
+
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
   })
+
+  io.ready     := true.B
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
@@ -67,7 +72,7 @@ class IDU extends Module with HasInstrType{
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
   rf.io.rs2           := rs2
-  rf.io.wen           := io.regWrite.wen
+  rf.io.wen           := io.regWrite.wen && io.finish // todo
   rf.io.waddr         := io.regWrite.rd
   rf.io.wdata         := io.regWrite.value
   rf.io.clock         := clock
@@ -75,12 +80,12 @@ class IDU extends Module with HasInstrType{
   
   csrReg.io.raddr     := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
   csrReg.io.waddr     := io.csrWrite.waddr
-  csrReg.io.wen       := io.csrWrite.wen
+  csrReg.io.wen       := io.csrWrite.wen && io.finish
   csrReg.io.wdata     := io.csrWrite.wdata
   csrReg.io.clock     := clock
   csrReg.io.reset     := reset
   // exception
-  csrReg.io.exception := io.csrWrite.exception
+  csrReg.io.exception := io.csrWrite.exception && io.finish
   csrReg.io.epc       := io.csrWrite.epc
   csrReg.io.no        := io.csrWrite.no
 

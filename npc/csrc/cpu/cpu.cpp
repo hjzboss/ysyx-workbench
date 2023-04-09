@@ -289,7 +289,7 @@ void delete_cpu() {
 
 static void isa_exec_once() {
   int cnt = 0;
-  while (!top->io_debug_execonce) {
+  while (!top->io_finish) {
     eval_wave();
     eval_wave();
     cnt += 1;

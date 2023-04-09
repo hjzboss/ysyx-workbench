@@ -12,6 +12,8 @@ class WBU extends Module {
     // 写回regfile 和 csrfile
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
+
+    val ready     = Output(Bool())
   })
 
   // 寄存器文件写回
@@ -27,4 +29,7 @@ class WBU extends Module {
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.no
+
+  // todo
+  io.ready             := true.B
 }

@@ -6,7 +6,7 @@ class DebugIO extends Bundle {
   val pc        = Output(UInt(64.W))
   val nextPc    = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
-  val execonce  = Output(Bool())
+  //val execonce  = Output(Bool())
 }
 
 class RFReadIO extends Bundle {
