@@ -33,6 +33,7 @@ class IFU extends Module with HasResetVector{
 
     // 控制模块
     val ready       = Output(Bool()) // 取指完成
+    val finish      = Input(Bool())
     //val stall       = Input(Bool()) // 停顿信号
 
     // 来自wbu，当前指令已执行完毕
@@ -98,9 +99,8 @@ class IFU extends Module with HasResetVector{
   io.axiReq                 := state === addr
   io.axiReady               := dataFire
 
+  val readyFlag              = RegInit(false.B)
+  readyFlag                 := Mux(state === data && dataFire && !io.finish, true.B, Mux(readyFlag && !io.finish, true.B, false.B))
   // 取指完毕信号
-  val ready                  = state === data && dataFire
-  val readyReg               = RegInit(false.B)
-  readyReg                  := Mux(state === data, ready, readyReg)
-  io.ready                  := Mux(state === data, ready, readyReg)
+  io.ready                  := (state === data && dataFire) || readyFlag
 }

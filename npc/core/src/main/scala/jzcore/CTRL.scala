@@ -18,10 +18,7 @@ class CTRL extends Module {
     val finish   = Output(Bool())
   })
 
-  //io.stallIfu := io.lsuTrans
-  //io.stallLsu := !io.fetchReady
-
-  io.pcEnable := io.iduReady && io.exuReady && io.lsuReady && io.wbuReady
+  io.pcEnable := io.iduReady && io.exuReady && io.lsuReady && io.wbuReady // todo
 
   io.finish   := io.iduReady && io.exuReady && io.lsuReady && io.wbuReady && io.ifuReady
 }

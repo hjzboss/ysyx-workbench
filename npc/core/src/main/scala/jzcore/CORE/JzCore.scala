@@ -199,4 +199,5 @@ class JzCore extends Module {
 
   io.debug          <> ifu.io.debug
   io.finish         <> ctrl.io.finish
+  ifu.io.finish     := ctrl.io.finish
 }
