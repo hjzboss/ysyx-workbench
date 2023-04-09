@@ -91,6 +91,7 @@ class JzCore extends Module {
 
     lsu.io.axiRaddrIO.ready   := false.B
     lsu.io.axiRdataIO.valid   := false.B
+    lsu.io.axiRdataIO.bits.rdata := 0.U
     lsu.io.axiRdataIO.bits.rresp   := 0.U
     lsu.io.axiWaddrIO.ready   := false.B
     lsu.io.axiWdataIO.ready   := false.B
