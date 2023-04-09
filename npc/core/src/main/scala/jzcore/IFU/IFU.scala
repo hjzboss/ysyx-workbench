@@ -76,7 +76,7 @@ class IFU extends Module with HasResetVector{
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   val instReg                = RegInit(Instruction.NOP)
-  instReg                   := Mux(state === data, inst, instReg)
+  instReg                   := Mux(state === data || io.finish, inst, instReg)
 
   // 更新pc值
   //pc                        := Mux(io.pcEnable && io.finish, Mux(io.redirect.valid, dnpc, snpc), pc)
