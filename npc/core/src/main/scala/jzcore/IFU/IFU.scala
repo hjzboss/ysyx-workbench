@@ -79,16 +79,16 @@ class IFU extends Module with HasResetVector{
   instReg                   := Mux(state === data, inst, instReg)
 
   // 更新pc值
-  pc                        := Mux(io.pcEnable && io.finish, Mux(io.redirect.valid, dnpc, snpc), pc)
-/*
+  //pc                        := Mux(io.pcEnable && io.finish, Mux(io.redirect.valid, dnpc, snpc), pc)
+
   pc                        := MuxLookup(state, pc, List(
-                                  addr  -> pc,
+                                  addr  -> Mux(io.finish, snpc, pc),
                                   // 如果rresp不是okay，则pc保持原值重新取指，todo，当lsu取指成功后再更新pc
                                   //data  -> Mux(!((dataFire && !io.stall) || (io.stall && io.lsuReady)), pc, Mux(io.redirect.valid, dnpc, snpc))
                                   // 单周期时，wbu执行完毕才更新pc
                                   data  -> Mux(io.pcEnable, Mux(io.redirect.valid, dnpc, snpc), pc)
                                 ))
-*/
+
   // 仿真环境
   io.debug.inst             := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
   io.debug.nextPc           := Mux(io.redirect.valid, dnpc, snpc)
