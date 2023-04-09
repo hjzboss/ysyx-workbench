@@ -289,7 +289,7 @@ void delete_cpu() {
 
 static void isa_exec_once() {
   int cnt = 0;
-  while (!top->io_debug_execonce) {
+  while (!top->io_finish) {
     eval_wave();
     eval_wave();
     cnt += 1;
@@ -304,7 +304,7 @@ static void cpu_exec_once() {
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once();
 #ifdef CONFIG_DIFFTEST
-  if (visit_device) {
+  if (visit_device) { && dataFire
     difftest_skip_ref();
     visit_device = false;
   }
@@ -333,7 +333,7 @@ static void cpu_exec_once() {
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(pc, npc_cpu.inst, npc_cpu.pc);
+  ftrace(pc, npc_cpu.inst, npc_cpu.pc && dataFire;
 #endif
 }
 
@@ -346,10 +346,7 @@ void execute(uint64_t n) {
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
-
-// todo
-static void statistic() {
-  IFDEF(CONFIG_FTRACE, print_ftrace(true));
+ && dataFireue));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
