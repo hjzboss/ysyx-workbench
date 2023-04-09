@@ -94,7 +94,7 @@ class IFU extends Module with HasResetVector{
 
   io.out.pc                 := pc
   //io.out.inst               := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
-  io.out.inst               := Mux(state === data, inst, instReg)
+  io.out.inst               := inst
 
   io.axiReq                 := state === addr
   io.axiReady               := dataFire
