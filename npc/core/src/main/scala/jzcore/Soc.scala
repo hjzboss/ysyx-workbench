@@ -7,8 +7,8 @@ import utils._
 class Soc extends Module {
   val io = IO(new Bundle {
     // 传给仿真环境
-    val debug     = new DebugIO
-    val 
+    val debug       = new DebugIO
+    val finish     = Output(Bool())
 
     // 防止被优化
     val valid1     = Output(Bool())
