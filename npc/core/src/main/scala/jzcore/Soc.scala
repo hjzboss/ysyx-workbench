@@ -7,7 +7,7 @@ import utils._
 class Soc extends Module {
   val io = IO(new Bundle {
     // 传给仿真环境
-    val debug       = new DebugIO
+    val debug      = new DebugIO
     val finish     = Output(Bool())
 
     // 防止被优化
@@ -26,8 +26,8 @@ class Soc extends Module {
   core.io.axiBrespIO <> sram.io.brespIO
 
   // 仿真环境
-  io.debug        <> core.io.debug
-  io.valid1       <> core.io.axiWaddrIO.valid
-  io.valid2       <> sram.io.waddrIO.valid
-  io.finish       <> core.io.finish 
+  io.debug        := core.io.debug
+  io.valid1       := core.io.axiWaddrIO.valid
+  io.valid2       := sram.io.waddrIO.valid
+  io.finish       := core.io.finish 
 }
