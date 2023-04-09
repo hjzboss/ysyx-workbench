@@ -39,8 +39,14 @@ class AxiArbiter extends Module {
   lsuReq := Mux(state === idle && io.lsuReq, true.B, false.B)
 
   // 仲裁
+  /*
   val grantIfu = (state === idle && !io.lsuReq && io.ifuReq) || (state === grant && ifuReq)
   val grantLsu = (state === idle && io.lsuReq) || (state === grant && lsuReq)
+  io.grantIfu := grantIfu
+  io.grantLsu := grantLsu
+  */
+  val grantIfu = state === grant && ifuReq
+  val grantLsu = state === grant && lsuReq
   io.grantIfu := grantIfu
   io.grantLsu := grantLsu
 }
