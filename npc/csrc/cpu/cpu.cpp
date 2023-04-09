@@ -333,7 +333,7 @@ static void cpu_exec_once() {
 #endif
 
 #ifdef CONFIG_FTRACE
-  ftrace(pc, npc_cpu.inst, npc_cpu.pc && dataFire;
+  ftrace(pc, npc_cpu.inst, npc_cpu.pc);
 #endif
 }
 
@@ -346,7 +346,10 @@ void execute(uint64_t n) {
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
- && dataFireue));
+
+// todo
+static void statistic() {
+  IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
