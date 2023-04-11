@@ -21,7 +21,7 @@ class WBU_REG extends Module with HasResetVector {
   lsuReset.rd         := 0.U(5.W)
   lsuReset.regWen     := false.B
   lsuReset.pc         := resetVector.U(64.W)
-  lsuReset.no         := 0.U(4.W)
+  lsuReset.excepNo    := 0.U(4.W)
   lsuReset.exception  := false.B
   lsuReset.csrWaddr   := 0.U(2.W)
   lsuReset.csrWen     := false.B

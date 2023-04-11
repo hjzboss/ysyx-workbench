@@ -53,19 +53,19 @@ class EXU extends Module {
 
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
-  io.out.wen           := io.ctrl.memWen
-  io.out.ren           := io.ctrl.memRen
-  io.out.addr          := aluOut
-  io.out.wdata         := opBPre // todo:forward
+  io.out.lsuWen        := io.ctrl.memWen
+  io.out.lsuRen        := io.ctrl.memRen
+  io.out.lsuAddr       := aluOut
+  io.out.lsuWdata      := opBPre // todo:forward
   io.out.loadMem       := io.ctrl.loadMem
   io.out.exuOut        := aluOut
   io.out.rd            := io.ctrl.rd
   io.out.regWen        := io.ctrl.regWen
   io.out.pc            := io.datasrc.pc
-  io.out.no            := Mux(io.ctrl.sysInsType === System.ecall, "hb".U, 0.U)
-  io.out.exception     := io.ctrl.sysInsType === System.ecall
+  io.out.excepNo       := io.ctrl.excepNo
+  io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
-  io.out.csrWen        := io.ctrl.isCsr
+  io.out.csrWen        := io.ctrl.csrWen
   io.out.ebreak        := io.ctrl.ebreak
   io.out.haltRet       := opAPre // todo: forward
 }

@@ -96,9 +96,10 @@ class IDU extends Module with HasInstrType{
   //io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
-  io.ctrl.isCsr       := instrtype === InstrZ
+  io.ctrl.csrWen      := instrtype === InstrZ
   io.ctrl.csrWaddr    := csrRaddr
-  io.ctrl.sysInsType  := systemCtrl
+  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, 0.U)
+  io.ctrl.exception   := systemCtrl === System.ecall // todo:type of exception, just for ecall now
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
   io.ctrl.ebreak      := io.ctrl.sysInsType === System.ebreak

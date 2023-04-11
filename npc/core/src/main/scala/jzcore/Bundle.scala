@@ -51,9 +51,10 @@ class CtrlFlow extends Bundle {
   //val wdata         = Output(UInt(64.W)) // 写数据
   val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
-  val isCsr         = Output(Bool()) // 是否是csr指令
+  val csrWen        = Output(Bool()) // 是否是csr指令
   val csrWaddr      = Output(UInt(2.W))
-  val sysInsType    = Output(UInt(2.W)) // 系统指令的类型
+  val excepNo       = Output(UInt(4.W))
+  val exception     = Output(Bool()) // 系统指令的类型
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
@@ -62,10 +63,10 @@ class CtrlFlow extends Bundle {
 class ExuOut extends Bundle {
   val lsType        = Output(UInt(4.W))
   val wmask         = Output(UInt(8.W))
-  val wen           = Output(Bool())
-  val ren           = Output(Bool())
-  val addr          = Output(UInt(64.W))
-  val wdata         = Output(UInt(64.W))
+  val lsuWen        = Output(Bool())
+  val lsuRen        = Output(Bool())
+  val lsuAddr       = Output(UInt(64.W))
+  val lsuWdata      = Output(UInt(64.W))
   val loadMem       = Output(Bool())
 
   val exuOut        = Output(UInt(64.W))
@@ -73,7 +74,7 @@ class ExuOut extends Bundle {
   val regWen        = Output(Bool())
 
   val pc            = Output(UInt(64.W))
-  val no            = Output(UInt(4.W))
+  val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
   val csrWen        = Output(Bool())
@@ -89,7 +90,7 @@ class LsuOut extends Bundle {
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
   val pc            = Output(UInt(64.W))
-  val no            = Output(UInt(4.W))
+  val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
   val csrWen        = Output(Bool())

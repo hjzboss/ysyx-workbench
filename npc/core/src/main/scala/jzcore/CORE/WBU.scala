@@ -30,7 +30,7 @@ class WBU extends Module {
   // exception
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
-  io.csrWrite.no       := io.in.no
+  io.csrWrite.no       := io.in.excepNo
 
   // ebreak
   stop.io.valid        := io.in.ebreak
