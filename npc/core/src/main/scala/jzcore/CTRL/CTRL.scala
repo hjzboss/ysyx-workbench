@@ -4,6 +4,7 @@ import chisel3._
 import top.Settings
 import chisel3.util._
 
+// 集中式控制模块
 class CTRL extends Module {
   val io = IO(new Bundle {
     val ifuReady = Input(Bool())

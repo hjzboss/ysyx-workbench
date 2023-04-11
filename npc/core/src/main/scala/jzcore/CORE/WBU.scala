@@ -13,8 +13,10 @@ class WBU extends Module {
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
 
-    val ready     = Output(Bool())
+    val ready     = Output(Bool()) // 用于仿真环境，提示执行完一条指令
   })
+
+  val stop              = Module(new Stop)
 
   // 寄存器文件写回
   io.regWrite.rd       := io.in.rd
@@ -30,6 +32,7 @@ class WBU extends Module {
   io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.no
 
-  // todo
-  io.ready             := true.B
+  // ebreak
+  stop.io.valid        := io.in.ebreak
+  stop.io.haltRet      := io.in.haltRet
 }

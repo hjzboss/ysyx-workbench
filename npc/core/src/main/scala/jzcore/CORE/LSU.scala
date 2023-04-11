@@ -8,7 +8,7 @@ import utils._
 class LSU extends Module {
   val io = IO(new Bundle {
     // exu传入
-    val in          = Flipped(new MemCtrl)
+    val in          = Flipped(new ExuOut)
 
     // 传给wbu
     val out         = new LsuOut

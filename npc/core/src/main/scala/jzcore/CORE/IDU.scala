@@ -17,18 +17,12 @@ class IDU extends Module with HasInstrType{
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
-    
-    // 来自控制模块的停顿信号
-    //val stall     = Input(Bool())
-
-    val ready     = Output(Bool()) // todo：暂时一直为true
-    val finish    = Input(Bool()) // todo: 结束时才更新存储器
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
   })
 
-  io.ready     := true.B
+  //io.ready     := true.B
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
@@ -50,15 +44,15 @@ class IDU extends Module with HasInstrType{
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
   val memEn     = lsctrl(3)
-  val imm = LookupTree(instrtype, List(
-    InstrZ    -> ZeroExt(inst(19, 15), 64),
-    InstrI    -> SignExt(inst(31, 20), 64),
-    InstrIJ   -> SignExt(inst(31, 20), 64),
-    InstrS    -> SignExt(Cat(inst(31, 25), inst(11, 7)), 64),
-    InstrB    -> SignExt(Cat(inst(31), inst(7), inst(30, 25), inst(11, 8), 0.U(1.W)), 64),
-    InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
-    InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
-  ))
+  val imm       = LookupTree(instrtype, List(
+                    InstrZ    -> ZeroExt(inst(19, 15), 64),
+                    InstrI    -> SignExt(inst(31, 20), 64),
+                    InstrIJ   -> SignExt(inst(31, 20), 64),
+                    InstrS    -> SignExt(Cat(inst(31, 25), inst(11, 7)), 64),
+                    InstrB    -> SignExt(Cat(inst(31), inst(7), inst(30, 25), inst(11, 8), 0.U(1.W)), 64),
+                    InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
+                    InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
+                  ))
 
   val csrRaddr = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
@@ -99,7 +93,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
-  io.ctrl.wdata       := rf.io.src2
+  //io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.isCsr       := instrtype === InstrZ
@@ -107,6 +101,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.sysInsType  := systemCtrl
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
+  io.ctrl.ebreak      := io.ctrl.sysInsType === System.ebreak
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2

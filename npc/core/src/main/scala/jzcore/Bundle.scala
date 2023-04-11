@@ -43,22 +43,23 @@ class AluIO extends Bundle {
 }
 
 class CtrlFlow extends Bundle {
-  val br            = Output(Bool())
-  val rd            = Output(UInt(5.W))
-  val regWen        = Output(Bool())
-  val isJalr        = Output(Bool())
-  val lsType        = Output(UInt(4.W))
-  val wdata         = Output(UInt(64.W))
-  val loadMem       = Output(Bool())
-  val wmask         = Output(UInt(8.W))
-  val isCsr         = Output(Bool())
+  val br            = Output(Bool()) // 分支指令信号
+  val rd            = Output(UInt(5.W)) // 目的寄存器
+  val regWen        = Output(Bool()) // 寄存器写使能
+  val isJalr        = Output(Bool()) // 是否三jalr指令
+  val lsType        = Output(UInt(4.W)) // 访存指令类型
+  //val wdata         = Output(UInt(64.W)) // 写数据
+  val loadMem       = Output(Bool()) // 写回的值是否来自存储器
+  val wmask         = Output(UInt(8.W)) // 写腌码
+  val isCsr         = Output(Bool()) // 是否是csr指令
   val csrWaddr      = Output(UInt(2.W))
-  val sysInsType    = Output(UInt(2.W))
-  val memWen        = Output(Bool())
-  val memRen        = Output(Bool())
+  val sysInsType    = Output(UInt(2.W)) // 系统指令的类型
+  val memWen        = Output(Bool()) // 存储器写使能
+  val memRen        = Output(Bool()) // 存储器读使能
+  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
 }
 
-class MemCtrl extends Bundle {
+class ExuOut extends Bundle {
   val lsType        = Output(UInt(4.W))
   val wmask         = Output(UInt(8.W))
   val wen           = Output(Bool())
@@ -76,6 +77,9 @@ class MemCtrl extends Bundle {
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
   val csrWen        = Output(Bool())
+
+  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  val haltRet       = Output(UInt(64.W))
 }
 
 class LsuOut extends Bundle {
@@ -89,6 +93,9 @@ class LsuOut extends Bundle {
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(2.W))
   val csrWen        = Output(Bool())
+
+  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  val haltRet       = Output(UInt(64.W))
 }
 
 class InstrFetch extends Bundle {

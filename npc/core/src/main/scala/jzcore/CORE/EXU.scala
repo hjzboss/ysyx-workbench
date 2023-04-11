@@ -12,18 +12,17 @@ class EXU extends Module {
     val ctrl      = Flipped(new CtrlFlow)
     
     // 传给Lsu
-    val out       = new MemCtrl
+    val out       = new ExuOut
 
-/*
-    // 写回idu
-    val regWrite  = new RFWriteIO
-    val csrWrite  = new CSRWriteIO
-*/
-
-    // 写回ifu
+    // 写回ifu,todo:需要移动到idu阶段
     val redirect  = new RedirectIO
 
-    val ready     = Output(Bool()) // todo，此时总是true
+    // lsu模块的旁路数据
+
+    // wbu模块的旁路数据
+
+    // forward模块的旁路控制信号
+
   })
 
   val alu   = Module(new Alu)
@@ -57,7 +56,7 @@ class EXU extends Module {
   io.out.wen           := io.ctrl.memWen
   io.out.ren           := io.ctrl.memRen
   io.out.addr          := aluOut
-  io.out.wdata         := io.ctrl.wdata
+  io.out.wdata         := opBPre // todo:forward
   io.out.loadMem       := io.ctrl.loadMem
   io.out.exuOut        := aluOut
   io.out.rd            := io.ctrl.rd
@@ -67,10 +66,6 @@ class EXU extends Module {
   io.out.exception     := io.ctrl.sysInsType === System.ecall
   io.out.csrWaddr      := io.ctrl.csrWaddr
   io.out.csrWen        := io.ctrl.isCsr
-
-  io.ready             := true.B
-
-  // ebreak, todo
-  stop.io.valid        := Mux(io.ctrl.sysInsType === System.ebreak, true.B, false.B)
-  stop.io.haltRet      := io.datasrc.src1
+  io.out.ebreak        := io.ctrl.ebreak
+  io.out.haltRet       := opAPre // todo: forward
 }
