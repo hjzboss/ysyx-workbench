@@ -50,6 +50,8 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.memWen        := false.B
   ctrlReset.memRen        := false.B
   ctrlReset.ebreak        := false.B
+  ctrlReset.rs1           := 0.U(5.W)
+  ctrlReset.rs2           := 0.U(5.W)
 
   val datasrcReg           = RegInit(datasrcReset)
   datasrcReg              := Mux(io.flush, datasrcReset, Mux(io.stall, datasrcReg, io.datasrcIn))

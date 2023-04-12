@@ -34,7 +34,7 @@ class IFU extends Module with HasResetVector {
     // 控制模块
     val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
     //val finish      = Input(Bool())
-    val stall       = Input(Bool()) // 停顿信号，来源于lsu
+    val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
 
     // 来自wbu，当前指令已执行完毕
     //val pcEnable    = Input(Bool())
@@ -57,8 +57,8 @@ class IFU extends Module with HasResetVector {
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
 
-  // 取指接口，todo：停顿信号也要发挥作用
-  io.axiRaddrIO.valid       := state === addr
+  // axi取指接口
+  io.axiRaddrIO.valid       := state === addr && !io.stall
   io.axiRaddrIO.bits.addr   := pc
   // 使用cache时的准备：当lsu访存未结束时应该阻塞ifu阶段，要保证取出的指令的值保持到lsu访存完成
   io.axiRdataIO.ready       := state === data && !io.stall
@@ -87,7 +87,9 @@ class IFU extends Module with HasResetVector {
                                   //data  -> Mux(!((dataFire && !io.stall) || (io.stall && io.lsuReady)), pc, Mux(io.redirect.valid, dnpc, snpc))
                                   // 单周期时，wbu执行完毕才更新pc
                                   //data  -> Mux(io.pcEnable, Mux(io.redirect.valid, dnpc, snpc), pc)
-                                  data  -> Mux(io.redirect.valid, dnpc, snpc)
+                                  
+                                  // 流水线模式，当停顿信号生效时保持原pc
+                                  data  -> Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
                                 ))
 
   // 仿真环境
@@ -101,8 +103,8 @@ class IFU extends Module with HasResetVector {
   //io.out.inst               := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
   io.out.inst               := inst
 
-  io.axiReq                 := state === addr
-  io.axiReady               := dataFire
+  io.axiReq                 := state === addr && !io.stall
+  io.axiReady               := state === data && dataFire
 
   //val readyFlag              = RegInit(false.B)
   //readyFlag                 := Mux(state === data && dataFire && !io.finish, true.B, Mux(readyFlag && !io.finish, true.B, false.B))

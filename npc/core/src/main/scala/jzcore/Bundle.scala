@@ -58,6 +58,10 @@ class CtrlFlow extends Bundle {
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+
+  // 用于送给旁路单元
+  val rs1           = Output(UInt(5.W))
+  val rs2           = Output(UInt(5.W))
 }
 
 class ExuOut extends Bundle {

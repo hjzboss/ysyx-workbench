@@ -18,11 +18,14 @@ class EXU extends Module {
     val redirect  = new RedirectIO
 
     // lsu模块的旁路数据
+    val lsuOut    = Input(UInt(64.W))
 
     // wbu模块的旁路数据
+    val wbuOut    = Input(UInt(64.W))
 
     // forward模块的旁路控制信号
-
+    val forwardA  = Input(UInt(2.W))
+    val forwardB  = Input(UInt(2.W))
   })
 
   val alu   = Module(new Alu)
@@ -31,9 +34,9 @@ class EXU extends Module {
   val aluSrc1 = io.aluCtrl.aluSrc1
   val aluSrc2 = io.aluCtrl.aluSrc2
 
-  // todo: forward
-  val opAPre = io.datasrc.src1
-  val opBPre = io.datasrc.src2
+  // forward
+  val opAPre = Mux(io.forwardA === Forward.lsuData, io.lsuData, Mux(io.forwardA === Forward.wbuData, io.wbuData, io.datasrc.src1))
+  val opBPre = Mux(io.forwardB === Forward.lsuData, io.lsuData, Mux(io.forwardB === Forward.wbuData, io.wbuData, io.datasrc.src2))
 
   val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))

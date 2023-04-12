@@ -7,39 +7,31 @@ import chisel3.util._
 // 集中式控制模块
 class CTRL extends Module {
   val io = IO(new Bundle {
+    // ifu和lsu都是多周期完成，因此需要ready信号来停顿对应的流水线
     val ifuReady = Input(Bool())
-    //val iduReady = Input(Bool())
-    //val exuReady = Input(Bool())
     val lsuReady = Input(Bool())
+
+    // 分支指令需要flush流水线
     val branch   = Input(Bool())
-    //val wbuReady = Input(Bool())
 
-    //val pcEnable = Output(Bool())
-
-    // 传给仿真环境，单周期有用
-    //val finish   = Output(Bool())
-
-    // stall pipline reg
-    val stallIfu    = Output(Bool()) // keep instruction
+    // stall pipline reg and pc
+    val stallPc     = Output(Bool())
     val stallIduReg = Output(Bool())
     val stallExuReg = Output(Bool())
     val stallLsuReg = Output(Bool())
 
     // flush pipline reg
     val flushIduReg = Output(Bool())
-    //val flushExuReg = Output(Bool())
     val flushWbuReg = Output(Bool()) // set when lsu is unready
   })
-
-  //io.pcEnable := io.iduReady && io.exuReady && io.lsuReady && io.wbuReady // todo
-
-  //io.finish   := io.iduReady && io.exuReady && io.lsuReady && io.wbuReady && io.ifuReady
-  io.stallIfu := !io.lsuReady
+  
+  // 当取指未完成时停顿之前所有阶段
+  io.stallPc     := !io.lsuReady
   io.stallIduReg := !io.lsuReady
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady
 
-  // todo: branch
-  io.flushIduReg := !io.ifuReady
+  // 当取指未完成或者发现是分支指令时flush idu_reg
+  io.flushIduReg := !io.ifuReady || io.branch
   io.flushWbuReg := !io.lsuReady
 }

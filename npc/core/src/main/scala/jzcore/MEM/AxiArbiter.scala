@@ -7,7 +7,6 @@ import utils._
 /**
   * axi请求仲裁器，仲裁策略是lsu优先
   */
-
 class AxiArbiter extends Module {
   val io = IO(new Bundle {
     // ifu仲裁信号
@@ -42,14 +41,6 @@ class AxiArbiter extends Module {
   lsuReqReg := Mux(state === idle, lsuReq, lsuReqReg)
 
   // 仲裁
-  /*
-  val grantIfu = (state === idle && !io.lsuReq && io.ifuReq) || (state === grant && ifuReq)
-  val grantLsu = (state === idle && io.lsuReq) || (state === grant && lsuReq)
-  io.grantIfu := grantIfu
-  io.grantLsu := grantLsu
-  val grantIfu = state === grant && ifuReq
-  val grantLsu = state === grant && lsuReq
-  */
-  io.grantIfu := state === grant && ifuReqReg
-  io.grantLsu := state === grant && lsuReqReg
+  io.grantIfu := (state === grant && ifuReqReg) || (state === idle && ifuReq)
+  io.grantLsu := (state === grant && lsuReqReg) || (state === idle && lsuReq)
 }

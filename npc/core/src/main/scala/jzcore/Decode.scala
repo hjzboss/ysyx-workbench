@@ -133,6 +133,14 @@ object MemEn {
   def apply() = UInt(2.W)
 }
 
+object Forward {
+  def normal  = "b00".U
+  def lsuData = "b01".U
+  def wbuData = "b10".U
+
+  def apply() = UInt(2.W)
+}
+
 trait HasInstrType {
   def InstrN  = "b0000".U
   def InstrI  = "b0100".U
