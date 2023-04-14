@@ -12,14 +12,15 @@ class WBU extends Module {
     // 写回regfile 和 csrfile
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
-
-    val ready     = Output(Bool())
   })
+
+  val stop              = Module(new Stop)
 
   // 寄存器文件写回
   io.regWrite.rd       := io.in.rd
   io.regWrite.wen      := io.in.regWen
-  io.regWrite.value    := Mux(io.in.loadMem, io.in.lsuOut, io.in.exuOut)
+  //io.regWrite.value    := Mux(io.in.loadMem, io.in.lsuOut, io.in.exuOut)
+  io.regWrite.value    := Mux(io.in.csrWen, io.in.csrValue, Mux(io.in.loadMem, io.in.lsuOut, io.in.exuOut))
 
   // csr文件写回
   io.csrWrite.waddr    := io.in.csrWaddr
@@ -28,8 +29,9 @@ class WBU extends Module {
   // exception
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
-  io.csrWrite.no       := io.in.no
+  io.csrWrite.no       := io.in.excepNo
 
-  // todo
-  io.ready             := true.B
+  // ebreak
+  stop.io.valid        := io.in.ebreak
+  stop.io.haltRet      := io.in.haltRet
 }
