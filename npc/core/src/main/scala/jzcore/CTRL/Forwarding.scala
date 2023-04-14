@@ -5,7 +5,7 @@ import top.Settings
 import chisel3.util._
 
 // 旁路单元
-class Forward extends Module {
+class Forwarding extends Module {
   val io = IO(new Bundle {
     // 目的寄存器编号
     val lsuRd     = Input(UInt(5.W))
