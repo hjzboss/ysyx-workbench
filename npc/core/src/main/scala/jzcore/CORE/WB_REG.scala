@@ -9,11 +9,11 @@ class WB_REG extends Module with HasResetVector {
     val validIn = Input(Bool())
     val validOut = Output(Bool())
   
-    val in = Flipped(new lsuOut)
-    val out = new lsuOut
+    val in = Flipped(new LsuOut)
+    val out = new LsuOut
   })
 
-  val lsuReset = Wire(new lsuOut)
+  val lsuReset = Wire(new LsuOut)
   lsuReset.exuOut     := 0.U(64.W)
   lsuReset.lsuOut     := 0.U(64.W)
   lsuReset.loadMem    := false.B
