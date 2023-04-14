@@ -9,7 +9,7 @@ trait HasResetVector {
 }
 
 // ifu_idu的流水线寄存器
-class ID_REG extends Module HasResetVector {
+class ID_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     val stall = Input(Bool()) // 停顿信号，用于阻塞流水线
     val flush = Input(Bool()) // 清空流水线
