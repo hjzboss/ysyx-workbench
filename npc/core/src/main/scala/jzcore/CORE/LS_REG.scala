@@ -4,10 +4,6 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
-}
-
 class LS_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     val stall = Input(Bool())
