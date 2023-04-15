@@ -62,6 +62,10 @@ class CtrlFlow extends Bundle {
   // 用于送给旁路单元
   val rs1           = Output(UInt(5.W))
   val rs2           = Output(UInt(5.W))
+
+  // debug
+  val debugPc       = Output(UInt(64.W))
+  val nextPc        = Output(UInt(64.W))
 }
 
 class ExuOut extends Bundle {
@@ -86,6 +90,10 @@ class ExuOut extends Bundle {
 
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val haltRet       = Output(UInt(64.W))
+
+  // debug
+  val debugPc       = Output(UInt(64.W))
+  val nextPc        = Output(UInt(64.W))
 }
 
 class LsuOut extends Bundle {
@@ -103,11 +111,18 @@ class LsuOut extends Bundle {
 
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val haltRet       = Output(UInt(64.W))
+
+  // debug
+  val debugPc       = Output(UInt(64.W))
+  val nextPc        = Output(UInt(64.W))
 }
 
 class InstrFetch extends Bundle {
   val pc            = Output(UInt(64.W))
   val inst          = Output(UInt(32.W))
+
+  val debugPc       = Output(UInt(64.W))
+  val nextPc        = Output(UInt(64.W))
 }
 
 class RedirectIO extends Bundle {

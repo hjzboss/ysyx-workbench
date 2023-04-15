@@ -16,12 +16,17 @@ class ID_REG extends Module with HasResetVector {
     // 传递数据
     val in    = Flipped(new InstrFetch)
     val out   = new InstrFetch
+
+    val debugIn = Flipped(new DebugIO)
+    val debugOut = new DebugIO
   })
 
   // 复位值
   val regReset = Wire(new InstrFetch)
   regReset.pc := resetVector.U(64.W)
   regReset.inst := Instruction.NOP
+  regReset.nextPc := resetVector.U(64.W)
+  regReset.debugPc := resetVector.U(64.W)
 
   // 流水线寄存器
   val idReg = RegInit(regReset)
@@ -32,4 +37,15 @@ class ID_REG extends Module with HasResetVector {
 
   io.out := idReg
   io.validOut := validReg
+
+  val debugReset = Wire(new DebugIO)
+  debugReset.pc := resetVector.U(64.W)
+  debugReset.nextPc := resetVector.U(64.W)
+  debugReset.inst := Instruction.NOP
+
+  val debugReg = RegInit(debugReset)
+  debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
+
+  io.debugOut := debugReg
+
 }

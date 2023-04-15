@@ -235,6 +235,10 @@ class JzCore extends Module {
 
   wbu.io.in         <> wbReg.io.out
 
-  io.debug          <> ifu.io.debug
+  idReg.io.debugIn  <> ifu.io.debug
+  exReg.io.debugIn  <> idReg.io.debugOut
+  lsReg.io.debugIn  <> exReg.io.debugOut
+  wbReg.io.debugIn  <> lsReg.io.debugOut
+  io.debug          <> wbReg.io.debugOut
   io.finish         <> wbReg.io.validOut
 }

@@ -21,6 +21,9 @@ class EX_REG extends Module with HasResetVector {
     val datasrcOut  = new DataSrcIO
     val aluCtrlOut  = new AluIO
     val ctrlOut     = new CtrlFlow
+
+    val debugIn = Flipped(new DebugIO)
+    val debugOut = new DebugIO
   })
 
   // 复位值
@@ -53,6 +56,9 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.sysInsType    := System.nop
   ctrlReset.rs1           := 0.U(5.W)
   ctrlReset.rs2           := 0.U(5.W)
+  
+  ctrlReset.debugPc       := resetVector.U(64.W)
+  ctrlReset.nextPc        := resetVector.U(64.W)
 
   val datasrcReg           = RegInit(datasrcReset)
   datasrcReg              := Mux(io.flush, datasrcReset, Mux(io.stall, datasrcReg, io.datasrcIn))
@@ -70,4 +76,14 @@ class EX_REG extends Module with HasResetVector {
   io.aluCtrlOut           := aluCtrlReg
   io.ctrlOut              := ctrlReg
   io.validOut             := validReg
+
+  val debugReset = Wire(new DebugIO)
+  debugReset.pc := resetVector.U(64.W)
+  debugReset.nextPc := resetVector.U(64.W)
+  debugReset.inst := Instruction.NOP
+
+  val debugReg = RegInit(debugReset)
+  debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
+
+  io.debugOut := debugReg
 }

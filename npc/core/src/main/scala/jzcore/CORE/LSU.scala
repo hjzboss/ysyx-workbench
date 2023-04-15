@@ -138,6 +138,9 @@ class LSU extends Module {
   io.out.haltRet        := io.in.haltRet
   io.out.csrValue       := io.in.csrValue
 
+  io.out.debugPc        := io.in.pc
+  io.out.nextPc         := io.in.nextPc
+
   //io.lsuTrans           := hasTrans || rState === wait_data || wState === wait_resp
   io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
 
