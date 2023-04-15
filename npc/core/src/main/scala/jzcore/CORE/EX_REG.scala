@@ -64,7 +64,7 @@ class EX_REG extends Module with HasResetVector {
   ctrlReg                 := Mux(io.flush, ctrlReset, Mux(io.stall, ctrlReg, io.ctrlIn))
 
   val validReg             = RegInit(false.B)
-  validReg                := Mux(io.stall, validReg, io.validIn)
+  validReg                := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
 
   io.datasrcOut           := datasrcReg
   io.aluCtrlOut           := aluCtrlReg
