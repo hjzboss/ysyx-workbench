@@ -216,9 +216,9 @@ class JzCore extends Module {
   idu.io.aluCtrl    <> exReg.io.aluCtrlIn
   idu.io.ctrl       <> exReg.io.ctrlIn
 
-  exu.io.datasrc    <> idu.io.datasrcOut
-  exu.io.aluCtrl    <> idu.io.aluCtrlOut
-  exu.io.ctrl       <> idu.io.ctrlOut
+  exu.io.datasrc    <> exReg.io.datasrcOut
+  exu.io.aluCtrl    <> exReg.io.aluCtrlOut
+  exu.io.ctrl       <> exReg.io.ctrlOut
   exu.io.lsuForward := lsReg.io.out.exuOut
   exu.io.wbuForward := wbu.io.regWrite.value // 可能三lsuout或者exuout
   exu.io.csrForward := wbReg.io.out.csrValue
