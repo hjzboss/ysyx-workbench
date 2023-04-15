@@ -6,6 +6,8 @@ import utils._
 
 class WB_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
+    val flush = Input(Bool())
+
     val validIn = Input(Bool())
     val validOut = Output(Bool())
   
@@ -29,10 +31,10 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.haltRet    := 0.U(64.W)
 
   val lsuReg           = RegInit(lsuReset)
-  lsuReg              := io.in
+  lsuReg              := Mux(io.flush, lsuReset, io.in)
 
   val validReg         = RegInit(false.B)
-  validReg            := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
+  validReg            := Mux(io.flush, false.B, io.validIn)
 
   io.out              := lsuReg
   io.validOut         := validReg
