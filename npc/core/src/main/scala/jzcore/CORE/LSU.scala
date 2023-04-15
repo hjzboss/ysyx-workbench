@@ -136,6 +136,7 @@ class LSU extends Module {
   io.out.csrWen         := io.in.csrWen
   io.out.ebreak         := io.in.ebreak
   io.out.haltRet        := io.in.haltRet
+  io.out.csrValue       := io.in.csrValue
 
   //io.lsuTrans           := hasTrans || rState === wait_data || wState === wait_resp
   io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
