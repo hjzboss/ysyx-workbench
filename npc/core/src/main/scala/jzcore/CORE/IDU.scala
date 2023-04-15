@@ -112,9 +112,6 @@ class IDU extends Module with HasInstrType{
   io.ctrl.rs1         := rs1
   io.ctrl.rs2         := rs2
 
-  io.ctrl.debugPc     := io.in.pc
-  io.ctrl.nextPc      := io.in.nextPc
-
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp

@@ -84,8 +84,4 @@ class EXU extends Module {
   io.out.haltRet       := opAPre // todo: forward
 
   io.out.csrValue      := opAPre
-
-  // debug
-  io.out.debugPc       := io.ctrl.pc
-  io.out.nextPc        := io.ctrl.nextPc
 }
