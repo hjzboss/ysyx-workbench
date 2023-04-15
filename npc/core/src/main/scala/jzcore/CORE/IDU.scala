@@ -95,7 +95,7 @@ class IDU extends Module with HasInstrType{
 
   io.ctrl.rd          := rd
   io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
-  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   //io.ctrl.wdata       := rf.io.src2
