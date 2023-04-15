@@ -32,5 +32,5 @@ class Soc extends Module {
   io.valid2       := sram.io.waddrIO.valid
   io.finish       := core.io.finish
 
-  io.csrAddr      := core.io.csrAddr 
+  //io.csrAddr      := core.io.csrAddr 
 }
