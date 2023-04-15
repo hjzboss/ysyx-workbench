@@ -103,6 +103,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
   io.ctrl.ebreak      := systemCtrl === System.ebreak
+  io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := rs1
   io.ctrl.rs2         := rs2
 
