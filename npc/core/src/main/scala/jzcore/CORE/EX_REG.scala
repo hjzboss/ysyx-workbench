@@ -56,9 +56,6 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.sysInsType    := System.nop
   ctrlReset.rs1           := 0.U(5.W)
   ctrlReset.rs2           := 0.U(5.W)
-  
-  ctrlReset.debugPc       := resetVector.U(64.W)
-  ctrlReset.nextPc        := resetVector.U(64.W)
 
   val datasrcReg           = RegInit(datasrcReset)
   datasrcReg              := Mux(io.flush, datasrcReset, Mux(io.stall, datasrcReg, io.datasrcIn))
