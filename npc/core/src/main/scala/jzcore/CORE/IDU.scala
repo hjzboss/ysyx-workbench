@@ -20,6 +20,7 @@ class IDU extends Module with HasInstrType{
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
+    val csrAddr   = Output(UInt(3.W))
   })
 
   //io.ready     := true.B
@@ -60,6 +61,8 @@ class IDU extends Module with HasInstrType{
     CsrId.mepc    -> CsrAddr.mepc,
     CsrId.mcause  -> CsrAddr.mcause
   ))
+
+  io.csrRaddr         := csrRaddr
 
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
