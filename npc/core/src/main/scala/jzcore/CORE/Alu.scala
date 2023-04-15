@@ -44,20 +44,6 @@ class Alu extends Module {
     AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
     AluOp.rem       -> (opA.asSInt() % opB.asSInt()).asUInt(),
     AluOp.remu      -> (opA % opB),
-
-/*
-    AluOp.addw      -> (opA + opB),
-    AluOp.subw      -> (opA - opB),
-    AluOp.mulw      -> (opA * opB),
-    AluOp.divw      -> (SignExt(opA(31, 0), 64).asSInt() / SignExt(opB(31, 0), 64).asSInt()).asUInt(), // todo
-    AluOp.divuw     -> (opA / opB),
-    AluOp.sllw      -> (opA << opB(4, 0)),
-    AluOp.srlw      -> (ZeroExt(opA(31, 0), 64) >> opB(4, 0)),
-    AluOp.sraw      -> (SignExt(opA(31, 0), 64).asSInt() >> opB(4, 0)).asUInt(),
-    AluOp.remw      -> (SignExt(opA(31, 0), 64).asSInt() % SignExt(opB(31, 0), 64).asSInt()).asUInt(),
-    AluOp.remuw     -> (ZeroExt(opA(31, 0), 64) % ZeroExt(opB(31, 0), 64)),
-*/
-
     AluOp.csrrw     -> opB,
     AluOp.csrrs     -> (opA | opB),
     AluOp.csrrc     -> (opA & ~opB)

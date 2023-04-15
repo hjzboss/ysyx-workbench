@@ -18,13 +18,19 @@ class JzCore extends Module {
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
   })
 
-  val ifu = Module(new IFU)
-  val idu = Module(new IDU)
-  val exu = Module(new EXU)
-  val lsu = Module(new LSU)
-  val wbu = Module(new WBU)
-  val ctrl= Module(new CTRL)
+  val ifu     = Module(new IFU)
+  val idu     = Module(new IDU)
+  val exu     = Module(new EXU)
+  val lsu     = Module(new LSU)
+  val wbu     = Module(new WBU)
+  val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
+
+  val idReg   = Module(new ID_REG)
+  val exReg   = Module(new EX_REG)
+  val lsReg   = Module(new LS_REG)
+  val wbReg   = Module(new WB_REG)
+  val forward = Module(new Forwarding)
 
   // 仲裁
   arbiter.io.ifuReq   <> ifu.io.axiReq
@@ -174,31 +180,58 @@ class JzCore extends Module {
     }
   }
 */
+  
+  ifu.io.out        <> idReg.io.in
+  ifu.io.redirect   <> exu.io.redirect
+  ifu.io.stall      <> ctrl.io.stallPc
+  ifu.io.valid      <> idReg.io.validIn
+  exReg.io.validIn  <> idReg.io.validOut
+  lsReg.io.validIn  <> exReg.io.validOut
+  wbReg.io.validIn  <> lsReg.io.validOut
 
   // 控制模块
   ctrl.io.ifuReady  <> ifu.io.ready
-  ctrl.io.iduReady  <> idu.io.ready
-  ctrl.io.exuReady  <> exu.io.ready
   ctrl.io.lsuReady  <> lsu.io.ready
-  ctrl.io.wbuReady  <> wbu.io.ready
+  ctrl.io.branch    := exu.io.redirect.valid
+  ctrl.io.stallIduReg <> idReg.io.stall
+  ctrl.io.stallExuReg <> exReg.io.stall
+  ctrl.io.stallLsuReg <> lsReg.io.stall
+  ctrl.io.flushIduReg <> idReg.io.flush
+  ctrl.io.flushWbuReg <> wbReg.io.flush
+  ctrl.io.flushExuReg <> exReg.io.flush
 
-  ifu.io.redirect   <> exu.io.redirect
-  ifu.io.pcEnable   <> ctrl.io.pcEnable
+  forward.io.lsuRd  := lsReg.io.out.rd
+  forward.io.wbuRd  := wbReg.io.out.rd
+  forward.io.lsuRegWen := lsReg.io.out.regWen
+  forward.io.wbuRegWen := wbReg.io.out.regWen
+  forward.io.rs1    := exReg.io.ctrlOut.rs1
+  forward.io.rs2    := exReg.io.ctrlOut.rs2
+  forward.io.wbuCsrWen := wbReg.io.out.csrWen
+  forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
+  forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
 
-  idu.io.in         <> ifu.io.out
+  idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite
   idu.io.csrWrite   <> wbu.io.csrWrite
+  idu.io.datasrc    <> exReg.io.datasrcIn
+  idu.io.aluCtrl    <> exReg.io.aluCtrlIn
+  idu.io.ctrl       <> exReg.io.ctrlIn
 
-  exu.io.datasrc    <> idu.io.datasrc
-  exu.io.aluCtrl    <> idu.io.aluCtrl
-  exu.io.ctrl       <> idu.io.ctrl
+  exu.io.datasrc    <> exReg.io.datasrcOut
+  exu.io.aluCtrl    <> exReg.io.aluCtrlOut
+  exu.io.ctrl       <> exReg.io.ctrlOut
+  exu.io.lsuForward := lsReg.io.out.exuOut
+  exu.io.wbuForward := wbu.io.regWrite.value // 可能三lsuout或者exuout
+  exu.io.csrForward := wbReg.io.out.csrValue
+  exu.io.out        <> lsReg.io.in
+  exu.io.forwardA   <> forward.io.forwardA
+  exu.io.forwardB   <> forward.io.forwardB
 
-  lsu.io.in         <> exu.io.out
+  lsu.io.in         <> lsReg.io.out
+  lsu.io.out        <> wbReg.io.in
 
-  wbu.io.in         <> lsu.io.out
+  wbu.io.in         <> wbReg.io.out
 
   io.debug          <> ifu.io.debug
-  io.finish         <> ctrl.io.finish
-  ifu.io.finish     := ctrl.io.finish
-  idu.io.finish     := ctrl.io.finish
+  io.finish         <> wbReg.io.validOut
 }

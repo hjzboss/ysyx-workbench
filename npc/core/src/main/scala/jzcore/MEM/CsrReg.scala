@@ -14,10 +14,10 @@ class CsrReg extends BlackBox {
     val epc       = Input(UInt(64.W))
     val no        = Input(UInt(4.W))
 
-    val raddr     = Input(UInt(2.W))
+    val raddr     = Input(UInt(3.W))
     val rdata     = Output(UInt(64.W))
 
-    val waddr     = Input(UInt(2.W))
+    val waddr     = Input(UInt(3.W))
     val wen       = Input(Bool())
     val wdata     = Input(UInt(64.W))
   })
