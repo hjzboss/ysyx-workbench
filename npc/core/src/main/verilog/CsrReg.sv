@@ -25,7 +25,7 @@ initial set_csr_ptr(csr);  // rf为通用寄存器的二维数组变量
 
 initial csr[0] = 64'ha00001800; // 初始化mstatus
 
-assign rdata = csr[raddr];
+assign rdata = csr[raddr[1:0]];
 
 always @(posedge clock) begin
   if (wen) csr[waddr[1:0]] <= wdata;
