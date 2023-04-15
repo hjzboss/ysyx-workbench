@@ -13,7 +13,7 @@ class Soc extends Module {
     // 防止被优化
     val valid1     = Output(Bool())
     val valid2     = Output(Bool())
-    val csrAddr    = Output(UInt(3.W))
+    //val csrAddr    = Output(UInt(3.W))
   })
 
   //val rsram = Module(new Sram)
