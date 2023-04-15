@@ -62,7 +62,7 @@ class IDU extends Module with HasInstrType{
     CsrId.mcause  -> CsrAddr.mcause
   ))
 
-  io.csrRaddr         := csrRaddr
+  io.csrAaddr         := csrRaddr // todo
 
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
