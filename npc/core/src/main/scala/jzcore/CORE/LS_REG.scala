@@ -4,12 +4,13 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
-}
-
-class LSU_REG extends Module with HasResetVector {
+class LS_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
+    val stall = Input(Bool())
+
+    val validIn = Input(Bool())
+    val validOut = Output(Bool())
+
     val in = Flipped(new ExuOut)
     val out = new ExuOut
   })
@@ -28,13 +29,18 @@ class LSU_REG extends Module with HasResetVector {
   exuOutReset.pc          := resetVector.U(64.W)
   exuOutReset.excepNo     := 0.U(4.W)
   exuOutReset.exception   := false.B
-  exuOutReset.csrWaddr    := 0.U(2.W)
+  exuOutReset.csrWaddr    := CsrAddr.nul
   exuOutReset.csrWen      := false.B
+  exuOutReset.csrValue    := 0.U(64.W)
   exuOutReset.ebreak      := false.B
   exuOutReset.haltRet     := 0.U(64.W)
 
   val memCtrlReg           = RegInit(exuOutReset)
-  memCtrlReg              := io.in
+  memCtrlReg              := Mux(io.stall, memCtrlReg, io.in)
+
+  val validReg             = RegInit(false.B)
+  validReg                := Mux(io.stall, validReg, io.validIn)
 
   io.out                  := memCtrlReg
+  io.validOut             := validReg
 }

@@ -12,6 +12,8 @@ class IFU extends Module with HasResetVector {
   val io = IO(new Bundle {
     // 用于仿真环境
     val debug       = new DebugIO
+    
+    val valid       = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
 
     // 来自exu
     val redirect    = Flipped(new RedirectIO)
@@ -103,7 +105,7 @@ class IFU extends Module with HasResetVector {
   //io.out.inst               := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
   io.out.inst               := inst
 
-  io.axiReq                 := state === addr && !io.stall
+  io.axiReq                 := state === addr
   io.axiReady               := state === data && dataFire
 
   //val readyFlag              = RegInit(false.B)
@@ -111,4 +113,5 @@ class IFU extends Module with HasResetVector {
   
   // 取指完毕信号，用于提醒流水线寄存器传递数据
   io.ready                  := state === data && dataFire
+  io.valid                  := state === data && dataFire
 }

@@ -66,7 +66,7 @@ class IDU extends Module with HasInstrType{
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
   rf.io.rs2           := rs2
-  rf.io.wen           := io.regWrite.wen && io.finish // todo
+  rf.io.wen           := io.regWrite.wen
   rf.io.waddr         := io.regWrite.rd
   rf.io.wdata         := io.regWrite.value
   rf.io.clock         := clock
@@ -74,12 +74,12 @@ class IDU extends Module with HasInstrType{
   
   csrReg.io.raddr     := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
   csrReg.io.waddr     := io.csrWrite.waddr
-  csrReg.io.wen       := io.csrWrite.wen && io.finish
+  csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
   csrReg.io.clock     := clock
   csrReg.io.reset     := reset
   // exception
-  csrReg.io.exception := io.csrWrite.exception && io.finish
+  csrReg.io.exception := io.csrWrite.exception
   csrReg.io.epc       := io.csrWrite.epc
   csrReg.io.no        := io.csrWrite.no
 
@@ -102,7 +102,8 @@ class IDU extends Module with HasInstrType{
   io.ctrl.exception   := systemCtrl === System.ecall // todo:type of exception, just for ecall now
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
-  io.ctrl.ebreak      := io.ctrl.sysInsType === System.ebreak
+  io.ctrl.ebreak      := systemCtrl === System.ebreak
+  io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := rs1
   io.ctrl.rs2         := rs2
 

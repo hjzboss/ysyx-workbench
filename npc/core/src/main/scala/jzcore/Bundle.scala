@@ -22,7 +22,7 @@ class RFWriteIO extends Bundle {
 
 class CSRWriteIO extends Bundle {
   val wen       = Output(Bool())
-  val waddr     = Output(UInt(2.W))
+  val waddr     = Output(UInt(3.W))
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
   val epc       = Output(UInt(64.W))
@@ -52,13 +52,13 @@ class CtrlFlow extends Bundle {
   val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
   val csrWen        = Output(Bool()) // 是否是csr指令
-  val csrWaddr      = Output(UInt(2.W))
+  val csrWaddr      = Output(UInt(3.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool()) // 系统指令的类型
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-
+  val sysInsType    = Output(UInt(2.W))
   // 用于送给旁路单元
   val rs1           = Output(UInt(5.W))
   val rs2           = Output(UInt(5.W))
@@ -80,8 +80,9 @@ class ExuOut extends Bundle {
   val pc            = Output(UInt(64.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
-  val csrWaddr      = Output(UInt(2.W))
+  val csrWaddr      = Output(UInt(3.W))
   val csrWen        = Output(Bool())
+  val csrValue      = Output(UInt(64.W))
 
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val haltRet       = Output(UInt(64.W))
@@ -96,8 +97,9 @@ class LsuOut extends Bundle {
   val pc            = Output(UInt(64.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
-  val csrWaddr      = Output(UInt(2.W))
+  val csrWaddr      = Output(UInt(3.W))
   val csrWen        = Output(Bool())
+  val csrValue      = Output(UInt(64.W))
 
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val haltRet       = Output(UInt(64.W))

@@ -108,12 +108,13 @@ object CsrId {
 }
 
 object CsrAddr {
-  def mstatus = "b00".U
-  def mtvec   = "b01".U
-  def mepc    = "b10".U
-  def mcause  = "b11".U
+  def mstatus = "b000".U
+  def mtvec   = "b001".U
+  def mepc    = "b010".U
+  def mcause  = "b011".U
+  def nul     = "b100".U
 
-  def apply() = UInt(2.W)
+  def apply() = UInt(3.W)
 }
 
 object System {
@@ -137,6 +138,7 @@ object Forward {
   def normal  = "b00".U
   def lsuData = "b01".U
   def wbuData = "b10".U
+  def csrData = "b11".U
 
   def apply() = UInt(2.W)
 }

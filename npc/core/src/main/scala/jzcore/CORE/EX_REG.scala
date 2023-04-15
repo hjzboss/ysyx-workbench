@@ -4,14 +4,14 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
-}
-
 class EX_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     val stall = Input(Bool())
     val flush = Input(Bool())
+
+    // just for debug
+    val validIn = Input(Bool())
+    val validOut = Output(Bool())
 
     // 数据传递
     val datasrcIn   = Flipped(new DataSrcIO)
@@ -46,10 +46,11 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.csrWen        := false.B
   ctrlReset.excepNo       := 0.U(4.W)
   ctrlReset.exception     := false.B
-  ctrlReset.csrWaddr      := 0.U(2.W)
+  ctrlReset.csrWaddr      := CsrAddr.nul
   ctrlReset.memWen        := false.B
   ctrlReset.memRen        := false.B
   ctrlReset.ebreak        := false.B
+  ctrlReset.sysInsType    := System.nop
   ctrlReset.rs1           := 0.U(5.W)
   ctrlReset.rs2           := 0.U(5.W)
 
@@ -62,7 +63,11 @@ class EX_REG extends Module with HasResetVector {
   val ctrlReg              = RegInit(ctrlReset)
   ctrlReg                 := Mux(io.flush, ctrlReset, Mux(io.stall, ctrlReg, io.ctrlIn))
 
+  val validReg             = RegInit(false.B)
+  validReg                := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
+
   io.datasrcOut           := datasrcReg
   io.aluCtrlOut           := aluCtrlReg
   io.ctrlOut              := ctrlReg
+  io.validOut             := validReg
 }

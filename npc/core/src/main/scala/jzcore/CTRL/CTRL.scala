@@ -23,6 +23,7 @@ class CTRL extends Module {
     // flush pipline reg
     val flushIduReg = Output(Bool())
     val flushWbuReg = Output(Bool()) // set when lsu is unready
+    val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
   })
   
   // 当取指未完成时停顿之前所有阶段
@@ -33,5 +34,6 @@ class CTRL extends Module {
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushIduReg := !io.ifuReady || io.branch
+  io.flushExuReg := io.branch
   io.flushWbuReg := !io.lsuReady
 }

@@ -4,17 +4,18 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
-}
-
-class WBU_REG extends Module with HasResetVector {
+class WB_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
-    val in = Flipped(new lsuOut)
-    val out = new lsuOut
+    val flush = Input(Bool())
+
+    val validIn = Input(Bool())
+    val validOut = Output(Bool())
+  
+    val in = Flipped(new LsuOut)
+    val out = new LsuOut
   })
 
-  val lsuReset = Wire(new lsuOut)
+  val lsuReset = Wire(new LsuOut)
   lsuReset.exuOut     := 0.U(64.W)
   lsuReset.lsuOut     := 0.U(64.W)
   lsuReset.loadMem    := false.B
@@ -23,13 +24,18 @@ class WBU_REG extends Module with HasResetVector {
   lsuReset.pc         := resetVector.U(64.W)
   lsuReset.excepNo    := 0.U(4.W)
   lsuReset.exception  := false.B
-  lsuReset.csrWaddr   := 0.U(2.W)
+  lsuReset.csrWaddr   := CsrAddr.nul
   lsuReset.csrWen     := false.B
+  lsuReset.csrValue   := 0.U(64.W)
   lsuReset.ebreak     := false.B
   lsuReset.haltRet    := 0.U(64.W)
 
   val lsuReg           = RegInit(lsuReset)
-  lsuReg              := io.in
+  lsuReg              := Mux(io.flush, lsuReset, io.in)
+
+  val validReg         = RegInit(false.B)
+  validReg            := Mux(io.flush, false.B, io.validIn)
 
   io.out              := lsuReg
+  io.validOut         := validReg
 }

@@ -7,25 +7,24 @@ import utils._
 class EXU extends Module {
   val io = IO(new Bundle {
     // 来自idu
-    val datasrc   = Flipped(new DataSrcIO)
-    val aluCtrl   = Flipped(new AluIO)
-    val ctrl      = Flipped(new CtrlFlow)
+    val datasrc     = Flipped(new DataSrcIO)
+    val aluCtrl     = Flipped(new AluIO)
+    val ctrl        = Flipped(new CtrlFlow)
     
     // 传给Lsu
-    val out       = new ExuOut
+    val out         = new ExuOut
 
     // 写回ifu,todo:需要移动到idu阶段
-    val redirect  = new RedirectIO
+    val redirect    = new RedirectIO
 
-    // lsu模块的旁路数据
-    val lsuOut    = Input(UInt(64.W))
+    // 旁路数据
+    val lsuForward  = Input(UInt(64.W))
+    val wbuForward  = Input(UInt(64.W))
+    val csrForward  = Input(UInt(64.W))
 
-    // wbu模块的旁路数据
-    val wbuOut    = Input(UInt(64.W))
-
-    // forward模块的旁路控制信号
-    val forwardA  = Input(UInt(2.W))
-    val forwardB  = Input(UInt(2.W))
+    // 旁路控制信号
+    val forwardA    = Input(UInt(2.W))
+    val forwardB    = Input(UInt(2.W))
   })
 
   val alu   = Module(new Alu)
@@ -35,8 +34,20 @@ class EXU extends Module {
   val aluSrc2 = io.aluCtrl.aluSrc2
 
   // forward
-  val opAPre = Mux(io.forwardA === Forward.lsuData, io.lsuData, Mux(io.forwardA === Forward.wbuData, io.wbuData, io.datasrc.src1))
-  val opBPre = Mux(io.forwardB === Forward.lsuData, io.lsuData, Mux(io.forwardB === Forward.wbuData, io.wbuData, io.datasrc.src2))
+  //val opAPre = Mux(io.forwardA === Forward.lsuData, io.lsuForward, Mux(io.forwardA === Forward.wbuForward, io.wbuData, io.datasrc.src1))
+  val opAPre = MuxLookup(io.forwardA, io.datasrc.src1, List(
+    Forward.lsuData -> io.lsuForward,
+    Forward.wbuData -> io.wbuForward,
+    Forward.csrData -> io.csrForward,
+    Forward.normal  -> io.datasrc.src1
+  ))
+  val opBPre = MuxLookup(io.forwardB, io.datasrc.src2, List(
+    Forward.lsuData -> io.lsuForward,
+    Forward.wbuData -> io.wbuForward,
+    Forward.csrData -> io.csrForward,
+    Forward.normal  -> io.datasrc.src2
+  ))
+  //val opBPre = Mux(io.forwardB === Forward.lsuData, io.lsuData, Mux(io.forwardB === Forward.wbuData, io.wbuData, io.datasrc.src2))
 
   val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
@@ -71,4 +82,6 @@ class EXU extends Module {
   io.out.csrWen        := io.ctrl.csrWen
   io.out.ebreak        := io.ctrl.ebreak
   io.out.haltRet       := opAPre // todo: forward
+
+  io.out.csrValue      := opAPre
 }

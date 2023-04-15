@@ -8,11 +8,11 @@ module CsrReg (
     input [3:0] no, 
 
     // read port
-    input [1:0] raddr,
+    input [2:0] raddr,
     output [63:0] rdata,
 
     // write port
-    input [1:0] waddr,
+    input [2:0] waddr,
     input wen,
     input [63:0] wdata
 );
@@ -28,7 +28,7 @@ initial csr[0] = 64'ha00001800; // 初始化mstatus
 assign rdata = csr[raddr];
 
 always @(posedge clock) begin
-  if (wen) csr[waddr] <= wdata;
+  if (wen) csr[waddr[1:0]] <= wdata;
 end
 
 // todo
