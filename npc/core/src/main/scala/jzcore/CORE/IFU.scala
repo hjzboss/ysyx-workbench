@@ -82,7 +82,7 @@ class IFU extends Module with HasResetVector {
 
   // 更新pc值
   //pc                        := Mux(io.pcEnable && io.finish, Mux(io.redirect.valid, dnpc, snpc), pc)
-/*
+
   pc                        := MuxLookup(state, pc, List(
                                   addr  -> Mux(io.redirect.valid && !io.stall, dnpc, pc),
                                   // 如果rresp不是okay，则pc保持原值重新取指，todo，当lsu取指成功后再更新pc
@@ -93,8 +93,6 @@ class IFU extends Module with HasResetVector {
                                   // 流水线模式，当停顿信号生效时保持原pc
                                   data  -> Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
                                 ))
-*/
-  pc := pc
 
   // 仿真环境
   //io.debug.inst             := Mux(state === data || (state === addr && io.axiGrant), inst, instReg)
