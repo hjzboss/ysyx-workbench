@@ -287,7 +287,6 @@ void delete_cpu() {
   IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
-// todo
 static void isa_exec_once() {
   int cnt = 0;
   while (!top->io_finish) {
@@ -310,8 +309,9 @@ static void cpu_exec_once() {
     visit_device = false;
   }
 #endif
-  npc_cpu.pc = top->io_debug_pc; // 执行后的pc
-  npc_cpu.npc = top->io_debug_nextPc;
+  //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
+  npc_cpu.pc = top->io_debug_nextPc;
+  //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
