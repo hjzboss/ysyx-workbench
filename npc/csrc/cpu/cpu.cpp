@@ -287,7 +287,7 @@ void delete_cpu() {
   IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
-static void isa_exec_once(uint64_t *npc) {
+static void isa_exec_once(uint64_t *pc, uint64_t *npc) {
   int cnt = 0;
   while (!top->io_finish) {
     eval_wave();
@@ -303,7 +303,7 @@ static void isa_exec_once(uint64_t *npc) {
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once(&npc_cpu.pc);
+  isa_exec_once(&pc, &npc_cpu.pc);
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
     difftest_skip_ref();
