@@ -298,6 +298,7 @@ static void isa_exec_once() {
   }
   eval_wave();
   eval_wave();
+  printf("next pc=%016x\n", top->io_debug_nextPc);
 }
 
 static void cpu_exec_once() {
