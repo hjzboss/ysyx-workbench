@@ -13,6 +13,9 @@ class LS_REG extends Module with HasResetVector {
 
     val in = Flipped(new ExuOut)
     val out = new ExuOut
+
+    val debugIn = Flipped(new DebugIO)
+    val debugOut = new DebugIO
   })
 
   val exuOutReset          = Wire(new ExuOut)
@@ -43,4 +46,14 @@ class LS_REG extends Module with HasResetVector {
 
   io.out                  := memCtrlReg
   io.validOut             := validReg
+
+  val debugReset = Wire(new DebugIO)
+  debugReset.pc := resetVector.U(64.W)
+  debugReset.nextPc := resetVector.U(64.W)
+  debugReset.inst := Instruction.NOP
+
+  val debugReg = RegInit(debugReset)
+  debugReg := Mux(io.stall, debugReg, io.debugIn)
+
+  io.debugOut := debugReg
 }

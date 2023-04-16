@@ -14,6 +14,7 @@
 !build.sc
 !README.md
 build/
+.github/
 
 # mill
 out/

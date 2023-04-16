@@ -20,6 +20,7 @@ class IDU extends Module with HasInstrType{
 
     // 防止信号被优化
     val lsType    = Output(UInt(4.W))
+    //val csrAddr   = Output(UInt(3.W))
   })
 
   //io.ready     := true.B
@@ -61,6 +62,8 @@ class IDU extends Module with HasInstrType{
     CsrId.mcause  -> CsrAddr.mcause
   ))
 
+  //io.csrAddr         := csrRaddr // todo
+
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
   // registerfile
@@ -72,7 +75,9 @@ class IDU extends Module with HasInstrType{
   rf.io.clock         := clock
   rf.io.reset         := reset
   
-  csrReg.io.raddr     := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
+  val raddr            = Wire(UInt(3.W))
+  raddr               := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddr))
+  csrReg.io.raddr     := raddr
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
@@ -90,7 +95,7 @@ class IDU extends Module with HasInstrType{
 
   io.ctrl.rd          := rd
   io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
-  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   //io.ctrl.wdata       := rf.io.src2

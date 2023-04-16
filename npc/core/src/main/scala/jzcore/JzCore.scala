@@ -15,7 +15,9 @@ class JzCore extends Module {
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
-    val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
+    val axiBrespIO  = Flipped(Decoupled(new BrespIO))   
+
+    //val csrAddr     = Output(UInt(3.W)) 
   })
 
   val ifu     = Module(new IFU)
@@ -32,6 +34,7 @@ class JzCore extends Module {
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
 
+  //io.csrAddr  := idu.io.csrAddr
   // 仲裁
   arbiter.io.ifuReq   <> ifu.io.axiReq
   arbiter.io.grantIfu <> ifu.io.axiGrant
@@ -232,6 +235,11 @@ class JzCore extends Module {
 
   wbu.io.in         <> wbReg.io.out
 
-  io.debug          <> ifu.io.debug
+  idReg.io.debugIn  <> ifu.io.debug
+  exReg.io.debugIn  <> idReg.io.debugOut
+  exu.io.debugIn    <> exReg.io.debugOut
+  lsReg.io.debugIn  <> exu.io.debugOut
+  wbReg.io.debugIn  <> lsReg.io.debugOut
+  io.debug          <> wbReg.io.debugOut
   io.finish         <> wbReg.io.validOut
 }

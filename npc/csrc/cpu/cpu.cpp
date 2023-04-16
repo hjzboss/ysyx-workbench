@@ -287,7 +287,7 @@ void delete_cpu() {
   IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
-static void isa_exec_once() {
+static void isa_exec_once(uint64_t *pc, uint64_t *npc) {
   int cnt = 0;
   while (!top->io_finish) {
     eval_wave();
@@ -295,6 +295,8 @@ static void isa_exec_once() {
     cnt += 1;
     if (cnt == 16) break;
   }
+  *pc  = top->io_debug_pc;
+  *npc = top->io_debug_nextPc;
   eval_wave();
   eval_wave();
 }
@@ -302,15 +304,17 @@ static void isa_exec_once() {
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once();
+  isa_exec_once(&pc, &npc_cpu.pc);
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
     difftest_skip_ref();
     visit_device = false;
   }
 #endif
-  npc_cpu.pc = top->io_debug_pc; // 执行后的pc
-  npc_cpu.npc = top->io_debug_nextPc;
+  //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
+  //npc_cpu.pc = top->io_debug_nextPc; // next pc
+  //printf("shit: %016x\n", top->io_debug_nextPc);
+  //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
