@@ -287,6 +287,7 @@ void delete_cpu() {
   IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
+// todo
 static void isa_exec_once() {
   int cnt = 0;
   while (!top->io_finish) {
