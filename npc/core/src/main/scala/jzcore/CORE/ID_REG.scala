@@ -36,23 +36,27 @@ class ID_REG extends Module with HasResetVector {
   io.out := idReg
   io.validOut := validReg
 
+  val debugPcReg = RegInit(resetVector.U(64.W))
+  debugPcReg := Mux(io.flush, resetVector.U(64.W), Mux(io.stall, debugPcReg, io.debugIn.pc))
+
+  val debugInstReg = RegInit(Instruction.NOP)
+  debugPcReg := Mux(io.flush, Instruction.NOP, Mux(io.stall, debugInstReg, io.debugIn.inst))
+
+  val debugNpcReg = RegInit(resetVector.U(64.W))
+  debugPcReg := Mux(io.flush, resetVector.U(64.W), Mux(io.stall, debugNpcReg, io.debugIn.nextPc))
+
+/*
   val debugReset = Wire(new DebugIO)
   debugReset.pc := resetVector.U(64.W)
   debugReset.nextPc := resetVector.U(64.W)
   debugReset.inst := Instruction.NOP
 
   val debugReg = RegInit(debugReset)
-  //debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
+  debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
   //debugReg := Mux(io.stall, debugReg, io.debugIn)
-
-  when (io.stall) {
-    debugReg := debugReg
-  }.elsewhen (io.flush) {
-    debugReg := debugReset
-  }.otherwise {
-    debugReg := io.debugIn
-  }
-
   io.debugOut := debugReg
-
+*/
+  io.debugOut.pc := debugPcReg
+  io.debugOut.nextPc := debugNpcReg
+  io.debugOut.inst := debugInstReg
 }
