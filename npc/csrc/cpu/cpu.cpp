@@ -310,7 +310,7 @@ static void cpu_exec_once() {
   }
 #endif
   //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
-  //npc_cpu.pc = top->io_debug_nextPc; // next pc
+  npc_cpu.pc = top->io_debug_nextPc; // next pc
   //printf("shit: %016x\n", top->io_debug_nextPc);
   //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
