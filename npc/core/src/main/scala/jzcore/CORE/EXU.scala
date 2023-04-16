@@ -25,6 +25,9 @@ class EXU extends Module {
     // 旁路控制信号
     val forwardA    = Input(UInt(2.W))
     val forwardB    = Input(UInt(2.W))
+
+    val debugIn     = Flipped(new DebugIO)
+    val debugOut    = new DebugIO
   })
 
   val alu   = Module(new Alu)
@@ -82,6 +85,9 @@ class EXU extends Module {
   io.out.csrWen        := io.ctrl.csrWen
   io.out.ebreak        := io.ctrl.ebreak
   io.out.haltRet       := opAPre // todo: forward
-
   io.out.csrValue      := opAPre
+
+  io.debugOut.inst     := io.debugIn.inst
+  io.debugOut.pc       := io.debugIn.pc
+  io.debugOut.nextPc   := Mux(io.redirect.valid, io.redirect.brAddr, io.debugIn.nextPc)
 }
