@@ -5,7 +5,7 @@ include ./scripts/sim-npc.mk
 #FPGA_CSRC = $(shell find $(abspath ./csrc) -name "*_fpga.cpp")
 #FPGA_CSRC += $(SRC_AUTO_BIND)
 
-VERILATOR_FPGAFLAG = --cc \
+VERILATOR_FPGAFLAG = -Wall --cc \
 										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
