@@ -41,8 +41,8 @@ class ID_REG extends Module with HasResetVector {
   debugReset.nextPc := resetVector.U(64.W)
   debugReset.inst := Instruction.NOP
 
-  val debugReg = RegEnable(Mux(io.flush, debugReset, io.debugIn), debugReset, !io.stall)
-  //debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
+  val debugReg = RegInit(debugReset)
+  debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
   //debugReg := Mux(io.stall, debugReg, io.debugIn)
 
   io.debugOut := debugReg
