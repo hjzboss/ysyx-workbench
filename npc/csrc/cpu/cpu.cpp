@@ -290,6 +290,7 @@ void delete_cpu() {
 static void isa_exec_once() {
   int cnt = 0;
   while (!top->io_finish) {
+    printf("next pc=%016x\n", top->io_debug_nextPc);
     eval_wave();
     eval_wave();
     cnt += 1;
