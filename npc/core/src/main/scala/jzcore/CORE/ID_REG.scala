@@ -43,6 +43,9 @@ class ID_REG extends Module with HasResetVector {
 
   val debugReg = RegInit(debugReset)
   debugReg := Mux(io.flush, debugReset, Mux(io.stall, debugReg, io.debugIn))
+  when (io.stall) {
+    debugReg := debugReg
+  }
   //debugReg := Mux(io.stall, debugReg, io.debugIn)
   io.debugOut := debugReg
 }
