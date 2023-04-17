@@ -16,6 +16,9 @@ class WB_REG extends Module with HasResetVector {
 
     val debugIn = Flipped(new DebugIO)
     val debugOut = new DebugIO
+
+    val lsFlagIn = Input(Bool())
+    val lsFlagOut = Output(Bool())
   })
 
   val lsuReset = Wire(new LsuOut)
@@ -51,4 +54,9 @@ class WB_REG extends Module with HasResetVector {
   debugReg := Mux(io.flush, debugReset, io.debugIn)
 
   io.debugOut := debugReg
+
+  val lsFlagReg = RegInit(false.B)
+  lsFlagReg := Mux(io.flush, false.B, io.lsFlagIn)
+
+  io.lsFlagOut := lsFlagReg
 }

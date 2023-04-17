@@ -11,6 +11,10 @@ class CTRL extends Module {
     val ifuReady = Input(Bool())
     val lsuReady = Input(Bool())
 
+    // axi仲裁信号
+    val ifuGrant = Input(Bool())
+    val lsuGrant = Input(Bool())
+
     // 分支指令需要flush流水线
     val branch   = Input(Bool())
 

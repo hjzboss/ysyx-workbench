@@ -14,6 +14,8 @@ class Soc extends Module {
     val valid1     = Output(Bool())
     val valid2     = Output(Bool())
     //val csrAddr    = Output(UInt(3.W))
+
+    val lsFlag     = Output(Bool())
   })
 
   //val rsram = Module(new Sram)
@@ -32,5 +34,6 @@ class Soc extends Module {
   io.valid2       := sram.io.waddrIO.valid
   io.finish       := core.io.finish
 
+  io.lsFlag       := core.io.lsFlag
   //io.csrAddr      := core.io.csrAddr 
 }

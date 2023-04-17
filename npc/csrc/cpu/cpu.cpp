@@ -287,7 +287,7 @@ void delete_cpu() {
   IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
-static void isa_exec_once(uint64_t *pc, uint64_t *npc) {
+static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
   int cnt = 0;
   while (!top->io_finish) {
     eval_wave();
@@ -297,23 +297,25 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc) {
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
+  *lsFlag = top->io_lsFlag;
   eval_wave();
   eval_wave();
 }
 
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
+  bool lsFlag = false; // 访存信号
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once(&pc, &npc_cpu.pc);
+  isa_exec_once(&pc, &npc_cpu.pc, &lsFlag);
 #ifdef CONFIG_DIFFTEST
-  if (visit_device) {
+  // 由于访存会在lsu阶段产生，会提前设置visit_device信号，因此要用个lsflag信号
+  if (visit_device && lsFlag) {
     difftest_skip_ref();
     visit_device = false;
   }
 #endif
   //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
   //npc_cpu.pc = top->io_debug_nextPc; // next pc
-  //printf("shit: %016x\n", top->io_debug_nextPc);
   //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
@@ -330,6 +332,7 @@ static void cpu_exec_once() {
   memset(p, ' ', space_len);
   p += space_len;
 
+  // 反汇编
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, npc_cpu.logbuf + sizeof(npc_cpu.logbuf) - p, pc, (uint8_t *)&npc_cpu.inst, ilen);
 

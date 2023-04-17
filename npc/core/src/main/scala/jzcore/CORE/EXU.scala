@@ -37,7 +37,6 @@ class EXU extends Module {
   val aluSrc2 = io.aluCtrl.aluSrc2
 
   // forward
-  //val opAPre = Mux(io.forwardA === Forward.lsuData, io.lsuForward, Mux(io.forwardA === Forward.wbuForward, io.wbuData, io.datasrc.src1))
   val opAPre = MuxLookup(io.forwardA, io.datasrc.src1, List(
     Forward.lsuData -> io.lsuForward,
     Forward.wbuData -> io.wbuForward,
@@ -50,7 +49,6 @@ class EXU extends Module {
     Forward.csrData -> io.csrForward,
     Forward.normal  -> io.datasrc.src2
   ))
-  //val opBPre = Mux(io.forwardB === Forward.lsuData, io.lsuData, Mux(io.forwardB === Forward.wbuData, io.wbuData, io.datasrc.src2))
 
   val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))

@@ -39,7 +39,9 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.haltRet     := 0.U(64.W)
 
   val memCtrlReg           = RegInit(exuOutReset)
-  memCtrlReg              := Mux(io.stall, memCtrlReg, io.in)
+  val stallMemCtrl         = dontTouch(Wire(new ExuOut))
+  stallMemCtrl            := Mux(io.stall, memCtrlReg, io.in)
+  memCtrlReg              := stallMemCtrl
 
   val validReg             = RegInit(false.B)
   validReg                := Mux(io.stall, validReg, io.validIn)
@@ -53,7 +55,9 @@ class LS_REG extends Module with HasResetVector {
   debugReset.inst := Instruction.NOP
 
   val debugReg = RegInit(debugReset)
-  debugReg := Mux(io.stall, debugReg, io.debugIn)
+  val stallDebug = dontTouch(Wire(new DebugIO))
+  stallDebug := Mux(io.stall, debugReg, io.debugIn)
+  debugReg := stallDebug
 
   io.debugOut := debugReg
 }

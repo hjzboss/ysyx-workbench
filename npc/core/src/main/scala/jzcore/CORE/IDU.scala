@@ -17,13 +17,7 @@ class IDU extends Module with HasInstrType{
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
-
-    // 防止信号被优化
-    val lsType    = Output(UInt(4.W))
-    //val csrAddr   = Output(UInt(3.W))
   })
-
-  //io.ready     := true.B
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
@@ -41,7 +35,8 @@ class IDU extends Module with HasInstrType{
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = lsctrl(0)
+  val lsType    = dontTouch(Wire(UInt(4.W))) // 防止信号被优化
+  lsType       := lsctrl(0)
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
   val memEn     = lsctrl(3)
@@ -61,8 +56,6 @@ class IDU extends Module with HasInstrType{
     CsrId.mepc    -> CsrAddr.mepc,
     CsrId.mcause  -> CsrAddr.mcause
   ))
-
-  //io.csrAddr         := csrRaddr // todo
 
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
@@ -98,7 +91,6 @@ class IDU extends Module with HasInstrType{
   io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
-  //io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.csrWen      := instrtype === InstrZ
@@ -109,12 +101,10 @@ class IDU extends Module with HasInstrType{
   io.ctrl.memRen      := memEn === MemEn.load
   io.ctrl.ebreak      := systemCtrl === System.ebreak
   io.ctrl.sysInsType  := systemCtrl
-  io.ctrl.rs1         := rs1
-  io.ctrl.rs2         := rs2
+  io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
+  io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
-
-  io.lsType           := lsType
 }

@@ -15,8 +15,6 @@ class LSU extends Module {
 
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
-    //val lsuTrans    = Output(Bool())
-    //val stall       = Input(Bool())
 
     // axi总线访存接口
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -29,6 +27,8 @@ class LSU extends Module {
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
     val axiReady    = Output(Bool())
+
+    val lsFlag      = Output(Bool())
   })
 
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // resp
@@ -71,15 +71,9 @@ class LSU extends Module {
   io.axiWdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
   io.axiBrespIO.ready      := wState === wait_resp
 
-/*  
-  val lsTypeReg          = RegInit(LsType.nop)
-  lsTypeReg             := Mux(readTrans && io.axiGrant, io.in.lsType, lsTypeReg)
-*/
 
   // 数据对齐
-  val align              = Cat(addr(2, 0), 0.U(3.W)) // 此处变成了0，原因未知
-  //val alignReg           = RegInit(0.U(6.W))
-  //alignReg              := Mux(readTrans && io.axiGrant, align, alignReg)
+  val align              = Cat(addr(2, 0), 0.U(3.W))
   val rdata              = io.axiRdataIO.bits.rdata >> align
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
@@ -99,49 +93,27 @@ class LSU extends Module {
   val writeTrans         = io.in.lsuWen
   val hasTrans           = (readTrans || writeTrans) && io.axiGrant
 
-/*
-  // 当lsu访存未结束时锁存控制信号,todo
-  val exuOutreg          = RegInit(0.U(64.W))
-  val loadMemreg         = RegInit(false.B)
-  val rdreg              = RegInit(0.U(5.W))
-  val regWenreg          = RegInit(false.B)
-  val exceptionreg       = RegInit(false.B)
-  val csrWaddrreg        = RegInit(0.U(2.W))
-  val csrWenreg          = RegInit(false.B)
-  val noreg              = RegInit(0.U(4.W))
-  exuOutreg             := Mux(hasTrans, io.in.exuOut, exuOutreg)
-  loadMemreg            := Mux(hasTrans, io.in.loadMem, loadMemreg)
-  rdreg                 := Mux(hasTrans, io.in.rd, rdreg)
-  regWenreg             := Mux(hasTrans, io.in.regWen, regWenreg)
-  exceptionreg          := Mux(hasTrans, io.in.exception, exceptionreg)
-  csrWaddrreg           := Mux(hasTrans, io.in.csrWaddr, csrWaddrreg)
-  csrWenreg             := Mux(hasTrans, io.in.csrWen, csrWenreg)
-  noreg                 := Mux(hasTrans, io.in.no, noreg)
-*/
-
   io.out.lsuOut         := lsuOut
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
-  //io.out.regWen         := Mux(!io.ready, false.B, Mux(rState === wait_data || wState === wait_resp, regWenreg, io.in.regWen))
   io.out.regWen         := io.in.regWen
   io.out.pc             := io.in.pc
   io.out.excepNo        := io.in.excepNo
   io.out.exception      := io.in.exception
-  //io.out.no             := Mux(rState === idle && wState === idle, io.in.no, noreg)
-  //io.out.exception      := Mux(!io.ready, false.B, Mux(rState === wait_data || wState === wait_resp, exceptionreg, io.in.exception))
-  //io.out.csrWaddr       := Mux(rState === idle && wState === idle, io.in.csrWaddr, csrWaddrreg)
-  //io.out.csrWen         := Mux(!io.ready, false.B, Mux(rState === wait_data || wState === wait_resp, csrWenreg, io.in.csrWen))
   io.out.csrWaddr       := io.in.csrWaddr
   io.out.csrWen         := io.in.csrWen
   io.out.ebreak         := io.in.ebreak
   io.out.haltRet        := io.in.haltRet
   io.out.csrValue       := io.in.csrValue
 
-  //io.lsuTrans           := hasTrans || rState === wait_data || wState === wait_resp
+
   io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
 
   // 仲裁信号
   io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
   io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
+
+  // 传给仿真环境，用于外设访问的判定
+  io.lsFlag             := io.in.lsuRen || io.in.lsuWen
 }
