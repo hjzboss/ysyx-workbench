@@ -50,7 +50,7 @@ class IFU extends Module with HasResetVector {
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
-    addr    -> Mux(addrFire && io.axiGrant && !io.redirect.valid, data, addr),
+    addr    -> Mux(addrFire && io.axiGrant, data, addr),
     data    -> Mux(dataFire, addr, data)
   ))
 
