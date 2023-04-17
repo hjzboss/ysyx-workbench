@@ -31,7 +31,7 @@ class ID_REG extends Module with HasResetVector {
   val shit = dontTouch(Wire(new InstrFetch))
   //val stall = dontTouch(Wire(Bool()))
   //stall := io.stall
-  shit := Mux(stall, idReg, io.in)
+  shit := Mux(io.stall, idReg, io.in)
   idReg := Mux(io.flush, regReset, shit)
 
   val validReg = RegInit(false.B)
