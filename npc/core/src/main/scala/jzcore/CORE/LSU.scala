@@ -115,5 +115,5 @@ class LSU extends Module {
   io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
 
   // 传给仿真环境，用于外设访问的判定
-  io.lsFlag             := io.in.ren || io.in.wen
+  io.lsFlag             := io.in.lsuRen || io.in.lsuWen
 }

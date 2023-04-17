@@ -117,5 +117,5 @@ class IDU extends Module with HasInstrType{
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
 
-  io.lsType           := lsType
+  //io.lsType           := lsType
 }
