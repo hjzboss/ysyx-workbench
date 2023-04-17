@@ -13,7 +13,6 @@ class Soc extends Module {
     // 防止被优化
     val valid1     = Output(Bool())
     val valid2     = Output(Bool())
-    //val stallReg   = new InstrFetch
     //val csrAddr    = Output(UInt(3.W))
   })
 
@@ -21,7 +20,6 @@ class Soc extends Module {
   val sram = Module(new Sram)
   val core  = Module(new JzCore)
 
-  //io.stallReg <> core.io.stallReg
   core.io.axiRaddrIO <> sram.io.raddrIO
   core.io.axiRdataIO <> sram.io.rdataIO
   core.io.axiWaddrIO <> sram.io.waddrIO
