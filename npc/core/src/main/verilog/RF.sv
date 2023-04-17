@@ -20,8 +20,9 @@ import "DPI-C" function void set_gpr_ptr(input logic [63:0] a []);
 
 initial set_gpr_ptr(rf);  // rf为通用寄存器的二维数组变量
 
-assign src1 = rf[rs1];
-assign src2 = rf[rs2];
+// forward
+assign src1 = wen && waddr == rs1 ? wdata : rf[rs1];
+assign src2 = wen && waddr == rs2 ? wdata : rf[rs2];
 
 always @(posedge clock) begin
   if (wen && waddr != 5'd0) rf[waddr] <= wdata;
