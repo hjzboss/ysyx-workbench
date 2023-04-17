@@ -27,7 +27,7 @@ class ID_REG extends Module with HasResetVector {
   regReset.inst := Instruction.NOP
 
   // 流水线寄存器
-  val idReg = dontTouch(RegInit(regReset))
+  val idReg = RegInit(regReset)
   val shit = dontTouch(Wire(new InstrFetch))
   //val stall = dontTouch(Wire(Bool()))
   //stall := io.stall
