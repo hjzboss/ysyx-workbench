@@ -304,10 +304,11 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
 
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
-  bool lsFlag = false;
+  bool lsFlag = false; // 访存信号
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once(&pc, &npc_cpu.pc, &lsFlag);
 #ifdef CONFIG_DIFFTEST
+  // 由于访存会在lsu阶段产生，会提前设置visit_device信号，因此要用个lsflag信号
   if (visit_device && lsFlag) {
     difftest_skip_ref();
     visit_device = false;
