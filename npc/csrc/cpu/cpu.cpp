@@ -302,15 +302,15 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc) {
 }
 
 static void cpu_exec_once() {
-  uint64_t pc = top->io_debug_pc; // 当前pc
-  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once(&pc, &npc_cpu.pc);
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
     difftest_skip_ref();
     visit_device = false;
   }
 #endif
+  uint64_t pc = top->io_debug_pc; // 当前pc
+  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
+  isa_exec_once(&pc, &npc_cpu.pc);
   //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
   //npc_cpu.pc = top->io_debug_nextPc; // next pc
   //printf("shit: %016x\n", top->io_debug_nextPc);
