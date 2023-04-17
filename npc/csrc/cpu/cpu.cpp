@@ -307,7 +307,6 @@ static void cpu_exec_once() {
   isa_exec_once(&pc, &npc_cpu.pc);
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
-    printf("pc=%016lx\n", pc);
     difftest_skip_ref();
     visit_device = false;
   }

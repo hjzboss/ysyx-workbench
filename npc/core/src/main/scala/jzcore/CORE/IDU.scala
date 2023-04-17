@@ -19,7 +19,7 @@ class IDU extends Module with HasInstrType{
     val ctrl      = new CtrlFlow
 
     // 防止信号被优化
-    val lsType    = Output(UInt(4.W))
+    //val lsType    = Output(UInt(4.W))
     //val csrAddr   = Output(UInt(3.W))
   })
 
@@ -41,7 +41,8 @@ class IDU extends Module with HasInstrType{
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = lsctrl(0)
+  val lsType    = dontTouch(Wire(UInt(4.W))) // 防止信号被优化
+  lsType       := lsctrl(0)
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
   val memEn     = lsctrl(3)

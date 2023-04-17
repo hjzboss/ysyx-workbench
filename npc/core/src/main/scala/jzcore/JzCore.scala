@@ -18,6 +18,8 @@ class JzCore extends Module {
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))   
 
     //val csrAddr     = Output(UInt(3.W)) 
+
+    val lsFlag      = Output(Bool())
   })
 
   val ifu     = Module(new IFU)
@@ -235,6 +237,8 @@ class JzCore extends Module {
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 
+  wbu.io.lsFlagIn   <> lsu.io.lsFlag
+  io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
   wbu.io.in         <> wbReg.io.out
 
   idReg.io.debugIn  <> ifu.io.debug
