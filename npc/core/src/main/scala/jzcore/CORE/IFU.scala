@@ -112,6 +112,6 @@ class IFU extends Module with HasResetVector {
   //readyFlag                 := Mux(state === data && dataFire && !io.finish, true.B, Mux(readyFlag && !io.finish, true.B, false.B))
   
   // 取指完毕信号，用于提醒流水线寄存器传递数据
-  io.ready                  := state === data && dataFire
+  io.ready                  := (state === data && dataFire) || io.stall
   io.valid                  := state === data && dataFire
 }
