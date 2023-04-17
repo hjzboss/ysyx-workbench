@@ -305,9 +305,9 @@ static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
   npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once(&pc, &npc_cpu.pc);
-  // 当访问外设时跳过difftest
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
+    printf("pc=%016x\n", pc);
     difftest_skip_ref();
     visit_device = false;
   }
