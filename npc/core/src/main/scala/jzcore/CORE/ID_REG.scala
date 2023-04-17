@@ -30,8 +30,10 @@ class ID_REG extends Module with HasResetVector {
 
   // 流水线寄存器
   val idReg = RegInit(regReset)
-  io.stallReg := Mux(io.stall, idReg, io.in)
-  idReg := Mux(io.flush, regReset, io.stallReg)
+  //io.stallReg = Mux(io.stall, idReg, io.in)
+  //io.stallReg := Mux(io.flush, regReset, Mux(io.stall, ))
+  idReg := Mux(io.flush, regReset, Mux(io.stall, idReg, io.in))
+  io.stallReg := idReg
 
   val validReg = RegInit(false.B)
   validReg := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
