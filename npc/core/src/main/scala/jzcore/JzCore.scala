@@ -18,7 +18,7 @@ class JzCore extends Module {
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))   
 
     //val csrAddr     = Output(UInt(3.W)) 
-    val stallReg    = new InstrFetch
+    //val stallReg    = new InstrFetch
   })
 
   val ifu     = Module(new IFU)
@@ -35,7 +35,7 @@ class JzCore extends Module {
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
 
-  io.stallReg <> idReg.io.stallReg
+  //io.stallReg <> idReg.io.stallReg
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁

@@ -20,7 +20,7 @@ class ID_REG extends Module with HasResetVector {
     val debugIn = Flipped(new DebugIO)
     val debugOut = new DebugIO
 
-    val stallReg = new InstrFetch
+    //val stallReg = new InstrFetch
   })
 
   // 复位值
@@ -33,7 +33,7 @@ class ID_REG extends Module with HasResetVector {
   //io.stallReg = Mux(io.stall, idReg, io.in)
   //io.stallReg := Mux(io.flush, regReset, Mux(io.stall, ))
   idReg := Mux(io.flush, regReset, Mux(io.stall, idReg, io.in))
-  io.stallReg := idReg
+  //io.stallReg := idReg
 
   val validReg = RegInit(false.B)
   validReg := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
