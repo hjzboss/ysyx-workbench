@@ -84,7 +84,7 @@ class IFU extends Module with HasResetVector {
   //pc                        := Mux(io.pcEnable && io.finish, Mux(io.redirect.valid, dnpc, snpc), pc)
 
   val stallPc                = dontTouch(Wire(UInt(64.W)))
-  stallPc                    = Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
+  stallPc                   := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
 
   pc                        := MuxLookup(state, pc, List(
                                   addr  -> Mux(io.redirect.valid && !io.stall, dnpc, pc),
