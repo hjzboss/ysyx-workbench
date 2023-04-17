@@ -60,7 +60,7 @@ class IFU extends Module with HasResetVector {
   val dnpc = io.redirect.brAddr
 
   // axi取指接口
-  io.axiRaddrIO.valid       := state === addr && !io.stall
+  io.axiRaddrIO.valid       := state === addr && !io.stall && !io.redirect.valid
   io.axiRaddrIO.bits.addr   := pc
   // 使用cache时的准备：当lsu访存未结束时应该阻塞ifu阶段，要保证取出的指令的值保持到lsu访存完成
   io.axiRdataIO.ready       := state === data && !io.stall
