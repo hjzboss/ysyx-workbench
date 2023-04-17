@@ -302,6 +302,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc) {
 }
 
 static void cpu_exec_once() {
+  // 当访问外设时跳过difftest
 #ifdef CONFIG_DIFFTEST
   if (visit_device) {
     difftest_skip_ref();
@@ -313,7 +314,6 @@ static void cpu_exec_once() {
   isa_exec_once(&pc, &npc_cpu.pc);
   //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
   //npc_cpu.pc = top->io_debug_nextPc; // next pc
-  //printf("shit: %016x\n", top->io_debug_nextPc);
   //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
@@ -330,6 +330,7 @@ static void cpu_exec_once() {
   memset(p, ' ', space_len);
   p += space_len;
 
+  // 反汇编
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, npc_cpu.logbuf + sizeof(npc_cpu.logbuf) - p, pc, (uint8_t *)&npc_cpu.inst, ilen);
 
