@@ -27,7 +27,7 @@ class ID_REG extends Module with HasResetVector {
   regReset.inst := Instruction.NOP
 
   // 流水线寄存器
-  val idReg = dontTouch(RegInit(regReset))
+  val idReg = RegInit(regReset)
   idReg := Mux(io.flush, regReset, Mux(io.stall, idReg, io.in))
 
   val validReg = RegInit(false.B)
