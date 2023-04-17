@@ -11,6 +11,10 @@ class CTRL extends Module {
     val ifuReady = Input(Bool())
     val lsuReady = Input(Bool())
 
+    // axi仲裁信号
+    val ifuGrant = Input(Bool())
+    val lsuGrant = Input(Bool())
+
     // 分支指令需要flush流水线
     val branch   = Input(Bool())
 
@@ -27,7 +31,7 @@ class CTRL extends Module {
   })
   
   // 当取指未完成时停顿之前所有阶段
-  io.stallPc     := !io.lsuReady
+  io.stallPc     := !io.lsuReady && !ifuGrant && lsuGrant
   io.stallIduReg := !io.lsuReady
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady

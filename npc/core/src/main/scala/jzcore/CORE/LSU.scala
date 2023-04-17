@@ -139,7 +139,8 @@ class LSU extends Module {
   io.out.csrValue       := io.in.csrValue
 
   //io.lsuTrans           := hasTrans || rState === wait_data || wState === wait_resp
-  io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay) || !io.axiGrant
+  // todo: 当请求信号有效但是为被grant时应该要使ready信号有效（说明ifugrant有效），防止死锁
+  io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
 
   // 仲裁信号
   io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
