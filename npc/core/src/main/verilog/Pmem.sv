@@ -26,8 +26,8 @@ import "DPI-C" function void pmem_write(
 //assign visit_advice = (rvalid || mask != 8'd0) && ((raddr == CONFIG_FB_ADDR || raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_SERIAL_MMIO || raddr == CONFIG_VGA_CTL_MMIO || raddr == SYNC_ADDR)
 //                      || (raddr == CONFIG_FB_ADDR || raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_SERIAL_MMIO || raddr == CONFIG_VGA_CTL_MMIO || raddr == SYNC_ADDR))
 
-assign visit_advice = (rvalid && (raddr == `CONFIG_FB_ADDR || raddr == `CONFIG_TIMER_MMIO || raddr == `CONFIG_SERIAL_MMIO || raddr == `CONFIG_VGA_CTL_MMIO || raddr == `SYNC_ADDR))
-                      || (mask != 8'd0 && (waddr == `CONFIG_FB_ADDR || waddr == `CONFIG_TIMER_MMIO || waddr == `CONFIG_SERIAL_MMIO || waddr == `CONFIG_VGA_CTL_MMIO || waddr == `SYNC_ADDR))
+//assign visit_advice = (rvalid && (raddr == `CONFIG_FB_ADDR || raddr == `CONFIG_TIMER_MMIO || raddr == `CONFIG_SERIAL_MMIO || raddr == `CONFIG_VGA_CTL_MMIO || raddr == `SYNC_ADDR))
+//                      || (mask != 8'd0 && (waddr == `CONFIG_FB_ADDR || waddr == `CONFIG_TIMER_MMIO || waddr == `CONFIG_SERIAL_MMIO || waddr == `CONFIG_VGA_CTL_MMIO || waddr == `SYNC_ADDR))
 
 always @(*) begin
   if (rvalid)
