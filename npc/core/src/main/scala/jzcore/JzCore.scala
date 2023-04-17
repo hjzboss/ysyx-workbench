@@ -195,6 +195,8 @@ class JzCore extends Module {
   // 控制模块
   ctrl.io.ifuReady  <> ifu.io.ready
   ctrl.io.lsuReady  <> lsu.io.ready
+  ctrl.io.ifuGrant  := arbiter.io.ifuGrant
+  ctrl.io.lsuGrant  := arbiter.io.lsuGrant
   ctrl.io.branch    := exu.io.redirect.valid
   ctrl.io.stallIduReg <> idReg.io.stall
   ctrl.io.stallExuReg <> exReg.io.stall
