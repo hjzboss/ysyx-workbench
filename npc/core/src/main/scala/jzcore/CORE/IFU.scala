@@ -50,8 +50,8 @@ class IFU extends Module with HasResetVector {
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
-    addr    -> Mux(addrFire && io.axiGrant, data, addr),
-    data    -> Mux(dataFire, addr, data)
+    addr    -> Mux(addrFire && io.axiGrant && !io.redirect.valid, data, addr),
+    data    -> Mux(dataFire || io.redirect.valid, addr, data)
   ))
 
   // pc
@@ -112,6 +112,6 @@ class IFU extends Module with HasResetVector {
   //readyFlag                 := Mux(state === data && dataFire && !io.finish, true.B, Mux(readyFlag && !io.finish, true.B, false.B))
   
   // 取指完毕信号，用于提醒流水线寄存器传递数据
-  io.ready                  := (state === data && dataFire) || io.stall
+  io.ready                  := (state === data && dataFire && !io.redirect.valid) || io.stall
   io.valid                  := state === data && dataFire
 }
