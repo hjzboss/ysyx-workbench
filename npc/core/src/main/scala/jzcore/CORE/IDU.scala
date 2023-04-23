@@ -13,6 +13,17 @@ class IDU extends Module with HasInstrType{
     val regWrite  = Flipped(new RFWriteIO)
     val csrWrite  = Flipped(new CSRWriteIO)
 
+/*
+    // 旁路控制信号
+    val forwardA    = Input(UInt(2.W))
+    val forwardB    = Input(UInt(2.W))
+
+    // 旁路数据
+    val exuForward  = Input(UInt(64.W))
+    val lsuForward  = Input(UInt(64.W))
+    val csrForward  = Input(UInt(64.W))
+*/
+
     // 送给exu的控制信号
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
@@ -21,6 +32,7 @@ class IDU extends Module with HasInstrType{
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
+  //val brAlu     = Module(new BrAlu)
 
   val inst      = io.in.inst
   val op        = inst(6, 0)
@@ -58,8 +70,33 @@ class IDU extends Module with HasInstrType{
   ))
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
+/*
   // 分支计算
-  
+  // forward
+  val opAPre = MuxLookup(io.forwardA, io.datasrc.src1, List(
+    Forward.lsuData -> io.lsuForward,
+    Forward.wbuData -> io.wbuForward,
+    Forward.csrData -> io.csrForward,
+    Forward.normal  -> io.datasrc.src1
+  ))
+  val opBPre = MuxLookup(io.forwardB, io.datasrc.src2, List(
+    Forward.lsuData -> io.lsuForward,
+    Forward.wbuData -> io.wbuForward,
+    Forward.csrData -> io.csrForward,
+    Forward.normal  -> io.datasrc.src2
+  ))
+  brAlu.io.opA         := opAPre
+  brAlu.io.opB         := opBpre
+  brAlu.io.brType      := aluOp
+  val brMark           := brAlu.io.brMark
+  val brInstr           = instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
+  // todo: branch addr
+  val brAddrOpA         = Mux(instrtype === InstrIJ, opAPre, io.in.pc)
+  val brAddr            = brAddrOpA + imm
+
+  io.redirect.brAddr   := Mux(systemCtrl === System.ecall, opAPre, Mux(systemCtrl === System.mret, aluOut, brAddr))
+  io.redirect.valid    := Mux((brInstr && brMark) || systemCtrl === System.ecall || systemCtrl === System.mret, true.B, false.B)
+*/
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
