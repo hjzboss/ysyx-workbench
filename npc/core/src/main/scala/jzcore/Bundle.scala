@@ -9,6 +9,11 @@ class DebugIO extends Bundle {
   //val execonce  = Output(Bool())
 }
 
+class CacheReadIO extends Decoupled {
+  val addr      = Output(UInt(64.W))
+  val data      = Input(UInt(64.W))
+}
+
 class RFReadIO extends Bundle {
   val rs1   = Output(UInt(5.W))
   val rs2   = Output(UInt(5.W))
