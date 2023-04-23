@@ -19,7 +19,6 @@ class WBU extends Module {
   // 寄存器文件写回
   io.regWrite.rd       := io.in.rd
   io.regWrite.wen      := io.in.regWen
-  //io.regWrite.value    := Mux(io.in.loadMem, io.in.lsuOut, io.in.exuOut)
   io.regWrite.value    := Mux(io.in.csrWen, io.in.csrValue, Mux(io.in.loadMem, io.in.lsuOut, io.in.exuOut))
 
   // csr文件写回

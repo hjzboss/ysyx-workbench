@@ -17,13 +17,7 @@ class IDU extends Module with HasInstrType{
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
-
-    // 防止信号被优化
-    //val lsType    = Output(UInt(4.W))
-    //val csrAddr   = Output(UInt(3.W))
   })
-
-  //io.ready     := true.B
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
@@ -35,6 +29,7 @@ class IDU extends Module with HasInstrType{
   val rd        = inst(11, 7)
   val csr       = inst(31, 20)
 
+  // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
   val instrtype = ctrlList(0)
@@ -55,17 +50,16 @@ class IDU extends Module with HasInstrType{
                     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
                     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
                   ))
-
   val csrRaddr = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
     CsrId.mepc    -> CsrAddr.mepc,
     CsrId.mcause  -> CsrAddr.mcause
   ))
-
-  //io.csrAddr         := csrRaddr // todo
-
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
+
+  // 分支计算
+  
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
@@ -89,6 +83,7 @@ class IDU extends Module with HasInstrType{
   csrReg.io.epc       := io.csrWrite.epc
   csrReg.io.no        := io.csrWrite.no
 
+  // 输出信息
   io.datasrc.pc       := io.in.pc
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
@@ -99,7 +94,6 @@ class IDU extends Module with HasInstrType{
   io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
-  //io.ctrl.wdata       := rf.io.src2
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.csrWen      := instrtype === InstrZ
@@ -116,6 +110,4 @@ class IDU extends Module with HasInstrType{
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
-
-  //io.lsType           := lsType
 }
