@@ -1,12 +1,19 @@
 package jzcore
 
 import chisel3._
+import chisel3.util._
+import utils._
 
 class DebugIO extends Bundle {
   val pc        = Output(UInt(64.W))
   val nextPc    = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
   //val execonce  = Output(Bool())
+}
+
+class CacheIO extends Bundle {
+  val addr      = Output(UInt(64.W))
+  val data      = Input(UInt(64.W))
 }
 
 class RFReadIO extends Bundle {

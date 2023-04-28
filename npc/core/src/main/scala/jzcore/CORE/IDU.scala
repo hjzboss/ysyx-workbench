@@ -13,6 +13,17 @@ class IDU extends Module with HasInstrType{
     val regWrite  = Flipped(new RFWriteIO)
     val csrWrite  = Flipped(new CSRWriteIO)
 
+/*
+    // 旁路控制信号
+    val forwardA    = Input(UInt(2.W))
+    val forwardB    = Input(UInt(2.W))
+
+    // 旁路数据
+    val exuForward  = Input(UInt(64.W))
+    val lsuForward  = Input(UInt(64.W))
+    val csrForward  = Input(UInt(64.W))
+*/
+
     // 送给exu的控制信号
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
@@ -21,6 +32,7 @@ class IDU extends Module with HasInstrType{
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
+  //val brAlu     = Module(new BrAlu)
 
   val inst      = io.in.inst
   val op        = inst(6, 0)
@@ -29,6 +41,7 @@ class IDU extends Module with HasInstrType{
   val rd        = inst(11, 7)
   val csr       = inst(31, 20)
 
+  // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
   val instrtype = ctrlList(0)
@@ -49,15 +62,41 @@ class IDU extends Module with HasInstrType{
                     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
                     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
                   ))
-
   val csrRaddr = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
     CsrId.mepc    -> CsrAddr.mepc,
     CsrId.mcause  -> CsrAddr.mcause
   ))
-
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
+
+/*
+  // 分支计算
+  // forward
+  val opAPre = MuxLookup(io.forwardA, io.datasrc.src1, List(
+    Forward.lsuData -> io.lsuForward,
+    Forward.wbuData -> io.wbuForward,
+    Forward.csrData -> io.csrForward,
+    Forward.normal  -> io.datasrc.src1
+  ))
+  val opBPre = MuxLookup(io.forwardB, io.datasrc.src2, List(
+    Forward.lsuData -> io.lsuForward,
+    Forward.wbuData -> io.wbuForward,
+    Forward.csrData -> io.csrForward,
+    Forward.normal  -> io.datasrc.src2
+  ))
+  brAlu.io.opA         := opAPre
+  brAlu.io.opB         := opBpre
+  brAlu.io.brType      := aluOp
+  val brMark           := brAlu.io.brMark
+  val brInstr           = instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
+  // todo: branch addr
+  val brAddrOpA         = Mux(instrtype === InstrIJ, opAPre, io.in.pc)
+  val brAddr            = brAddrOpA + imm
+
+  io.redirect.brAddr   := Mux(systemCtrl === System.ecall, opAPre, Mux(systemCtrl === System.mret, aluOut, brAddr))
+  io.redirect.valid    := Mux((brInstr && brMark) || systemCtrl === System.ecall || systemCtrl === System.mret, true.B, false.B)
+*/
 
   // registerfile
   rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
@@ -81,6 +120,7 @@ class IDU extends Module with HasInstrType{
   csrReg.io.epc       := io.csrWrite.epc
   csrReg.io.no        := io.csrWrite.no
 
+  // 输出信息
   io.datasrc.pc       := io.in.pc
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)

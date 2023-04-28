@@ -21,23 +21,28 @@ class IFU extends Module with HasResetVector {
     // 送给idu
     val out         = new InstrFetch
 
-    // axi接口
+/*
+    // axi
     val axiRaddrIO  = Decoupled(new RaddrIO)
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
-
     // 仲裁信号
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
     val axiReady    = Output(Bool())
+*/
+
+    // icache读端口，todo
+    val icacheIO    = Decoupled(new CacheIO)
 
     // 控制模块
     val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
     val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
   })
 
+  // axi握手信号
   val dataFire = io.axiRdataIO.valid && io.axiRdataIO.ready
   val addrFire = io.axiRaddrIO.ready && io.axiRaddrIO.valid
 
@@ -46,7 +51,7 @@ class IFU extends Module with HasResetVector {
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
-    addr    -> Mux(io.redirect.valid, addr, Mux(addrFire && io.axiGrant, data, addr)),
+    addr    -> Mux(io.redirect.valid, addr, Mux(addrFire, data, addr)),
     data    -> Mux(dataFire, addr, data)
   ))
 
@@ -55,6 +60,11 @@ class IFU extends Module with HasResetVector {
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
 
+/*
+  // cache
+  io.icacheIO.valid          := state === addr && !io.stall && !io.redirect.valid
+  io.icacheIO.bits.addr      := pc
+*/
   // axi取指接口
   io.axiRaddrIO.valid       := state === addr && !io.stall && !io.redirect.valid
   io.axiRaddrIO.bits.addr   := pc
@@ -69,8 +79,9 @@ class IFU extends Module with HasResetVector {
   io.axiWdataIO.bits.wstrb  := 0.U
   io.axiBrespIO.ready       := false.B
 
-  // 数据选择
+  // 数据选择, todo: 从cache中选择
   val instPre                = io.axiRdataIO.bits.rdata
+  //val instPre                = io.icacheIO.bits.data
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   val stallPc                = dontTouch(Wire(UInt(64.W)))
@@ -78,7 +89,7 @@ class IFU extends Module with HasResetVector {
 
   pc                        := MuxLookup(state, pc, List(
                                   addr  -> Mux(io.redirect.valid && !io.stall, dnpc, pc),  
-                                  // 流水线模式，当停顿信号生效时保持原pc
+                                  // 当停顿信号生效时保持原pc
                                   data  -> stallPc
                                 ))
 

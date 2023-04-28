@@ -28,6 +28,8 @@ class CTRL extends Module {
     val flushIduReg = Output(Bool())
     val flushWbuReg = Output(Bool()) // set when lsu is unready
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
+
+    // todo: load-use停顿处理
   })
   
   // 当取指未完成时停顿之前所有阶段
