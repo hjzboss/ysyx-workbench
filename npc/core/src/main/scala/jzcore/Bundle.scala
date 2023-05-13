@@ -8,12 +8,26 @@ class DebugIO extends Bundle {
   val pc        = Output(UInt(64.W))
   val nextPc    = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
-  //val execonce  = Output(Bool())
 }
 
-class CacheIO extends Bundle {
-  val addr      = Output(UInt(64.W))
+class CacheReadIO extends Bundle {
+  val addr      = Input(UInt(64.W))
+  val data      = Output(UInt(64.W))
+}
+
+class CacheWriteIO extends Bundle {
+  val addr      = Input(UInt(64.W))
   val data      = Input(UInt(64.W))
+}
+
+class MetaData extends Bundle {
+  val valid         = Bool()
+  val dirty         = Bool()
+  val tag           = UInt(52.W)
+}
+
+class ReplaceIO extends Bundle {
+  val block     = Output(Vec(64, UInt(8.W)))
 }
 
 class RFReadIO extends Bundle {

@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+/*
 trait HasCacheIO {
   implicit val cacheConfig: CacheConfig
   val io = IO(new CacheIO)
@@ -44,6 +45,28 @@ class CacheBank(entryNum: Int, blockWidth: Int, tagWidth: Int) extends Module {
     val dirty = Output(Bool())
     val tag   = Output(UInt(tagWidth.W))
     val rdata = Output()
+  })
+
+
+}
+*/
+
+// 四路组相联cache
+class ICache extends Module {
+  val io = IO(new Bundle {
+    // 和cpu的接口
+    val readIO      = Flipped(Decoupled(new CacheIO))
+
+    // axi总线请求信号
+    val axiRaddrIO  = Decoupled(new RaddrIO)
+    val axiRdataIO  = Flipped(Decoupled(new RdataIO))
+    val axiWaddrIO  = Decoupled(new WaddrIO)
+    val axiWdataIO  = Decoupled(new WdataIO)
+    val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
+    // 仲裁信号
+    val axiReq      = Output(Bool())
+    val axiGrant    = Input(Bool())
+    val axiReady    = Output(Bool())
   })
 
 

@@ -14,5 +14,6 @@
 /nvboard
 #/am-kernels
 /target
+.metals/
 .vscode
 .bsp
