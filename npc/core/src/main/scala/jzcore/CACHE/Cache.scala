@@ -89,6 +89,6 @@ class Cache extends Module {
     "b1000".U   -> dataArray(3).io.Q,
   ))
   val alignData = Mux(align, blockData(127, 64), blockData(63, 0))
-  io.cpu2cache.rdata := Mux(state === data, alignData, 0.U(64.W))
+  io.cpu2cache.bits.rdata := Mux(state === data, alignData, 0.U(64.W))
   io.cpu2cache.ready := state === data
 }
