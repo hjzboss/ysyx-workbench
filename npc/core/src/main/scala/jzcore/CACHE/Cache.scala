@@ -30,11 +30,14 @@ class Cache extends Module {
   val hit   = WireDefault(false.B)
   val dirty = WireDefault(false.B)
 
+  // axi fire
   val raddrFire          = io.axiRaddrIO.valid && io.axiRaddrIO.ready
   val rdataFire          = io.axiRdataIO.valid && io.axiRdataIO.ready
   val waddrFire          = io.axiWaddrIO.valid && io.axiWaddrIO.ready
   val wdataFire          = io.axiWdataIO.valid && io.axiWdataIO.ready
   val brespFire          = io.axiBrespIO.valid && io.axiBrespIO.ready
+
+  val cacheFire          = io.cpu2cache.valid && io.cpu2cache.ready
 
   // cache状态机
   val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 = Enum(7)
@@ -43,7 +46,7 @@ class Cache extends Module {
   state := MuxLookup(state, idle, List(
     idle        -> Mux(io.cpu2cache.valid, tagCompare, idle),
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
-    data        -> idle,
+    data        -> Mux(cacheFire, idle, data),
     writeback1  -> Mux(waddrFire, writeback2, writeback1),
     writeback2  -> Mux(wdataFire, allocate1, writeback2),
     allocate1   -> Mux(raddrFire, allocate2, allocate1),
