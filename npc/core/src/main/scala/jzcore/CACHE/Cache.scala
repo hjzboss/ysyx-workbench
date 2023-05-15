@@ -54,20 +54,25 @@ class Cache extends Module {
   ))
 
   val addr    = io.cpu2cache.bits.addr
-  val tag     = addr(63, 12)
-  val index   = addr(11, 6)
-  val align   = addr(5, 3)
+  val tag     = addr(63, 9)
+  val index   = addr(8, 4)
+  val align   = addr(3)
 
   val metaInit        = Wire(new MetaData)
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
   metaInit.cacheable := false.B
-  metaInit.tag       := 0.U(57.W)
+  metaInit.tag       := 0.U(55.W)
 
   // cache bank: 4
   val metaArray = Vec(4, VecInit(Seq.fill(32)(metaInit)))
-  val dataArray = List.fill(2)(Module(new Ram))
+  val dataArray = List.fill(4)(Module(new Ram))
 
-  
+  val hitList = Vec(4, Bool())
+
+  (0 to 3).map(i => (hitList(i) := metaArray(i)(index).valid && (metaArray(i)(index).tag === tag)))
+
+  hit := (hitList.asUInt).orR.toBool
+
   io.cpu2cache.ready := state === data
 }

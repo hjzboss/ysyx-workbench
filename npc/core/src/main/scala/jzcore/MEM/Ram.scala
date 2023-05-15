@@ -6,6 +6,8 @@ import utils._
 
 
 /**
+  * 128 bit * 64 
+  * 
   * output [127:0] Q	读数据
   * input CLK	时钟
   * input CEN	使能信号, 低电平有效

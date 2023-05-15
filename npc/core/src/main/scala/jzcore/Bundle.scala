@@ -19,8 +19,8 @@ class CacheIO extends Bundle {
 
 class CacheDecode extends Bundle {
   val index       = Input(UInt(5.W))
-  val tag         = Input(UInt(57.W))
-  val byte        = Input(UInt(2.W))
+  val tag         = Input(UInt(55.W))
+  val byte        = Input(Bool())
 }
 
 class MetaData extends Bundle {
