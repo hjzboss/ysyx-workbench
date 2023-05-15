@@ -40,7 +40,7 @@ class Cache extends Module {
   val cacheFire          = io.cpu2cache.valid && io.cpu2cache.ready
 
   // cache状态机
-  val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 = Enum(7)
+  val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: Nil = Enum(7)
   // val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
