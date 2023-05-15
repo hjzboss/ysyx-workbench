@@ -61,7 +61,7 @@ class Cache extends Module {
   val metaInit        = Wire(new MetaData)
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
-  metaInit.cacheable := false.B
+  //metaInit.cacheable := false.B
   metaInit.tag       := 0.U(55.W)
 
   // cache bank: 4
@@ -69,17 +69,27 @@ class Cache extends Module {
   val metaArray = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
   val dataArray = List.fill(4)(Module(new Ram))
 
-  val hitList = Vec(4, Bool())
+  // hit and dirty
+  val hitList = Wire(Vec(4, Bool()))
   (0 to 3).map(i => (hitList(i) := metaArray(i)(index).valid && (metaArray(i)(index).tag === tag)))
-  hit := (hitList.asUInt).orR
-
   dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
     "b0001".U   -> metaArray(0)(index).dirty,
     "b0010".U   -> metaArray(1)(index).dirty,
     "b0100".U   -> metaArray(2)(index).dirty,
     "b1000".U   -> metaArray(3)(index).dirty,
   ))
+  hit := (hitList.asUInt).orR
 
 
+
+  // return data
+  val blockData = LookupTreeDefault(hitList.asUInt, 0.U(128.W), List(
+    "b0001".U   -> dataArray(0)(index).Q,
+    "b0010".U   -> dataArray(1)(index).Q,
+    "b0100".U   -> dataArray(2)(index).Q,
+    "b1000".U   -> dataArray(3)(index).Q,
+  ))
+  val alignData = Mux(align, blockData(127, 64), blockData(63, 0))
+  io.cpu2cache.rdata := Mux(state === data, alignData, 0.U(64.W))
   io.cpu2cache.ready := state === data
 }

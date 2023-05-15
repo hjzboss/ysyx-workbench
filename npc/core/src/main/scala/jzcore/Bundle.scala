@@ -27,7 +27,7 @@ class MetaData extends Bundle {
   val valid         = Bool()
   val dirty         = Bool()
   val tag           = UInt(57.W)
-  val cacheable     = Bool()
+  //val cacheable     = Bool()
 }
 
 class RFReadIO extends Bundle {
