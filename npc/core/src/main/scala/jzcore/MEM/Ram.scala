@@ -16,12 +16,12 @@ import utils._
   */
 class Ram extends BlackBox {
   val io = IO(new Bundle {
-    val Q     = Output(UInt(128.U))
+    val Q     = Output(UInt(128.W))
     val CLK   = Input(Bool())
     val CEN   = Input(Bool())
     val WEN   = Input(Bool())
-    val BWEN  = Input(UInt(128.U))
+    val BWEN  = Input(UInt(128.W))
     val A     = Input(UInt(6.W))
-    val D     = Input(UInt(128.U)) 
+    val D     = Input(UInt(128.W)) 
   })
 }
