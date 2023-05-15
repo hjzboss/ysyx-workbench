@@ -37,23 +37,23 @@ class Cache extends Module {
   val brespFire          = io.axiBrespIO.valid && io.axiBrespIO.ready
 
   // cache状态机
-  val idle :: tag :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 = Enum(7)
+  val IDLE :: TAG :: DATA :: WRITEBACK1 :: WRITEBACK2 :: ALLOCATE1 :: ALLOCATE2 = Enum(7)
   // val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
-  val state = RegInit(idle)
-  state := MuxLookup(state, idle, List(
-    idle        -> Mux(io.cpu2cache.valid, tag, idle),
-    tag         -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
-    data        -> idle,
-    writeback1  -> Mux(waddrFire, writeback2, writeback1),
-    writeback2  -> Mux(wdataFire, allocate1, writeback2),
-    allocate1   -> Mux(raddrFire, allocate2, allocate1),
-    allocate2   -> Mux(rdataFire, data, allocate2)
+  val state = RegInit(IDLE)
+  state := MuxLookup(state, IDLE, List(
+    IDLE        -> Mux(io.cpu2cache.valid, TAG, IDLE),
+    TAG         -> Mux(hit, DATA, Mux(dirty, WRITEBACK1, ALLOCATE1)),
+    DATA        -> IDLE,
+    WRITEBACK1  -> Mux(waddrFire, WRITEBACK2, WRITEBACK1),
+    WRITEBACK2  -> Mux(wdataFire, ALLOCATE1, WRITEBACK2),
+    ALLOCATE1   -> Mux(raddrFire, ALLOCATE2, ALLOCATE1),
+    ALLOCATE2   -> Mux(rdataFire, DATA, ALLOCATE2)
   ))
 
   val addr    = io.cpu2cache.bits.addr
-  val tag     = raddr(63, 12)
-  val index   = raddr(11, 6)
-  val align   = raddr(5, 3)
+  val tag     = addr(63, 12)
+  val index   = addr(11, 6)
+  val align   = addr(5, 3)
 
   val metaInit        = Wire(new MetaData)
   metaInit.valid      = false.B
@@ -66,5 +66,5 @@ class Cache extends Module {
   val dataArray = Vec(2, new Ram)
 
   
-  io.cpu2cache.ready := state === data
+  io.cpu2cache.ready := state === DATA
 }
