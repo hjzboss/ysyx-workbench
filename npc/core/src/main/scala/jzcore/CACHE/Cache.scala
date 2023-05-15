@@ -42,7 +42,7 @@ class Cache extends Module {
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
     idle        -> Mux(io.cpu2cache.valid, tagCompare, idle),
-    tagCompare         -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
+    tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
     data        -> idle,
     writeback1  -> Mux(waddrFire, writeback2, writeback1),
     writeback2  -> Mux(wdataFire, allocate1, writeback2),
@@ -56,10 +56,10 @@ class Cache extends Module {
   val align   = addr(5, 3)
 
   val metaInit        = Wire(new MetaData)
-  metaInit.valid      = false.B
-  metaInit.dirty      = false.B
-  metaInit.cacheable  = false.B
-  metaInit.tag        = 0.U(57.W)
+  metaInit.valid     := false.B
+  metaInit.dirty     := false.B
+  metaInit.cacheable := false.B
+  metaInit.tag       := 0.U(57.W)
 
   // cache bank: 4
   val metaArray = Vec(4, VecInit(Seq.fill(32)(metaInit)))
