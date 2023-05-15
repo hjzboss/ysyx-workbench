@@ -66,7 +66,7 @@ class Cache extends Module {
 
   // cache bank: 4
   val metaArray = Vec(4, VecInit(Seq.fill(32)(metaInit)))
-  val dataArray = Vec(2, new Ram)
+  val dataArray = List.fill(2)(Module(new Ram))
 
   
   io.cpu2cache.ready := state === data
