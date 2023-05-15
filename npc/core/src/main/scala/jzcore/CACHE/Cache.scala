@@ -83,10 +83,10 @@ class Cache extends Module {
 
   // return data
   val blockData = LookupTreeDefault(hitList.asUInt, 0.U(128.W), List(
-    "b0001".U   -> dataArray(0).Q,
-    "b0010".U   -> dataArray(1).Q,
-    "b0100".U   -> dataArray(2).Q,
-    "b1000".U   -> dataArray(3).Q,
+    "b0001".U   -> dataArray(0).io.Q,
+    "b0010".U   -> dataArray(1).io.Q,
+    "b0100".U   -> dataArray(2).io.Q,
+    "b1000".U   -> dataArray(3).io.Q,
   ))
   val alignData = Mux(align, blockData(127, 64), blockData(63, 0))
   io.cpu2cache.rdata := Mux(state === data, alignData, 0.U(64.W))
