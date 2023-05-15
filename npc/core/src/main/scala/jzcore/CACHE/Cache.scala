@@ -65,14 +65,21 @@ class Cache extends Module {
   metaInit.tag       := 0.U(55.W)
 
   // cache bank: 4
-  val metaArray = Vec(4, VecInit(Seq.fill(32)(metaInit)))
+  //val metaArray = Vec(4, VecInit(Seq.fill(32)(metaInit)))
+  val metaArray = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
   val dataArray = List.fill(4)(Module(new Ram))
 
   val hitList = Vec(4, Bool())
-
   (0 to 3).map(i => (hitList(i) := metaArray(i)(index).valid && (metaArray(i)(index).tag === tag)))
+  hit := (hitList.asUInt).orR
 
-  hit := (hitList.asUInt).orR.toBool
+  dirty := MuxLookup(hitList, false.B, List(
+    "b0001".U   -> metaArray(0)(index).dirty,
+    "b0010".U   -> metaArray(1)(index).dirty,
+    "b0100".U   -> metaArray(2)(index).dirty,
+    "b1000".U   -> metaArray(3)(index).dirty,
+  ))
 
+  
   io.cpu2cache.ready := state === data
 }
