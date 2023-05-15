@@ -8,12 +8,26 @@ class DebugIO extends Bundle {
   val pc        = Output(UInt(64.W))
   val nextPc    = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
-  //val execonce  = Output(Bool())
 }
 
-class CacheReadIO extends Decoupled {
-  val addr      = Output(UInt(64.W))
-  val data      = Input(UInt(64.W))
+class CacheIO extends Bundle {
+  val addr  = Output(UInt(64.W))
+  val rdata = Input(UInt(64.W))
+  val wdata = Output(UInt(64.W))
+  val wen   = Output(Bool())
+}
+
+class CacheDecode extends Bundle {
+  val index       = Input(UInt(5.W))
+  val tag         = Input(UInt(57.W))
+  val byte        = Input(UInt(2.W))
+}
+
+class MetaData extends Bundle {
+  val valid         = Bool()
+  val dirty         = Bool()
+  val tag           = UInt(57.W)
+  val cacheable     = Bool()
 }
 
 class RFReadIO extends Bundle {
