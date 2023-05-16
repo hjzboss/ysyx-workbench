@@ -102,6 +102,12 @@ static void trace_and_difftest() {
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
 
+// for ebreak instruction
+extern "C" void c_break(long long halt_ret) {
+  npc_state.state = NPC_END;
+  npc_state.halt_pc = top->io_debug_pc;
+  npc_state.halt_ret = halt_ret;
+}
 
 /*
 extern "C" void inst_read(long long raddr, int *rdata) {
@@ -227,17 +233,6 @@ static void eval_wave() {
 #endif
   main_time++;
 }
-
-
-// for ebreak instruction
-extern "C" void c_break(long long halt_ret) {
-  npc_state.state = NPC_END;
-  eval_wave();
-  printf("io_debug_pc=%016x\n", top->io_debug_pc);
-  npc_state.halt_pc = top->io_debug_pc;
-  npc_state.halt_ret = halt_ret;
-}
-
 
 static void init_wave() {
   Verilated::traceEverOn(true);
