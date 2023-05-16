@@ -105,7 +105,8 @@ static void trace_and_difftest() {
 // for ebreak instruction
 extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
-  npc_state.halt_pc = top->io_debug_nextPc;
+  eval_wave();
+  npc_state.halt_pc = top->io_debug_pc;
   npc_state.halt_ret = halt_ret;
 }
 
