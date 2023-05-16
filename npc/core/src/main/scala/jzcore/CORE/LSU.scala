@@ -67,10 +67,9 @@ class LSU extends Module {
   io.axiWaddrIO.valid      := wState === idle && io.in.lsuWen
   io.axiWaddrIO.bits.addr  := addr
   io.axiWdataIO.valid      := wState === idle && io.in.lsuWen
-  io.axiWdataIO.bits.wdata := io.in.lsuWdata
+  io.axiWdataIO.bits.wdata := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   io.axiWdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
   io.axiBrespIO.ready      := wState === wait_resp
-
 
   // 数据对齐
   val align              = Cat(addr(2, 0), 0.U(3.W))
