@@ -90,5 +90,5 @@ class EXU extends Module {
 
   io.debugOut.inst     := io.debugIn.inst
   io.debugOut.pc       := io.debugIn.pc
-  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddr, io.debugIn.nextPc)
+  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)
 }
