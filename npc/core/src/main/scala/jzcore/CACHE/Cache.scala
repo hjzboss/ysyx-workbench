@@ -136,6 +136,7 @@ class Cache extends Module {
     }
   }.otherwhen(state === data && io.wen) {
     // write data
+    /*
     switch(hitList) {
       is("b0001".U) {
         io.sram0_cen    := false.B
@@ -143,7 +144,8 @@ class Cache extends Module {
         // mask, todo
 
       }
-    } 
+    } */
+    
   }.otherwise {
     io.sram0_cen  := true.B
     io.sram1_cen  := true.B
