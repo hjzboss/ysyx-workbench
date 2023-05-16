@@ -197,7 +197,8 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
       rdata = vga_read(waddr & ~0x7ull, 8);
-      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
+      //rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       vga_write(waddr & ~0x7ull, 8, rdata);
     }
     else {
@@ -205,7 +206,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       rdata = paddr_read(waddr & ~0x7ull, 8);
       //uint64_t rdata1 = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
-      printf("rdata=%x, rdata1=%x\n", rdata, rdata1);
+      //printf("rdata=%x, rdata1=%x\n", rdata, rdata1);
       paddr_write(waddr & ~0x7ull, 8, rdata);      
     }
   }
