@@ -28,7 +28,7 @@ class EX_REG extends Module with HasResetVector {
 
   // 复位值
   val datasrcReset         = Wire(new DataSrcIO)
-  datasrcReset.pc         := resetVector.U(64.W)
+  datasrcReset.pc         := resetVector.U(32.W)
   datasrcReset.src1       := 0.U(64.W)
   datasrcReset.src2       := 0.U(64.W)
   datasrcReset.imm        := 0.U(64.W)
@@ -81,8 +81,8 @@ class EX_REG extends Module with HasResetVector {
   io.validOut             := validReg
 
   val debugReset = Wire(new DebugIO)
-  debugReset.pc := resetVector.U(64.W)
-  debugReset.nextPc := resetVector.U(64.W)
+  debugReset.pc := resetVector.U(32.W)
+  debugReset.nextPc := resetVector.U(32.W)
   debugReset.inst := Instruction.NOP
 
   val debugReg = RegInit(debugReset)

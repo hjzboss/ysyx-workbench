@@ -50,7 +50,9 @@ class EXU extends Module {
     Forward.normal  -> io.datasrc.src2
   ))
 
-  val opA = Mux(aluSrc1 === SrcType.pc, io.datasrc.pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
+  val pc = ZeroExt(io.datasrc.pc, 64)
+
+  val opA = Mux(aluSrc1 === SrcType.pc, pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
   val aluOut  = alu.io.aluOut
 
@@ -59,18 +61,19 @@ class EXU extends Module {
   alu.io.aluOp         := io.aluCtrl.aluOp
 
   // todo: branch addr
-  val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, io.datasrc.pc)
+  val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, pc)
   val brAddr            = brAddrOpA + io.datasrc.imm
 
   // ecall mret
-  io.redirect.brAddr   := Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
+  val brAddr            = Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
+  io.redirect.brAddr   := brAddr(31, 0)
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
   io.out.lsuWen        := io.ctrl.memWen
   io.out.lsuRen        := io.ctrl.memRen
-  io.out.lsuAddr       := aluOut
+  io.out.lsuAddr       := aluOut(31, 0)
   io.out.lsuWdata      := opBPre // todo:forward
   io.out.loadMem       := io.ctrl.loadMem
   io.out.exuOut        := aluOut
@@ -87,5 +90,5 @@ class EXU extends Module {
 
   io.debugOut.inst     := io.debugIn.inst
   io.debugOut.pc       := io.debugIn.pc
-  io.debugOut.nextPc   := Mux(io.redirect.valid, io.redirect.brAddr, io.debugIn.nextPc)
+  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddr, io.debugIn.nextPc)
 }

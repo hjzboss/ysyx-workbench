@@ -5,28 +5,29 @@ import chisel3.util._
 import utils._
 
 class DebugIO extends Bundle {
-  val pc        = Output(UInt(64.W))
+  val pc        = Output(UInt(32.W))
   val nextPc    = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
 }
 
 class CacheIO extends Bundle {
-  val addr  = Output(UInt(64.W))
+  val addr  = Output(UInt(32.W))
   val rdata = Input(UInt(64.W))
   val wdata = Output(UInt(64.W))
   val wen   = Output(Bool())
+  val wmask = Output(UInt(8.W))
 }
 
 class CacheDecode extends Bundle {
-  val index       = Input(UInt(5.W))
-  val tag         = Input(UInt(55.W))
+  val index       = Input(UInt(6.W))
+  val tag         = Input(UInt(54.W))
   val byte        = Input(Bool())
 }
 
 class MetaData extends Bundle {
   val valid         = Bool()
   val dirty         = Bool()
-  val tag           = UInt(57.W)
+  val tag           = UInt(54.W)
   //val cacheable     = Bool()
 }
 
@@ -46,12 +47,12 @@ class CSRWriteIO extends Bundle {
   val waddr     = Output(UInt(3.W))
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
-  val epc       = Output(UInt(64.W))
+  val epc       = Output(UInt(32.W))
   val no        = Output(UInt(4.W))
 }
 
 class DataSrcIO extends Bundle {
-  val pc    = Output(UInt(64.W))
+  val pc    = Output(UInt(32.W))
   val src1  = Output(UInt(64.W))
   val src2  = Output(UInt(64.W))
   val imm   = Output(UInt(64.W))
@@ -90,7 +91,7 @@ class ExuOut extends Bundle {
   val wmask         = Output(UInt(8.W))
   val lsuWen        = Output(Bool())
   val lsuRen        = Output(Bool())
-  val lsuAddr       = Output(UInt(64.W))
+  val lsuAddr       = Output(UInt(32.W))
   val lsuWdata      = Output(UInt(64.W))
   val loadMem       = Output(Bool())
 
@@ -98,7 +99,7 @@ class ExuOut extends Bundle {
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
 
-  val pc            = Output(UInt(64.W))
+  val pc            = Output(UInt(32.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(3.W))
@@ -115,7 +116,7 @@ class LsuOut extends Bundle {
   val loadMem       = Output(Bool())
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
-  val pc            = Output(UInt(64.W))
+  val pc            = Output(UInt(32.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(3.W))
@@ -127,22 +128,22 @@ class LsuOut extends Bundle {
 }
 
 class InstrFetch extends Bundle {
-  val pc            = Output(UInt(64.W))
+  val pc            = Output(UInt(32.W))
   val inst          = Output(UInt(32.W))
 }
 
 class RedirectIO extends Bundle {
-  val brAddr        = Output(UInt(64.W))
+  val brAddr        = Output(UInt(32.W))
   val valid         = Output(Bool())
 }
 
 // axi接口
 class RaddrIO extends Bundle {
-  val addr          = Output(UInt(64.W))
+  val addr          = Output(UInt(32.W))
 }
 
 class WaddrIO extends Bundle {
-  val addr          = Output(UInt(64.W))
+  val addr          = Output(UInt(32.W))
 }
 
 class RdataIO extends Bundle {

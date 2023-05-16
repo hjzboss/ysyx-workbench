@@ -54,7 +54,7 @@ class IFU extends Module with HasResetVector {
   ))
 
   // pc
-  val pc  = RegInit(resetVector.U(64.W))
+  val pc  = RegInit(resetVector.U(32.W))
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
 
@@ -82,7 +82,7 @@ class IFU extends Module with HasResetVector {
   //val instPre                = io.icacheIO.bits.data
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
-  val stallPc                = dontTouch(Wire(UInt(64.W)))
+  val stallPc                = dontTouch(Wire(UInt(32.W)))
   stallPc                   := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
 
   pc                        := MuxLookup(state, pc, List(
