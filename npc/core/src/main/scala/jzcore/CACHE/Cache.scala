@@ -120,7 +120,7 @@ class Cache extends Module {
   io.sram3_addr   := index
   io.sram3_wen    := !io.cpu2cache.bits.wen
 
-  when((state === tagCompare && hit && !io.wen) || (state === allocate2 && rdataFire && !io.wen)) {
+  when((state === tagCompare && hit && !io.cpu2cache.bits.wen) || (state === allocate2 && rdataFire && !io.cpu2cache.bits.wen)) {
     // read data
     io.sram0_cen  := false.B
     io.sram1_cen  := false.B
@@ -145,7 +145,6 @@ class Cache extends Module {
 
       }
     } */
-    
   }.otherwise {
     io.sram0_cen  := true.B
     io.sram1_cen  := true.B
