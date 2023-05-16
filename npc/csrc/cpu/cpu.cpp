@@ -203,9 +203,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     else {
       // 物理内存
       rdata = paddr_read(waddr & ~0x7ull, 8);
-      uint64_t rdata1 = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
-      rdata = (rdata & ~wmask_64) + (wdata & wmask_64);
-      printf("rdata=%x, rdata1=%x\n", rdata, rdata1);
+      //uint64_t rdata1 = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
+      //printf("rdata=%x, rdata1=%x\n", rdata, rdata1);
       paddr_write(waddr & ~0x7ull, 8, rdata);      
     }
   }
