@@ -134,7 +134,7 @@ class Cache extends Module {
       is(2.U) {}
       is(3.U) {}
     }
-  }.elsewhen(state === data && io.wen) {
+  }.elsewhen(state === data && io.cpu2cache.bits.wen) {
     // write data
     /*
     switch(hitList) {
