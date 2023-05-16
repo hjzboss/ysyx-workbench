@@ -232,6 +232,7 @@ static void eval_wave() {
 // for ebreak instruction
 extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
+  eval_wave();
   printf("io_debug_pc=%016x\n", top->io_debug_pc);
   npc_state.halt_pc = top->io_debug_pc;
   npc_state.halt_ret = halt_ret;
