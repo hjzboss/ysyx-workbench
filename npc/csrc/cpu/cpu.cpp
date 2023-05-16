@@ -205,6 +205,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       rdata = paddr_read(waddr & ~0x7ull, 8);
       //rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       rdata = (rdata & ~wmask_64) + (wdata & wmask_64);
+      printf("rdata=%x\n", rdata);
       paddr_write(waddr & ~0x7ull, 8, rdata);      
     }
   }
