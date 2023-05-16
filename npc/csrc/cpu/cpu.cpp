@@ -228,13 +228,16 @@ static void eval_wave() {
   main_time++;
 }
 
+
 // for ebreak instruction
 extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
   eval_wave();
+  eval_wave();
   npc_state.halt_pc = top->io_debug_pc;
   npc_state.halt_ret = halt_ret;
 }
+
 
 static void init_wave() {
   Verilated::traceEverOn(true);
