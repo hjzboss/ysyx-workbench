@@ -126,7 +126,7 @@ class Cache extends Module {
     io.sram1_cen  := false.B
     io.sram2_cen  := false.B
     io.sram3_cen  := false.B
-  }.otherwhen(state === allocate2 && rdataFire) {
+  }.elsewhen(state === allocate2 && rdataFire) {
     // allocate: todo
     switch(randCount) {
       is(0.U) {}
@@ -134,7 +134,7 @@ class Cache extends Module {
       is(2.U) {}
       is(3.U) {}
     }
-  }.otherwhen(state === data && io.wen) {
+  }.elsewhen(state === data && io.wen) {
     // write data
     /*
     switch(hitList) {
