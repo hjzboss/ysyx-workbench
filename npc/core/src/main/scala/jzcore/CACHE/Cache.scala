@@ -1,4 +1,3 @@
-/*
 package jzcore
 
 import chisel3._
@@ -47,8 +46,6 @@ class Cache extends Module {
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
-    // todo: burst
-
 
     // arbiter
     val axiReq      = Output(Bool())
@@ -59,6 +56,10 @@ class Cache extends Module {
   // 随机替换计数器
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
+
+  // 待替换的路
+  val victimWay          = RegInit(0.U(2.W))
+  victimWay             := Mux(state === tagCompare, randCount, victimWay)
 
   val hit                = WireDefault(false.B)
   val dirty              = WireDefault(false.B)
@@ -86,23 +87,24 @@ class Cache extends Module {
     allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.last, data, allocate2) // data
   ))
 
-  // address decoder
-  val addr    = io.cpu2cache.bits.addr
-  val tag     = addr(63, 10)
-  val index   = addr(9, 4)
-  val align   = addr(3)
-
   // meta data
   val metaInit        = Wire(new MetaData)
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
   //metaInit.cacheable := false.B
   metaInit.tag       := 0.U(54.W)
-  val metaArray = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
+  val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
 
-  // hit and dirty
-  val hitList = Wire(Vec(4, Bool()))
-  (0 to 3).map(i => (hitList(i) := metaArray(i)(index).valid && (metaArray(i)(index).tag === tag)))
+  // ---------------------------address decode-----------------------------------------
+  val addr    = io.cpu2cache.bits.addr
+  val tag     = addr(63, 10)
+  val index   = addr(9, 4)
+  val align   = addr(3)
+
+  // ---------------------lookup metaArray and dataArray-------------------------------
+  // metaArray lookup
+  val hitList = RegInit(VecInit(List.fill(4)(false.B)))
+  (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), Mux(state === idle && io.cpu2cache.valid, false.B, hitList(i)))))
   dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
     "b0001".U   -> metaArray(0)(index).dirty,
     "b0010".U   -> metaArray(1)(index).dirty,
@@ -110,11 +112,35 @@ class Cache extends Module {
     "b1000".U   -> metaArray(3)(index).dirty,
   ))
   hit := (hitList.asUInt).orR
+  // dataArray lookup
+  val dataBlock = RegInit(0.U(128.W))
+  when(state === tagCompare) {
+    when(hit) {
+      dataBlock := LookupTree(hitLIst.asUInt, List(
+                    "b0001".U   -> io.sram0_rdata,
+                    "b0010".U   -> io.sram1_rdata,
+                    "b0100".U   -> io.sram2_rdata,
+                    "b1000".U   -> io.sram3_rdata,
+                  ))
+    }.otherwise {
+      // random choose
+      dataBlock := LookupTree(randCount, List(
+                    0.U   -> io.sram0_rdata,
+                    1.U   -> io.sram1_rdata,
+                    2.U   -> io.sram2_rdata,
+                    3.U   -> io.sram3_rdata,
+                  ))
+    }
+  }.otherwise {
+    dataBlock := dataBlock
+  }
 
-  val wburstOne = RegInit(Bool())
-  wburstOne := Mux(state === writeback1, false.B, Mux(state === writeback2 && wdataFire, true.B, wburstOne))
+  // ----------------------------write back and allocate--------------------------------
+  val allocTag = RegInit(false.B)
+  allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
+  
   val rburstOne = RegInit(Bool())
-  rburstOne := Mux(state === allocate1, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
+  rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1
@@ -122,7 +148,7 @@ class Cache extends Module {
 
   val burstAddr            = addr & "hfffffff8".U
 
-  // todo: allocate axi, burst read
+  // allocate axi, burst read
   io.axiRaddrIO.valid     := state === allocate1
   io.axiRaddrIO.bit.addr  := burstAddr
   io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
@@ -130,7 +156,7 @@ class Cache extends Module {
   io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
   io.axiRdataIO.ready     := state === allocate2
 
-  val rblockBuffer         = RegInit(VecInit(Seq.fill(2)(0.U(64.W))))
+  val rblockBuffer         = RegInit(VecInit(Seq.fill(2)(0.U(64.W)))) // allocate block
   rblockBuffer(0)         := MuxLookup(state, 0.U(64.W), List(
                               writeback1 -> 0.U(64.W),
                               writeback2 -> Mux(rdataFire && !rburstOne, io.axiRdataio.bits.rdata, rblockBuffer(0))
@@ -143,21 +169,30 @@ class Cache extends Module {
   val rblockData           = Cat(rblockBuffer(1), rblockBuffer(0))
   val rblockDataRev        = Cat(rblockBuffer(0), rblockBuffer(1))
 
-  // todo: writeback axi, burst write
+  // writeback axi, burst write
+  val wburstOne = RegInit(Bool())
+  wburstOne := Mux(state === tagCompare, false.B, Mux((state === writeback1 && wdataFire) || (state === writeback2 && !wburstOne && wdataFire), true.B, wburstOne))
+  //wburstOne := Mux(state === writeback1, false.B, Mux(state === writeback2 && wdataFire, true.B, wburstOne))
+
   io.axiWaddrIO.valid     := state === writeback1
   io.axiWaddrIO.bits.addr := burstAddr
   io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap
 
-  io.axiWdataIO.valid     := state === writeback2
-  io.axiWdataIO.wlast     := state === writeback2 && wburstEnd
-  io.axiWdataIO.wstrb     := "b11111111".U
-  // todo: wdata
-
-
-
-  // ram
+  io.axiWdataIO.valid     := state === writeback1 || state === writeback2
+  io.axiWdataIO.bits.wlast:= state === writeback2 && wburstOne
+  io.axiWdataIO.bits.wstrb:= "b11111111".U
+  // burst write
+  when(state === writeback1 || (state === writeback2 && !wburstOne)) {
+    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 32), dataBlock(31, 0))
+  }.elsewhen(state === writeback2 && wburstOne) {
+    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(31, 0), dataBlock(63, 32))
+  }.otherwise {
+    io.axiWdataIO.bits.wdata := 0.U(64.W)
+  }
+  
+  // dataArray control
   io.sram0_addr   := index
   io.sram0_wen    := !io.cpu2cache.bits.wen
   io.sram1_addr   := index
@@ -167,19 +202,16 @@ class Cache extends Module {
   io.sram3_addr   := index
   io.sram3_wen    := !io.cpu2cache.bits.wen
 
-  io.sram0_cen    := true.B
-  io.sram1_cen    := true.B
-  io.sram2_cen    := true.B
-  io.sram3_cen    := true.B
-  when((state === tagCompare && hit && !io.cpu2cache.bits.wen) || (state === allocate2 && rdataFire && !io.cpu2cache.bits.wen)) {
+  // todo: 什么时候读dataArray? allocate2阶段是否需要读?
+  when(state === idle && io.cpu2cache.valid) {
     // read data
     io.sram0_cen  := false.B
     io.sram1_cen  := false.B
     io.sram2_cen  := false.B
     io.sram3_cen  := false.B
-  }.elsewhen(state === allocate2 && rdataFire) {
-    // allocate
-    switch(randCount) {
+  }.elsewhen(state === allocate2 && rdataFire && io.axiRdataIO.bits.rlast) {
+    // allocate dataArray
+    switch(victimWay) {
       is(0.U) {
         io.sram0_cen    := false.B
         io.sram0_wdata  := Mux(align, rblockDataRev, rblockData)
@@ -205,16 +237,40 @@ class Cache extends Module {
         io.sram3_wmask  := 0.U(128.W)
       }
     }
-  }.elsewhen(state === data && io.cpu2cache.bits.wen) {
-    // write data
-    switch(hitList) {
-      is("b0001".U) {
-        io.sram0_cen    := false.B
-        //io.sram0_wmask  := Mux(align, "h0000_0000_0000_0000_ffff_ffff_ffff_ffff".U, "hffff_ffff_ffff_ffff_0000_0000_0000_0000".U)
-        // mask, todo
-        
+    // allocate metaArray
+    val metaAlloc = Wire(new MetaData)
+    metaAlloc.tag := tag
+    metaAlloc.valid := true.B
+    metaAlloc.dirty := false.B
+    metaArray(victimWay)(index) := metaAlloc
+  }.elsewhen(state === data) {
+    when(allocTag) {
+      switch(victimWay) {
+        is(0.U) {
+          io.sram0_cen    := false.B
+          io.sram0_wmask  := 
+          //io.sram0_wmask  := Mux(align, "h0000_0000_0000_0000_ffff_ffff_ffff_ffff".U, "hffff_ffff_ffff_ffff_0000_0000_0000_0000".U)
+          // mask, todo
+          
+        }
+      }
+    }.otherwise {
+      // write data
+      switch(hitList) {
+        is("b0001".U) {
+          io.sram0_cen    := false.B
+          //io.sram0_wmask  := Mux(align, "h0000_0000_0000_0000_ffff_ffff_ffff_ffff".U, "hffff_ffff_ffff_ffff_0000_0000_0000_0000".U)
+          // mask, todo
+          
+        }
       }
     }
+
+  }.otherwise {
+    io.sram0_cen    := true.B
+    io.sram1_cen    := true.B
+    io.sram2_cen    := true.B
+    io.sram3_cen    := true.B
   }
 
   // return value
@@ -228,4 +284,3 @@ class Cache extends Module {
   io.cpu2cache.bits.rdata := Mux(state === data, alignData, 0.U(64.W))
   io.cpu2cache.ready      := state === data
 }
-*/

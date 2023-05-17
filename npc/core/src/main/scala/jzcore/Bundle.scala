@@ -141,29 +141,29 @@ class RedirectIO extends Bundle {
 class RaddrIO extends Bundle {
   val addr          = Output(UInt(32.W))
   // 读突发信号
-  //val len           = Output(UInt(8.W))
-  //val size          = Output(UInt(3.W))
-  //val burst         = Output(UInt(2.W))
+  val len           = Output(UInt(8.W))
+  val size          = Output(UInt(3.W))
+  val burst         = Output(UInt(2.W))
 }
 
 class WaddrIO extends Bundle {
   val addr          = Output(UInt(32.W))
   // 写突发信号
-  //val len           = Output(UInt(8.W))
-  //val size          = Output(UInt(3.W))
-  //val burst         = Output(UInt(2.W))
+  val len           = Output(UInt(8.W))
+  val size          = Output(UInt(3.W))
+  val burst         = Output(UInt(2.W))
 }
 
 class RdataIO extends Bundle {
   val rdata         = Output(UInt(64.W))
   val rresp         = Output(UInt(2.W))
-  //val rlast         = Output(Bool())
+  val rlast         = Output(Bool())
 }
 
 class WdataIO extends Bundle {
   val wdata         = Output(UInt(64.W))
   val wstrb         = Output(UInt(8.W))
-  //val wlast         = Output(Bool())
+  val wlast         = Output(Bool())
 }
 
 class BrespIO extends Bundle {
