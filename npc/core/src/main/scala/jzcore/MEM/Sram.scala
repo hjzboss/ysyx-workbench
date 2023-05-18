@@ -63,7 +63,7 @@ class Sram extends Module {
   val brespFire          = io.brespIO.valid && io.brespIO.ready
 
   // write state
-  val w_wait :: w_data :: w_resp :: Nil = Enum(2)
+  val w_wait :: w_data :: w_resp :: Nil = Enum(3)
   val wState = RegInit(w_wait)
   wState := MuxLookup(wState, w_wait, List(
     w_wait       -> Mux(waddrFire && wdataFire && io.wdataIO.bits.wlast, w_resp, Mux(waddrFire, w_data, w_wait)),
