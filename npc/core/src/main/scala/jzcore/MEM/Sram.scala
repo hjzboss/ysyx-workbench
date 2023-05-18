@@ -86,7 +86,7 @@ class Sram extends Module {
   }
 
   waddrReg              := Mux(wState === w_wait, io.waddrIO.bits.addr, waddrReg)
-  wmaskReg              := Mux(wState === w_wait, io.waddrIO.bits.wstrb, wmaskReg)
+  wmaskReg              := Mux(wState === w_wait, io.wdataIO.bits.wstrb, wmaskReg)
 
   // 写事务
   io.waddrIO.ready      := wState === w_wait
