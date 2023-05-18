@@ -266,24 +266,28 @@ class Cache extends Module {
     (0 to 8).map(i => (wmask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
     // write enable
     when(allocTag) {
-      metaArray(victimWay)(index).dirty := true.B
+      //metaArray(victimWay)(index).dirty := true.B
       switch(victimWay) {
         is(0.U) {
+          metaArray(0)(index).dirty := true.B
           io.sram0_cen    := false.B
           io.sram0_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
           io.sram0_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is(1.U) {
+          metaArray(1)(index).dirty := true.B
           io.sram1_cen    := false.B
           io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
           io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is(2.U) {
+          metaArray(2)(index).dirty := true.B
           io.sram1_cen    := false.B
           io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
           io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is(3.U) {
+          metaArray(3)(index).dirty := true.B
           io.sram1_cen    := false.B
           io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
           io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
