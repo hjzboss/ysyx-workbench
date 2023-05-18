@@ -215,7 +215,7 @@ class Cache extends Module {
   // burst write
   when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 32), dataBlock(31, 0))
-  }.elsewhen(state === writeback2 && wburstOne === 1.U(2.W)) {
+  }.elsewhen(state === writeback2 && wburst === 1.U(2.W)) {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(31, 0), dataBlock(63, 32))
   }.otherwise {
     io.axiWdataIO.bits.wdata := 0.U(64.W)
