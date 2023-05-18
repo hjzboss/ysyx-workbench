@@ -61,7 +61,7 @@ class IFU extends Module with HasResetVector {
   // 保存跳转分支
   val brAddr                 = RegInit(resetVector.U(32.W))
   brAddr                    := Mux(io.redirect.valid, io.redirect.brAddr, brAddr)
-  val brFlag                 = RegInit(Bool())
+  val brFlag                 = RegInit(false.B)
   brFlag                    := Mux(state === addr, false.B, Mux(io.redirect.valid, true.B, brFlag))
 
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
