@@ -32,18 +32,17 @@ class Sram extends Module {
 
   // read state
   val rcnt               = RegInit(0.U(2.W))
-  rcnt                  := Mux(rState === ar_wait, 0.U(2.W), Mux(rState === fetch && rdataFire, rcnt + 1.U(2.W), rcnt))
-
   val rsize              = RegInit(1.U(2.W))
-  rsize                 := Mux(rState === ar_wait && raddrFire, io.raddrIO.bits.len - 1.U(2.W), rsize)
 
   val ar_wait :: fetch :: Nil = Enum(2)
-  val rState = RegInit(ar_wait)
+  val rState  = RegInit(ar_wait)
   rState := MuxLookup(rState, ar_wait, List(
     ar_wait       -> Mux(raddrFire, fetch, ar_wait), // 等待地址信息
     fetch         -> Mux(rdataFire && rcnt === rsize, ar_wait, fetch), // 取指完成，当取指阻塞时保持状态
   ))
   
+  rcnt                  := Mux(rState === ar_wait, 0.U(2.W), Mux(rState === fetch && rdataFire, rcnt + 1.U(2.W), rcnt))
+  rsize                 := Mux(rState === ar_wait && raddrFire, io.raddrIO.bits.len - 1.U(2.W), rsize)
   raddrReg              := Mux(rState === ar_wait, io.raddrIO.bits.addr, raddrReg)
 
   // 读事务
