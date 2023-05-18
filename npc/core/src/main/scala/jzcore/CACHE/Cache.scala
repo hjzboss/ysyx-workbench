@@ -92,7 +92,7 @@ class Cache extends Module {
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // addr
     writeback2  -> Mux(brespFire, allocate1, writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // addr 
-    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.last, data, allocate2) // data
+    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2) // data
   ))
 
   // meta data
@@ -160,13 +160,13 @@ class Cache extends Module {
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1
-  io.axiReady := state === allocate2 && rdataFire && io.rdataIO.rlast
+  io.axiReady := state === allocate2 && rdataFire && io.rdataIO.bits.rlast
 
   val burstAddr            = addr & "hfffffff8".U
 
   // allocate axi, burst read
   io.axiRaddrIO.valid     := state === allocate1
-  io.axiRaddrIO.bit.addr  := burstAddr
+  io.axiRaddrIO.bits.addr  := burstAddr
   io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
@@ -262,8 +262,8 @@ class Cache extends Module {
   }.elsewhen(state === data && cwdataFire) {
     // write dataArray
     // wmask8 to wmask64
-    val mask64 = Wire(Vec(8, UInt(8.W)))
-    (0 to 8).map(i => (mask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
+    val wmask64 = Wire(Vec(8, UInt(8.W)))
+    (0 to 8).map(i => (wmask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
     // write enable
     when(allocTag) {
       metaArray(victimWay)(index).dirty := true.B
