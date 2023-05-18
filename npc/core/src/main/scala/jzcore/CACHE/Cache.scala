@@ -156,7 +156,7 @@ class Cache extends Module {
   val allocTag = RegInit(false.B)
   allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
 
-  val rburstOne = RegInit(Bool())
+  val rburstOne = RegInit(false.B)
   rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
 
   // axi
