@@ -187,23 +187,35 @@ class Cache extends Module {
   val rblockDataRev        = Cat(rblockBuffer(0), rblockBuffer(1))
 
   // writeback axi, burst write
-  val wburstOne = RegInit(false.B)
-  wburstOne := Mux(state === tagCompare, false.B, Mux((state === writeback1 && wdataFire) || (state === writeback2 && !wburstOne && wdataFire), true.B, wburstOne))
+  //val wburstOne = RegInit(false.B)
+  val wburst = RegInit(0.U(2.W))
+  when(state === tagCompare) {
+    wburst := 0.U(2.W)
+  }.otherwhen(state === writeback1 && wdataFire && waddrFire && io.axiGrant) {
+    wburst := wburst + 1.U(2.W)
+  }.otherwhen(state === writeback2 && (wburst === 1.U(2.W) || wburst === 0.U(2.W)) && wdataFire) {
+    wburst := wburst + 1.U(2.W)
+  }.otherwise {
+    wburst := wburst
+  }
+  //wburstOne := Mux(state === tagCompare, false.B, Mux((state === writeback1 && wdataFire) || (state === writeback2 && !wburstOne && wdataFire), true.B, wburstOne))
   //wburstOne := Mux(state === writeback1, false.B, Mux(state === writeback2 && wdataFire, true.B, wburstOne))
 
-  io.axiWaddrIO.valid     := state === writeback1
+  io.axiWaddrIO.valid     := state === writeback1 && io.axiGrant
   io.axiWaddrIO.bits.addr := burstAddr
   io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap
 
   io.axiWdataIO.valid     := state === writeback1 || state === writeback2
-  io.axiWdataIO.bits.wlast:= state === writeback2 && wburstOne
+  io.axiWdataIO.bits.wlast:= state === writeback2 && wburst === 1.U(2.W)
   io.axiWdataIO.bits.wstrb:= "b11111111".U
+
+  io.axiBrespIO.ready     := state === writeback2 && wburst === 2.U(2.W)
   // burst write
-  when(state === writeback1 || (state === writeback2 && !wburstOne)) {
+  when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 32), dataBlock(31, 0))
-  }.elsewhen(state === writeback2 && wburstOne) {
+  }.elsewhen(state === writeback2 && wburstOne === 1.U(2.W)) {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(31, 0), dataBlock(63, 32))
   }.otherwise {
     io.axiWdataIO.bits.wdata := 0.U(64.W)
