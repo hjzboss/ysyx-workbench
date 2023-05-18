@@ -106,7 +106,9 @@ class Cache extends Module {
   // ---------------------------address decode-----------------------------------------
   val addr    = RegInit(0.U(32.W))
   val wen     = RegInit(false.B)
-  val tag     = Wire(UInt(22.W))wdataFire io.ctrlIO.bits.wen, wen)
+  val tag     = Wire(UInt(22.W))
+  addr       := Mux(state === idle && ctrlFire, io.ctrlIO.bits.addr, addr)
+  wen        := Mux(state === idle && ctrlFire, io.ctrlIO.bits.wen, wen)
   tag        := addr(31, 10)
   index      := addr(9, 4)
   align      := addr(3)
