@@ -267,7 +267,7 @@ class Cache extends Module {
     // write dataArray
     // wmask8 to wmask64
     val wmask64 = Wire(Vec(8, UInt(8.W)))
-    (0 to 8).map(i => (wmask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
+    (0 to 7).map(i => (wmask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
     // write enable
     when(allocTag) {
       //metaArray(victimWay)(index).dirty := true.B
