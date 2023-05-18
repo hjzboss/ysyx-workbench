@@ -92,6 +92,7 @@ class JzCore extends Module {
     lsu.io.axiRdataIO.valid   := false.B
     lsu.io.axiRdataIO.bits.rdata := 0.U
     lsu.io.axiRdataIO.bits.rresp   := 0.U
+    lsu.io.axiRdataIO.bits.rlast   := true.B
     lsu.io.axiWaddrIO.ready   := false.B
     lsu.io.axiWdataIO.ready   := false.B
     lsu.io.axiBrespIO.valid   := false.B
@@ -107,6 +108,7 @@ class JzCore extends Module {
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
     icache.io.axiRdataIO.bits.rdata := 0.U
+    icache.io.axiRdataIO.bits.rlast := true.B
     icache.io.axiRdataIO.bits.rresp   := 0.U
     icache.io.axiWaddrIO.ready   := false.B
     icache.io.axiWdataIO.ready   := false.B
@@ -117,18 +119,23 @@ class JzCore extends Module {
     // 没有请求
     io.axiRaddrIO.valid       := false.B
     io.axiRaddrIO.bits.addr   := 0.U
+    io.axiRaddrIO.bits.len    := 0.U
+    io.axiRaddrIO.bits.size   := 0.U
+    io.axiRaddrIO.bits.burst  := 0.U
     io.axiRdataIO.ready       := false.B
     io.axiWaddrIO.valid       := false.B
     io.axiWaddrIO.bits.addr   := 0.U
     io.axiWdataIO.valid       := false.B
     io.axiWdataIO.bits.wdata  := 0.U
     io.axiWdataIO.bits.wstrb  := 0.U
+    io.axiWdataIO.bits.wlast  := true.B
     io.axiBrespIO.ready       := false.B
 
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
     icache.io.axiRdataIO.bits.rdata := 0.U
     icache.io.axiRdataIO.bits.rresp   := 0.U
+    icache.io.axiRdataIO.bits.rlast   := true.B
     icache.io.axiWaddrIO.ready   := false.B
     icache.io.axiWdataIO.ready   := false.B
     icache.io.axiBrespIO.valid   := false.B
@@ -137,6 +144,7 @@ class JzCore extends Module {
     lsu.io.axiRaddrIO.ready   := false.B
     lsu.io.axiRdataIO.valid   := false.B
     lsu.io.axiRdataIO.bits.rdata := 0.U
+    lsu.io.axiRdataIO.bits.rlast   := true.B
     lsu.io.axiRdataIO.bits.rresp   := 0.U
     lsu.io.axiWaddrIO.ready   := false.B
     lsu.io.axiWdataIO.ready   := false.B
