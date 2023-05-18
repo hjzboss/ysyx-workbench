@@ -232,35 +232,35 @@ class Cache extends Module {
     metaAlloc.tag := tag
     metaAlloc.valid := true.B
     metaAlloc.dirty := false.B
+    io.sram0_cen    := true.B
+    io.sram0_wdata  := Mux(align, rblockDataRev, rblockData)
+    io.sram0_wmask  := 0.U(128.W)
+    io.sram1_cen    := true.B
+    io.sram1_wdata  := Mux(align, rblockDataRev, rblockData)
+    io.sram1_wmask  := 0.U(128.W)
+    io.sram2_cen    := true.B
+    io.sram2_wdata  := Mux(align, rblockDataRev, rblockData)
+    io.sram2_wmask  := 0.U(128.W)
+    io.sram3_cen    := true.B
+    io.sram3_wdata  := Mux(align, rblockDataRev, rblockData)
+    io.sram3_wmask  := 0.U(128.W)
     // allocate dataArray
     switch(victimWay) {
       is(0.U) {
         metaArray(0)(index) := metaAlloc
         io.sram0_cen    := false.B
-        io.sram0_wdata  := Mux(align, rblockDataRev, rblockData)
-        io.sram0_wen    := false.B
-        io.sram0_wmask  := 0.U(128.W)
       }
       is(1.U) {
         metaArray(1)(index) := metaAlloc
         io.sram1_cen    := false.B
-        io.sram1_wdata  := Mux(align, rblockDataRev, rblockData)
-        io.sram1_wen    := false.B
-        io.sram1_wmask  := 0.U(128.W)
       }
       is(2.U) {
         metaArray(2)(index) := metaAlloc
         io.sram2_cen    := false.B
-        io.sram2_wdata  := Mux(align, rblockDataRev, rblockData)
-        io.sram2_wen    := false.B
-        io.sram2_wmask  := 0.U(128.W)
       }
       is(3.U) {
         metaArray(3)(index) := metaAlloc
         io.sram3_cen    := false.B
-        io.sram3_wdata  := Mux(align, rblockDataRev, rblockData)
-        io.sram3_wen    := false.B
-        io.sram3_wmask  := 0.U(128.W)
       }
     }
   }.elsewhen(state === data && cwdataFire) {

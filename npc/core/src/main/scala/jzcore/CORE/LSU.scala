@@ -43,6 +43,7 @@ class LSU extends Module {
 
   val addr               = io.in.lsuAddr
 
+  // todo
   io.axiRaddrIO.bits.len := 0.U
   io.axiRaddrIO.bits.size:= 3.U
   io.axiRaddrIO.bits.burst := 2.U(2.W)
