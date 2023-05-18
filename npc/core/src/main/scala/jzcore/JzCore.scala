@@ -261,8 +261,8 @@ class JzCore extends Module {
   ifu.io.stall      <> ctrl.io.stallPc
   ifu.io.valid      <> idReg.io.validIn
   ifu.io.icacheCtrl <> icache.io.ctrlIO
-  ifu.io.icacheRead <> icache.io.wdataIO
-  ifu.io.icacheWrite<> icache.io.rdataIO
+  ifu.io.icacheRead <> icache.io.rdataIO
+  ifu.io.icacheWrite<> icache.io.wdataIO
   exReg.io.validIn  <> idReg.io.validOut
   lsReg.io.validIn  <> exReg.io.validOut
   wbReg.io.validIn  <> lsReg.io.validOut
