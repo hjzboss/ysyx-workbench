@@ -10,12 +10,22 @@ class DebugIO extends Bundle {
   val inst      = Output(UInt(32.W))
 }
 
-class CacheIO extends Bundle {
+// todo: cpu需要返回一个ready信号给cache，代表成功接受数据，此bundle需要进一步分离
+class CacheCtrlIO extends Bundle {
   val addr  = Output(UInt(32.W))
-  val rdata = Input(UInt(64.W))
-  val wdata = Output(UInt(64.W))
+  //val rdata = Input(UInt(64.W))
+  //val wdata = Output(UInt(64.W))
   val wen   = Output(Bool())
+  //val wmask = Output(UInt(8.W))
+}
+
+class CacheWriteIO extends Bundle {
+  val wdata = Output(UInt(64.W))
   val wmask = Output(UInt(8.W))
+}
+
+class CacheReadIO extends Bundle {
+  val rdata = Output(UInt(64.W))
 }
 
 class CacheDecode extends Bundle {
@@ -27,7 +37,7 @@ class CacheDecode extends Bundle {
 class MetaData extends Bundle {
   val valid         = Bool()
   val dirty         = Bool()
-  val tag           = UInt(54.W)
+  val tag           = UInt(22.W)
   //val cacheable     = Bool()
 }
 

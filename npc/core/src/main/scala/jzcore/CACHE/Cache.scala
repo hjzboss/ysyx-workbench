@@ -5,11 +5,17 @@ import chisel3.util._
 import utils._
 
 
+/**
+  * todo：访问外设时需要直接跳过cache，cacheable位的处理
+  */
+
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class Cache extends Module {
   val io = IO(new Bundle {
     // cpu
-    val cpu2cache = Flipped(Decoupled(new CacheIO))
+    val ctrlIO          = Flipped(Decoupled(new CacheCtrolIO))
+    val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
+    val rdataIO         = Decoupled(new CacheReadIO) 
 
     // ram, dataArray
     val sram0_rdata     = Input(UInt(128.W))
@@ -53,11 +59,11 @@ class Cache extends Module {
     val axiReady    = Output(Bool())
   })
 
-  // 随机替换计数器
+  // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
 
-  // 待替换的路
+  // the way chosen to victim
   val victimWay          = RegInit(0.U(2.W))
   victimWay             := Mux(state === tagCompare, randCount, victimWay)
 
@@ -71,16 +77,18 @@ class Cache extends Module {
   val wdataFire          = io.axiWdataIO.valid && io.axiWdataIO.ready
   val brespFire          = io.axiBrespIO.valid && io.axiBrespIO.ready
 
-  val cacheFire          = io.cpu2cache.valid && io.cpu2cache.ready
+  val ctrlFire           = io.ctrlIO.valid && io.ctrlIO.ready
+  val cwdataFire         = io.wdataIO.valid && io.wdataIO.ready
+  val crdataFire         = io.rdataIO.valid && io.rdataIO.ready
 
-  // cache状态机
+  // cache state machine
   val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: Nil = Enum(7)
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle        -> Mux(io.cpu2cache.valid, tagCompare, idle),
+    idle        -> Mux(ctrlFire, tagCompare, idle),
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
-    data        -> Mux(cacheFire, idle, data),
+    data        -> Mux(crdataFire || cwdataFire, idle, data),
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // addr
     writeback2  -> Mux(brespFire, allocate1, writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // addr 
@@ -92,19 +100,22 @@ class Cache extends Module {
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
   //metaInit.cacheable := false.B
-  metaInit.tag       := 0.U(54.W)
+  metaInit.tag       := 0.U(22.W)
   val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
 
   // ---------------------------address decode-----------------------------------------
-  val addr    = io.cpu2cache.bits.addr
-  val tag     = addr(63, 10)
-  val index   = addr(9, 4)
-  val align   = addr(3)
+  val addr    = RegInit(0.U(32.W))
+  val wen     = RegInit(false.B)
+  val tag     = Wire(UInt(22.W))wdataFire io.ctrlIO.bits.wen, wen)
+  tag        := addr(31, 10)
+  index      := addr(9, 4)
+  align      := addr(3)
 
   // ---------------------lookup metaArray and dataArray-------------------------------
   // metaArray lookup
-  val hitList = RegInit(VecInit(List.fill(4)(false.B)))
-  (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), Mux(state === idle && io.cpu2cache.valid, false.B, hitList(i)))))
+  val hitList    = VecInit(List.fill(4)(false.B))
+  val hitListReg = RegInit(VecInit(List.fill(4)(false.B)))
+  (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), false.B)))
   dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
     "b0001".U   -> metaArray(0)(index).dirty,
     "b0010".U   -> metaArray(1)(index).dirty,
@@ -112,11 +123,12 @@ class Cache extends Module {
     "b1000".U   -> metaArray(3)(index).dirty,
   ))
   hit := (hitList.asUInt).orR
+  hitListReg := Mux(state === tagCompare, hitList, hitListReg)
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {
     when(hit) {
-      dataBlock := LookupTree(hitLIst.asUInt, List(
+      dataBlock := LookupTree(hitList.asUInt, List(
                     "b0001".U   -> io.sram0_rdata,
                     "b0010".U   -> io.sram1_rdata,
                     "b0100".U   -> io.sram2_rdata,
@@ -144,7 +156,7 @@ class Cache extends Module {
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1
-  io.axiReady := (state === writeback2 && brespFire) || (state === allocate2 && rdataFire && io.rdataIO.rlast)
+  io.axiReady := state === allocate2 && rdataFire && io.rdataIO.rlast
 
   val burstAddr            = addr & "hfffffff8".U
 
@@ -191,19 +203,19 @@ class Cache extends Module {
   }.otherwise {
     io.axiWdataIO.bits.wdata := 0.U(64.W)
   }
-  
+
   // dataArray control
   io.sram0_addr   := index
-  io.sram0_wen    := !io.cpu2cache.bits.wen
+  io.sram0_wen    := !wen
   io.sram1_addr   := index
-  io.sram1_wen    := !io.cpu2cache.bits.wen
+  io.sram1_wen    := !wen
   io.sram2_addr   := index
-  io.sram2_wen    := !io.cpu2cache.bits.wen
+  io.sram2_wen    := !wen
   io.sram3_addr   := index
-  io.sram3_wen    := !io.cpu2cache.bits.wen
+  io.sram3_wen    := !wen
 
   // todo: 什么时候读dataArray? allocate2阶段是否需要读?
-  when(state === idle && io.cpu2cache.valid) {
+  when(state === idle && ctrlFire) {
     // read data
     io.sram0_cen  := false.B
     io.sram1_cen  := false.B
@@ -243,29 +255,64 @@ class Cache extends Module {
     metaAlloc.valid := true.B
     metaAlloc.dirty := false.B
     metaArray(victimWay)(index) := metaAlloc
-  }.elsewhen(state === data) {
+  }.elsewhen(state === data && cwdataFire) {
+    // write dataArray
+    // wmask8 to wmask64
+    val mask64 = Wire(Vec(8, UInt(8.W)))
+    (0 to 8).map(i => (mask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
+    // write enable
     when(allocTag) {
+      metaArray(victimWay)(index).dirty := true.B
       switch(victimWay) {
         is(0.U) {
           io.sram0_cen    := false.B
-          io.sram0_wmask  := 
-          //io.sram0_wmask  := Mux(align, "h0000_0000_0000_0000_ffff_ffff_ffff_ffff".U, "hffff_ffff_ffff_ffff_0000_0000_0000_0000".U)
-          // mask, todo
-          
+          io.sram0_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram0_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+        }
+        is(1.U) {
+          io.sram1_cen    := false.B
+          io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+        }
+        is(2.U) {
+          io.sram1_cen    := false.B
+          io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+        }
+        is(3.U) {
+          io.sram1_cen    := false.B
+          io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
       }
     }.otherwise {
-      // write data
-      switch(hitList) {
+      switch(hitListReg) {
         is("b0001".U) {
+          metaArray(0)(index).dirty := true.B
           io.sram0_cen    := false.B
-          //io.sram0_wmask  := Mux(align, "h0000_0000_0000_0000_ffff_ffff_ffff_ffff".U, "hffff_ffff_ffff_ffff_0000_0000_0000_0000".U)
-          // mask, todo
-          
+          io.sram0_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram0_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+        }
+        is("b0010".U) {
+          metaArray(1)(index).dirty := true.B
+          io.sram1_cen    := false.B
+          io.sram1_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram1_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+        }
+        is("b0100".U) {
+          metaArray(2)(index).dirty := true.B
+          io.sram2_cen    := false.B
+          io.sram2_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram2_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+        }
+        is("b1000".U) {
+          metaArray(3)(index).dirty := true.B
+          io.sram3_cen    := false.B
+          io.sram3_wmask  := Mux(align, Cat(wmask64.toUInt, "hffffffffffffffff".U), Cat("hffffffffffffffff".U, wmask64.toUInt))
+          io.sram3_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
       }
     }
-
   }.otherwise {
     io.sram0_cen    := true.B
     io.sram1_cen    := true.B
@@ -273,14 +320,19 @@ class Cache extends Module {
     io.sram3_cen    := true.B
   }
 
-  // return value
-  val blockData = LookupTreeDefault(hitList.asUInt, 0.U(128.W), List(
-    "b0001".U   -> io.sram0_rdata,
-    "b0010".U   -> io.sram1_rdata,
-    "b0100".U   -> io.sram2_rdata,
-    "b1000".U   -> io.sram3_rdata,
-  ))
-  val alignData = Mux(align, blockData(127, 64), blockData(63, 0))
-  io.cpu2cache.bits.rdata := Mux(state === data, alignData, 0.U(64.W))
-  io.cpu2cache.ready      := state === data
+  // -----------------------data aligner-------------------------------
+  val alignData = WireDefault(0.U(64.W))
+  when(state === data) {
+    when(allocTag) {
+      alignData := rblockBuffer(0)
+    }.otherwise {
+      alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
+    }
+  }
+  io.wdataIO.ready         := state === data
+
+  io.rdataIO.bits.rdata    := Mux(state === data, alignData, 0.U(64.W))
+  io.rdataIO.valid         := state === data
+
+  io.ctrlIO.ready          := state === idle
 }

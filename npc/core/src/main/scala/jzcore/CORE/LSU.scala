@@ -16,13 +16,15 @@ class LSU extends Module {
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
 
+    val icacheIO    = Decoupled(new CacheIO)
+
     // axi总线访存接口
     val axiRaddrIO  = Decoupled(new RaddrIO)
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))
-    
+
     // 仲裁信号
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
