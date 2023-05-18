@@ -13,7 +13,7 @@ import utils._
 class Cache extends Module {
   val io = IO(new Bundle {
     // cpu
-    val ctrlIO          = Flipped(Decoupled(new CacheCtrolIO))
+    val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
     val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
     val rdataIO         = Decoupled(new CacheReadIO) 
 
@@ -107,6 +107,8 @@ class Cache extends Module {
   val addr    = RegInit(0.U(32.W))
   val wen     = RegInit(false.B)
   val tag     = Wire(UInt(22.W))
+  val index   = Wire(UInt(6.W))
+  val align   = Wire(Bool())
   addr       := Mux(state === idle && ctrlFire, io.ctrlIO.bits.addr, addr)
   wen        := Mux(state === idle && ctrlFire, io.ctrlIO.bits.wen, wen)
   tag        := addr(31, 10)
