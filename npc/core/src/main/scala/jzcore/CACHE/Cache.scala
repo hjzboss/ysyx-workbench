@@ -191,9 +191,9 @@ class Cache extends Module {
   val wburst = RegInit(0.U(2.W))
   when(state === tagCompare) {
     wburst := 0.U(2.W)
-  }.otherwhen(state === writeback1 && wdataFire && waddrFire && io.axiGrant) {
+  }.elsewhen(state === writeback1 && wdataFire && waddrFire && io.axiGrant) {
     wburst := wburst + 1.U(2.W)
-  }.otherwhen(state === writeback2 && (wburst === 1.U(2.W) || wburst === 0.U(2.W)) && wdataFire) {
+  }.elsewhen(state === writeback2 && (wburst === 1.U(2.W) || wburst === 0.U(2.W)) && wdataFire) {
     wburst := wburst + 1.U(2.W)
   }.otherwise {
     wburst := wburst

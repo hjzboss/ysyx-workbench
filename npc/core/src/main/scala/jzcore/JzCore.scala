@@ -72,7 +72,6 @@ class JzCore extends Module {
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁
   arbiter.io.ifuReq   <> icache.io.axiReq
-  //arbiter.io.ifuReq   <> ifu.io.axiReq
   arbiter.io.grantIfu <> icache.io.axiGrant
   arbiter.io.ifuReady <> icache.io.axiReady
   arbiter.io.lsuReq   <> lsu.io.axiReq
@@ -122,6 +121,9 @@ class JzCore extends Module {
     io.axiRaddrIO.bits.len    := 0.U
     io.axiRaddrIO.bits.size   := 0.U
     io.axiRaddrIO.bits.burst  := 0.U
+    io.axiWaddrIO.bits.len    := 0.U
+    io.axiWaddrIO.bits.size   := 0.U
+    io.axiWaddrIO.bits.burst  := 0.U
     io.axiRdataIO.ready       := false.B
     io.axiWaddrIO.valid       := false.B
     io.axiWaddrIO.bits.addr   := 0.U
