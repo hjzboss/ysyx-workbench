@@ -158,6 +158,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
 
 
 extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
+  printf("wmask=%x\n", wmask);
   // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
@@ -185,25 +186,28 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       wmask = wmask >> 1;
     }
     // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
+    /*
     uint64_t tmp = wmask_64;
     int shift_cnt = 0;
     for(int i = 64; i > 0; i--) {
       if(tmp & 0x01 == 0x01) break;
       shift_cnt++;
       tmp = tmp >> 1;
-    }
+    }*/
 
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
       rdata = vga_read(waddr & ~0x7ull, 8);
-      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
+      //rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       vga_write(waddr & ~0x7ull, 8, rdata);
     }
     else {
       // 物理内存
       rdata = paddr_read(waddr & ~0x7ull, 8);
-      rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      //uint64_t rdata1 = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
+      rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
       paddr_write(waddr & ~0x7ull, 8, rdata);      
     }
   }

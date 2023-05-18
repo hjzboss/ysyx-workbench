@@ -117,11 +117,11 @@ class IDU extends Module with HasInstrType{
   csrReg.io.reset     := reset
   // exception
   csrReg.io.exception := io.csrWrite.exception
-  csrReg.io.epc       := io.csrWrite.epc
+  csrReg.io.epc       := io.csrWrite.epc(31, 0)
   csrReg.io.no        := io.csrWrite.no
 
   // 输出信息
-  io.datasrc.pc       := io.in.pc
+  io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm

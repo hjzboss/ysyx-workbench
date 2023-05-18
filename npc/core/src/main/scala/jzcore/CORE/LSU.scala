@@ -16,13 +16,15 @@ class LSU extends Module {
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
 
+    //val icacheIO    = Decoupled(new CacheIO)
+
     // axi总线访存接口
     val axiRaddrIO  = Decoupled(new RaddrIO)
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))
-    
+
     // 仲裁信号
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
@@ -40,6 +42,15 @@ class LSU extends Module {
   val brespFire          = io.axiBrespIO.valid && io.axiBrespIO.ready
 
   val addr               = io.in.lsuAddr
+
+  // todo
+  io.axiRaddrIO.bits.len := 0.U
+  io.axiRaddrIO.bits.size:= 3.U
+  io.axiRaddrIO.bits.burst := 2.U(2.W)
+  io.axiWaddrIO.bits.len := 0.U
+  io.axiWaddrIO.bits.size:= 3.U
+  io.axiWaddrIO.bits.burst := 2.U(2.W)
+  io.axiWdataIO.bits.wlast := true.B
 
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
@@ -67,10 +78,9 @@ class LSU extends Module {
   io.axiWaddrIO.valid      := wState === idle && io.in.lsuWen
   io.axiWaddrIO.bits.addr  := addr
   io.axiWdataIO.valid      := wState === idle && io.in.lsuWen
-  io.axiWdataIO.bits.wdata := io.in.lsuWdata
+  io.axiWdataIO.bits.wdata := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   io.axiWdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
   io.axiBrespIO.ready      := wState === wait_resp
-
 
   // 数据对齐
   val align              = Cat(addr(2, 0), 0.U(3.W))

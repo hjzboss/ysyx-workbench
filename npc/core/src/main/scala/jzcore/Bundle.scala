@@ -5,29 +5,40 @@ import chisel3.util._
 import utils._
 
 class DebugIO extends Bundle {
-  val pc        = Output(UInt(64.W))
+  val pc        = Output(UInt(32.W))
   val nextPc    = Output(UInt(64.W))
   val inst      = Output(UInt(32.W))
 }
 
-class CacheReadIO extends Bundle {
-  val addr      = Input(UInt(64.W))
-  val data      = Output(UInt(64.W))
+// todo: cpu需要返回一个ready信号给cache，代表成功接受数据，此bundle需要进一步分离
+class CacheCtrlIO extends Bundle {
+  val addr  = Output(UInt(32.W))
+  //val rdata = Input(UInt(64.W))
+  //val wdata = Output(UInt(64.W))
+  val wen   = Output(Bool())
+  //val wmask = Output(UInt(8.W))
 }
 
 class CacheWriteIO extends Bundle {
-  val addr      = Input(UInt(64.W))
-  val data      = Input(UInt(64.W))
+  val wdata = Output(UInt(64.W))
+  val wmask = Output(UInt(8.W))
+}
+
+class CacheReadIO extends Bundle {
+  val rdata = Output(UInt(64.W))
+}
+
+class CacheDecode extends Bundle {
+  val index       = Input(UInt(6.W))
+  val tag         = Input(UInt(54.W))
+  val byte        = Input(Bool())
 }
 
 class MetaData extends Bundle {
   val valid         = Bool()
   val dirty         = Bool()
-  val tag           = UInt(52.W)
-}
-
-class ReplaceIO extends Bundle {
-  val block     = Output(Vec(64, UInt(8.W)))
+  val tag           = UInt(22.W)
+  //val cacheable     = Bool()
 }
 
 class RFReadIO extends Bundle {
@@ -46,12 +57,12 @@ class CSRWriteIO extends Bundle {
   val waddr     = Output(UInt(3.W))
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
-  val epc       = Output(UInt(64.W))
+  val epc       = Output(UInt(32.W))
   val no        = Output(UInt(4.W))
 }
 
 class DataSrcIO extends Bundle {
-  val pc    = Output(UInt(64.W))
+  val pc    = Output(UInt(32.W))
   val src1  = Output(UInt(64.W))
   val src2  = Output(UInt(64.W))
   val imm   = Output(UInt(64.W))
@@ -90,7 +101,7 @@ class ExuOut extends Bundle {
   val wmask         = Output(UInt(8.W))
   val lsuWen        = Output(Bool())
   val lsuRen        = Output(Bool())
-  val lsuAddr       = Output(UInt(64.W))
+  val lsuAddr       = Output(UInt(32.W))
   val lsuWdata      = Output(UInt(64.W))
   val loadMem       = Output(Bool())
 
@@ -98,7 +109,7 @@ class ExuOut extends Bundle {
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
 
-  val pc            = Output(UInt(64.W))
+  val pc            = Output(UInt(32.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(3.W))
@@ -115,7 +126,7 @@ class LsuOut extends Bundle {
   val loadMem       = Output(Bool())
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
-  val pc            = Output(UInt(64.W))
+  val pc            = Output(UInt(32.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(3.W))
@@ -127,32 +138,42 @@ class LsuOut extends Bundle {
 }
 
 class InstrFetch extends Bundle {
-  val pc            = Output(UInt(64.W))
+  val pc            = Output(UInt(32.W))
   val inst          = Output(UInt(32.W))
 }
 
 class RedirectIO extends Bundle {
-  val brAddr        = Output(UInt(64.W))
+  val brAddr        = Output(UInt(32.W))
   val valid         = Output(Bool())
 }
 
 // axi接口
 class RaddrIO extends Bundle {
-  val addr          = Output(UInt(64.W))
+  val addr          = Output(UInt(32.W))
+  // 读突发信号
+  val len           = Output(UInt(8.W))
+  val size          = Output(UInt(3.W))
+  val burst         = Output(UInt(2.W))
 }
 
 class WaddrIO extends Bundle {
-  val addr          = Output(UInt(64.W))
+  val addr          = Output(UInt(32.W))
+  // 写突发信号
+  val len           = Output(UInt(8.W))
+  val size          = Output(UInt(3.W))
+  val burst         = Output(UInt(2.W))
 }
 
 class RdataIO extends Bundle {
   val rdata         = Output(UInt(64.W))
   val rresp         = Output(UInt(2.W))
+  val rlast         = Output(Bool())
 }
 
 class WdataIO extends Bundle {
   val wdata         = Output(UInt(64.W))
   val wstrb         = Output(UInt(8.W))
+  val wlast         = Output(Bool())
 }
 
 class BrespIO extends Bundle {
