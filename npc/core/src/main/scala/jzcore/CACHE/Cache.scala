@@ -149,18 +149,13 @@ class Cache extends Module {
     }
   }.otherwise {
     dataBlock := dataBlock
-  }
-
-  // ----------------------------write back and allocate--------------------------------
-  val allocTag = RegInit(false.B)
-  allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
-  
+  }写事务
   val rburstOne = RegInit(Bool())
   rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1
-  io.axiReady := state === allocate2 && rdataFire && io.rdataIO.bits.rlast
+  io.axiReady := state === allocate2 && rdataFire 
 
   val burstAddr            = addr & "hfffffff8".U
 
@@ -226,39 +221,42 @@ class Cache extends Module {
     io.sram2_cen  := false.B
     io.sram3_cen  := false.B
   }.elsewhen(state === allocate2 && rdataFire && io.axiRdataIO.bits.rlast) {
+    // allocate metaArray
+    val metaAlloc = Wire(new MetaData)
+    metaAlloc.tag := tag
+    metaAlloc.valid := true.B
+    metaAlloc.dirty := false.B
     // allocate dataArray
     switch(victimWay) {
       is(0.U) {
+        metaArray(0)(index) := metaAlloc
         io.sram0_cen    := false.B
         io.sram0_wdata  := Mux(align, rblockDataRev, rblockData)
         io.sram0_wen    := false.B
         io.sram0_wmask  := 0.U(128.W)
       }
       is(1.U) {
+        metaArray(1)(index) := metaAlloc
         io.sram1_cen    := false.B
         io.sram1_wdata  := Mux(align, rblockDataRev, rblockData)
         io.sram1_wen    := false.B
         io.sram1_wmask  := 0.U(128.W)
       }
       is(2.U) {
+        metaArray(2)(index) := metaAlloc
         io.sram2_cen    := false.B
         io.sram2_wdata  := Mux(align, rblockDataRev, rblockData)
         io.sram2_wen    := false.B
         io.sram2_wmask  := 0.U(128.W)
       }
       is(3.U) {
+        metaArray(3)(index) := metaAlloc
         io.sram3_cen    := false.B
         io.sram3_wdata  := Mux(align, rblockDataRev, rblockData)
         io.sram3_wen    := false.B
         io.sram3_wmask  := 0.U(128.W)
       }
     }
-    // allocate metaArray
-    val metaAlloc = Wire(new MetaData)
-    metaAlloc.tag := tag
-    metaAlloc.valid := true.B
-    metaAlloc.dirty := false.B
-    metaArray(victimWay)(index) := metaAlloc
   }.elsewhen(state === data && cwdataFire) {
     // write dataArray
     // wmask8 to wmask64
@@ -294,7 +292,7 @@ class Cache extends Module {
         }
       }
     }.otherwise {
-      switch(hitListReg) {
+      switch(hitListReg.toUInt) {
         is("b0001".U) {
           metaArray(0)(index).dirty := true.B
           io.sram0_cen    := false.B

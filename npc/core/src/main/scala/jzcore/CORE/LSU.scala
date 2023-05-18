@@ -16,7 +16,7 @@ class LSU extends Module {
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
 
-    val icacheIO    = Decoupled(new CacheIO)
+    //val icacheIO    = Decoupled(new CacheIO)
 
     // axi总线访存接口
     val axiRaddrIO  = Decoupled(new RaddrIO)
