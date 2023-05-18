@@ -43,6 +43,14 @@ class LSU extends Module {
 
   val addr               = io.in.lsuAddr
 
+  io.axiRaddrIO.bits.len := 0.U
+  io.axiRaddrIO.bits.size:= 3.U
+  io.axiRaddrIO.bits.burst := 2.U(2.W)
+  io.axiWaddrIO.bits.len := 0.U
+  io.axiWaddrIO.bits.size:= 3.U
+  io.axiWaddrIO.bits.burst := 2.U(2.W)
+  io.axiWaddrIO.bits.wlast := true.B
+
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
   val rState = RegInit(idle)

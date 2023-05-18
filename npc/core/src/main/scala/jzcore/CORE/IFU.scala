@@ -76,6 +76,7 @@ class IFU extends Module with HasResetVector {
   io.icacheRead.ready       := state === data && !io.stall
  
   io.icacheWrite.valid      := false.B
+  io.icacheWrite.bits.wdata := 0.U(64.W)
   io.icacheWrite.bits.wmask := 0.U(8.W)
 
   // 数据选择, todo: 从cache中选择
