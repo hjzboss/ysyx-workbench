@@ -19,7 +19,7 @@ import utils._
 class Ram extends BlackBox {
   val io = IO(new Bundle {
     val Q     = Output(UInt(128.W))
-    val CLK   = Input(Bool())
+    val CLK   = Input(Clock())
     val CEN   = Input(Bool())
     val WEN   = Input(Bool())
     val BWEN  = Input(UInt(128.W))
