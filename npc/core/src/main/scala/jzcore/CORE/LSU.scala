@@ -49,7 +49,7 @@ class LSU extends Module {
   io.axiWaddrIO.bits.len := 0.U
   io.axiWaddrIO.bits.size:= 3.U
   io.axiWaddrIO.bits.burst := 2.U(2.W)
-  io.axiWaddrIO.bits.wlast := true.B
+  io.axiWdataIO.bits.wlast := true.B
 
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
