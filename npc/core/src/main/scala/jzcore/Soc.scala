@@ -32,10 +32,10 @@ class Soc extends Module {
   core.io.axiWdataIO <> sram.io.wdataIO
   core.io.axiBrespIO <> sram.io.brespIO
 
-  ram0.io.CLK := Clock
-  ram1.io.CLK := Clock
-  ram2.io.CLK := Clock
-  ram3.io.CLK := Clock
+  ram0.io.CLK := clock
+  ram1.io.CLK := clock
+  ram2.io.CLK := clock
+  ram3.io.CLK := clock
 
   // ram, dataArray
   core.io.sram0_rdata <> ram0.io.Q
