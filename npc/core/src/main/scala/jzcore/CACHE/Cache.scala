@@ -187,7 +187,7 @@ class Cache extends Module {
   val rblockDataRev        = Cat(rblockBuffer(0), rblockBuffer(1))
 
   // writeback axi, burst write
-  val wburstOne = RegInit(Bool())
+  val wburstOne = RegInit(false.B)
   wburstOne := Mux(state === tagCompare, false.B, Mux((state === writeback1 && wdataFire) || (state === writeback2 && !wburstOne && wdataFire), true.B, wburstOne))
   //wburstOne := Mux(state === writeback1, false.B, Mux(state === writeback2 && wdataFire, true.B, wburstOne))
 
