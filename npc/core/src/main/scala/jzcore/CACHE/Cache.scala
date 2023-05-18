@@ -149,7 +149,12 @@ class Cache extends Module {
     }
   }.otherwise {
     dataBlock := dataBlock
-  }写事务
+  }
+
+    // ----------------------------write back and allocate--------------------------------
+  val allocTag = RegInit(false.B)
+  allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
+
   val rburstOne = RegInit(Bool())
   rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
 
