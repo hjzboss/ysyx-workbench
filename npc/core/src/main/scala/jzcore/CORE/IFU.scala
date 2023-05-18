@@ -64,6 +64,11 @@ class IFU extends Module with HasResetVector {
   val brFlag                 = RegInit(false.B)
   brFlag                    := Mux(state === addr, false.B, Mux(io.redirect.valid, true.B, brFlag))
 
+  // pc
+  val pc   = RegInit(resetVector.U(32.W))
+  val snpc = pc + 4.U
+  val dnpc = io.redirect.brAddr
+
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
   io.icacheCtrl.bits.wen    := false.B
@@ -72,11 +77,6 @@ class IFU extends Module with HasResetVector {
  
   io.icacheWrite.valid      := false.B
   io.icacheWrite.bits.wmask := 0.U(8.W)
-
-  // pc
-  val pc   = RegInit(resetVector.U(32.W))
-  val snpc = pc + 4.U
-  val dnpc = io.redirect.brAddr
 
   // 数据选择, todo: 从cache中选择
   val instPre                = io.icacheRead.bits.rdata
