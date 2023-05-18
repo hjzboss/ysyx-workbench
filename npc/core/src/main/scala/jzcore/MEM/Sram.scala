@@ -42,7 +42,7 @@ class Sram extends Module {
   ))
 
   val rsize              = RegInit(1.U(2.W))
-  rsize                 := Mux(rState === ar_wait && raddrFire, io.raddrIO.bits.size - 1.U(2.W), rsize)
+  rsize                 := Mux(rState === ar_wait && raddrFire, io.raddrIO.bits.len - 1.U(2.W), rsize)
   
   raddrReg              := Mux(rState === ar_wait, io.raddrIO.bits.addr, raddrReg)
 
@@ -74,7 +74,7 @@ class Sram extends Module {
   ))
 
   //val wsize              = RegInit(1.U(2.W))
-  //wsize                 := Mux(wState === w_wait && waddrFire, io.waddrIO.bits.size - 1.U(2.W), wsize)
+  //wsize                 := Mux(wState === w_wait && waddrFire, io.waddrIO.bits.len - 1.U(2.W), wsize)
 
   val wcnt               = RegInit(0.U(2.W))
   when(wState === w_wait) {
