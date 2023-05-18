@@ -65,7 +65,6 @@ class Cache extends Module {
 
   // the way chosen to victim
   val victimWay          = RegInit(0.U(2.W))
-  victimWay             := Mux(state === tagCompare, randCount, victimWay)
 
   val hit                = WireDefault(false.B)
   val dirty              = WireDefault(false.B)
@@ -94,6 +93,8 @@ class Cache extends Module {
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // addr 
     allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2) // data
   ))
+
+  victimWay             := Mux(state === tagCompare, randCount, victimWay)
 
   // meta data
   val metaInit        = Wire(new MetaData)
