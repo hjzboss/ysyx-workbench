@@ -152,13 +152,13 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = i8042_data_io_handler();
   }
   else {
+    //printf("rdata=%016x\n", paddr_read(raddr & ~0x7ull, 8));
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
 }
 
 
 extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
-  printf("wmask=%x\n", wmask);
   // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
@@ -297,7 +297,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 16) break;
+    if (cnt == 26) break;
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
@@ -405,6 +405,7 @@ void cpu_exec(uint64_t n) {
            (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           npc_state.halt_pc);
+          //printf("halt_ret=%d\n", npc_state.halt_ret);
           printf("\n");
     // fall through
     case NPC_QUIT: statistic();

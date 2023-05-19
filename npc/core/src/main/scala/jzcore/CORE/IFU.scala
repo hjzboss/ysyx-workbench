@@ -61,8 +61,9 @@ class IFU extends Module with HasResetVector {
   // 保存跳转分支
   val brAddr                 = RegInit(resetVector.U(32.W))
   brAddr                    := Mux(io.redirect.valid, io.redirect.brAddr, brAddr)
+  // 分支跳转标志，用于返回icache一个正确的信号，防止阻塞
   val brFlag                 = RegInit(false.B)
-  brFlag                    := Mux(state === addr, false.B, Mux(io.redirect.valid, true.B, brFlag))
+  brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.redirect.valid, true.B, brFlag))
 
   // pc
   val pc   = RegInit(resetVector.U(32.W))
@@ -79,23 +80,21 @@ class IFU extends Module with HasResetVector {
   io.icacheWrite.bits.wdata := 0.U(64.W)
   io.icacheWrite.bits.wmask := 0.U(8.W)
 
-  // 数据选择, todo: 从cache中选择
-  val instPre                = io.icacheRead.bits.rdata
+  // 当发生分支跳转时忽略icache返回的数据
+  val instPre                = Mux(brFlag || io.redirect.valid, 0.U(32.W), io.icacheRead.bits.rdata)
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
-  // todo：接收cache数据成功后才更改pc
+  // 当停顿信号生效时保持原pc
   val stallPc                = dontTouch(Wire(UInt(32.W)))
-  stallPc                   := Mux(io.stall, pc, Mux(brFlag, brAddr, snpc))
+  stallPc                   := Mux(rdataFire && !io.stall, Mux(brFlag, brAddr, snpc), pc)
 
   pc                        := MuxLookup(state, pc, List(
                                   addr  -> Mux(io.redirect.valid && !io.stall, dnpc, pc),  
-                                  // 当停顿信号生效时保持原pc
                                   data  -> stallPc
                                 ))
 
   // 仿真环境
   io.debug.inst             := inst
-  //io.debug.nextPc           := Mux(io.redirect.valid, dnpc, snpc)
   io.debug.nextPc           := stallPc
   io.debug.pc               := pc
 
@@ -104,5 +103,5 @@ class IFU extends Module with HasResetVector {
 
   // 取指完毕信号，用于提醒流水线寄存器传递数据
   io.ready                  := (state === data && rdataFire) || io.stall // todo
-  io.valid                  := state === data && rdataFire
+  io.valid                  := state === data && rdataFire && !brFlag // 分支发生跳转时的指令是无效的
 }

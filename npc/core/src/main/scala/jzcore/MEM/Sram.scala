@@ -42,7 +42,7 @@ class Sram extends Module {
   ))
   
   rcnt                  := Mux(rState === ar_wait, 0.U(2.W), Mux(rState === fetch && rdataFire, rcnt + 1.U(2.W), rcnt))
-  rsize                 := Mux(rState === ar_wait && raddrFire, io.raddrIO.bits.len - 1.U(2.W), rsize)
+  rsize                 := Mux(rState === ar_wait && raddrFire, io.raddrIO.bits.len, rsize)
   raddrReg              := Mux(rState === ar_wait, io.raddrIO.bits.addr, raddrReg)
 
   // 读事务
