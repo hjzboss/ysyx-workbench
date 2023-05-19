@@ -105,5 +105,5 @@ class IFU extends Module with HasResetVector {
 
   // 取指完毕信号，用于提醒流水线寄存器传递数据
   io.ready                  := (state === data && rdataFire) || io.stall // todo
-  io.valid                  := state === data && rdataFire
+  io.valid                  := state === data && rdataFire && !brFlag
 }
