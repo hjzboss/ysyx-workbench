@@ -80,7 +80,7 @@ class IFU extends Module with HasResetVector {
   io.icacheWrite.bits.wmask := 0.U(8.W)
 
   // 数据选择, todo: 从cache中选择
-  val instPre                = Mux(brFlag, 0.U(32.W), io.icacheRead.bits.rdata)
+  val instPre                = Mux(brFlag || io.redirect.valid, 0.U(32.W), io.icacheRead.bits.rdata)
   //val instPre                = io.icacheRead.bits.rdata
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
