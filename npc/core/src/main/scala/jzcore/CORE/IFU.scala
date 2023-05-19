@@ -86,7 +86,6 @@ class IFU extends Module with HasResetVector {
 
   // todo：接收cache数据成功后才更改pc
   val stallPc                = dontTouch(Wire(UInt(32.W)))
-  //stallPc                   := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, Mux(rdataFire, snpc, pc)))
   stallPc                   := Mux(rdataFire && !io.stall, Mux(brFlag, brAddr, snpc), pc)
   //stallPc                   := Mux(io.stall, pc, Mux(brFlag, brAddr, snpc))
 
