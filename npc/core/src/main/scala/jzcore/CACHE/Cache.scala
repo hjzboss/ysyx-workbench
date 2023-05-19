@@ -156,8 +156,8 @@ class Cache extends Module {
   val allocTag = RegInit(false.B)
   allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
 
-  val rburstOne = RegInit(false.B)
-  rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
+  //val rburstOne = RegInit(false.B)
+  //rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1
@@ -173,17 +173,17 @@ class Cache extends Module {
   io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
   io.axiRdataIO.ready     := state === allocate2
 
-  /*
-  val rblockBuffer         = RegInit(VecInit(Seq.fill(2)(0.U(64.W)))) // allocate block
-  rblockBuffer(0)         := MuxLookup(state, 0.U(64.W), List(
+  val rblockBuffer         = RegInit(0.U(64.W))
+  //val rblockBuffer         = RegInit(VecInit(Seq.fill(2)(0.U(64.W)))) // allocate block
+  rblockBuffer            := MuxLookup(state, 0.U(64.W), List(
                               allocate1 -> 0.U(64.W),
-                              allocate2 -> Mux(rdataFire && !rburstOne, io.axiRdataIO.bits.rdata, rblockBuffer(0))
+                              allocate2 -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)
                             ))
+  /*
   rblockBuffer(1)         := MuxLookup(state, 0.U(64.W), List(
                               allocate1 -> 0.U(64.W),
                               allocate2 -> Mux(rdataFire && io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer(1))
                             ))
-
   val rblockData           = Cat(rblockBuffer(1), rblockBuffer(0))
   val rblockDataRev        = Cat(rblockBuffer(0), rblockBuffer(1))
   */
@@ -370,7 +370,7 @@ class Cache extends Module {
   val alignData = WireDefault(0.U(64.W))
   when(state === data) {
     when(allocTag) {
-      alignData := rblockBuffer(0)
+      alignData := rblockBuffer
     }.otherwise {
       alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
     }
