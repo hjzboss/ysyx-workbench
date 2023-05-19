@@ -80,18 +80,20 @@ class IFU extends Module with HasResetVector {
   io.icacheWrite.bits.wmask := 0.U(8.W)
 
   // 数据选择, todo: 从cache中选择
-  val instPre                = io.icacheRead.bits.rdata
+  val instPre                = Mux(brFlag, 0.U(32.W), io.icacheRead.bits.rdata)
+  //val instPre                = io.icacheRead.bits.rdata
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   // todo：接收cache数据成功后才更改pc
   val stallPc                = dontTouch(Wire(UInt(32.W)))
+  //stallPc                   := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, Mux(rdataFire, snpc, pc)))
   stallPc                   := Mux(rdataFire && !io.stall, Mux(brFlag, brAddr, snpc), pc)
   //stallPc                   := Mux(io.stall, pc, Mux(brFlag, brAddr, snpc))
 
   pc                        := MuxLookup(state, pc, List(
                                   addr  -> Mux(io.redirect.valid && !io.stall, dnpc, pc),  
                                   // 当停顿信号生效时保持原pc
-                                  data  -> stallPc
+                                  data  -> stallPc // todo
                                 ))
 
   // 仿真环境
