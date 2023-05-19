@@ -9,6 +9,7 @@ class Soc extends Module {
     // 传给仿真环境
     val debug      = new DebugIO
     val finish     = Output(Bool())
+    val hitList     = Output(Vec(4, Bool()))
 
     // 防止被优化
     val valid1     = Output(Bool())
@@ -25,6 +26,8 @@ class Soc extends Module {
   val ram2 = Module(new Ram)
   val ram3 = Module(new Ram)
   val core = Module(new JzCore)
+
+  io.hitList <> core.io.hitList
 
   core.io.axiRaddrIO <> sram.io.raddrIO
   core.io.axiRdataIO <> sram.io.rdataIO

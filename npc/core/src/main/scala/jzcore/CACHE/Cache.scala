@@ -57,6 +57,9 @@ class Cache extends Module {
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
     val axiReady    = Output(Bool())
+
+    // debug
+    val hitList     = Output(Vec(4, Bool()))
   })
 
   // random replace count
@@ -118,7 +121,8 @@ class Cache extends Module {
 
   // ---------------------lookup metaArray and dataArray-------------------------------
   // metaArray lookup
-  val hitList    = VecInit(List.fill(4)(false.B))
+  val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
+  io.hitList    := hitList
   val hitListReg = RegInit(VecInit(List.fill(4)(false.B)))
   (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), false.B)))
   dirty := LookupTreeDefault(hitList.asUInt, false.B, List(

@@ -9,6 +9,7 @@ class JzCore extends Module {
     // 传给仿真环境
     val debug       = new DebugIO
     val finish      = Output(Bool())
+    val hitList     = Output(Vec(4, Bool()))
 
     // icache data array
     val sram0_rdata     = Input(UInt(128.W))
@@ -68,6 +69,8 @@ class JzCore extends Module {
   val lsReg   = Module(new LS_REG)
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
+
+  io.hitList <> icache.io.hitList
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁
