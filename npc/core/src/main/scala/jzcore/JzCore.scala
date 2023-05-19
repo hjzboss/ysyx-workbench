@@ -49,8 +49,6 @@ class JzCore extends Module {
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))   
 
-    //val csrAddr     = Output(UInt(3.W)) 
-
     val lsFlag      = Output(Bool())
   })
 
@@ -61,7 +59,7 @@ class JzCore extends Module {
   val wbu     = Module(new WBU)
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
-  val icache  = Module(new Cache)
+  val icache  = Module(new ICache)
 
   val idReg   = Module(new ID_REG)
   val exReg   = Module(new EX_REG)
@@ -154,81 +152,6 @@ class JzCore extends Module {
     lsu.io.axiBrespIO.bits.bresp   := 0.U
   }
   
-  
-/*
-  switch (grant) {
-    is (0.U) {
-      // 没有请求
-      io.axiRaddrIO.valid       := false.B
-      io.axiRdataIO.ready       := false.B
-      io.axiWaddrIO.valid       := false.B
-      io.axiWdataIO.bits.wdata  := 0.U
-      io.axiWdataIO.bits.wstrb  := 0.U
-      io.axiBrespIO.ready       := false.B
-
-      ifu.io.axiRaddrIO.ready   := false.B
-      ifu.io.axiRdataIO.valid   := false.B
-      ifu.io.axiRdataIO.bits.rresp   := 0.U
-      ifu.io.axiWaddrIO.ready   := false.B
-      ifu.io.axiWdataIO.ready   := false.B
-      ifu.io.axiBrespIO.valid   := false.B
-      ifu.io.axiBrespIO.bits.bresp   := false.B
-
-      lsu.io.axiRaddrIO.ready   := false.B
-      lsu.io.axiRdataIO.valid   := false.B
-      lsu.io.axiRdataIO.bits.rresp   := 0.U
-      lsu.io.axiWaddrIO.ready   := false.B
-      lsu.io.axiWdataIO.ready   := false.B
-      lsu.io.axiBrespIO.valid   := false.B
-      lsu.io.axiBrespIO.bits.bresp   := false.B
-    }
-    is (2.U) {
-      io.axiRaddrIO <> ifu.io.axiRaddrIO
-      io.axiRdataIO <> ifu.io.axiRdataIO
-      io.axiWaddrIO <> ifu.io.axiWaddrIO
-      io.axiWdataIO <> ifu.io.axiWdataIO
-      io.axiBrespIO <> ifu.io.axiBrespIO
-
-      lsu.io.axiRaddrIO.ready   := false.B
-      lsu.io.axiRdataIO.valid   := false.B
-      lsu.io.axiRdataIO.bits.rresp   := 0.U
-      lsu.io.axiWaddrIO.ready   := false.B
-      lsu.io.axiWdataIO.ready   := false.B
-      lsu.io.axiBrespIO.valid   := false.B
-      lsu.io.axiBrespIO.bits.bresp   := false.B
-    }
-    is (1.U) {
-      io.axiRaddrIO <> lsu.io.axiRaddrIO
-      io.axiRdataIO <> lsu.io.axiRdataIO
-      io.axiWaddrIO <> lsu.io.axiWaddrIO
-      io.axiWdataIO <> lsu.io.axiWdataIO
-      io.axiBrespIO <> lsu.io.axiBrespIO
-
-      ifu.io.axiRaddrIO.ready   := false.B
-      ifu.io.axiRdataIO.valid   := false.B
-      ifu.io.axiRdataIO.bits.rresp   := 0.U
-      ifu.io.axiWaddrIO.ready   := false.B
-      ifu.io.axiWdataIO.ready   := false.B
-      ifu.io.axiBrespIO.valid   := false.B
-      ifu.io.axiBrespIO.bits.bresp   := false.B
-    }
-    is (3.U) {
-      io.axiRaddrIO <> lsu.io.axiRaddrIO
-      io.axiRdataIO <> lsu.io.axiRdataIO
-      io.axiWaddrIO <> lsu.io.axiWaddrIO
-      io.axiWdataIO <> lsu.io.axiWdataIO
-      io.axiBrespIO <> lsu.io.axiBrespIO
-
-      ifu.io.axiRaddrIO.ready   := false.B
-      ifu.io.axiRdataIO.valid   := false.B
-      ifu.io.axiRdataIO.bits.rresp   := 0.U
-      ifu.io.axiWaddrIO.ready   := false.B
-      ifu.io.axiWdataIO.ready   := false.B
-      ifu.io.axiBrespIO.valid   := false.B
-      ifu.io.axiBrespIO.bits.bresp   := false.B
-    }
-  }
-*/
   // ram, dataArray
   icache.io.sram0_rdata <> io.sram0_rdata
   icache.io.sram0_cen <> io.sram0_cen

@@ -4,13 +4,8 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-
-/**
-  * todo：访问外设时需要直接跳过cache，cacheable位的处理
-  */
-
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
-class Cache extends Module {
+class ICache extends Module {
   val io = IO(new Bundle {
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
@@ -156,9 +151,6 @@ class Cache extends Module {
   val allocTag = RegInit(false.B)
   allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
 
-  //val rburstOne = RegInit(false.B)
-  //rburstOne := Mux(state === tagCompare, false.B, Mux(state === allocate2 && rdataFire, true.B, rburstOne))
-
   // axi
   io.axiReq := state === writeback1 || state === allocate1
   io.axiReady := state === allocate2 && rdataFire && io.axiRdataIO.bits.rlast
@@ -174,21 +166,10 @@ class Cache extends Module {
   io.axiRdataIO.ready     := state === allocate2
 
   val rblockBuffer         = RegInit(0.U(64.W))
-  //val rblockBuffer         = RegInit(VecInit(Seq.fill(2)(0.U(64.W)))) // allocate block
   rblockBuffer            := MuxLookup(state, 0.U(64.W), List(
                               allocate1 -> 0.U(64.W),
                               allocate2 -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)
                             ))
-  /*
-  rblockBuffer(1)         := MuxLookup(state, 0.U(64.W), List(
-                              allocate1 -> 0.U(64.W),
-                              allocate2 -> Mux(rdataFire && io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer(1))
-                            ))
-  val rblockData           = Cat(rblockBuffer(1), rblockBuffer(0))
-  val rblockDataRev        = Cat(rblockBuffer(0), rblockBuffer(1))
-  */
-  // writeback axi, burst write
-  //val wburstOne = RegInit(false.B)
   val wburst = RegInit(0.U(2.W))
   when(state === tagCompare) {
     wburst := 0.U(2.W)
@@ -199,8 +180,6 @@ class Cache extends Module {
   }.otherwise {
     wburst := wburst
   }
-  //wburstOne := Mux(state === tagCompare, false.B, Mux((state === writeback1 && wdataFire) || (state === writeback2 && !wburstOne && wdataFire), true.B, wburstOne))
-  //wburstOne := Mux(state === writeback1, false.B, Mux(state === writeback2 && wdataFire, true.B, wburstOne))
 
   io.axiWaddrIO.valid     := state === writeback1 && io.axiGrant
   io.axiWaddrIO.bits.addr := burstAddr
@@ -248,7 +227,6 @@ class Cache extends Module {
   io.sram2_wmask  := ~0.U(128.W)
   io.sram3_wdata  := 0.U
   io.sram3_wmask  := ~0.U(128.W)
-  // todo: 什么时候读dataArray? allocate2阶段是否需要读?
   when(state === idle && ctrlFire) {
     // read data
     io.sram0_addr := io.ctrlIO.bits.addr(9, 4)
@@ -270,8 +248,6 @@ class Cache extends Module {
       is(0.U) {
         metaArray(0)(index) := metaAlloc
         io.sram0_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        //io.sram0_wdata  := io.axiRdataIO.bits.rdata
-        //io.sram0_wmask  := 0.U(128.W)
         io.sram0_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
         io.sram0_cen    := false.B
         io.sram0_wen    := false.B
