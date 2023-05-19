@@ -251,9 +251,13 @@ class Cache extends Module {
   // todo: 什么时候读dataArray? allocate2阶段是否需要读?
   when(state === idle && ctrlFire) {
     // read data
+    io.sram0_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram0_cen  := false.B
+    io.sram1_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram1_cen  := false.B
+    io.sram2_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram2_cen  := false.B
+    io.sram3_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram3_cen  := false.B
   }.elsewhen(state === allocate2 && rdataFire) {
     // allocate metaArray
