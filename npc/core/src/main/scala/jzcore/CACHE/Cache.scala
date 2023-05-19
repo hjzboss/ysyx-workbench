@@ -161,7 +161,7 @@ class Cache extends Module {
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1
-  io.axiReady := state === allocate2 && rdataFire 
+  io.axiReady := state === allocate2 && rdataFire && io.axiRdataIO.bits.rlast
 
   val burstAddr            = addr & "hfffffff8".U
 
