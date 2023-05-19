@@ -152,7 +152,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = i8042_data_io_handler();
   }
   else {
-    printf("rdata=%016x\n", paddr_read(raddr & ~0x7ull, 8));
+    //printf("rdata=%016x\n", paddr_read(raddr & ~0x7ull, 8));
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
 }
@@ -405,7 +405,7 @@ void cpu_exec(uint64_t n) {
            (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           npc_state.halt_pc);
-          printf("halt_ret=%d\n", npc_state.halt_ret);
+          //printf("halt_ret=%d\n", npc_state.halt_ret);
           printf("\n");
     // fall through
     case NPC_QUIT: statistic();
