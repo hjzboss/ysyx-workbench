@@ -62,7 +62,7 @@ class IFU extends Module with HasResetVector {
   val brAddr                 = RegInit(resetVector.U(32.W))
   brAddr                    := Mux(io.redirect.valid, io.redirect.brAddr, brAddr)
   val brFlag                 = RegInit(false.B)
-  brFlag                    := Mux(state === addr, false.B, Mux(io.redirect.valid, true.B, brFlag))
+  brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.redirect.valid, true.B, brFlag))
 
   // pc
   val pc   = RegInit(resetVector.U(32.W))
