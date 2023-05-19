@@ -105,7 +105,7 @@ class Cache extends Module {
   metaInit.dirty     := false.B
   //metaInit.cacheable := false.B
   metaInit.tag       := 0.U(22.W)
-  val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
+  val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(64)(metaInit))))
 
   // ---------------------------address decode-----------------------------------------
   val addr    = RegInit(0.U(32.W))
