@@ -296,7 +296,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 16) break;
+    if (cnt == 26) break;
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
