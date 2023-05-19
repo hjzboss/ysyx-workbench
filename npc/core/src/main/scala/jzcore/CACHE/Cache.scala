@@ -175,12 +175,12 @@ class Cache extends Module {
 
   val rblockBuffer         = RegInit(VecInit(Seq.fill(2)(0.U(64.W)))) // allocate block
   rblockBuffer(0)         := MuxLookup(state, 0.U(64.W), List(
-                              writeback1 -> 0.U(64.W),
-                              writeback2 -> Mux(rdataFire && !rburstOne, io.axiRdataIO.bits.rdata, rblockBuffer(0))
+                              allocate1 -> 0.U(64.W),
+                              allocate2 -> Mux(rdataFire && !rburstOne, io.axiRdataIO.bits.rdata, rblockBuffer(0))
                             ))
   rblockBuffer(1)         := MuxLookup(state, 0.U(64.W), List(
-                              writeback1 -> 0.U(64.W),
-                              writeback2 -> Mux(rdataFire && io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer(1))
+                              allocate1 -> 0.U(64.W),
+                              allocate2 -> Mux(rdataFire && io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer(1))
                             ))
 
   val rblockData           = Cat(rblockBuffer(1), rblockBuffer(0))
