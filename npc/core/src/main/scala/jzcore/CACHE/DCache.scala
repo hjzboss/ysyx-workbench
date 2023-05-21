@@ -96,7 +96,7 @@ class DCache extends Module {
   ))
 
   // not cacheable access
-  val addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(4)
+  //val addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(4)
   val rState = RegInit(idle)
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
