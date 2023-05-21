@@ -190,7 +190,7 @@ class DCache extends Module {
   axiDataReg              := Mux(rState === data_trans && rdataFire, io.axiRdataIO.bits.rdata, axiDataReg)
 
   val rblockBuffer         = RegInit(0.U(64.W))
-  rblockBuffer            := MuxLookup(state, 0.U(64.W), List(
+  rblockBuffer            := MuxLookup(state, rblockBuffer, List(
                               allocate1 -> 0.U(64.W),
                               allocate2 -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)
                             ))
