@@ -74,7 +74,7 @@ class LSU extends Module {
     data -> Mux(readFire && writeFire, Mux(hasTrans, ctrl, idle), data) // todo
   ))
 
-  val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050.U && addr =/= 0xa0000100.U && addr =/= 0xa0000080.U && addr =/= 0xa00003f8.U && addr =/= 0xa0000108.U
+  val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100.U && addr =/= 0xa0000080.U && addr =/= 0xa00003f8.U && addr =/= 0xa0000108.U
 
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
