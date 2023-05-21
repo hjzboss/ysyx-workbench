@@ -40,7 +40,33 @@ class JzCore extends Module {
     val sram3_wdata     = Output(UInt(128.W)) 
 
     // dcache data array
+    val sram4_rdata     = Input(UInt(128.W))
+    val sram4_cen       = Output(Bool())
+    val sram4_wen       = Output(Bool())
+    val sram4_wmask     = Output(UInt(128.W))
+    val sram4_addr      = Output(UInt(6.W))
+    val sram4_wdata     = Output(UInt(128.W)) 
 
+    val sram5_rdata     = Input(UInt(128.W))
+    val sram5_cen       = Output(Bool())
+    val sram5_wen       = Output(Bool())
+    val sram5_wmask     = Output(UInt(128.W))
+    val sram5_addr      = Output(UInt(6.W))
+    val sram5_wdata     = Output(UInt(128.W)) 
+
+    val sram6_rdata     = Input(UInt(128.W))
+    val sram6_cen       = Output(Bool())
+    val sram6_wen       = Output(Bool())
+    val sram6_wmask     = Output(UInt(128.W))
+    val sram6_addr      = Output(UInt(6.W))
+    val sram6_wdata     = Output(UInt(128.W)) 
+
+    val sram7_rdata     = Input(UInt(128.W))
+    val sram7_cen       = Output(Bool())
+    val sram7_wen       = Output(Bool())
+    val sram7_wmask     = Output(UInt(128.W))
+    val sram7_addr      = Output(UInt(6.W))
+    val sram7_wdata     = Output(UInt(128.W)) 
 
     // axi访存接口
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -180,6 +206,35 @@ class JzCore extends Module {
   icache.io.sram3_wmask <> io.sram3_wmask
   icache.io.sram3_addr <> io.sram3_addr
   icache.io.sram3_wdata <> io.sram3_wdata
+
+  // dcache
+  dcache.io.sram4_rdata <> io.sram4_rdata
+  dcache.io.sram4_cen <> io.sram4_cen
+  dcache.io.sram4_wen <> io.sram4_wen
+  dcache.io.sram4_wmask <> io.sram4_wmask
+  dcache.io.sram4_addr <> io.sram4_addr
+  dcache.io.sram4_wdata <> io.sram4_wdata
+
+  dcache.io.sram5_rdata <> io.sram5_rdata
+  dcache.io.sram5_cen <> io.sram5_cen
+  dcache.io.sram5_wen <> io.sram5_wen
+  dcache.io.sram5_wmask <> io.sram5_wmask
+  dcache.io.sram5_addr <> io.sram5_addr
+  dcache.io.sram5_wdata <> io.sram5_wdata
+
+  dcache.io.sram6_rdata <> io.sram6_rdata
+  dcache.io.sram6_cen <> io.sram6_cen
+  dcache.io.sram6_wen <> io.sram6_wen
+  dcache.io.sram6_wmask <> io.sram6_wmask
+  dcache.io.sram6_addr <> io.sram6_addr
+  dcache.io.sram6_wdata <> io.sram6_wdata
+
+  dcache.io.sram7_rdata <> io.sram7_rdata
+  dcache.io.sram7_cen <> io.sram7_cen
+  dcache.io.sram7_wen <> io.sram7_wen
+  dcache.io.sram7_wmask <> io.sram7_wmask
+  dcache.io.sram7_addr <> io.sram7_addr
+  dcache.io.sram7_wdata <> io.sram7_wdata
 
   ifu.io.out        <> idReg.io.in
   ifu.io.redirect   <> exu.io.redirect

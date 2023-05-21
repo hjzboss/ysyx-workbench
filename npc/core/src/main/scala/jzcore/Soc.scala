@@ -70,6 +70,35 @@ class Soc extends Module {
   core.io.sram3_addr <> ram3.io.A
   core.io.sram3_wdata <> ram3.io.D
 
+
+  core.io.sram4_rdata <> ram4.io.Q
+  core.io.sram4_cen <> ram4.io.CEN
+  core.io.sram4_wen <> ram4.io.WEN
+  core.io.sram4_wmask <> ram4.io.BWEN
+  core.io.sram4_addr <> ram4.io.A
+  core.io.sram4_wdata <> ram4.io.D
+
+  core.io.sram5_rdata <> ram5.io.Q
+  core.io.sram5_cen <> ram5.io.CEN
+  core.io.sram5_wen <> ram5.io.WEN
+  core.io.sram5_wmask <> ram5.io.BWEN
+  core.io.sram5_addr <> ram5.io.A
+  core.io.sram5_wdata <> ram5.io.D
+
+  core.io.sram6_rdata <> ram6.io.Q
+  core.io.sram6_cen <> ram6.io.CEN
+  core.io.sram6_wen <> ram6.io.WEN
+  core.io.sram6_wmask <> ram6.io.BWEN
+  core.io.sram6_addr <> ram6.io.A
+  core.io.sram6_wdata <> ram6.io.D
+
+  core.io.sram7_rdata <> ram7.io.Q
+  core.io.sram7_cen <> ram7.io.CEN
+  core.io.sram7_wen <> ram7.io.WEN
+  core.io.sram7_wmask <> ram7.io.BWEN
+  core.io.sram7_addr <> ram7.io.A
+  core.io.sram7_wdata <> ram7.io.D
+
   // 仿真环境
   io.debug        := core.io.debug
   io.valid1       := core.io.axiWaddrIO.valid
