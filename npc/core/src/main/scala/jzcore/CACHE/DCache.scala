@@ -223,6 +223,8 @@ class DCache extends Module {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 32), dataBlock(31, 0))
   }.elsewhen(state === writeback2 && wburst === 1.U(2.W)) {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(31, 0), dataBlock(63, 32))
+  }.elsewhen(wState === addr_trans || wState === data_trans) {
+    io.axiWdataIO.bits.wdata := io.wdataIO.bits.wdata
   }.otherwise {
     io.axiWdataIO.bits.wdata := 0.U(64.W)
   }
