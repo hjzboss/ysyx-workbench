@@ -5,6 +5,6 @@ int main() {
   //int b = 123;
   //void *a = &b;
   //printf("%s = %p\n", shit, a);
-  printf("fuck\n\n\n");
+  printf("fuck\n");
   return 0;
 }
