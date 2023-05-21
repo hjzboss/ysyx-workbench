@@ -151,7 +151,7 @@ class LSU extends Module {
 
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
-  io.ready              := (state === idle && !(readTrans || writeTrans)) || (state === data && readFire && writeFire)
+  io.ready              := (state === idle && !(readTrans || writeTrans)) || (state === data && (readFire || writeFire))
   // 仲裁信号
   //io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
   //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
