@@ -166,7 +166,7 @@ class ICache extends Module {
   io.axiRdataIO.ready     := state === allocate2
 
   val rblockBuffer         = RegInit(0.U(64.W))
-  rblockBuffer            := MuxLookup(state, 0.U(64.W), List(
+  rblockBuffer            := MuxLookup(state, rblockBuffer, List(
                               allocate1 -> 0.U(64.W),
                               allocate2 -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)
                             ))
