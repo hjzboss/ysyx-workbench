@@ -86,6 +86,7 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
+  val dcache  = Module(new DCache)
 
   val idReg   = Module(new ID_REG)
   val exReg   = Module(new EX_REG)
@@ -287,6 +288,9 @@ class JzCore extends Module {
   exu.io.forwardA   <> forward.io.forwardA
   exu.io.forwardB   <> forward.io.forwardB
 
+  lsu.io.dcacheCtrl <> dcache.io.ctrlIO
+  lsu.io.dcacheRead <> dcache.io.rdataIO
+  lsu.io.dcacheWrite<> dcache.io.wdataIO
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 
