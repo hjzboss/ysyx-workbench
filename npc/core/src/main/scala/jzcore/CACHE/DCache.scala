@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+// todo: cacheable处理
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class DCache extends Module {
   val io = IO(new Bundle {
@@ -13,33 +14,33 @@ class DCache extends Module {
     val rdataIO         = Decoupled(new CacheReadIO) 
 
     // ram, dataArray
-    val sram0_rdata     = Input(UInt(128.W))
-    val sram0_cen       = Output(Bool())
-    val sram0_wen       = Output(Bool())
-    val sram0_wmask     = Output(UInt(128.W))
-    val sram0_addr      = Output(UInt(6.W))
-    val sram0_wdata     = Output(UInt(128.W)) 
+    val sram4_rdata     = Input(UInt(128.W))
+    val sram4_cen       = Output(Bool())
+    val sram4_wen       = Output(Bool())
+    val sram4_wmask     = Output(UInt(128.W))
+    val sram4_addr      = Output(UInt(6.W))
+    val sram4_wdata     = Output(UInt(128.W)) 
 
-    val sram1_rdata     = Input(UInt(128.W))
-    val sram1_cen       = Output(Bool())
-    val sram1_wen       = Output(Bool())
-    val sram1_wmask     = Output(UInt(128.W))
-    val sram1_addr      = Output(UInt(6.W))
-    val sram1_wdata     = Output(UInt(128.W)) 
+    val sram5_rdata     = Input(UInt(128.W))
+    val sram5_cen       = Output(Bool())
+    val sram5_wen       = Output(Bool())
+    val sram5_wmask     = Output(UInt(128.W))
+    val sram5_addr      = Output(UInt(6.W))
+    val sram5_wdata     = Output(UInt(128.W)) 
 
-    val sram2_rdata     = Input(UInt(128.W))
-    val sram2_cen       = Output(Bool())
-    val sram2_wen       = Output(Bool())
-    val sram2_wmask     = Output(UInt(128.W))
-    val sram2_addr      = Output(UInt(6.W))
-    val sram2_wdata     = Output(UInt(128.W)) 
+    val sram6_rdata     = Input(UInt(128.W))
+    val sram6_cen       = Output(Bool())
+    val sram6_wen       = Output(Bool())
+    val sram6_wmask     = Output(UInt(128.W))
+    val sram6_addr      = Output(UInt(6.W))
+    val sram6_wdata     = Output(UInt(128.W)) 
 
-    val sram3_rdata     = Input(UInt(128.W))
-    val sram3_cen       = Output(Bool())
-    val sram3_wen       = Output(Bool())
-    val sram3_wmask     = Output(UInt(128.W))
-    val sram3_addr      = Output(UInt(6.W))
-    val sram3_wdata     = Output(UInt(128.W)) 
+    val sram7_rdata     = Input(UInt(128.W))
+    val sram7_cen       = Output(Bool())
+    val sram7_wen       = Output(Bool())
+    val sram7_wmask     = Output(UInt(128.W))
+    val sram7_addr      = Output(UInt(6.W))
+    val sram7_wdata     = Output(UInt(128.W)) 
 
     // axi
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -63,6 +64,11 @@ class DCache extends Module {
 
   val hit                = WireDefault(false.B)
   val dirty              = WireDefault(false.B)
+  val addr               = RegInit(0.U(32.W))
+  val wen                = RegInit(false.B)
+  val tag                = Wire(UInt(22.W))
+  val index              = Wire(UInt(6.W))
+  val align              = Wire(Bool())
 
   // axi fire
   val raddrFire          = io.axiRaddrIO.valid && io.axiRaddrIO.ready
@@ -75,12 +81,12 @@ class DCache extends Module {
   val cwdataFire         = io.wdataIO.valid && io.wdataIO.ready
   val crdataFire         = io.rdataIO.valid && io.rdataIO.ready
 
-  // cache state machine
+  // cache state machine，cacheable access
   val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: Nil = Enum(7)
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle        -> Mux(ctrlFire, tagCompare, idle),
+    idle        -> Mux(ctrlFire && io.ctrlIO.bits.cacheable, tagCompare, idle),
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
     data        -> Mux(crdataFire || cwdataFire, idle, data),
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // addr
@@ -89,22 +95,35 @@ class DCache extends Module {
     allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2) // data
   ))
 
+  // not cacheable access
+  val addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(3)
+  val rState = RegInit(idle)
+  rState := MuxLookup(rState, idle, List(
+    idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
+    addr_trans  -> Mux(raddrFire && io.axiGrant, data_trans, addr_trans),
+    data_trans  -> Mux(rdataFire, Mux(crdataFire, idle, ok), data_trans), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    ok          -> Mux(crdataFire, idle, ok)
+  ))
+
+  val wState = RegInit(idle)
+  wState := MuxLookup(wState, idle, List(
+    idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && io.ctrlIO.bits.wen, addr_trans, idle),
+    addr_trans  -> Mux(waddrFire && io.axiGrant, Mux(wdataFire, wait_resp, data_trans), addr_trans),
+    data_trans  -> Mux(wdataFire, wait_resp, data_trans),
+    wait_resp   -> Mux(brespFire, Mux(cwdataFire, idle, ok), wait_resp), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    ok          -> Mux(cwdataFire, idle, ok)
+  ))
+
   victimWay             := Mux(state === tagCompare, randCount, victimWay)
 
   // meta data
   val metaInit        = Wire(new MetaData)
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
-  //metaInit.cacheable := false.B
   metaInit.tag       := 0.U(22.W)
   val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(64)(metaInit))))
-
+  
   // ---------------------------address decode-----------------------------------------
-  val addr    = RegInit(0.U(32.W))
-  val wen     = RegInit(false.B)
-  val tag     = Wire(UInt(22.W))
-  val index   = Wire(UInt(6.W))
-  val align   = Wire(Bool())
   addr       := Mux(state === idle && ctrlFire, io.ctrlIO.bits.addr, addr)
   wen        := Mux(state === idle && ctrlFire, io.ctrlIO.bits.wen, wen)
   tag        := addr(31, 10)
@@ -152,18 +171,23 @@ class DCache extends Module {
   allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
 
   // axi
-  io.axiReq := state === writeback1 || state === allocate1
-  io.axiReady := state === allocate2 && rdataFire && io.axiRdataIO.bits.rlast
+  io.axiReq := state === writeback1 || state === allocate1 || rState === addr_trans || wState === addr_trans // todo: 可以提前申请总线请求
+  io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.axiRdataIO.bits.rlast) || (wState === wait_resp && brespFire)
 
   val burstAddr            = addr & "hfffffff8".U
 
   // allocate axi, burst read
-  io.axiRaddrIO.valid     := state === allocate1
-  io.axiRaddrIO.bits.addr  := burstAddr
-  io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
+  io.axiRaddrIO.valid     := state === allocate1 || rState === addr_trans
+  io.axiRaddrIO.bits.addr := burstAddr
+  //io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
+  io.axiRaddrIO.bits.len  := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
   io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
-  io.axiRdataIO.ready     := state === allocate2
+  io.axiRdataIO.ready     := state === allocate2 || rState === data_trans
+
+  // 锁存axi读取的值
+  val axiDataReg           = RegInit(0.U(64.W))
+  axiDataReg              := Mux(rState === data_trans && rdataFire, io.axiRdataIO.bits.rdata, axiDataReg)
 
   val rblockBuffer         = RegInit(0.U(64.W))
   rblockBuffer            := MuxLookup(state, 0.U(64.W), List(
@@ -181,17 +205,19 @@ class DCache extends Module {
     wburst := wburst
   }
 
-  io.axiWaddrIO.valid     := state === writeback1 && io.axiGrant
+  io.axiWaddrIO.valid     := state === writeback1 || wState === addr_trans
   io.axiWaddrIO.bits.addr := burstAddr
-  io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
+  //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
+  io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap
 
-  io.axiWdataIO.valid     := state === writeback1 || state === writeback2
-  io.axiWdataIO.bits.wlast:= state === writeback2 && wburst === 1.U(2.W)
-  io.axiWdataIO.bits.wstrb:= "b11111111".U
+  io.axiWdataIO.valid     := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
+  io.axiWdataIO.bits.wlast:= (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
+  //io.axiWdataIO.bits.wstrb:= "b11111111".U
+  io.axiWdataIO.bits.wstrb:= Mux(wState === addr_trans || wState === data_trans, io.wdataIO.bits.wmask, "b11111111".U)
 
-  io.axiBrespIO.ready     := state === writeback2 && wburst === 2.U(2.W)
+  io.axiBrespIO.ready     := (state === writeback2 && wburst === 2.U(2.W)) || wState === wait_resp
   // burst write
   when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
     io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 32), dataBlock(31, 0))
@@ -281,7 +307,6 @@ class DCache extends Module {
     (0 to 7).map(i => (wmask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
     // write enable
     when(allocTag) {
-      //metaArray(victimWay)(index).dirty := true.B
       switch(victimWay) {
         is(0.U) {
           metaArray(0)(index).dirty := true.B
@@ -355,10 +380,16 @@ class DCache extends Module {
       alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
     }
   }
-  io.wdataIO.ready         := state === data
+  // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+  io.wdataIO.ready         := state === data || (wState === wait_resp && brespFire) || wState === ok
 
-  io.rdataIO.bits.rdata    := Mux(state === data, alignData, 0.U(64.W))
-  io.rdataIO.valid         := state === data
+  //io.rdataIO.bits.rdata    := Mux(state === data, alignData, 0.U(64.W))
+  //io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits,rdata, 0.U(64.W)))
+  io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
+  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits,rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
 
-  io.ctrlIO.ready          := state === idle
+  //io.ctrlIO.ready          := state === idle // todo
+  io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
+
+  // todo: 锁存axi数据
 }

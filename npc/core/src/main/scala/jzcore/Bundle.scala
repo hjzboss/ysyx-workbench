@@ -12,11 +12,9 @@ class DebugIO extends Bundle {
 
 // todo: cpu需要返回一个ready信号给cache，代表成功接受数据，此bundle需要进一步分离
 class CacheCtrlIO extends Bundle {
-  val addr  = Output(UInt(32.W))
-  //val rdata = Input(UInt(64.W))
-  //val wdata = Output(UInt(64.W))
-  val wen   = Output(Bool())
-  //val wmask = Output(UInt(8.W))
+  val addr      = Output(UInt(32.W))
+  val wen       = Output(Bool())
+  val cacheable = Output(Bool()) // cacheable or uncacheable, just for dcache
 }
 
 class CacheWriteIO extends Bundle {

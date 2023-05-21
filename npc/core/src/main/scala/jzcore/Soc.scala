@@ -24,6 +24,10 @@ class Soc extends Module {
   val ram1 = Module(new Ram)
   val ram2 = Module(new Ram)
   val ram3 = Module(new Ram)
+  val ram4 = Module(new Ram)
+  val ram5 = Module(new Ram)
+  val ram6 = Module(new Ram)
+  val ram7 = Module(new Ram)
   val core = Module(new JzCore)
 
   core.io.axiRaddrIO <> sram.io.raddrIO
