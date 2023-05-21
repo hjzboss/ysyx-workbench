@@ -386,7 +386,7 @@ class DCache extends Module {
   //io.rdataIO.bits.rdata    := Mux(state === data, alignData, 0.U(64.W))
   //io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits,rdata, 0.U(64.W)))
   io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
-  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits,rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
+  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits.rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
 
   //io.ctrlIO.ready          := state === idle // todo
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
