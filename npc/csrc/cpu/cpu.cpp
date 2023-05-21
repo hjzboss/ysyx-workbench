@@ -143,6 +143,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = i8042_data_io_handler();
   }
   else {
+    printf("raddr=%016x, rdata=%x\n", raddr, rdata);
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
 }
