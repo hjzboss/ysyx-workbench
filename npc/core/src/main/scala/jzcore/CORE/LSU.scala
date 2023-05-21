@@ -66,7 +66,7 @@ class LSU extends Module {
   val readFire    = io.dcacheRead.valid && io.dcacheWrite.ready
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
 
-  val idle :: ctrl :: data :: Nil = Enum(2)
+  val idle :: ctrl :: data :: Nil = Enum(3)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
     idle -> Mux(hasTrans, ctrl, idle),
