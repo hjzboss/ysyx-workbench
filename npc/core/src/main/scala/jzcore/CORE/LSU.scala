@@ -71,7 +71,7 @@ class LSU extends Module {
   state := MuxLookup(state, idle, List(
     idle -> Mux(hasTrans, ctrl, idle),
     ctrl -> Mux(ctrlFire, data, ctrl),
-    data -> Mux(readFire && writeFire, Mux(hasTrans, ctrl, idle), data) // todo
+    data -> Mux(readFire && writeFire, idle, data) // todo
   ))
 
   val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U
