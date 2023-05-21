@@ -166,7 +166,7 @@ class DCache extends Module {
     dataBlock := dataBlock
   }
 
-    // ----------------------------write back and allocate--------------------------------
+  // ----------------------------write back and allocate--------------------------------
   val allocTag = RegInit(false.B)
   allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
 

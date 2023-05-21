@@ -294,7 +294,7 @@ class JzCore extends Module {
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 
-  wbReg.io.lsFlagIn   <> lsu.io.lsFlag
+  wbReg.io.lsFlagIn <> lsu.io.lsFlag
   io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
   wbu.io.in         <> wbReg.io.out
 
