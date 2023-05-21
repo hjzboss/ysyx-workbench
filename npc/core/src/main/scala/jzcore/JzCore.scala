@@ -98,9 +98,9 @@ class JzCore extends Module {
   arbiter.io.ifuReq   <> icache.io.axiReq
   arbiter.io.grantIfu <> icache.io.axiGrant
   arbiter.io.ifuReady <> icache.io.axiReady
-  arbiter.io.lsuReq   <> lsu.io.axiReq
-  arbiter.io.grantLsu <> lsu.io.axiGrant
-  arbiter.io.lsuReady <> lsu.io.axiReady
+  arbiter.io.lsuReq   <> dcache.io.axiReq
+  arbiter.io.grantLsu <> dcache.io.axiGrant
+  arbiter.io.lsuReady <> dcache.io.axiReady
 
   // axi访问接口
   val grant = Cat(arbiter.io.grantIfu, arbiter.io.grantLsu)
@@ -111,22 +111,22 @@ class JzCore extends Module {
     io.axiWdataIO <> icache.io.axiWdataIO
     io.axiBrespIO <> icache.io.axiBrespIO
 
-    lsu.io.axiRaddrIO.ready   := false.B
-    lsu.io.axiRdataIO.valid   := false.B
-    lsu.io.axiRdataIO.bits.rdata := 0.U
-    lsu.io.axiRdataIO.bits.rresp   := 0.U
-    lsu.io.axiRdataIO.bits.rlast   := true.B
-    lsu.io.axiWaddrIO.ready   := false.B
-    lsu.io.axiWdataIO.ready   := false.B
-    lsu.io.axiBrespIO.valid   := false.B
-    lsu.io.axiBrespIO.bits.bresp   := 0.U
+    dcache.io.axiRaddrIO.ready   := false.B
+    dcache.io.axiRdataIO.valid   := false.B
+    dcache.io.axiRdataIO.bits.rdata := 0.U
+    dcache.io.axiRdataIO.bits.rresp   := 0.U
+    dcache.io.axiRdataIO.bits.rlast   := true.B
+    dcache.io.axiWaddrIO.ready   := false.B
+    dcache.io.axiWdataIO.ready   := false.B
+    dcache.io.axiBrespIO.valid   := false.B
+    dcache.io.axiBrespIO.bits.bresp   := 0.U
   }
   .elsewhen(grant === 1.U || grant === 3.U) {
-    io.axiRaddrIO <> lsu.io.axiRaddrIO
-    io.axiRdataIO <> lsu.io.axiRdataIO
-    io.axiWaddrIO <> lsu.io.axiWaddrIO
-    io.axiWdataIO <> lsu.io.axiWdataIO
-    io.axiBrespIO <> lsu.io.axiBrespIO
+    io.axiRaddrIO <> dcache.io.axiRaddrIO
+    io.axiRdataIO <> dcache.io.axiRdataIO
+    io.axiWaddrIO <> dcache.io.axiWaddrIO
+    io.axiWdataIO <> dcache.io.axiWdataIO
+    io.axiBrespIO <> dcache.io.axiBrespIO
 
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
@@ -167,15 +167,15 @@ class JzCore extends Module {
     icache.io.axiBrespIO.valid   := false.B
     icache.io.axiBrespIO.bits.bresp   := 0.U
 
-    lsu.io.axiRaddrIO.ready   := false.B
-    lsu.io.axiRdataIO.valid   := false.B
-    lsu.io.axiRdataIO.bits.rdata := 0.U
-    lsu.io.axiRdataIO.bits.rlast   := true.B
-    lsu.io.axiRdataIO.bits.rresp   := 0.U
-    lsu.io.axiWaddrIO.ready   := false.B
-    lsu.io.axiWdataIO.ready   := false.B
-    lsu.io.axiBrespIO.valid   := false.B
-    lsu.io.axiBrespIO.bits.bresp   := 0.U
+    dcache.io.axiRaddrIO.ready   := false.B
+    dcache.io.axiRdataIO.valid   := false.B
+    dcache.io.axiRdataIO.bits.rdata := 0.U
+    dcache.io.axiRdataIO.bits.rlast   := true.B
+    dcache.io.axiRdataIO.bits.rresp   := 0.U
+    dcache.io.axiWaddrIO.ready   := false.B
+    dcache.io.axiWdataIO.ready   := false.B
+    dcache.io.axiBrespIO.valid   := false.B
+    dcache.io.axiBrespIO.bits.bresp   := 0.U
   }
   
   // ram, dataArray
