@@ -40,6 +40,10 @@ class Soc extends Module {
   ram1.io.CLK := clock
   ram2.io.CLK := clock
   ram3.io.CLK := clock
+  ram4.io.CLK := clock
+  ram5.io.CLK := clock
+  ram6.io.CLK := clock
+  ram7.io.CLK := clock
 
   // ram, dataArray
   core.io.sram0_rdata <> ram0.io.Q
