@@ -63,7 +63,7 @@ class LSU extends Module {
   val hasTrans    = readTrans || writeTrans
 
   val ctrlFire    = io.dcacheCtrl.valid && io.dcacheCtrl.ready
-  val readFire    = io.dcacheRead.valid && io.dcacheWrite.ready
+  val readFire    = io.dcacheRead.valid && io.dcacheRead.ready
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
 
   val idle :: ctrl :: data :: Nil = Enum(3)
@@ -71,7 +71,7 @@ class LSU extends Module {
   state := MuxLookup(state, idle, List(
     idle -> Mux(hasTrans, ctrl, idle),
     ctrl -> Mux(ctrlFire, data, ctrl),
-    data -> Mux(readFire && writeFire, idle, data) // todo
+    data -> Mux(readFire || writeFire, idle, data) // todo
   ))
 
   val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U
