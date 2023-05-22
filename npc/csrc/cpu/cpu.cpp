@@ -117,7 +117,6 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
-    printf("timer\n");
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
@@ -133,14 +132,12 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     return;
   }
   else if (raddr == CONFIG_VGA_CTL_MMIO) {
-    printf("vga\n");
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // VGA_CTRL, 返回屏幕大小，可在config.h中配置
     uint32_t data = get_vga_config();
     *rdata = data;
   }
   else if (raddr == CONFIG_I8042_DATA_MMIO) {
-    printf("keyboard\n");
     // 返回键盘码
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     *rdata = i8042_data_io_handler();
@@ -157,7 +154,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0 || waddr < 0x80000000ull) return;
   if (waddr == CONFIG_SERIAL_MMIO) {
-    printf("uart\n");
     //printf("wdata=%x\n", wdata);
     // uart
     putchar(wdata);
@@ -165,7 +161,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     return;
   }
   else if (waddr == SYNC_ADDR) {
-    printf("sync\n");
     // 设置同步位
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     syn_update();
