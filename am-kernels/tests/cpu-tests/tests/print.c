@@ -5,6 +5,8 @@ int main() {
   //int b = 123;
   //void *a = &b;
   //printf("%s = %p\n", shit, a);
-  printf("fuck\n");
+  *(int *)0x81a00000 = 12345;
+  int *shit = (int *)0x81a00000;
+  printf("fuck=%ld\n", *shit);
   return 0;
 }
