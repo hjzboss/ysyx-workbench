@@ -63,7 +63,7 @@ class DCache extends Module {
   val victimWay          = RegInit(0.U(2.W))
 
   val hit                = dontTouch(WireDefault(false.B))
-  val dirty              = WireDefault(false.B)
+  val dirty              = dontTouch(WireDefault(false.B))
   val addr               = RegInit(0.U(32.W))
   val wen                = RegInit(false.B)
   val tag                = Wire(UInt(22.W))
@@ -135,14 +135,22 @@ class DCache extends Module {
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
   val hitListReg = RegInit(VecInit(List.fill(4)(false.B)))
   (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), false.B)))
-  dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
-    "b0001".U   -> metaArray(0)(index).dirty,
-    "b0010".U   -> metaArray(1)(index).dirty,
-    "b0100".U   -> metaArray(2)(index).dirty,
-    "b1000".U   -> metaArray(3)(index).dirty,
-  ))
   hit := (hitList.asUInt).orR
   hitListReg := Mux(state === tagCompare, hitList, hitListReg)
+
+  when(state === tagCompare) {
+    when(hit) {
+      dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
+        "b0001".U   -> metaArray(0)(index).dirty,
+        "b0010".U   -> metaArray(1)(index).dirty,
+        "b0100".U   -> metaArray(2)(index).dirty,
+        "b1000".U   -> metaArray(3)(index).dirty,
+      ))
+    }.otherwise {
+      dirty := metaArray(randCount)(index).dirty
+    }
+  }
+
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {
