@@ -6,10 +6,10 @@ int fuck[65535] = {};
 int main() {
   int i;
   //char *ptr = (char *)0x81000000;
-  for(i = 0; i < 200; i++) {
+  for(i = 0; i < 230; i++) {
     fuck[i] = 1;
   }
-  for(i = 0; i < 200; i++) {
+  for(i = 0; i < 230; i++) {
     check(fuck[i] == 1);
   }
 
