@@ -148,10 +148,10 @@ class DCache extends Module {
               ))
     }.otherwise {
       dirty := LookupTree(randCount, List(
-                  0.U   -> metaArray(0)(index).dirty,
-                  1.U   -> metaArray(1)(index).dirty,
-                  2.U   -> metaArray(2)(index).dirty,
-                  3.U   -> metaArray(3)(index).dirty,
+                0.U   -> metaArray(0)(index).dirty,
+                1.U   -> metaArray(1)(index).dirty,
+                2.U   -> metaArray(2)(index).dirty,
+                3.U   -> metaArray(3)(index).dirty,
               ))
     }
   }
