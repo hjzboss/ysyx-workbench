@@ -141,13 +141,18 @@ class DCache extends Module {
   when(state === tagCompare) {
     when(hit) {
       dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
-        "b0001".U   -> metaArray(0)(index).dirty,
-        "b0010".U   -> metaArray(1)(index).dirty,
-        "b0100".U   -> metaArray(2)(index).dirty,
-        "b1000".U   -> metaArray(3)(index).dirty,
-      ))
+                "b0001".U   -> metaArray(0)(index).dirty,
+                "b0010".U   -> metaArray(1)(index).dirty,
+                "b0100".U   -> metaArray(2)(index).dirty,
+                "b1000".U   -> metaArray(3)(index).dirty,
+              ))
     }.otherwise {
-      dirty := metaArray(randCount)(index).dirty
+      dirty := LookupTree(randCount, List(
+                  0.U   -> metaArray(0)(index).dirty,
+                  1.U   -> metaArray(1)(index).dirty,
+                  2.U   -> metaArray(2)(index).dirty,
+                  3.U   -> metaArray(3)(index).dirty,
+              ))
     }
   }
 
