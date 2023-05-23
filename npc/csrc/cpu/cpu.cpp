@@ -206,6 +206,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
 
 
 static void reset(int time) {
+  visit_device = true;
   top->reset = 1;
   while (time >= 0) {
     top->clock = !top->clock;
@@ -217,6 +218,7 @@ static void reset(int time) {
     time--;  
   }
   top->reset = 0;
+  visit_device = false;
 }
 
 
@@ -292,7 +294,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
-  //*inst = top->io_debug_inst;
+  *inst = top->io_debug_inst;
   *lsFlag = top->io_lsFlag;
   eval_wave();
   eval_wave();
@@ -301,8 +303,8 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
   bool lsFlag = false; // 访存信号
-  npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
-  isa_exec_once(&pc, &npc_cpu.pc, &lsFlag);
+  //npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
+  isa_exec_once(&pc, &npc_cpu.pc, &lsFlag, &npc_cpu.inst);
 #ifdef CONFIG_DIFFTEST
   // 由于访存会在lsu阶段产生，会提前设置visit_device信号，因此要用个lsflag信号
   if (visit_device && lsFlag) {
