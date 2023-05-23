@@ -63,6 +63,7 @@ class ICache extends Module {
 
   val hit                = WireDefault(false.B)
   val dirty              = WireDefault(false.B)
+  val wtag               = RegInit(0.U(22.W)) // dirty的tag
 
   // axi fire
   val raddrFire          = io.axiRaddrIO.valid && io.axiRaddrIO.ready
@@ -116,14 +117,38 @@ class ICache extends Module {
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
   val hitListReg = RegInit(VecInit(List.fill(4)(false.B)))
   (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), false.B)))
-  dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
-    "b0001".U   -> metaArray(0)(index).dirty,
-    "b0010".U   -> metaArray(1)(index).dirty,
-    "b0100".U   -> metaArray(2)(index).dirty,
-    "b1000".U   -> metaArray(3)(index).dirty,
-  ))
   hit := (hitList.asUInt).orR
   hitListReg := Mux(state === tagCompare, hitList, hitListReg)
+
+  when(state === tagCompare) {
+    when(hit) {
+      dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
+                "b0001".U   -> metaArray(0)(index).dirty,
+                "b0010".U   -> metaArray(1)(index).dirty,
+                "b0100".U   -> metaArray(2)(index).dirty,
+                "b1000".U   -> metaArray(3)(index).dirty,
+              ))
+    }.otherwise {
+      dirty := LookupTree(randCount, List(
+                0.U   -> metaArray(0)(index).dirty,
+                1.U   -> metaArray(1)(index).dirty,
+                2.U   -> metaArray(2)(index).dirty,
+                3.U   -> metaArray(3)(index).dirty,
+              ))
+    }
+  }
+
+  when(state === tagCompare && !hit) {
+    wtag := LookupTree(randCount, List(
+              0.U   -> metaArray(0)(index).tag,
+              1.U   -> metaArray(1)(index).tag,
+              2.U   -> metaArray(2)(index).tag,
+              3.U   -> metaArray(3)(index).tag,
+            ))
+  }.otherwise {
+    wtag := wtag
+  }
+
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {
@@ -182,7 +207,7 @@ class ICache extends Module {
   }
 
   io.axiWaddrIO.valid     := state === writeback1 && io.axiGrant
-  io.axiWaddrIO.bits.addr := burstAddr
+  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
   io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap
