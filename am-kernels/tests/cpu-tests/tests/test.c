@@ -1,15 +1,15 @@
 #include "klib.h"
 #include "trap.h"
 
-char fuck[8] = {};
+int fuck[65535] = {};
 
 int main() {
-  char i;
+  int i;
   //char *ptr = (char *)0x81000000;
-  for(i = 0; i < 8; i++) {
+  for(i = 0; i < 65535; i++) {
     fuck[i] = i;
   }
-  for(i = 0; i < 8; i++) {
+  for(i = 0; i < 65535; i++) {
     check(fuck[i] == i);
   }
 
