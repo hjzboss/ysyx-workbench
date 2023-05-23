@@ -62,7 +62,7 @@ class DCache extends Module {
   // the way chosen to victim
   val victimWay          = RegInit(0.U(2.W))
 
-  val hit                = WireDefault(false.B)
+  val hit                = dontTouch(WireDefault(false.B))
   val dirty              = WireDefault(false.B)
   val addr               = RegInit(0.U(32.W))
   val wen                = RegInit(false.B)
