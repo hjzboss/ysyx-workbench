@@ -17,6 +17,7 @@ typedef struct {
   uint64_t gpr[32];
   uint64_t csr[CSR_NUM];
   uint64_t pc;
+  uint64_t inst;
 } NEMUCPUState;
 
 #endif
