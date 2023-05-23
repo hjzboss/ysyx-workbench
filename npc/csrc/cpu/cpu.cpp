@@ -284,7 +284,7 @@ void delete_cpu() {
   IFDEF(CONFIG_DTRACE, free_dtrace());
 }
 
-static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag) {
+static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *inst) {
   int cnt = 0;
   while (!top->io_finish) {
     eval_wave();
