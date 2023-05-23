@@ -405,6 +405,4 @@ class DCache extends Module {
 
   //io.ctrlIO.ready          := state === idle // todo
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
-
-  // todo: 锁存axi数据
 }
