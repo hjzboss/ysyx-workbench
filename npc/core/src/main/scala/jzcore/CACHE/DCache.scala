@@ -69,6 +69,7 @@ class DCache extends Module {
   val tag                = Wire(UInt(22.W))
   val index              = Wire(UInt(6.W))
   val align              = Wire(Bool())
+  val wtag               = RegInit(0.U(22.W)) // dirty的tag
 
   // axi fire
   val raddrFire          = io.axiRaddrIO.valid && io.axiRaddrIO.ready
@@ -156,6 +157,17 @@ class DCache extends Module {
     }
   }
 
+  when(state === tagCompare && !hit) {
+    wtag := LookupTree(randCount, List(
+              0.U   -> metaArray(0)(index).tag,
+              1.U   -> metaArray(1)(index).tag,
+              2.U   -> metaArray(2)(index).tag,
+              3.U   -> metaArray(3)(index).tag,
+            ))
+  }.otherwise {
+    wtag := wtag
+  }
+
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {
@@ -219,7 +231,8 @@ class DCache extends Module {
   }
 
   io.axiWaddrIO.valid     := state === writeback1 || wState === addr_trans
-  io.axiWaddrIO.bits.addr := burstAddr
+  //io.axiWaddrIO.bits.addr := burstAddr
+  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B
