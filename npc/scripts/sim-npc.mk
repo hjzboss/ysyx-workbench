@@ -31,7 +31,7 @@ NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
 NPC_FLAG += -i $(IMAGE_OBJ)
 NPC_FLAG += -e ${IMAGE}.elf
 NPC_FLAG += -d ${DIFFSET_SO}
-#NPC_FLAG += -b
+NPC_FLAG += -b
 
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 LFLAGS += $(DIFFSET_SO)
