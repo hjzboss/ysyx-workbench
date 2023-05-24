@@ -69,7 +69,7 @@ class DCache extends Module {
   val wen                = RegInit(false.B)
   val tag                = Wire(UInt(22.W))
   val index              = Wire(UInt(6.W))
-  val align              = dontTouch(Wire(Bool()))
+  val align              = Wire(Bool())
   val wtag               = RegInit(0.U(22.W)) // dirty的tag
 
   // axi fire
@@ -246,14 +246,11 @@ class DCache extends Module {
 
   io.axiBrespIO.ready     := (state === writeback2 && wburst === 2.U(2.W)) || wState === wait_resp
   
-  val cond                 = dontTouch(Wire(Bool()))
-  cond                    := state === writeback2 && wburst === 1.U(2.W)
-
   // burst write
   when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
-    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 32), dataBlock(31, 0))
-  }.elsewhen(cond) {
-    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(31, 0), dataBlock(63, 32))
+    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
+  }.elsewhen(state === writeback2 && wburst === 1.U(2.W)) {
+    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 0), dataBlock(127, 64))
   }.elsewhen(wState === addr_trans || wState === data_trans) {
     io.axiWdataIO.bits.wdata := io.wdataIO.bits.wdata
   }.otherwise {
