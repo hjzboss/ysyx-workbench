@@ -55,6 +55,14 @@ static void checkregs(NEMUCPUState *ref) {
     }
   }
 
+  // check inst
+  if(ref->inst != npc_cpu.inst) {
+    log_write(ANSI_FMT("inst error: \n", ANSI_FG_RED));
+    log_write("ref: 0x%08x\n", ref->inst);
+    log_write("dut: 0x%08x\n", npc_cpu.inst);
+    same = false;
+  }
+
   if(!same) {
     // print all dut regs when error
     isa_reg_display(err_list);

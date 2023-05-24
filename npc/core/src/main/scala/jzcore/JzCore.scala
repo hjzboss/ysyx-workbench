@@ -40,7 +40,33 @@ class JzCore extends Module {
     val sram3_wdata     = Output(UInt(128.W)) 
 
     // dcache data array
+    val sram4_rdata     = Input(UInt(128.W))
+    val sram4_cen       = Output(Bool())
+    val sram4_wen       = Output(Bool())
+    val sram4_wmask     = Output(UInt(128.W))
+    val sram4_addr      = Output(UInt(6.W))
+    val sram4_wdata     = Output(UInt(128.W)) 
 
+    val sram5_rdata     = Input(UInt(128.W))
+    val sram5_cen       = Output(Bool())
+    val sram5_wen       = Output(Bool())
+    val sram5_wmask     = Output(UInt(128.W))
+    val sram5_addr      = Output(UInt(6.W))
+    val sram5_wdata     = Output(UInt(128.W)) 
+
+    val sram6_rdata     = Input(UInt(128.W))
+    val sram6_cen       = Output(Bool())
+    val sram6_wen       = Output(Bool())
+    val sram6_wmask     = Output(UInt(128.W))
+    val sram6_addr      = Output(UInt(6.W))
+    val sram6_wdata     = Output(UInt(128.W)) 
+
+    val sram7_rdata     = Input(UInt(128.W))
+    val sram7_cen       = Output(Bool())
+    val sram7_wen       = Output(Bool())
+    val sram7_wmask     = Output(UInt(128.W))
+    val sram7_addr      = Output(UInt(6.W))
+    val sram7_wdata     = Output(UInt(128.W)) 
 
     // axi访存接口
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -60,6 +86,7 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
+  val dcache  = Module(new DCache)
 
   val idReg   = Module(new ID_REG)
   val exReg   = Module(new EX_REG)
@@ -72,9 +99,9 @@ class JzCore extends Module {
   arbiter.io.ifuReq   <> icache.io.axiReq
   arbiter.io.grantIfu <> icache.io.axiGrant
   arbiter.io.ifuReady <> icache.io.axiReady
-  arbiter.io.lsuReq   <> lsu.io.axiReq
-  arbiter.io.grantLsu <> lsu.io.axiGrant
-  arbiter.io.lsuReady <> lsu.io.axiReady
+  arbiter.io.lsuReq   <> dcache.io.axiReq
+  arbiter.io.grantLsu <> dcache.io.axiGrant
+  arbiter.io.lsuReady <> dcache.io.axiReady
 
   // axi访问接口
   val grant = Cat(arbiter.io.grantIfu, arbiter.io.grantLsu)
@@ -85,22 +112,22 @@ class JzCore extends Module {
     io.axiWdataIO <> icache.io.axiWdataIO
     io.axiBrespIO <> icache.io.axiBrespIO
 
-    lsu.io.axiRaddrIO.ready   := false.B
-    lsu.io.axiRdataIO.valid   := false.B
-    lsu.io.axiRdataIO.bits.rdata := 0.U
-    lsu.io.axiRdataIO.bits.rresp   := 0.U
-    lsu.io.axiRdataIO.bits.rlast   := true.B
-    lsu.io.axiWaddrIO.ready   := false.B
-    lsu.io.axiWdataIO.ready   := false.B
-    lsu.io.axiBrespIO.valid   := false.B
-    lsu.io.axiBrespIO.bits.bresp   := 0.U
+    dcache.io.axiRaddrIO.ready   := false.B
+    dcache.io.axiRdataIO.valid   := false.B
+    dcache.io.axiRdataIO.bits.rdata := 0.U
+    dcache.io.axiRdataIO.bits.rresp   := 0.U
+    dcache.io.axiRdataIO.bits.rlast   := true.B
+    dcache.io.axiWaddrIO.ready   := false.B
+    dcache.io.axiWdataIO.ready   := false.B
+    dcache.io.axiBrespIO.valid   := false.B
+    dcache.io.axiBrespIO.bits.bresp   := 0.U
   }
   .elsewhen(grant === 1.U || grant === 3.U) {
-    io.axiRaddrIO <> lsu.io.axiRaddrIO
-    io.axiRdataIO <> lsu.io.axiRdataIO
-    io.axiWaddrIO <> lsu.io.axiWaddrIO
-    io.axiWdataIO <> lsu.io.axiWdataIO
-    io.axiBrespIO <> lsu.io.axiBrespIO
+    io.axiRaddrIO <> dcache.io.axiRaddrIO
+    io.axiRdataIO <> dcache.io.axiRdataIO
+    io.axiWaddrIO <> dcache.io.axiWaddrIO
+    io.axiWdataIO <> dcache.io.axiWdataIO
+    io.axiBrespIO <> dcache.io.axiBrespIO
 
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
@@ -141,15 +168,15 @@ class JzCore extends Module {
     icache.io.axiBrespIO.valid   := false.B
     icache.io.axiBrespIO.bits.bresp   := 0.U
 
-    lsu.io.axiRaddrIO.ready   := false.B
-    lsu.io.axiRdataIO.valid   := false.B
-    lsu.io.axiRdataIO.bits.rdata := 0.U
-    lsu.io.axiRdataIO.bits.rlast   := true.B
-    lsu.io.axiRdataIO.bits.rresp   := 0.U
-    lsu.io.axiWaddrIO.ready   := false.B
-    lsu.io.axiWdataIO.ready   := false.B
-    lsu.io.axiBrespIO.valid   := false.B
-    lsu.io.axiBrespIO.bits.bresp   := 0.U
+    dcache.io.axiRaddrIO.ready   := false.B
+    dcache.io.axiRdataIO.valid   := false.B
+    dcache.io.axiRdataIO.bits.rdata := 0.U
+    dcache.io.axiRdataIO.bits.rlast   := true.B
+    dcache.io.axiRdataIO.bits.rresp   := 0.U
+    dcache.io.axiWaddrIO.ready   := false.B
+    dcache.io.axiWdataIO.ready   := false.B
+    dcache.io.axiBrespIO.valid   := false.B
+    dcache.io.axiBrespIO.bits.bresp   := 0.U
   }
   
   // ram, dataArray
@@ -180,6 +207,35 @@ class JzCore extends Module {
   icache.io.sram3_wmask <> io.sram3_wmask
   icache.io.sram3_addr <> io.sram3_addr
   icache.io.sram3_wdata <> io.sram3_wdata
+
+  // dcache
+  dcache.io.sram4_rdata <> io.sram4_rdata
+  dcache.io.sram4_cen <> io.sram4_cen
+  dcache.io.sram4_wen <> io.sram4_wen
+  dcache.io.sram4_wmask <> io.sram4_wmask
+  dcache.io.sram4_addr <> io.sram4_addr
+  dcache.io.sram4_wdata <> io.sram4_wdata
+
+  dcache.io.sram5_rdata <> io.sram5_rdata
+  dcache.io.sram5_cen <> io.sram5_cen
+  dcache.io.sram5_wen <> io.sram5_wen
+  dcache.io.sram5_wmask <> io.sram5_wmask
+  dcache.io.sram5_addr <> io.sram5_addr
+  dcache.io.sram5_wdata <> io.sram5_wdata
+
+  dcache.io.sram6_rdata <> io.sram6_rdata
+  dcache.io.sram6_cen <> io.sram6_cen
+  dcache.io.sram6_wen <> io.sram6_wen
+  dcache.io.sram6_wmask <> io.sram6_wmask
+  dcache.io.sram6_addr <> io.sram6_addr
+  dcache.io.sram6_wdata <> io.sram6_wdata
+
+  dcache.io.sram7_rdata <> io.sram7_rdata
+  dcache.io.sram7_cen <> io.sram7_cen
+  dcache.io.sram7_wen <> io.sram7_wen
+  dcache.io.sram7_wmask <> io.sram7_wmask
+  dcache.io.sram7_addr <> io.sram7_addr
+  dcache.io.sram7_wdata <> io.sram7_wdata
 
   ifu.io.out        <> idReg.io.in
   ifu.io.redirect   <> exu.io.redirect
@@ -232,10 +288,13 @@ class JzCore extends Module {
   exu.io.forwardA   <> forward.io.forwardA
   exu.io.forwardB   <> forward.io.forwardB
 
+  lsu.io.dcacheCtrl <> dcache.io.ctrlIO
+  lsu.io.dcacheRead <> dcache.io.rdataIO
+  lsu.io.dcacheWrite<> dcache.io.wdataIO
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 
-  wbReg.io.lsFlagIn   <> lsu.io.lsFlag
+  wbReg.io.lsFlagIn <> lsu.io.lsFlag
   io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
   wbu.io.in         <> wbReg.io.out
 

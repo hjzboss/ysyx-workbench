@@ -24,6 +24,10 @@ class Soc extends Module {
   val ram1 = Module(new Ram)
   val ram2 = Module(new Ram)
   val ram3 = Module(new Ram)
+  val ram4 = Module(new Ram)
+  val ram5 = Module(new Ram)
+  val ram6 = Module(new Ram)
+  val ram7 = Module(new Ram)
   val core = Module(new JzCore)
 
   core.io.axiRaddrIO <> sram.io.raddrIO
@@ -36,6 +40,10 @@ class Soc extends Module {
   ram1.io.CLK := clock
   ram2.io.CLK := clock
   ram3.io.CLK := clock
+  ram4.io.CLK := clock
+  ram5.io.CLK := clock
+  ram6.io.CLK := clock
+  ram7.io.CLK := clock
 
   // ram, dataArray
   core.io.sram0_rdata <> ram0.io.Q
@@ -65,6 +73,35 @@ class Soc extends Module {
   core.io.sram3_wmask <> ram3.io.BWEN
   core.io.sram3_addr <> ram3.io.A
   core.io.sram3_wdata <> ram3.io.D
+
+
+  core.io.sram4_rdata <> ram4.io.Q
+  core.io.sram4_cen <> ram4.io.CEN
+  core.io.sram4_wen <> ram4.io.WEN
+  core.io.sram4_wmask <> ram4.io.BWEN
+  core.io.sram4_addr <> ram4.io.A
+  core.io.sram4_wdata <> ram4.io.D
+
+  core.io.sram5_rdata <> ram5.io.Q
+  core.io.sram5_cen <> ram5.io.CEN
+  core.io.sram5_wen <> ram5.io.WEN
+  core.io.sram5_wmask <> ram5.io.BWEN
+  core.io.sram5_addr <> ram5.io.A
+  core.io.sram5_wdata <> ram5.io.D
+
+  core.io.sram6_rdata <> ram6.io.Q
+  core.io.sram6_cen <> ram6.io.CEN
+  core.io.sram6_wen <> ram6.io.WEN
+  core.io.sram6_wmask <> ram6.io.BWEN
+  core.io.sram6_addr <> ram6.io.A
+  core.io.sram6_wdata <> ram6.io.D
+
+  core.io.sram7_rdata <> ram7.io.Q
+  core.io.sram7_cen <> ram7.io.CEN
+  core.io.sram7_wen <> ram7.io.WEN
+  core.io.sram7_wmask <> ram7.io.BWEN
+  core.io.sram7_addr <> ram7.io.A
+  core.io.sram7_wdata <> ram7.io.D
 
   // 仿真环境
   io.debug        := core.io.debug
