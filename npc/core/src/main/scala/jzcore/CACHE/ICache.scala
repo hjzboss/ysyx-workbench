@@ -372,12 +372,34 @@ class ICache extends Module {
     }
   }
 
-  // -----------------------data aligner-------------------------------
-  val alignData = WireDefault(0.U(64.W))
-  when(state === data) {
-    when(allocTag) {
-      alignData := rblockBuffer
-    }.otherwise {
+  // -----------------------data aligner--    // ram, dataArray
+    val sram0_rdata     = Input(UInt(128.W))
+    val sram0_cen       = Output(Bool())
+    val sram0_wen       = Output(Bool())
+    val sram0_wmask     = Output(UInt(128.W))
+    val sram0_addr      = Output(UInt(6.W))
+    val sram0_wdata     = Output(UInt(128.W)) 
+
+    val sram1_rdata     = Input(UInt(128.W))
+    val sram1_cen       = Output(Bool())
+    val sram1_wen       = Output(Bool())
+    val sram1_wmask     = Output(UInt(128.W))
+    val sram1_addr      = Output(UInt(6.W))
+    val sram1_wdata     = Output(UInt(128.W)) 
+
+    val sram2_rdata     = Input(UInt(128.W))
+    val sram2_cen       = Output(Bool())
+    val sram2_wen       = Output(Bool())
+    val sram2_wmask     = Output(UInt(128.W))
+    val sram2_addr      = Output(UInt(6.W))
+    val sram2_wdata     = Output(UInt(128.W)) 
+
+    val sram3_rdata     = Input(UInt(128.W))
+    val sram3_cen       = Output(Bool())
+    val sram3_wen       = Output(Bool())
+    val sram3_wmask     = Output(UInt(128.W))
+    val sram3_addr      = Output(UInt(6.W))
+    val sram3_wdata     = Output(UInt(128.W)) 
       alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
     }
   }
@@ -392,7 +414,7 @@ class ICache extends Module {
 
 // todo: cacheable处理
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
-class DCache extends Module {
+class ICache extends Module {
   val io = IO(new Bundle {
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
@@ -400,33 +422,33 @@ class DCache extends Module {
     val rdataIO         = Decoupled(new CacheReadIO) 
 
     // ram, dataArray
-    val sram4_rdata     = Input(UInt(128.W))
-    val sram4_cen       = Output(Bool())
-    val sram4_wen       = Output(Bool())
-    val sram4_wmask     = Output(UInt(128.W))
-    val sram4_addr      = Output(UInt(6.W))
-    val sram4_wdata     = Output(UInt(128.W)) 
+    val sram0_rdata     = Input(UInt(128.W))
+    val sram0_cen       = Output(Bool())
+    val sram0_wen       = Output(Bool())
+    val sram0_wmask     = Output(UInt(128.W))
+    val sram0_addr      = Output(UInt(6.W))
+    val sram0_wdata     = Output(UInt(128.W)) 
 
-    val sram5_rdata     = Input(UInt(128.W))
-    val sram5_cen       = Output(Bool())
-    val sram5_wen       = Output(Bool())
-    val sram5_wmask     = Output(UInt(128.W))
-    val sram5_addr      = Output(UInt(6.W))
-    val sram5_wdata     = Output(UInt(128.W)) 
+    val sram1_rdata     = Input(UInt(128.W))
+    val sram1_cen       = Output(Bool())
+    val sram1_wen       = Output(Bool())
+    val sram1_wmask     = Output(UInt(128.W))
+    val sram1_addr      = Output(UInt(6.W))
+    val sram1_wdata     = Output(UInt(128.W)) 
 
-    val sram6_rdata     = Input(UInt(128.W))
-    val sram6_cen       = Output(Bool())
-    val sram6_wen       = Output(Bool())
-    val sram6_wmask     = Output(UInt(128.W))
-    val sram6_addr      = Output(UInt(6.W))
-    val sram6_wdata     = Output(UInt(128.W)) 
+    val sram2_rdata     = Input(UInt(128.W))
+    val sram2_cen       = Output(Bool())
+    val sram2_wen       = Output(Bool())
+    val sram2_wmask     = Output(UInt(128.W))
+    val sram2_addr      = Output(UInt(6.W))
+    val sram2_wdata     = Output(UInt(128.W)) 
 
-    val sram7_rdata     = Input(UInt(128.W))
-    val sram7_cen       = Output(Bool())
-    val sram7_wen       = Output(Bool())
-    val sram7_wmask     = Output(UInt(128.W))
-    val sram7_addr      = Output(UInt(6.W))
-    val sram7_wdata     = Output(UInt(128.W)) 
+    val sram3_rdata     = Input(UInt(128.W))
+    val sram3_cen       = Output(Bool())
+    val sram3_wen       = Output(Bool())
+    val sram3_wmask     = Output(UInt(128.W))
+    val sram3_addr      = Output(UInt(6.W))
+    val sram3_wdata     = Output(UInt(128.W)) 
 
     // axi
     val axiRaddrIO  = Decoupled(new RaddrIO)
