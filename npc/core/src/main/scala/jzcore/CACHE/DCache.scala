@@ -4,7 +4,6 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-// bug: 只要出现写回，就会出现问题
 // todo: cacheable处理
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class DCache extends Module {

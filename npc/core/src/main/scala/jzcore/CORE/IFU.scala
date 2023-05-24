@@ -73,10 +73,11 @@ class IFU extends Module with HasResetVector {
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
   io.icacheCtrl.bits.wen    := false.B
-  io.icacheCtrl.bits.cacheable := true.B
+  io.icacheCtrl.bits.cacheable := true.B // todo
 
   io.icacheRead.ready       := state === data && !io.stall
- 
+  
+  // todo: 是否会写？
   io.icacheWrite.valid      := false.B
   io.icacheWrite.bits.wdata := 0.U(64.W)
   io.icacheWrite.bits.wmask := 0.U(8.W)
