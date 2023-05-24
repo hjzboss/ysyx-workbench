@@ -90,7 +90,7 @@ class ICache extends Module {
     allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2) // data
   ))
 
-  victimWay             := Mux(state === tagCompare, randCount, victimWay)
+  victimWay          := Mux(state === tagCompare, randCount, victimWay)
 
   // meta data
   val metaInit        = Wire(new MetaData)
