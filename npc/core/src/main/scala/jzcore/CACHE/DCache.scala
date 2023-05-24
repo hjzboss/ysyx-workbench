@@ -246,7 +246,8 @@ class DCache extends Module {
 
   io.axiBrespIO.ready     := (state === writeback2 && wburst === 2.U(2.W)) || wState === wait_resp
   
-  val cond                 = state === writeback2 && wburst === 1.U(2.W)
+  val cond                 = dontTouch(Wire(Bool()))
+  cond                    := state === writeback2 && wburst === 1.U(2.W)
 
   // burst write
   when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
