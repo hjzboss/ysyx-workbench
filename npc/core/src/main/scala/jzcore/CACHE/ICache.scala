@@ -422,7 +422,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.out.inst := inst
   io.out.pc   := stage3Reg.pc
 
-  io.validOut := reset && !io.flushIn && (state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall
+  io.validOut := Reset && !io.flushIn && (state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall
   io.debugOut.inst := inst
 }
 
