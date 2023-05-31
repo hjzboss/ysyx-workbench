@@ -8,38 +8,39 @@ import chisel3.util._
 class CTRL extends Module {
   val io = IO(new Bundle {
     // ifu和lsu都是多周期完成，因此需要ready信号来停顿对应的流水线
-    val ifuReady = Input(Bool())
-    val lsuReady = Input(Bool())
-
-    // axi仲裁信号
-    val ifuGrant = Input(Bool())
-    val lsuGrant = Input(Bool())
+    //val ifuReady = Input(Bool())
+    val icStall     = Input(Bool())
+    val lsuReady    = Input(Bool())
 
     // 分支指令需要flush流水线
-    val branch   = Input(Bool())
+    val branch      = Input(Bool())
 
     // stall pipline reg and pc
     val stallPc     = Output(Bool())
+    val stallICache = Output(Bool())
     val stallIduReg = Output(Bool())
     val stallExuReg = Output(Bool())
     val stallLsuReg = Output(Bool())
 
     // flush pipline reg
+    val flushICache = Output(Bool())
     val flushIduReg = Output(Bool())
     val flushWbuReg = Output(Bool()) // set when lsu is unready
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
 
     // todo: load-use停顿处理
+    
   })
   
   // 当取指未完成时停顿之前所有阶段
-  io.stallPc     := !io.lsuReady
+  io.stallPc     := !io.lsuReady || io.icStall
   io.stallIduReg := !io.lsuReady
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
-  io.flushIduReg := !io.ifuReady || io.branch
+  io.flushICache := io.branch
+  io.flushIduReg := io.branch
   io.flushExuReg := io.branch
-  io.flushWbuReg := !io.lsuReady
+  io.flushWbuReg := !io.lsuReady // todo
 }

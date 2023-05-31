@@ -237,26 +237,28 @@ class JzCore extends Module {
   dcache.io.sram7_addr <> io.sram7_addr
   dcache.io.sram7_wdata <> io.sram7_wdata
 
-  ifu.io.out        <> idReg.io.in
-  ifu.io.redirect   <> exu.io.redirect
-  ifu.io.stall      <> ctrl.io.stallPc
-  ifu.io.valid      <> idReg.io.validIn
-  ifu.io.icacheCtrl <> icache.io.ctrlIO
-  ifu.io.icacheRead <> icache.io.rdataIO
-  ifu.io.icacheWrite<> icache.io.wdataIO
-  exReg.io.validIn  <> idReg.io.validOut
-  lsReg.io.validIn  <> exReg.io.validOut
-  wbReg.io.validIn  <> lsReg.io.validOut
+  ifu.io.out          <> icache.io.cpu2cache
+  icache.io.cache2cpu <> idReg.io.in
+  ifu.io.redirect     <> exu.io.redirect
+  icache.io.validOut  <> idReg.io.validIn
+  //ifu.io.icacheCtrl <> icache.io.ctrlIO
+  //ifu.io.icacheRead <> icache.io.rdataIO
+  //ifu.io.icacheWrite<> icache.io.wdataIO
+  exReg.io.validIn    <> idReg.io.validOut
+  lsReg.io.validIn    <> exReg.io.validOut
+  wbReg.io.validIn    <> lsReg.io.validOut
 
   // 控制模块
-  ctrl.io.ifuReady  <> ifu.io.ready
-  ctrl.io.lsuReady  <> lsu.io.ready
-  ctrl.io.ifuGrant  := arbiter.io.grantIfu
-  ctrl.io.lsuGrant  := arbiter.io.grantLsu
-  ctrl.io.branch    := exu.io.redirect.valid
+  //ctrl.io.ifuReady  <> ifu.io.ready
+  ctrl.io.icStall     <> icache.io.stallOut
+  ctrl.io.lsuReady    <> lsu.io.ready
+  ctrl.io.branch      := exu.io.redirect.valid
+  ctrl.io.stallICache <> icache.io.stallIn
   ctrl.io.stallIduReg <> idReg.io.stall
   ctrl.io.stallExuReg <> exReg.io.stall
   ctrl.io.stallLsuReg <> lsReg.io.stall
+  ctrl.io.stallPc     <> ifu.io.stall
+  ctrl.io.flushICache <> icache.io.flush
   ctrl.io.flushIduReg <> idReg.io.flush
   ctrl.io.flushWbuReg <> wbReg.io.flush
   ctrl.io.flushExuReg <> exReg.io.flush
@@ -298,7 +300,8 @@ class JzCore extends Module {
   io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
   wbu.io.in         <> wbReg.io.out
 
-  idReg.io.debugIn  <> ifu.io.debug
+  ifu.io.debug      <> icache.io.debugIn
+  idReg.io.debugIn  <> icache.io.debugOut
   exReg.io.debugIn  <> idReg.io.debugOut
   exu.io.debugIn    <> exReg.io.debugOut
   lsReg.io.debugIn  <> exu.io.debugOut

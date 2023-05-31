@@ -13,37 +13,25 @@ class IFU extends Module with HasResetVector {
     // 用于仿真环境
     val debug       = new DebugIO
     
-    val valid       = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
+    //val valid       = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
 
     // from exu
-    val redirect    = Flipped(new RedirectIO)
+    val redirect      = Flipped(new RedirectIO)
 
     // to idu
-    val out         = new InstrFetch
-
-    /*
-    // axi
-    val axiRaddrIO  = Decoupled(new RaddrIO)
-    val axiRdataIO  = Flipped(Decoupled(new RdataIO))
-    val axiWaddrIO  = Decoupled(new WaddrIO)
-    val axiWdataIO  = Decoupled(new WdataIO)
-    val axiBrespIO  = Flipped(Decoupled(new BrespIO))    
-    // 仲裁信号
-    val axiReq      = Output(Bool())
-    val axiGrant    = Input(Bool())
-    val axiReady    = Output(Bool())
-    */
+    val out           = new Stage1IO
 
     // icache
-    val icacheCtrl  = Decoupled(new CacheCtrlIO)
-    val icacheRead  = Flipped(Decoupled(new CacheReadIO))
-    val icacheWrite = Decoupled(new CacheWriteIO)
+    //val icacheCtrl  = Decoupled(new CacheCtrlIO)
+    //val icacheRead  = Flipped(Decoupled(new CacheReadIO))
+    //val icacheWrite = Decoupled(new CacheWriteIO)
  
     // ctrl
-    val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
+    //val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
     val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
   })
 
+  /*
   val addrFire      = io.icacheCtrl.valid && io.icacheCtrl.ready
   val rdataFire     = io.icacheRead.valid && io.icacheRead.ready
   val wdataFire     = io.icacheWrite.valid && io.icacheWrite.ready
@@ -64,12 +52,21 @@ class IFU extends Module with HasResetVector {
   // 分支跳转标志，用于返回icache一个正确的信号，防止阻塞
   val brFlag                 = RegInit(false.B)
   brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.redirect.valid, true.B, brFlag))
-
+  */
   // pc
   val pc   = RegInit(resetVector.U(32.W))
   val snpc = pc + 4.U
   val dnpc = io.redirect.brAddr
 
+  pc      := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
+  
+  io.out.addr := pc 
+  io.out.cacheable := true.B // todo: 接入soc时需要更改
+
+  io.debug.pc := pc 
+  io.debug.nextPc := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
+  io.debug.inst := Instruction.NOP
+  /*
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
   io.icacheCtrl.bits.wen    := false.B
@@ -81,7 +78,7 @@ class IFU extends Module with HasResetVector {
   io.icacheWrite.valid      := false.B
   io.icacheWrite.bits.wdata := 0.U(64.W)
   io.icacheWrite.bits.wmask := 0.U(8.W)
-
+  
   // 当发生分支跳转时忽略icache返回的数据
   val instPre                = Mux(brFlag || io.redirect.valid, 0.U(32.W), io.icacheRead.bits.rdata)
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
@@ -106,4 +103,5 @@ class IFU extends Module with HasResetVector {
   // 取指完毕信号，用于提醒流水线寄存器传递数据
   io.ready                  := (state === data && rdataFire) || io.stall // todo
   io.valid                  := state === data && rdataFire && !brFlag // 分支发生跳转时的指令是无效的
+  */
 }

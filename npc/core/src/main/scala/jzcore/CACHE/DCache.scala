@@ -235,8 +235,8 @@ class DCache extends Module {
   io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
-  io.axiWaddrIO.bits.size := 3.U(3.W) // 8B
-  io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap
+  io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
+  io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
 
   io.axiWdataIO.valid     := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
   io.axiWdataIO.bits.wlast:= (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
