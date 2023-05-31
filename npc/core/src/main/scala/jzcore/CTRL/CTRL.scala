@@ -36,8 +36,8 @@ class CTRL extends Module {
     val rs2         = Input(UInt(5.W))
   })
 
-  val loadUse     = WireDefault(false.B)
-  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
+  val loadUse     = dontTouch(WireDefault(false.B))
+  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2)
 
   // 当取指未完成时停顿之前所有阶段
   io.stallICache := !io.lsuReady | loadUse
