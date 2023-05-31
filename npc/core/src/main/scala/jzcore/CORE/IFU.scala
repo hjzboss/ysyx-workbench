@@ -69,7 +69,7 @@ class IFU extends Module with HasResetVector {
   io.debug.inst := Instruction.NOP
 
   val valid    = dontTouch(WireDefault(false.B))
-  valid := true.B
+  valid := !io.stall
   io.valid    := valid
   /*
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
