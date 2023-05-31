@@ -309,6 +309,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.axiWaddrIO.bits.burst:= 0.U
   io.axiWdataIO.valid     := false.B
   io.axiWdataIO.bits.wlast:= true.B
+  io.axiWdataIO.bits.wdata:= 0.U(64.W)
   io.axiWdataIO.bits.wstrb:= 0.U(8.W)
   io.axiBrespIO.ready     := true.B
 

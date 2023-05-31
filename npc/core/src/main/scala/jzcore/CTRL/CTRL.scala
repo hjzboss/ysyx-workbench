@@ -33,6 +33,7 @@ class CTRL extends Module {
   })
   
   // 当取指未完成时停顿之前所有阶段
+  io.stallICache := !io.lsuReady
   io.stallPc     := !io.lsuReady || io.icStall
   io.stallIduReg := !io.lsuReady
   io.stallExuReg := !io.lsuReady
