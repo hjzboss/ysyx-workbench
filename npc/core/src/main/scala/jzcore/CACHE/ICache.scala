@@ -139,6 +139,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   // meta array
   val metaInit           = Wire(new MetaData)
   metaInit.valid        := false.B
+  metaInit.dirty        := false.B
   metaInit.tag          := 0.U(22.W)
   val metaArray          = List.fill(4)(RegInit(VecInit(Seq.fill(64)(metaInit))))
 
