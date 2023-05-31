@@ -260,7 +260,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   })
 
   val flushReg          = WireDefault(false.B)
-  io.redirect             := flushReg
+  io.redirect          := flushReg
   val regInit           = Wire(new Stage3IO)
   regInit.pc           := resetVector.U(32.W)
   regInit.cacheline    := 0.U(128.W)
@@ -421,8 +421,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
   }
   io.out.inst := inst
   io.out.pc   := stage3Reg.pc
-  
-  io.validOut := !io.flushIn && (state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall
+
+  io.validOut := reset && !io.flushIn && (state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall
   io.debugOut.inst := inst
 }
 
