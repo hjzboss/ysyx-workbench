@@ -3,11 +3,14 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import javax.xml.transform.OutputKeys
 
 
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
+    val redirect   = Input(Bool())
     val stage3Addr = Input(UInt(6.W))
+    val stage2Addr = Input(UInt(6.W))
     val stage1Addr = Input(UInt(6.W))
     val stage3Cen  = Input(Bool())
     val stage1Cen  = Input(Bool())
@@ -19,9 +22,12 @@ sealed class IcArbiter extends Module {
     val arbWen     = Output(Bool())
   })
 
-  io.arbAddr     := Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr)
-  io.arbCen      := Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen)
-  io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
+  io.arbAddr     := Mux(io.redirect, io.stage2Addr, Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr))
+  io.arbCen      := Mux(io.redirect, false.B, Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen))
+  io.arbWen      := Mux(io.redirect, true.B, Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen))
+  //io.arbAddr     := Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr)
+  //io.arbCen      := Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen)
+  //io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
 }
 
 sealed class CacheStage1 extends Module {
@@ -98,8 +104,13 @@ sealed class CacheStage2 extends Module with HasResetVector {
     val toStage3        = new Stage3IO
 
     val flushIn         = Input(Bool())
-    val stallOut        = Output(Bool())
+    //val stallOut        = Output(Bool())
     val stallIn         = Input(Bool())
+
+    val sram0_addr      = Output(UInt(6.W))
+    val sram1_addr      = Output(UInt(6.W))
+    val sram2_addr      = Output(UInt(6.W))
+    val sram3_addr      = Output(UInt(6.W))
 
     val sram0_rdata     = Input(UInt(128.W))
     val sram1_rdata     = Input(UInt(128.W))
@@ -109,7 +120,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
     val metaAlloc       = Flipped(new MetaAllocIO)
   })
 
-  val flush              = WireDefault(false.B)
+  //val flush              = WireDefault(false.B)
 
   // pipline reg
   val regInit            = Wire(new Stage2IO)
@@ -120,7 +131,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.pc            := resetVector.U(32.W)
   val stage2Reg          = RegInit(regInit)
   //stage2Reg             := Mux(flush || io.flushIn, regInit, Mux(io.stallIn, stage2Reg, io.toStage2))
-  stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn || flush, regInit, io.toStage2))
+  stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, io.toStage2))
 
   val debugReset         = Wire(new DebugIO)
   debugReset.pc         := resetVector.U(32.W)
@@ -131,8 +142,13 @@ sealed class CacheStage2 extends Module with HasResetVector {
   //val stallDebug         = dontTouch(Wire(new DebugIO))
   //stallDebug            := Mux(io.stallIn, debugReg, io.debugIn)
   //debugReg              := Mux(io.flushIn || flush, debugReset, stallDebug)
-  debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn || flush, debugReset, io.debugIn))
+  debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn))
   io.debugOut           := debugReg
+
+  io.sram0_addr         := stage2Reg.index
+  io.sram1_addr         := stage2Reg.index
+  io.sram2_addr         := stage2Reg.index
+  io.sram3_addr         := stage2Reg.index
 
   // random replace count
   val randCount          = RegInit(0.U(2.W))
@@ -167,15 +183,15 @@ sealed class CacheStage2 extends Module with HasResetVector {
   }
 
   io.toStage3.cacheline := MuxLookup(hit, 0.U(128.W), List(
-                            0.U -> io.sram0_rdata,
-                            2.U -> io.sram1_rdata,
-                            4.U -> io.sram2_rdata,
-                            8.U -> io.sram3_rdata,
+                              0.U -> io.sram0_rdata,
+                              2.U -> io.sram1_rdata,
+                              4.U -> io.sram2_rdata,
+                              8.U -> io.sram3_rdata,
                           ))
-  
-  flush                 := !hit // 当未命中时冲刷流水线寄存器, 停顿ifu
-  io.stallOut           := !hit
-  io.toStage3.hit       := Mux(io.flushIn || flush, true.B, hit)
+
+  //flush                 := !hit // 当未命中时冲刷流水线寄存器, 停顿ifu
+  //io.stallOut           := !hit
+  io.toStage3.hit       := Mux(io.flushIn, true.B, hit)
   io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
   io.toStage3.victim    := randCount
   io.toStage3.cacheable := stage2Reg.cacheable
@@ -197,6 +213,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
     val stallIn         = Input(Bool())
 
     val flushIn         = Input(Bool())
+    val redirect        = Output(Bool()) // 转发stage2的地址给data ram
 
     // to idu
     val out             = new InstrFetch
@@ -242,6 +259,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
     val axiReady        = Output(Bool())
   })
 
+  val flush             = WireDefault(false.B)
+  redirect             := flush
   val regInit           = Wire(new Stage3IO)
   regInit.pc           := resetVector.U(32.W)
   regInit.cacheline    := 0.U(128.W)
@@ -254,7 +273,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   regInit.index        := 0.U(6.W)
   val stage3Reg         = RegInit(regInit)
   //stage3Reg            := Mux(io.flushIn, regInit, Mux(io.stallOut || io.stallIn, stage3Reg, io.toStage3))
-  stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
+  stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flush, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
   val debugReset        = Wire(new DebugIO)
   debugReset.pc        := resetVector.U(32.W)
@@ -265,7 +284,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   //val stallDebug        = dontTouch(Wire(new DebugIO))
   //stallDebug           := Mux(io.stallIn || io.stallOut, debugReg, io.debugIn)
   //debugReg             := Mux(io.flushIn, debugReset, stallDebug)
-  debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
+  debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flush, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
   io.debugOut.pc       := debugReg.pc
   io.debugOut.nextPc   := debugReg.nextPc
 
@@ -274,9 +293,6 @@ sealed class CacheStage3 extends Module with HasResetVector {
   // axi fire
   val raddrFire         = io.axiRaddrIO.valid && io.axiRaddrIO.ready
   val rdataFire         = io.axiRdataIO.valid && io.axiRdataIO.ready
-
-  // todo: stall 和 flush的处理，stall优先于flush
-  // ctrl信号的连接
 
   // 分配和flash取指状态机
   val idle :: addr :: data :: flush :: stall :: Nil = Enum(5)
@@ -289,7 +305,10 @@ sealed class CacheStage3 extends Module with HasResetVector {
     flush -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), flush)
   ))
 
-  io.stallOut             := (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || (state === data && !io.axiRdataIO.bits.rlast)   
+  // todo
+  flush                   := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
+
+  io.stallOut             := (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
 
   io.axiReq               := state === addr
   //io.axiReq               := state === idle && (!stage3Reg.hit || !stage3Reg.cacheable) && !io.flushIn
@@ -306,9 +325,9 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val rblockBuffer         = RegInit(0.U(64.W))
   rblockBuffer            := MuxLookup(state, rblockBuffer, List(
                               addr -> 0.U(64.W),
-                              data -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer),
-                              flush-> 0.U(64.W)
+                              data -> Mux(io.flushIn, 0.U(64.W), Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)),
                             ))
+
   // todo
   io.axiWaddrIO.valid     := false.B
   io.axiWaddrIO.bits.addr := 0.U(32.W) 
@@ -391,7 +410,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
     }.otherwise {
       inst := Mux(stage3Reg.align(0), stage3Reg.cacheline(63, 32), stage3Reg.cacheline(31, 0))
     }
-  }.elsewhen((state === data && rdataFire && io.axiRdataIO.bits.rlast) || state === stall) {
+  }.elsewhen((state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.flushIn) || state === stall) {
     when(stage3Reg.cacheable) {
       inst := Mux(stage3Reg.align(0), rblockBuffer(63, 32), rblockBuffer(31, 0))
     }.otherwise {
@@ -481,13 +500,12 @@ class ICache extends Module {
   stage2.io.debugOut    <> stage3.io.debugIn
   stage3.io.debugOut    <> io.debugOut
 
-
   io.cpu2cache          <> stage1.io.toStage1
   stage1.io.toStage2    <> stage2.io.toStage2
   stage2.io.toStage3    <> stage3.io.toStage3
   io.cache2cpu          <> stage3.io.out
 
-  stage1.io.stall       := io.stallIn | stage3.io.stallOut | stage2.io.stallOut | io.flush
+  stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
   stage2.io.flushIn     := io.flush
   stage2.io.stallIn     := io.stallIn | stage3.io.stallOut
   stage2.io.sram0_rdata <> io.sram0_rdata
@@ -495,18 +513,21 @@ class ICache extends Module {
   stage2.io.sram2_rdata <> io.sram2_rdata
   stage2.io.sram3_rdata <> io.sram3_rdata
   stage2.io.metaAlloc   <> stage3.io.metaAlloc
-  stage3.io.stallIn     := io.stallIn
+  stage3.io.stallIn     := io.stallIn | stage3.io.stallOut
   stage3.io.flushIn     := io.flush
-  io.stallOut           := stage3.io.stallOut | stage2.io.stallOut
+  io.stallOut           := stage3.io.stallOut
 
-
+  dataArb0.io.redirect   := stage3.io.redirect
+  dataArb0.io.stage2Addr := stage2.io.sram0_addr
   dataArb0.io.stage3Addr := stage3.io.sram0_addr
   dataArb0.io.stage3Cen  := stage3.io.sram0_cen
   dataArb0.io.stage3Wen  := stage3.io.sram0_wen
   dataArb0.io.stage1Addr := stage1.io.sram0_addr
   dataArb0.io.stage1Cen  := stage1.io.sram0_cen
   dataArb0.io.stage1Wen  := stage1.io.sram0_wen
-
+  
+  dataArb1.io.redirect   := stage3.io.redirect
+  dataArb1.io.stage2Addr := stage2.io.sram0_addr
   dataArb1.io.stage3Addr := stage3.io.sram1_addr
   dataArb1.io.stage3Cen  := stage3.io.sram1_cen
   dataArb1.io.stage3Wen  := stage3.io.sram1_wen
@@ -514,6 +535,8 @@ class ICache extends Module {
   dataArb1.io.stage1Cen  := stage1.io.sram1_cen
   dataArb1.io.stage1Wen  := stage1.io.sram1_wen
 
+  dataArb2.io.redirect   := stage3.io.redirect
+  dataArb2.io.stage2Addr := stage2.io.sram0_addr
   dataArb2.io.stage3Addr := stage3.io.sram2_addr
   dataArb2.io.stage3Cen  := stage3.io.sram2_cen
   dataArb2.io.stage3Wen  := stage3.io.sram2_wen
@@ -521,6 +544,8 @@ class ICache extends Module {
   dataArb2.io.stage1Cen  := stage1.io.sram2_cen
   dataArb2.io.stage1Wen  := stage1.io.sram2_wen
 
+  dataArb3.io.redirect   := stage3.io.redirect
+  dataArb3.io.stage2Addr := stage2.io.sram0_addr
   dataArb3.io.stage3Addr := stage3.io.sram3_addr
   dataArb3.io.stage3Cen  := stage3.io.sram3_cen
   dataArb3.io.stage3Wen  := stage3.io.sram3_wen
