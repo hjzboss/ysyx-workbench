@@ -148,8 +148,9 @@ sealed class CacheStage2 extends Module with HasResetVector {
   // metaArray lookup
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
   (0 to 3).map(i => (hitList(i) := metaArray(i)(stage2Reg.index).valid && (metaArray(i)(stage2Reg.index).tag === stage2Reg.tag)))
-  val hit = (hitList.asUInt).orR
-
+  //val hit = (hitList.asUInt).orR
+  val hit = dontTouch(WireDefault(true.B))
+  hit    := (hitList.asUInt).orR
   // metaArray alloc
   when(io.metaAlloc.valid) {
     // allocate metaArray
