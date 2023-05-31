@@ -520,7 +520,7 @@ class ICache extends Module {
   dataArb2.io.stage1Cen  := stage1.io.sram2_cen
   dataArb2.io.stage1Wen  := stage1.io.sram2_wen
 
-  dataArb3.io.stage3Addr := stage3.io.sram 3_addr
+  dataArb3.io.stage3Addr := stage3.io.sram3_addr
   dataArb3.io.stage3Cen  := stage3.io.sram3_cen
   dataArb3.io.stage3Wen  := stage3.io.sram3_wen
   dataArb3.io.stage1Addr := stage1.io.sram3_addr
