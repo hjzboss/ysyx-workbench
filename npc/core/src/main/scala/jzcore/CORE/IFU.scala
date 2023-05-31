@@ -68,7 +68,9 @@ class IFU extends Module with HasResetVector {
   io.debug.nextPc := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
   io.debug.inst := Instruction.NOP
 
-  io.valid    := !io.stall
+  val valid    = dontTouch(WireDefault(false.B))
+  valid := true.B
+  io.valid    := valid
   /*
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
