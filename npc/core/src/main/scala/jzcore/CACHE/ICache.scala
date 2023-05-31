@@ -50,6 +50,7 @@ class CacheStage1 extends Module {
     val sram2_cen       = Output(Bool())
     val sram2_wen       = Output(Bool())
     //val srvalidam2_wdata     = Output(UInt(128.W)) 
+    val sram2_addr      = Output(UInt(6.W))
 
     //val sram3_rdata     = Input(UInt(128.W))
     val sram3_cen       = Output(Bool())
