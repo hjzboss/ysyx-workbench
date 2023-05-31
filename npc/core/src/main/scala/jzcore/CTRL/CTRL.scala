@@ -35,20 +35,20 @@ class CTRL extends Module {
     val rs1         = Input(UInt(5.W))
     val rs2         = Input(UInt(5.W))
   })
-  
-  val load_use    = WireDefault(false.B)
-  load_use       := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
+
+  val loadUse     = WireDefault(false.B)
+  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallICache := !io.lsuReady | load_use
-  io.stallPc     := !io.lsuReady | io.icStall | load_use
-  io.stallIduReg := !io.lsuReady | load_use
+  io.stallICache := !io.lsuReady | loadUse
+  io.stallPc     := !io.lsuReady | io.icStall | loadUse
+  io.stallIduReg := !io.lsuReady | loadUse
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushICache := io.branch
   io.flushIduReg := io.branch
-  io.flushExuReg := io.branch | load_use
+  io.flushExuReg := io.branch | loadUse
   io.flushWbuReg := !io.lsuReady // todo
 }
