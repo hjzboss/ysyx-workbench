@@ -7,7 +7,7 @@ import utils._
 
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
-    val stage3addr = Input(UInt(6.W))
+    val stage3Addr = Input(UInt(6.W))
     val stage1Addr = Input(UInt(6.W))
     val stage3Cen  = Input(Bool())
     val stage1Cen  = Input(Bool())
@@ -155,10 +155,10 @@ sealed class CacheStage2 extends Module with HasResetVector {
     meta.valid := true.B
     meta.dirty := false.B
     switch(io.metaAlloc.victim) {
-      is(0.U) { metaArray(0)(io.metaArray.index) := meta }
-      is(1.U) { metaArray(1)(io.metaArray.index) := meta }
-      is(2.U) { metaArray(2)(io.metaArray.index) := meta }
-      is(3.U) { metaArray(3)(io.metaArray.index) := meta }
+      is(0.U) { metaArray(0)(io.metaAlloc.index) := meta }
+      is(1.U) { metaArray(1)(io.metaAlloc.index) := meta }
+      is(2.U) { metaArray(2)(io.metaAlloc.index) := meta }
+      is(3.U) { metaArray(3)(io.metaAlloc.index) := meta }
     }
   }
 
