@@ -58,22 +58,26 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.rs2           := 0.U(5.W)
 
   val datasrcReg           = RegInit(datasrcReset)
-  val stallDatasrc         = dontTouch(Wire(new DataSrcIO))
-  stallDatasrc            := Mux(io.stall, datasrcReg, io.datasrcIn)
-  datasrcReg              := Mux(io.flush, datasrcReset, stallDatasrc)
+  //val stallDatasrc         = dontTouch(Wire(new DataSrcIO))
+  //stallDatasrc            := Mux(io.stall, datasrcReg, io.datasrcIn)
+  //datasrcReg              := Mux(io.flush, datasrcReset, stallDatasrc)
+  datasrcReg              := Mux(io.stall, datasrcReg, Mux(io.flush, datasrcReset, io.datasrcIn))
 
   val aluCtrlReg           = RegInit(aluCtrlReset)
-  val stallAluCtrl         = dontTouch(Wire(new AluIO))
-  stallAluCtrl            := Mux(io.stall, aluCtrlReg, io.aluCtrlIn)
-  aluCtrlReg              := Mux(io.flush, aluCtrlReset, stallAluCtrl)
+  //val stallAluCtrl         = dontTouch(Wire(new AluIO))
+  //stallAluCtrl            := Mux(io.stall, aluCtrlReg, io.aluCtrlIn)
+  //aluCtrlReg              := Mux(io.flush, aluCtrlReset, stallAluCtrl)
+  aluCtrlReg              := Mux(io.stall, aluCtrlReg, Mux(io.flush, aluCtrlReset, io.aluCtrlIn))
 
   val ctrlReg              = RegInit(ctrlReset)
-  val stallCtrl            = dontTouch(Wire(new CtrlFlow))
-  stallCtrl               := Mux(io.stall, ctrlReg, io.ctrlIn)
-  ctrlReg                 := Mux(io.flush, ctrlReset, stallCtrl)
+  //val stallCtrl            = dontTouch(Wire(new CtrlFlow))
+  //stallCtrl               := Mux(io.stall, ctrlReg, io.ctrlIn)
+  //ctrlReg                 := Mux(io.flush, ctrlReset, stallCtrl)
+  ctrlReg                 := Mux(io.stall, ctrlReg, Mux(io.flush, ctrlReset, io.ctrlIn))
 
   val validReg             = RegInit(false.B)
-  validReg                := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
+  //validReg                := Mux(io.flush, false.B, Mux(io.stall, validReg, io.validIn))
+  validReg                := Mux(io.stall, validReg, Mux(io.flush, false.B, io.validIn))
 
   io.datasrcOut           := datasrcReg
   io.aluCtrlOut           := aluCtrlReg
@@ -86,9 +90,11 @@ class EX_REG extends Module with HasResetVector {
   debugReset.inst := Instruction.NOP
 
   val debugReg = RegInit(debugReset)
-  val stallDebug = dontTouch(Wire(new DebugIO))
-  stallDebug := Mux(io.stall, debugReg, io.debugIn)
-  debugReg := Mux(io.flush, debugReset, stallDebug)
+  //val stallDebug = dontTouch(Wire(new DebugIO))
+  //stallDebug := Mux(io.stall, debugReg, io.debugIn)
+  //debugReg := Mux(io.flush, debugReset, stallDebug)
+  debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn))
+
 
   io.debugOut := debugReg
 }
