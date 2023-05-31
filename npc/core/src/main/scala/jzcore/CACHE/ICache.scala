@@ -4,9 +4,6 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-trait HasResetVector {
-  val resetVector = Settings.getLong("ResetVector")
-}
 
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
