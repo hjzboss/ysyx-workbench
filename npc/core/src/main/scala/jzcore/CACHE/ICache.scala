@@ -259,8 +259,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
     val axiReady        = Output(Bool())
   })
 
-  val flush             = WireDefault(false.B)
-  redirect             := flush
+  val flushReg          = WireDefault(false.B)
+  io.redirect             := flushReg
   val regInit           = Wire(new Stage3IO)
   regInit.pc           := resetVector.U(32.W)
   regInit.cacheline    := 0.U(128.W)
@@ -273,7 +273,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   regInit.index        := 0.U(6.W)
   val stage3Reg         = RegInit(regInit)
   //stage3Reg            := Mux(io.flushIn, regInit, Mux(io.stallOut || io.stallIn, stage3Reg, io.toStage3))
-  stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flush, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
+  stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
   val debugReset        = Wire(new DebugIO)
   debugReset.pc        := resetVector.U(32.W)
@@ -284,7 +284,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   //val stallDebug        = dontTouch(Wire(new DebugIO))
   //stallDebug           := Mux(io.stallIn || io.stallOut, debugReg, io.debugIn)
   //debugReg             := Mux(io.flushIn, debugReset, stallDebug)
-  debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flush, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
+  debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
   io.debugOut.pc       := debugReg.pc
   io.debugOut.nextPc   := debugReg.nextPc
 
@@ -306,7 +306,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   ))
 
   // todo
-  flush                   := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
+  flushReg                := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
 
   io.stallOut             := (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
 
