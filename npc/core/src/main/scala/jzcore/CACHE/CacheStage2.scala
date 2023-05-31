@@ -30,7 +30,7 @@ class CacheStage2 extends Module with HasResetVector {
   val flush              = WireDefault(false.B)
 
   // pipline reg
-  val regInit            = Wire(new CacheStage2)
+  val regInit            = Wire(new Stage2IO)
   regInit.index         := 0.U(6.W)
   regInit.tag           := 0.U(22.W)
   regInit.align         := false.B
