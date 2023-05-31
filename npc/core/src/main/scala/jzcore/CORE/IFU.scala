@@ -12,7 +12,7 @@ trait HasResetVector {
 class IFU extends Module with HasResetVector {
   val io = IO(new Bundle {
     // 用于仿真环境
-    val debug       = new DebugIO
+    val debug         = new DebugIO
     
     //val valid       = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
 
@@ -67,6 +67,7 @@ class IFU extends Module with HasResetVector {
   io.debug.pc := pc 
   io.debug.nextPc := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
   io.debug.inst := Instruction.NOP
+
   /*
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
