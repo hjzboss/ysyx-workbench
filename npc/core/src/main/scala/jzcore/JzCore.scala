@@ -250,6 +250,10 @@ class JzCore extends Module {
 
   // 控制模块
   //ctrl.io.ifuReady  <> ifu.io.ready
+  ctrl.io.memRen      := exReg.io.ctrlOut.memRen
+  ctrl.io.exRd        := exReg.io.ctrlOut.rd
+  ctrl.io.rs1         := idu.io.ctrl.rs1
+  ctrl.io.rs2         := idu.io.ctrl.rs2
   ctrl.io.icStall     <> icache.io.stallOut
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.branch      := exu.io.redirect.valid
