@@ -320,7 +320,11 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val rdata1       = Mux(align(1), Cat(0.U(64.W), io.axiRdataIO.bits.rdata), Cat(io.axiRdataIO.bits.rdata, 0.U(64.W)))
 
   // dataArray control, todo: 此时发生冲刷仍会写入cache
-  io.sram0_addr   := stage3Reg.index  io.debugOut          := debugReg
+  io.sram0_addr   := stage3Reg.index
+  io.sram0_wen    := true.B
+  io.sram1_addr   := stage3Reg.index
+  io.sram1_wen    := true.B
+  io.sram2_addr   := stage3Reg.index
   io.sram2_wen    := true.B
   io.sram3_addr   := stage3Reg.index
   io.sram3_wen    := true.B
