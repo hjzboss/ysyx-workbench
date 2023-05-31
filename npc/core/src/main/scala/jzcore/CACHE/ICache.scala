@@ -5,7 +5,7 @@ import chisel3.util._
 import utils._
 
 
-class IcArbiter extends Module {
+sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
     val stage3addr = Input(UInt(6.W))
     val stage1Addr = Input(UInt(6.W))
@@ -24,7 +24,7 @@ class IcArbiter extends Module {
   io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
 }
 
-class CacheStage1 extends Module {
+sealed class CacheStage1 extends Module {
   val io = IO(new Bundle {
     val toStage1        = Flipped(new Stage1IO)
     val toStage2        = new Stage2IO
@@ -87,7 +87,7 @@ class CacheStage1 extends Module {
   io.toStage2.cacheable := io.toStage1.cacheable
 }
 
-class CacheStage2 extends Module with HasResetVector {
+sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
     // debug
     val debugIn         = Flipped(new DebugIO)
@@ -112,7 +112,7 @@ class CacheStage2 extends Module with HasResetVector {
   val flush              = WireDefault(false.B)
 
   // pipline reg
-  val regInit            = Wire(new CacheStage2)
+  val regInit            = Wire(new Stage2IO)
   regInit.index         := 0.U(6.W)
   regInit.tag           := 0.U(22.W)
   regInit.align         := false.B
@@ -181,7 +181,7 @@ class CacheStage2 extends Module with HasResetVector {
   io.toStage3.tag       := stage2Reg.tag
 }
 
-class CacheStage3 extends Module with HasResetVector {
+sealed class CacheStage3 extends Module with HasResetVector {
   val io = IO(new Bundle {
     val validOut        = Output(Bool())
     val debugIn         = Flipped(new DebugIO)
