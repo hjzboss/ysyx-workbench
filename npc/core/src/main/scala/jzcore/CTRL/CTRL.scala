@@ -37,7 +37,7 @@ class CTRL extends Module {
   })
   
   val load_use    = WireDefault(false.B)
-  load_use       := memRen && (exRd === rs1 || exRd === rs2) 
+  load_use       := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
   io.stallICache := !io.lsuReady | load_use
