@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -97,4 +98,4 @@ class CacheStage2 extends Module with HasResetVector {
   io.toStage3.pc        := stage2Reg.pc
   io.toStage3.index     := stage2Reg.index
   io.toStage3.tag       := stage2Reg.tag
-}
+}*/

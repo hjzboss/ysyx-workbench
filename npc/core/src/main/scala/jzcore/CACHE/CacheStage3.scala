@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -220,3 +221,4 @@ class CacheStage3 extends Module with HasResetVector {
   io.validOut := !io.flushIn && (state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall
   io.debugOut.inst := inst
 }
+*/

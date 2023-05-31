@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -66,3 +67,4 @@ class CacheStage1 extends Module {
   io.toStage2.pc        := io.toStage1.addr
   io.toStage2.cacheable := io.toStage1.cacheable
 }
+*/

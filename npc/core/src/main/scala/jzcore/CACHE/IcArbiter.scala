@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -23,3 +24,4 @@ class IcArbiter extends Module {
   io.arbCen      := Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen)
   io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
 }
+*/
