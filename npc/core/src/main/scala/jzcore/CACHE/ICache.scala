@@ -153,10 +153,10 @@ sealed class CacheStage2 extends Module with HasResetVector {
   debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn))
   io.debugOut           := debugReg
 
-  io.sram0_addr         := stage2Reg.index
-  io.sram1_addr         := stage2Reg.index
-  io.sram2_addr         := stage2Reg.index
-  io.sram3_addr         := stage2Reg.index
+  //io.sram0_addr         := stage2Reg.index
+  //io.sram1_addr         := stage2Reg.index
+  //io.sram2_addr         := stage2Reg.index
+  //io.sram3_addr         := stage2Reg.index
 
   // random replace count
   val randCount          = RegInit(0.U(2.W))
@@ -522,7 +522,7 @@ class ICache extends Module {
   stage1.io.toStage2    <> stage2.io.toStage2
   stage2.io.toStage3    <> stage3.io.toStage3
   io.cache2cpu          <> stage3.io.out
-  io.redirect.brAddr    := stage2.io.tostage3.pc
+  io.redirect.brAddr    := stage2.io.toStage3.pc
   io.redirect.valid     := stage3.io.flushOut
 
   stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
