@@ -10,7 +10,7 @@ int main() {
     fuck[i] = 1;
   }
   for(i = 0; i < 65535; i++) {
-    check(fuck[i] == 0);
+    check(fuck[i] == 1);
   }
 
   return 0;
