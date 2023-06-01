@@ -528,7 +528,7 @@ class ICache extends Module {
 
   stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
   stage2.io.flushIn     := io.flush | stage3.io.flushOut
-  stage2.io.stallIn     := io.stallIn
+  stage2.io.stallIn     := io.stallIn | stage3.io.stallOut
   stage2.io.sram0_rdata <> io.sram0_rdata
   stage2.io.sram1_rdata <> io.sram1_rdata
   stage2.io.sram2_rdata <> io.sram2_rdata
