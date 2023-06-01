@@ -190,16 +190,24 @@ sealed class CacheStage2 extends Module with HasResetVector {
     }
   }
 
-  io.toStage3.cacheline := MuxLookup(hitList.asUInt, 0.U(128.W), List(
+  val stallReg           = RegInit(false.B)
+  stallReg              := Mux(io.stallIn || io.stage3Stall, true.B, false.B)
+
+  // todo: 未锁存
+  val cacheline          = RegInit(0.U(128.W))
+  val tmp                = MuxLookup(hitList.asUInt, 0.U(128.W), List(
                               1.U -> io.sram0_rdata,
                               2.U -> io.sram1_rdata,
                               4.U -> io.sram2_rdata,
                               8.U -> io.sram3_rdata,
                           ))
 
+  cacheline             := Mux(io.stallIn && !stallReg, tmp, Mux(io.flushIn, 0.U(128.W), Mux(io.stage3Stall && !stallReg, tmp, cacheline)))
+  io.toStage3.cacheline := Mux(stallReg, cacheline, tmp)
+
   io.toStage3.hit       := Mux(io.flushIn, true.B, hit)
-  //io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
-  io.toStage3.allocAddr := stage2Reg.pc & "hfffffff8".U
+  io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
+  //io.toStage3.allocAddr := stage2Reg.pc & "hfffffff8".U
   io.toStage3.victim    := randCount
   io.toStage3.cacheable := stage2Reg.cacheable
   io.toStage3.align     := stage2Reg.align
