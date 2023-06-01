@@ -202,12 +202,13 @@ sealed class CacheStage2 extends Module with HasResetVector {
                               8.U -> io.sram3_rdata,
                           ))
 
+  // todo 
   cacheline             := Mux(io.stallIn && !stallReg, tmp, Mux(io.flushIn, 0.U(128.W), Mux(io.stage3Stall && !stallReg, tmp, cacheline)))
   io.toStage3.cacheline := Mux(stallReg, cacheline, tmp)
 
-  io.toStage3.hit       := Mux(io.flushIn, true.B, hit)
+  // !stage2Reg.pc.or是为了复位后也要保证hit为true
+  io.toStage3.hit       := Mux(io.flushIn || !stage2Reg.pc.orR, true.B, hit)
   io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
-  //io.toStage3.allocAddr := stage2Reg.pc & "hfffffff8".U
   io.toStage3.victim    := randCount
   io.toStage3.cacheable := stage2Reg.cacheable
   io.toStage3.align     := stage2Reg.align

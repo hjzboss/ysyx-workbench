@@ -27,7 +27,7 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.loadMem    := false.B
   lsuReset.rd         := 0.U(5.W)
   lsuReset.regWen     := false.B
-  lsuReset.pc         := resetVector.U(32.W)
+  lsuReset.pc         := 0.U(32.W)
   lsuReset.excepNo    := 0.U(4.W)
   lsuReset.exception  := false.B
   lsuReset.csrWaddr   := CsrAddr.nul
@@ -46,8 +46,8 @@ class WB_REG extends Module with HasResetVector {
   io.validOut         := validReg
 
   val debugReset = Wire(new DebugIO)
-  debugReset.pc := resetVector.U(32.W)
-  debugReset.nextPc := resetVector.U(32.W)
+  debugReset.pc := 0.U(32.W)
+  debugReset.nextPc := 0.U(32.W)
   debugReset.inst := Instruction.NOP
 
   val debugReg = RegInit(debugReset)
