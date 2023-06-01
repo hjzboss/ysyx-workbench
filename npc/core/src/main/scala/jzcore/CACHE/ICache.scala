@@ -6,8 +6,7 @@ import utils._
 import javax.xml.transform.OutputKeys
 
 
-// 问题原因：state === data时，向cache写入第二部分时发生读写冲突，导致第二块没写进去
-// 需要更改方案：需要将stage2的pc转发给ifu，flush stage2和stage3
+// 问题原因：取指出错，取出了cacheline中错误位置的指令
 
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
