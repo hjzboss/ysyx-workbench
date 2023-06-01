@@ -198,10 +198,9 @@ sealed class CacheStage2 extends Module with HasResetVector {
                               8.U -> io.sram3_rdata,
                           ))
 
-  //flush                 := !hit // 当未命中时冲刷流水线寄存器, 停顿ifu
-  //io.stallOut           := !hit
   io.toStage3.hit       := Mux(io.flushIn, true.B, hit)
-  io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
+  //io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
+  io.toStage3.allocAddr := stage2Reg.pc & "hfffffff8".U
   io.toStage3.victim    := randCount
   io.toStage3.cacheable := stage2Reg.cacheable
   io.toStage3.align     := stage2Reg.align
@@ -791,7 +790,7 @@ class ICache extends Module {
 
   // allocate axi, burst read
   io.axiRaddrIO.valid     := state === allocate1
-  io.axiRaddrIO.bits.addr  := burstAddr
+  io.axiRaddrIO.bits.addr := burstAddr
   io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
   io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
