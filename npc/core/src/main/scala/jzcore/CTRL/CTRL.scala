@@ -37,12 +37,12 @@ class CTRL extends Module {
   })
 
   val loadUse     = dontTouch(WireDefault(false.B))
-  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2)
+  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallICache := !io.lsuReady | loadUse
-  io.stallPc     := !io.lsuReady | io.icStall | loadUse
-  io.stallIduReg := !io.lsuReady | loadUse
+  io.stallICache := !io.lsuReady | (loadUse & !io.branch)
+  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch)
+  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch)
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady
 

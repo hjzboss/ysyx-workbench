@@ -181,60 +181,60 @@ class JzCore extends Module {
   
   // ram, dataArray
   icache.io.sram0_rdata <> io.sram0_rdata
-  icache.io.sram0_cen <> io.sram0_cen
-  icache.io.sram0_wen <> io.sram0_wen
+  icache.io.sram0_cen   <> io.sram0_cen
+  icache.io.sram0_wen   <> io.sram0_wen
   icache.io.sram0_wmask <> io.sram0_wmask
-  icache.io.sram0_addr <> io.sram0_addr
+  icache.io.sram0_addr  <> io.sram0_addr
   icache.io.sram0_wdata <> io.sram0_wdata
 
   icache.io.sram1_rdata <> io.sram1_rdata
-  icache.io.sram1_cen <> io.sram1_cen
-  icache.io.sram1_wen <> io.sram1_wen
+  icache.io.sram1_cen   <> io.sram1_cen
+  icache.io.sram1_wen   <> io.sram1_wen
   icache.io.sram1_wmask <> io.sram1_wmask
-  icache.io.sram1_addr <> io.sram1_addr
+  icache.io.sram1_addr  <> io.sram1_addr
   icache.io.sram1_wdata <> io.sram1_wdata
 
   icache.io.sram2_rdata <> io.sram2_rdata
-  icache.io.sram2_cen <> io.sram2_cen
-  icache.io.sram2_wen <> io.sram2_wen
+  icache.io.sram2_cen   <> io.sram2_cen
+  icache.io.sram2_wen   <> io.sram2_wen
   icache.io.sram2_wmask <> io.sram2_wmask
-  icache.io.sram2_addr <> io.sram2_addr
+  icache.io.sram2_addr  <> io.sram2_addr
   icache.io.sram2_wdata <> io.sram2_wdata
 
   icache.io.sram3_rdata <> io.sram3_rdata
-  icache.io.sram3_cen <> io.sram3_cen
-  icache.io.sram3_wen <> io.sram3_wen
+  icache.io.sram3_cen   <> io.sram3_cen
+  icache.io.sram3_wen   <> io.sram3_wen
   icache.io.sram3_wmask <> io.sram3_wmask
-  icache.io.sram3_addr <> io.sram3_addr
+  icache.io.sram3_addr  <> io.sram3_addr
   icache.io.sram3_wdata <> io.sram3_wdata
 
   // dcache
   dcache.io.sram4_rdata <> io.sram4_rdata
-  dcache.io.sram4_cen <> io.sram4_cen
-  dcache.io.sram4_wen <> io.sram4_wen
+  dcache.io.sram4_cen   <> io.sram4_cen
+  dcache.io.sram4_wen   <> io.sram4_wen
   dcache.io.sram4_wmask <> io.sram4_wmask
-  dcache.io.sram4_addr <> io.sram4_addr
+  dcache.io.sram4_addr  <> io.sram4_addr
   dcache.io.sram4_wdata <> io.sram4_wdata
 
   dcache.io.sram5_rdata <> io.sram5_rdata
-  dcache.io.sram5_cen <> io.sram5_cen
-  dcache.io.sram5_wen <> io.sram5_wen
+  dcache.io.sram5_cen   <> io.sram5_cen
+  dcache.io.sram5_wen   <> io.sram5_wen
   dcache.io.sram5_wmask <> io.sram5_wmask
-  dcache.io.sram5_addr <> io.sram5_addr
+  dcache.io.sram5_addr  <> io.sram5_addr
   dcache.io.sram5_wdata <> io.sram5_wdata
 
   dcache.io.sram6_rdata <> io.sram6_rdata
-  dcache.io.sram6_cen <> io.sram6_cen
-  dcache.io.sram6_wen <> io.sram6_wen
+  dcache.io.sram6_cen   <> io.sram6_cen
+  dcache.io.sram6_wen   <> io.sram6_wen
   dcache.io.sram6_wmask <> io.sram6_wmask
-  dcache.io.sram6_addr <> io.sram6_addr
+  dcache.io.sram6_addr  <> io.sram6_addr
   dcache.io.sram6_wdata <> io.sram6_wdata
 
   dcache.io.sram7_rdata <> io.sram7_rdata
-  dcache.io.sram7_cen <> io.sram7_cen
-  dcache.io.sram7_wen <> io.sram7_wen
+  dcache.io.sram7_cen   <> io.sram7_cen
+  dcache.io.sram7_wen   <> io.sram7_wen
   dcache.io.sram7_wmask <> io.sram7_wmask
-  dcache.io.sram7_addr <> io.sram7_addr
+  dcache.io.sram7_addr  <> io.sram7_addr
   dcache.io.sram7_wdata <> io.sram7_wdata
 
   ifu.io.out          <> icache.io.cpu2cache
