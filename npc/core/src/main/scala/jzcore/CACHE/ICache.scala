@@ -136,13 +136,13 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.tag           := 0.U(22.W)
   regInit.align         := false.B
   regInit.cacheable     := true.B
-  regInit.pc            := 0.U(32.W)
+  regInit.pc            := resetVector.U(32.W)
   val stage2Reg          = RegInit(regInit)
   //stage2Reg             := Mux(flush || io.flushIn, regInit, Mux(io.stallIn, stage2Reg, io.toStage2))
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
 
   val debugReset         = Wire(new DebugIO)
-  debugReset.pc         := 0.U(32.W)
+  debugReset.pc         := resetVector.U(32.W)
   debugReset.nextPc     := 0.U(32.W)
   debugReset.inst       := Instruction.NOP
 
@@ -281,7 +281,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val flushReg          = WireDefault(false.B)
   io.redirect          := flushReg
   val regInit           = Wire(new Stage3IO)
-  regInit.pc           := 0.U(32.W)
+  regInit.pc           := resetVector.U(32.W)
   regInit.cacheline    := 0.U(128.W)
   regInit.hit          := true.B
   regInit.allocAddr    := 0.U(32.W)
@@ -295,7 +295,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
   val debugReset        = Wire(new DebugIO)
-  debugReset.pc        := 0.U(32.W)
+  debugReset.pc        := resetVector.U(32.W)
   debugReset.nextPc    := 0.U(32.W)
   debugReset.inst      := Instruction.NOP
 

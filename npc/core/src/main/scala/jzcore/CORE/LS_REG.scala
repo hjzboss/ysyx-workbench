@@ -23,13 +23,13 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.wmask       := Wmask.nop
   exuOutReset.lsuWen      := false.B
   exuOutReset.lsuRen      := false.B
-  exuOutReset.lsuAddr     := resetVector.U(64.W)
+  exuOutReset.lsuAddr     := 0.U(64.W)
   exuOutReset.lsuWdata    := 0.U(64.W)
   exuOutReset.loadMem     := false.B
   exuOutReset.exuOut      := 0.U(64.W)
   exuOutReset.rd          := 0.U(5.W)
   exuOutReset.regWen      := false.B
-  exuOutReset.pc          := resetVector.U(32.W)
+  exuOutReset.pc          := 0.U(32.W)
   exuOutReset.excepNo     := 0.U(4.W)
   exuOutReset.exception   := false.B
   exuOutReset.csrWaddr    := CsrAddr.nul
@@ -50,8 +50,8 @@ class LS_REG extends Module with HasResetVector {
   io.validOut             := validReg
 
   val debugReset = Wire(new DebugIO)
-  debugReset.pc := resetVector.U(32.W)
-  debugReset.nextPc := resetVector.U(32.W)
+  debugReset.pc := 0.U(32.W)
+  debugReset.nextPc := 0.U(32.W)
   debugReset.inst := Instruction.NOP
 
   val debugReg = RegInit(debugReset)
