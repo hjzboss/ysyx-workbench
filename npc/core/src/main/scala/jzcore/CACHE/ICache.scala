@@ -320,7 +320,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
   flushReg                := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
   io.flushOut             := flushReg
 
-  io.stallOut             := (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
+  val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
+  io.stallOut             := stallOut & !flushReg
 
   io.axiReq               := state === addr
   //io.axiReq               := state === idle && (!stage3Reg.hit || !stage3Reg.cacheable) && !io.flushIn
@@ -527,7 +528,7 @@ class ICache extends Module {
 
   stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
   stage2.io.flushIn     := io.flush | stage3.io.flushOut
-  stage2.io.stallIn     := io.stallIn | stage3.io.stallOut
+  stage2.io.stallIn     := io.stallIn
   stage2.io.sram0_rdata <> io.sram0_rdata
   stage2.io.sram1_rdata <> io.sram1_rdata
   stage2.io.sram2_rdata <> io.sram2_rdata
@@ -535,7 +536,7 @@ class ICache extends Module {
   stage2.io.metaAlloc   <> stage3.io.metaAlloc
   stage3.io.stallIn     := io.stallIn
   stage3.io.flushIn     := io.flush
-  io.stallOut            := stage3.io.stallOut
+  io.stallOut           := stage3.io.stallOut
 
   //dataArb0.io.redirect   := stage3.io.redirect
   //dataArb0.io.stage2Addr := stage2.io.sram0_addr
