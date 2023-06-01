@@ -203,7 +203,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
                           ))
 
   cacheline             := Mux(io.stallIn && !stallReg, tmp, Mux(io.flushIn, 0.U(128.W), Mux(io.stage3Stall && !stallReg, tmp, cacheline)))
-  io.toStage3.cacheline := Mux(stallReg, cacheline, tmp)
+  io.toStage3.cacheline := Mux(io.flushIn, 0.U(128.W), Mux(stallReg, cacheline, tmp))
 
   io.toStage3.hit       := Mux(io.flushIn, true.B, hit)
   io.toStage3.allocAddr := stage2Reg.tag ## stage2Reg.index ## stage2Reg.align(1) ## 0.U(3.W)
