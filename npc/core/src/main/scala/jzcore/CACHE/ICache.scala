@@ -140,7 +140,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.pc            := resetVector.U(32.W)
   val stage2Reg          = RegInit(regInit)
   //stage2Reg             := Mux(flush || io.flushIn, regInit, Mux(io.stallIn, stage2Reg, io.toStage2))
-  stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, validReg, io.toStage2)))
+  stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
 
   val debugReset         = Wire(new DebugIO)
   debugReset.pc         := resetVector.U(32.W)
