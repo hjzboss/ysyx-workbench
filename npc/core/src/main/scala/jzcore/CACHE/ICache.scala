@@ -190,7 +190,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
     }
   }
 
-  io.toStage3.cacheline := LookupTree(hitList, List(
+  io.toStage3.cacheline := MuxLookup(hitList.asUInt, 0.U(128.W), List(
                               0.U -> io.sram0_rdata,
                               2.U -> io.sram1_rdata,
                               4.U -> io.sram2_rdata,
