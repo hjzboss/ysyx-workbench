@@ -111,8 +111,8 @@ sealed class CacheStage2 extends Module with HasResetVector {
 
     val flushIn         = Input(Bool())
     //val stallOut        = Output(Bool())
-    val stallIn         = Input(Bool()) // lsu的stall
-    val stage3Stall     = Input(Bool()) // cache stage3的stall
+    val stallIn         = Input(Bool()) // lsu的stall，优先级最高
+    val stage3Stall     = Input(Bool()) // cache stage3的stall，优先级最低
 
     //val sram0_addr      = Output(UInt(6.W))
     //val sram1_addr      = Output(UInt(6.W))
