@@ -523,7 +523,7 @@ class ICache extends Module {
   stage2.io.toStage3    <> stage3.io.toStage3
   io.cache2cpu          <> stage3.io.out
   io.redirect.brAddr    := stage2.io.tostage3.pc
-  io.redirect.valid     := stage3.io.flush
+  io.redirect.valid     := stage3.io.flushOut
 
   stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
   stage2.io.flushIn     := io.flush | stage3.io.flushOut
