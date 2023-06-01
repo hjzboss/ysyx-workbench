@@ -21,11 +21,12 @@ class CTRL extends Module {
     val stallIduReg = Output(Bool())
     val stallExuReg = Output(Bool())
     val stallLsuReg = Output(Bool())
+    val stallWbuReg = Output(Bool())
 
     // flush pipline reg
     val flushICache = Output(Bool())
     val flushIduReg = Output(Bool())
-    val flushWbuReg = Output(Bool()) // set when lsu is unready
+    //val flushWbuReg = Output(Bool()) // set when lsu is unready
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
 
     // todo: load-use停顿处理
@@ -45,10 +46,11 @@ class CTRL extends Module {
   io.stallIduReg := !io.lsuReady | (loadUse & !io.branch)
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady
+  io.stallWbuReg := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushICache := io.branch
   io.flushIduReg := io.branch
   io.flushExuReg := io.branch | loadUse
-  io.flushWbuReg := !io.lsuReady // todo
+  //io.flushWbuReg := !io.lsuReady // todo
 }

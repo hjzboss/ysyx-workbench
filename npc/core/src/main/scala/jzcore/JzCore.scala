@@ -263,10 +263,10 @@ class JzCore extends Module {
   ctrl.io.stallIduReg <> idReg.io.stall
   ctrl.io.stallExuReg <> exReg.io.stall
   ctrl.io.stallLsuReg <> lsReg.io.stall
+  ctrl.io.stallWbuReg <> wbReg.io.stall
   ctrl.io.stallPc     <> ifu.io.stall
   ctrl.io.flushICache <> icache.io.flush
   ctrl.io.flushIduReg <> idReg.io.flush
-  ctrl.io.flushWbuReg <> wbReg.io.flush
   ctrl.io.flushExuReg <> exReg.io.flush
 
   forward.io.lsuRd  := lsReg.io.out.rd
