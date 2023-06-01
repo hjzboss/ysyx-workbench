@@ -6,11 +6,14 @@ import utils._
 import javax.xml.transform.OutputKeys
 
 
+// 问题原因：state === data时，向cache写入第二部分时发生读写冲突，导致第二块没写进去
+// 需要更改方案：需要将stage2的pc转发给ifu，flush stage2和stage3
+
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
-    val redirect   = Input(Bool())
+    //val redirect   = Input(Bool())
     val stage3Addr = Input(UInt(6.W))
-    val stage2Addr = Input(UInt(6.W))
+    //val stage2Addr = Input(UInt(6.W))
     val stage1Addr = Input(UInt(6.W))
     val stage3Cen  = Input(Bool())
     val stage1Cen  = Input(Bool())
@@ -22,12 +25,12 @@ sealed class IcArbiter extends Module {
     val arbWen     = Output(Bool())
   })
 
-  io.arbAddr     := Mux(io.redirect, io.stage2Addr, Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr))
-  io.arbCen      := Mux(io.redirect, false.B, Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen))
-  io.arbWen      := Mux(io.redirect, true.B, Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen))
-  //io.arbAddr     := Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr)
-  //io.arbCen      := Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen)
-  //io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
+  //io.arbAddr     := Mux(io.redirect, io.stage2Addr, Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr))
+  //io.arbCen      := Mux(io.redirect, false.B, Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen))
+  //io.arbWen      := Mux(io.redirect, true.B, Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen))
+  io.arbAddr     := Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr)
+  io.arbCen      := Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen)
+  io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
 }
 
 sealed class CacheStage1 extends Module {
@@ -110,10 +113,10 @@ sealed class CacheStage2 extends Module with HasResetVector {
     //val stallOut        = Output(Bool())
     val stallIn         = Input(Bool())
 
-    val sram0_addr      = Output(UInt(6.W))
-    val sram1_addr      = Output(UInt(6.W))
-    val sram2_addr      = Output(UInt(6.W))
-    val sram3_addr      = Output(UInt(6.W))
+    //val sram0_addr      = Output(UInt(6.W))
+    //val sram1_addr      = Output(UInt(6.W))
+    //val sram2_addr      = Output(UInt(6.W))
+    //val sram3_addr      = Output(UInt(6.W))
 
     val sram0_rdata     = Input(UInt(128.W))
     val sram1_rdata     = Input(UInt(128.W))
@@ -220,6 +223,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
     val stallIn         = Input(Bool())
 
     val flushIn         = Input(Bool())
+    val flushOut        = Output(Bool())
     val redirect        = Output(Bool()) // 转发stage2的地址给data ram
 
     // to idu
@@ -314,6 +318,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
 
   // todo
   flushReg                := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
+  io.flushOut             := flushReg
 
   io.stallOut             := (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
 
@@ -446,6 +451,7 @@ class ICache extends Module {
     // cpu
     val cpu2cache       = Flipped(new Stage1IO)
     val cache2cpu       = new InstrFetch
+    val redirect        = new RedirectIO
 
     // ram, dataArray
     val sram0_rdata     = Input(UInt(128.W))
@@ -516,9 +522,11 @@ class ICache extends Module {
   stage1.io.toStage2    <> stage2.io.toStage2
   stage2.io.toStage3    <> stage3.io.toStage3
   io.cache2cpu          <> stage3.io.out
+  io.redirect.brAddr    := stage2.io.tostage3.pc
+  io.redirect.valid     := stage3.io.flush
 
   stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
-  stage2.io.flushIn     := io.flush
+  stage2.io.flushIn     := io.flush | stage3.io.flushOut
   stage2.io.stallIn     := io.stallIn | stage3.io.stallOut
   stage2.io.sram0_rdata <> io.sram0_rdata
   stage2.io.sram1_rdata <> io.sram1_rdata
@@ -529,8 +537,8 @@ class ICache extends Module {
   stage3.io.flushIn     := io.flush
   io.stallOut            := stage3.io.stallOut
 
-  dataArb0.io.redirect   := stage3.io.redirect
-  dataArb0.io.stage2Addr := stage2.io.sram0_addr
+  //dataArb0.io.redirect   := stage3.io.redirect
+  //dataArb0.io.stage2Addr := stage2.io.sram0_addr
   dataArb0.io.stage3Addr := stage3.io.sram0_addr
   dataArb0.io.stage3Cen  := stage3.io.sram0_cen
   dataArb0.io.stage3Wen  := stage3.io.sram0_wen
@@ -538,8 +546,8 @@ class ICache extends Module {
   dataArb0.io.stage1Cen  := stage1.io.sram0_cen
   dataArb0.io.stage1Wen  := stage1.io.sram0_wen
   
-  dataArb1.io.redirect   := stage3.io.redirect
-  dataArb1.io.stage2Addr := stage2.io.sram0_addr
+  //dataArb1.io.redirect   := stage3.io.redirect
+  //dataArb1.io.stage2Addr := stage2.io.sram0_addr
   dataArb1.io.stage3Addr := stage3.io.sram1_addr
   dataArb1.io.stage3Cen  := stage3.io.sram1_cen
   dataArb1.io.stage3Wen  := stage3.io.sram1_wen
@@ -547,8 +555,8 @@ class ICache extends Module {
   dataArb1.io.stage1Cen  := stage1.io.sram1_cen
   dataArb1.io.stage1Wen  := stage1.io.sram1_wen
 
-  dataArb2.io.redirect   := stage3.io.redirect
-  dataArb2.io.stage2Addr := stage2.io.sram0_addr
+  //dataArb2.io.redirect   := stage3.io.redirect
+  //dataArb2.io.stage2Addr := stage2.io.sram0_addr
   dataArb2.io.stage3Addr := stage3.io.sram2_addr
   dataArb2.io.stage3Cen  := stage3.io.sram2_cen
   dataArb2.io.stage3Wen  := stage3.io.sram2_wen
@@ -556,8 +564,8 @@ class ICache extends Module {
   dataArb2.io.stage1Cen  := stage1.io.sram2_cen
   dataArb2.io.stage1Wen  := stage1.io.sram2_wen
 
-  dataArb3.io.redirect   := stage3.io.redirect
-  dataArb3.io.stage2Addr := stage2.io.sram0_addr
+  //dataArb3.io.redirect   := stage3.io.redirect
+  //dataArb3.io.stage2Addr := stage2.io.sram0_addr
   dataArb3.io.stage3Addr := stage3.io.sram3_addr
   dataArb3.io.stage3Cen  := stage3.io.sram3_cen
   dataArb3.io.stage3Wen  := stage3.io.sram3_wen

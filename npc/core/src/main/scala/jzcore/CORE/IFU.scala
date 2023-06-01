@@ -14,10 +14,11 @@ class IFU extends Module with HasResetVector {
     // 用于仿真环境
     val debug         = new DebugIO
     
-    val valid       = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
+    val valid         = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
 
     // from exu
-    val redirect      = Flipped(new RedirectIO)
+    val exuRedirect   = Flipped(new RedirectIO)
+    val icRedirect    = Flipped(new RedirectIO)
 
     // to idu
     val out           = new Stage1IO
@@ -29,7 +30,7 @@ class IFU extends Module with HasResetVector {
  
     // ctrl
     //val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
-    val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
+    val stall         = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
   })
 
   /*
@@ -55,22 +56,22 @@ class IFU extends Module with HasResetVector {
   brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.redirect.valid, true.B, brFlag))
   */
   // pc
-  val pc   = RegInit(resetVector.U(32.W))
-  val snpc = pc + 4.U
-  val dnpc = io.redirect.brAddr
+  val pc           = RegInit(resetVector.U(32.W))
+  val snpc         = pc + 4.U(32.W)
+  //val dnpc         = io.redirect.brAddr
 
-  pc      := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
+  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
   
-  io.out.addr := pc 
-  io.out.cacheable := true.B // todo: 接入soc时需要更改
+  io.out.addr     := pc 
+  io.out.cacheable:= true.B // todo: 接入soc时需要更改
 
-  io.debug.pc := pc 
-  io.debug.nextPc := Mux(io.stall, pc, Mux(io.redirect.valid, dnpc, snpc))
-  io.debug.inst := Instruction.NOP
+  io.debug.pc     := pc 
+  io.debug.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+  io.debug.inst   := Instruction.NOP
 
-  val valid    = dontTouch(WireDefault(false.B))
-  valid := !io.stall
-  io.valid    := valid
+  val valid        = dontTouch(WireDefault(false.B))
+  valid           := !io.stall
+  io.valid        := valid
   /*
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
