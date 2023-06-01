@@ -111,7 +111,8 @@ sealed class CacheStage2 extends Module with HasResetVector {
 
     val flushIn         = Input(Bool())
     //val stallOut        = Output(Bool())
-    val stallIn         = Input(Bool())
+    val stallIn         = Input(Bool()) // lsu的stall
+    val stage3Stall     = Input(Bool()) // cache stage3的stall
 
     //val sram0_addr      = Output(UInt(6.W))
     //val sram1_addr      = Output(UInt(6.W))
@@ -127,7 +128,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   })
 
   val validReg           = RegInit(false.B)
-  validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, io.validIn))    
+  validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, Mux(io.stage3Stall, validReg, io.validIn)))   
   io.validOut           := validReg
 
   // pipline reg
@@ -139,7 +140,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.pc            := resetVector.U(32.W)
   val stage2Reg          = RegInit(regInit)
   //stage2Reg             := Mux(flush || io.flushIn, regInit, Mux(io.stallIn, stage2Reg, io.toStage2))
-  stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, io.toStage2))
+  stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, validReg, io.toStage2)))
 
   val debugReset         = Wire(new DebugIO)
   debugReset.pc         := resetVector.U(32.W)
@@ -321,7 +322,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.flushOut             := flushReg
 
   val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
-  io.stallOut             := stallOut & !flushReg
+  io.stallOut             := stallOut
 
   io.axiReq               := state === addr
   //io.axiReq               := state === idle && (!stage3Reg.hit || !stage3Reg.cacheable) && !io.flushIn
@@ -528,7 +529,8 @@ class ICache extends Module {
 
   stage1.io.stall       := io.stallIn | stage3.io.stallOut | io.flush
   stage2.io.flushIn     := io.flush | stage3.io.flushOut
-  stage2.io.stallIn     := io.stallIn | stage3.io.stallOut
+  stage2.io.stallIn     := io.stallIn
+  stage2.io.stage3Stall := stage3.io.stallOut
   stage2.io.sram0_rdata <> io.sram0_rdata
   stage2.io.sram1_rdata <> io.sram1_rdata
   stage2.io.sram2_rdata <> io.sram2_rdata
