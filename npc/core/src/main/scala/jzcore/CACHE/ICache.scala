@@ -322,7 +322,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.flushOut             := flushReg
 
   val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
-  io.stallOut             := stallOut
+  io.stallOut             := stallOut && !flushReg
 
   io.axiReq               := state === addr
   //io.axiReq               := state === idle && (!stage3Reg.hit || !stage3Reg.cacheable) && !io.flushIn
