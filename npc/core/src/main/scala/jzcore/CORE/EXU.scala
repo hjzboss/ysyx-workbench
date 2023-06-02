@@ -31,7 +31,6 @@ class EXU extends Module {
   })
 
   val alu   = Module(new Alu)
-  val stop  = Module(new Stop)
 
   val aluSrc1 = io.aluCtrl.aluSrc1
   val aluSrc2 = io.aluCtrl.aluSrc2

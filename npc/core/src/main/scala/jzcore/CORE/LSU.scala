@@ -15,7 +15,7 @@ class LSU extends Module {
 
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
-    
+
     // dcache访问接口
     val dcacheCtrl  = Decoupled(new CacheCtrlIO)
     val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
