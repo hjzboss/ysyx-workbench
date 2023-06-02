@@ -91,6 +91,7 @@ uint8_t* new_space(int size) {
 }
 
 static void check_bound(IOMap *map, paddr_t addr, int flag) {
+  printf("name=%s\n", map->name);
   if (map == NULL) {
     if (flag) {
       printf("map_read\n");
