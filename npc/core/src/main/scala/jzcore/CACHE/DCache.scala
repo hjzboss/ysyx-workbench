@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-// todo: cacheable处理
+// todo: cacheable处理, 81aeadd0
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class DCache extends Module {
   val io = IO(new Bundle {
