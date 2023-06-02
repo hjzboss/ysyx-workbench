@@ -13,5 +13,10 @@ int main() {
     check(fuck[i] == 1);
   }
 
+  i = 0;
+  while(i < 65535) {
+    i++;
+  }
+
   return 0;
 }
