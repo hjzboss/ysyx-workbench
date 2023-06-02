@@ -25,6 +25,7 @@ int main() {
 
   init_fs();
 
+  printf("shit\n");
   init_proc();
 
   Log("Finish initialization");
