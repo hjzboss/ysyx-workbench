@@ -27,8 +27,6 @@ int main() {
 
   init_proc();
 
-  printf("shit\n");
-
   Log("Finish initialization");
 
 #ifdef HAS_CTE
