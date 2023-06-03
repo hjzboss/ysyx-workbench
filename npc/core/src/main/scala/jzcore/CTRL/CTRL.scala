@@ -41,8 +41,9 @@ class CTRL extends Module {
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallICache := !io.lsuReady | (loadUse & !io.branch)
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch)
+  //io.stallICache := !io.lsuReady | (loadUse & !io.branch)
+  //io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch)
+  io.stallPc     := !io.lsuReady | (loadUse & !io.branch)
   io.stallIduReg := !io.lsuReady | (loadUse & !io.branch)
   io.stallExuReg := !io.lsuReady
   io.stallLsuReg := !io.lsuReady
