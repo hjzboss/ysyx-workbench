@@ -18,7 +18,7 @@
 #include <cpu/cpu.h>
 
 //void init_rand();
-void init_log(const char *log_file);
+void npc_init_log(const char *log_file);
 //void init_mem();
 IFDEF(CONFIG_DIFFTEST, void init_difftest(char *ref_so_file, long img_size));
 //void init_device();
