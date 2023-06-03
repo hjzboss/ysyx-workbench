@@ -291,7 +291,7 @@ class JzCore extends Module {
   ctrl.io.exRd        := exReg.io.ctrlOut.rd
   ctrl.io.rs1         := idu.io.ctrl.rs1
   ctrl.io.rs2         := idu.io.ctrl.rs2
-  ctrl.io.icStall     <> icache.io.stallOut
+  //ctrl.io.icStall     <> icache.io.stallOut
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.branch      := exu.io.redirect.valid
   //ctrl.io.stallICache <> icache.io.stallIn

@@ -9,7 +9,7 @@ class CTRL extends Module {
   val io = IO(new Bundle {
     // ifu和lsu都是多周期完成，因此需要ready信号来停顿对应的流水线
     val ifuReady = Input(Bool())
-    val icStall     = Input(Bool())
+    //val icStall     = Input(Bool())
     val lsuReady    = Input(Bool())
 
     // 分支指令需要flush流水线
@@ -17,7 +17,7 @@ class CTRL extends Module {
 
     // stall pipline reg and pc
     val stallPc     = Output(Bool())
-    val stallICache = Output(Bool())
+    //val stallICache = Output(Bool())
     val stallIduReg = Output(Bool())
     val stallExuReg = Output(Bool())
     val stallLsuReg = Output(Bool())
