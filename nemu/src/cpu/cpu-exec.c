@@ -126,7 +126,6 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #endif
   log_write("%s\n", _this->logbuf);
   if (g_print_step) { 
-    printf("shit\n");
     IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); 
   }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
