@@ -48,5 +48,6 @@ void difftest_raise_intr(word_t NO) {
 
 void difftest_init(int port) {
   /* Perform ISA dependent initialization. */
+  init_log("/home/hjz/ysyx-workbench/npc/build/nemu-log.txt");
   init_isa();
 }
