@@ -4,7 +4,6 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-/*
 // 问题原因：取指出错，取出了cacheline中错误位置的指令
 
 sealed class IcArbiter extends Module {
@@ -613,8 +612,9 @@ class ICache extends Module {
   io.axiGrant           <> stage3.io.axiGrant
   io.axiReady           <> stage3.io.axiReady
 }
-*/
 
+
+/*
 // 非流水icache
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class ICache extends Module {
@@ -1001,3 +1001,4 @@ class ICache extends Module {
 
   io.ctrlIO.ready          := state === idle
 }
+*/
