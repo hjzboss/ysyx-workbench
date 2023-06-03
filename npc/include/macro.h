@@ -128,7 +128,7 @@
     ioe_write(reg, &__io_param); })
 
 
-#define log_write(...) IFNDEF(CONFIG_TARGET_NATIVE_ELF, \
+#define npc_log_write(...) IFNDEF(CONFIG_TARGET_NATIVE_ELF, \
   do { \
     extern FILE* npc_log_fp; \
     fprintf(npc_log_fp, __VA_ARGS__); \
@@ -139,7 +139,7 @@
 #define _Log(...) \
   do { \
     printf(__VA_ARGS__); \
-    log_write(__VA_ARGS__); \
+    npc_log_write(__VA_ARGS__); \
   } while (0)
 
 
