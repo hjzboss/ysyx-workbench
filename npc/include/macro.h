@@ -130,9 +130,9 @@
 
 #define log_write(...) IFNDEF(CONFIG_TARGET_NATIVE_ELF, \
   do { \
-    extern FILE* log_fp; \
-    fprintf(log_fp, __VA_ARGS__); \
-    fflush(log_fp); \
+    extern FILE* npc_log_fp; \
+    fprintf(npc_log_fp, __VA_ARGS__); \
+    fflush(npc_log_fp); \
   } while (0) \
 )
 
