@@ -315,7 +315,7 @@ class JzCore extends Module {
   forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
   forward.io.lsuCsrWen := lsReg.io.out.csrWen
   forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
-  forward.io.csrWen   := exReg.io.csrWen
+  forward.io.csrWen   := exReg.io.ctrlOut.csrWen
   forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
 
   idu.io.in         <> idReg.io.out
