@@ -45,17 +45,17 @@ class IFU extends Module with HasResetVector {
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(addr)
   state := MuxLookup(state, addr, List(
-    addr    -> Mux(io.redirect.valid, addr, Mux(addrFire && !io.stall, data, addr)),
+    addr    -> Mux(io.exuRedirect.valid, addr, Mux(addrFire && !io.stall, data, addr)),
     data    -> Mux(rdataFire && !io.stall, addr, data)
   ))
 
   // 保存跳转分支
   val brAddr                 = RegInit(resetVector.U(32.W))
-  brAddr                    := Mux(io.redirect.valid, io.redirect.brAddr, brAddr)
+  brAddr                    := Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, brAddr)
   // 分支跳转标志，用于返回icache一个正确的信号，防止阻塞
   val brFlag                 = RegInit(false.B)
-  brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.redirect.valid, true.B, brFlag))
-  val dnpc         = io.redirect.brAddr
+  brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.exuRedirect.valid, true.B, brFlag))
+  val dnpc         = io.exuRedirect.brAddr
   // 非流水icache end
 
   // pc
@@ -77,7 +77,7 @@ class IFU extends Module with HasResetVector {
   io.valid        := valid
   */
 
-  io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
+  io.icacheCtrl.valid       := state === addr && !io.stall && !io.exuRedirect.valid
   io.icacheCtrl.bits.addr   := pc
   io.icacheCtrl.bits.wen    := false.B
   io.icacheCtrl.bits.cacheable := true.B // todo
@@ -90,7 +90,7 @@ class IFU extends Module with HasResetVector {
   io.icacheWrite.bits.wmask := 0.U(8.W)
   
   // 当发生分支跳转时忽略icache返回的数据
-  val instPre                = Mux(brFlag || io.redirect.valid, 0.U(32.W), io.icacheRead.bits.rdata)
+  val instPre                = Mux(brFlag || io.exuRedirect.valid, 0.U(32.W), io.icacheRead.bits.rdata)
   val inst                   = Mux(pc(2) === 0.U(1.W), instPre(31, 0), instPre(63, 32))
 
   // 当停顿信号生效时保持原pc
@@ -98,7 +98,7 @@ class IFU extends Module with HasResetVector {
   stallPc                   := Mux(rdataFire && !io.stall, Mux(brFlag, brAddr, snpc), pc)
 
   pc                        := MuxLookup(state, pc, List(
-                                  addr  -> Mux(io.redirect.valid && !io.stall, dnpc, pc),  
+                                  addr  -> Mux(io.exuRedirect.valid && !io.stall, dnpc, pc),  
                                   data  -> stallPc
                                 ))
 
