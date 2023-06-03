@@ -273,6 +273,7 @@ class JzCore extends Module {
 */
   //ifu.io.out          <> icache.io.cpu2cache
   //icache.io.cache2cpu <> idReg.io.in
+  ifu.io.out          <> idReg.io.in
   ifu.io.exuRedirect  <> exu.io.redirect
   //ifu.io.icRedirect   <> icache.io.redirect
   //ifu.io.valid        <> icache.io.validIn
