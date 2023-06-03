@@ -16,12 +16,13 @@ class LSU extends Module {
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
 
+    /*
     // dcache访问接口
     val dcacheCtrl  = Decoupled(new CacheCtrlIO)
     val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
     val dcacheWrite = Decoupled(new CacheWriteIO)
+    */
 
-    /*
     // axi总线访存接口，用于外设的访问
     val axiRaddrIO  = Decoupled(new RaddrIO)
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
@@ -33,7 +34,7 @@ class LSU extends Module {
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
     val axiReady    = Output(Bool())
-    */
+
 
     val lsFlag      = Output(Bool())
   })
@@ -62,6 +63,7 @@ class LSU extends Module {
   val writeTrans  = io.in.lsuWen
   val hasTrans    = readTrans || writeTrans
 
+  /*
   val ctrlFire    = io.dcacheCtrl.valid && io.dcacheCtrl.ready
   val readFire    = io.dcacheRead.valid && io.dcacheRead.ready
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
@@ -85,8 +87,8 @@ class LSU extends Module {
   io.dcacheWrite.valid          := state === data
   io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
+  */
 
-  /*
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
   val rState = RegInit(idle)
@@ -115,7 +117,7 @@ class LSU extends Module {
   io.axiWdataIO.bits.wdata := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   io.axiWdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
   io.axiBrespIO.ready      := wState === wait_resp
-  */
+
 
   // 数据对齐
   val align              = Cat(addr(2, 0), 0.U(3.W))
@@ -150,11 +152,11 @@ class LSU extends Module {
   io.out.csrValue       := io.in.csrValue
 
 
-  //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
-  io.ready              := (state === idle && !(readTrans || writeTrans)) || (state === data && (readFire || writeFire))
+  io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
+  //io.ready              := (state === idle && !(readTrans || writeTrans)) || (state === data && (readFire || writeFire))
   // 仲裁信号
-  //io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
-  //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
+  io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
+  io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
 
   // 传给仿真环境，用于外设访问的判定
   io.lsFlag             := io.in.lsuRen || io.in.lsuWen
