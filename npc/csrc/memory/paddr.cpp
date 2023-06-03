@@ -33,10 +33,10 @@ static void insert_mtrace(bool is_read, uint64_t addr, int len, uint64_t value) 
   node->next = NULL;
   
   // log
-  log_write("[0x%016lx]", node->addr);
-  if (node->read) log_write(" --> ");
-  else log_write(" <-- ");
-  log_write("0x%016lx, len=%d bytes\n", node->value, node->len);
+  npc_log_write("[0x%016lx]", node->addr);
+  if (node->read) npc_log_write(" --> ");
+  else npc_log_write(" <-- ");
+  npc_log_write("0x%016lx, len=%d bytes\n", node->value, node->len);
 
   if (mtrace_head == NULL) {
     mtrace_head = node;
