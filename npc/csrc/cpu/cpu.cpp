@@ -251,8 +251,6 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  //npc_cpu.pc = top->io_debug_pc;
-  //npc_cpu.npc = top->io_debug_nextPc;
   npc_cpu.pc = RESET_ADDR;
   npc_cpu.npc = RESET_ADDR + 4;
 
