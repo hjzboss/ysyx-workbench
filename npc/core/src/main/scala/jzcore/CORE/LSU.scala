@@ -39,7 +39,7 @@ class LSU extends Module {
     val lsFlag      = Output(Bool())
   })
 
-  /*
+
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // resp
 
   val raddrFire          = io.axiRaddrIO.valid && io.axiRaddrIO.ready
@@ -56,7 +56,7 @@ class LSU extends Module {
   io.axiWaddrIO.bits.size:= 3.U
   io.axiWaddrIO.bits.burst := 2.U(2.W)
   io.axiWdataIO.bits.wlast := true.B
-  */
+
 
   val addr        = io.in.lsuAddr
   val readTrans   = io.in.lsuRen
