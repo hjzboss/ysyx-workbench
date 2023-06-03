@@ -8,7 +8,7 @@ import chisel3.util._
 class CTRL extends Module {
   val io = IO(new Bundle {
     // ifu和lsu都是多周期完成，因此需要ready信号来停顿对应的流水线
-    //val ifuReady = Input(Bool())
+    val ifuReady = Input(Bool())
     val icStall     = Input(Bool())
     val lsuReady    = Input(Bool())
 
@@ -49,8 +49,9 @@ class CTRL extends Module {
   io.stallWbuReg := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
-  io.flushICache := io.branch
-  io.flushIduReg := io.branch
+  //io.flushICache := io.branch
+  //io.flushIduReg := io.branch
+  io.flushIduReg := !io.ifuReady || io.branch
   io.flushExuReg := io.branch | loadUse
   //io.flushWbuReg := !io.lsuReady // todo
 }

@@ -18,22 +18,23 @@ class IFU extends Module with HasResetVector {
 
     // from exu
     val exuRedirect   = Flipped(new RedirectIO)
-    val icRedirect    = Flipped(new RedirectIO)
+    //val icRedirect    = Flipped(new RedirectIO)
 
     // to idu
-    val out           = new Stage1IO
+    //val out           = new Stage1IO
+    val out           = new InstrFetch
 
     // icache
-    //val icacheCtrl  = Decoupled(new CacheCtrlIO)
-    //val icacheRead  = Flipped(Decoupled(new CacheReadIO))
-    //val icacheWrite = Decoupled(new CacheWriteIO)
+    val icacheCtrl  = Decoupled(new CacheCtrlIO)
+    val icacheRead  = Flipped(Decoupled(new CacheReadIO))
+    val icacheWrite = Decoupled(new CacheWriteIO)
  
     // ctrl
-    //val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
-    val stall         = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
+    val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
+    val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
   })
-
-  /*
+  
+  // 非流水icache begin
   val addrFire      = io.icacheCtrl.valid && io.icacheCtrl.ready
   val rdataFire     = io.icacheRead.valid && io.icacheRead.ready
   val wdataFire     = io.icacheWrite.valid && io.icacheWrite.ready
@@ -54,12 +55,14 @@ class IFU extends Module with HasResetVector {
   // 分支跳转标志，用于返回icache一个正确的信号，防止阻塞
   val brFlag                 = RegInit(false.B)
   brFlag                    := Mux(state === addr || (state === data && rdataFire), false.B, Mux(io.redirect.valid, true.B, brFlag))
-  */
+  val dnpc         = io.redirect.brAddr
+  // 非流水icache end
+
   // pc
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
-  //val dnpc         = io.redirect.brAddr
 
+  /*
   pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
   
   io.out.addr     := pc 
@@ -72,7 +75,8 @@ class IFU extends Module with HasResetVector {
   val valid        = dontTouch(WireDefault(false.B))
   valid           := !io.stall && !io.exuRedirect.valid && !io.icRedirect.valid
   io.valid        := valid
-  /*
+  */
+
   io.icacheCtrl.valid       := state === addr && !io.stall && !io.redirect.valid
   io.icacheCtrl.bits.addr   := pc
   io.icacheCtrl.bits.wen    := false.B
@@ -109,5 +113,4 @@ class IFU extends Module with HasResetVector {
   // 取指完毕信号，用于提醒流水线寄存器传递数据
   io.ready                  := (state === data && rdataFire) || io.stall // todo
   io.valid                  := state === data && rdataFire && !brFlag // 分支发生跳转时的指令是无效的
-  */
 }
