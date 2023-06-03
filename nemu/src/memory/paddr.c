@@ -37,6 +37,7 @@ static mtrace_node *mtrace_head = NULL;
 static mtrace_node *mtrace_tail = NULL;
 
 static void insert_mtrace(bool is_read, paddr_t addr, int len, uint64_t value) {
+  printf("shit\n");
   mtrace_node *node = (mtrace_node*)malloc(sizeof(mtrace_node));
   node->read = is_read;
   node->addr = addr;
