@@ -26,9 +26,9 @@ static void checkregs(NEMUCPUState *ref) {
   bool err_list[list_len] = {};
   // check next pc
   if(ref->pc != npc_cpu.pc) {
-    log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
-    log_write("ref pc: 0x%016lx\n", ref->pc);
-    log_write("dut pc: 0x%016lx\n", npc_cpu.pc);
+    npc_log_write(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
+    npc_log_write("ref pc: 0x%016lx\n", ref->pc);
+    npc_log_write("dut pc: 0x%016lx\n", npc_cpu.pc);
     same = false;
     err_list[33] = true;
   }
@@ -36,9 +36,9 @@ static void checkregs(NEMUCPUState *ref) {
   // check reg
   for(int i = 0; i < 32; i++) {
     if(ref->gpr[i] != cpu_gpr[i]) {
-      log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
-      log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
-      log_write("dut %s: 0x%016lx\n", regs[i], cpu_gpr[i]);
+      npc_log_write(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, regs[i]);
+      npc_log_write("ref %s: 0x%016lx\n", regs[i], ref->gpr[i]);
+      npc_log_write("dut %s: 0x%016lx\n", regs[i], cpu_gpr[i]);
       same = false;
       err_list[i] = true;
     }
@@ -47,9 +47,9 @@ static void checkregs(NEMUCPUState *ref) {
   // check csr
   for(int i = 0; i < CSR_NUM; i++) {
     if(ref->csr[i] != cpu_csr[i]) {
-      log_write(ANSI_FMT("csr[%d] %s error: \n", ANSI_FG_RED), i, csrs[i]);
-      log_write("ref %s: 0x%016lx\n", csrs[i], ref->csr[i]);
-      log_write("dut %s: 0x%016lx\n", csrs[i], cpu_csr[i]);
+      npc_log_write(ANSI_FMT("csr[%d] %s error: \n", ANSI_FG_RED), i, csrs[i]);
+      npc_log_write("ref %s: 0x%016lx\n", csrs[i], ref->csr[i]);
+      npc_log_write("dut %s: 0x%016lx\n", csrs[i], cpu_csr[i]);
       same = false;
       err_list[i+34] = true;
     }
@@ -57,9 +57,9 @@ static void checkregs(NEMUCPUState *ref) {
 
   // check inst
   if(ref->inst != npc_cpu.inst) {
-    log_write(ANSI_FMT("inst error: \n", ANSI_FG_RED));
-    log_write("ref: 0x%08x\n", ref->inst);
-    log_write("dut: 0x%08x\n", npc_cpu.inst);
+    npc_log_write(ANSI_FMT("inst error: \n", ANSI_FG_RED));
+    npc_log_write("ref: 0x%08x\n", ref->inst);
+    npc_log_write("dut: 0x%08x\n", npc_cpu.inst);
     same = false;
   }
 
@@ -94,8 +94,8 @@ void init_difftest(char *ref_so_file, long img_size) {
   void (*ref_difftest_init)() = (void(*)())dlsym(handle, "difftest_init");
   assert(ref_difftest_init);
 
-  log_write("Differential testing: %s\n", ANSI_FMT("ON", ANSI_FG_GREEN));
-  log_write("The result of every instruction will be compared with %s.\n"
+  npc_log_write("Differential testing: %s\n", ANSI_FMT("ON", ANSI_FG_GREEN));
+  npc_log_write("The result of every instruction will be compared with %s.\n"
       "This will help you a lot for debugging, but also significantly reduce the performance. "
       "If it is not necessary, you can turn it off in menuconfig.\n", ref_so_file);
 

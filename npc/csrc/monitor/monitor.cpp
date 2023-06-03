@@ -18,7 +18,7 @@
 #include <cpu/cpu.h>
 
 //void init_rand();
-void init_log(const char *log_file);
+void npc_init_log(const char *log_file);
 //void init_mem();
 IFDEF(CONFIG_DIFFTEST, void init_difftest(char *ref_so_file, long img_size));
 //void init_device();
@@ -98,7 +98,7 @@ void init_monitor(int argc, char *argv[]) {
 
   IFDEF(CONFIG_FTRACE, init_elf(elf_file));
 
-  init_log(log_file);
+  npc_init_log(log_file);
 
   /* Perform ISA dependent initialization. */
   //init_isa();

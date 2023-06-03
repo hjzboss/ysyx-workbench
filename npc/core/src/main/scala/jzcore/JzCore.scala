@@ -102,6 +102,9 @@ class JzCore extends Module {
   arbiter.io.lsuReq   <> dcache.io.axiReq
   arbiter.io.grantLsu <> dcache.io.axiGrant
   arbiter.io.lsuReady <> dcache.io.axiReady
+  //arbiter.io.lsuReq   <> lsu.io.axiReq
+  //arbiter.io.grantLsu <> lsu.io.axiGrant
+  //arbiter.io.lsuReady <> lsu.io.axiReady
 
   // axi访问接口
   val grant = Cat(arbiter.io.grantIfu, arbiter.io.grantLsu)
@@ -121,6 +124,17 @@ class JzCore extends Module {
     dcache.io.axiWdataIO.ready   := false.B
     dcache.io.axiBrespIO.valid   := false.B
     dcache.io.axiBrespIO.bits.bresp   := 0.U
+    /*
+    lsu.io.axiRaddrIO.ready   := false.B
+    lsu.io.axiRdataIO.valid   := false.B
+    lsu.io.axiRdataIO.bits.rdata := 0.U
+    lsu.io.axiRdataIO.bits.rresp   := 0.U
+    lsu.io.axiRdataIO.bits.rlast   := true.B
+    lsu.io.axiWaddrIO.ready   := false.B
+    lsu.io.axiWdataIO.ready   := false.B
+    lsu.io.axiBrespIO.valid   := false.B
+    lsu.io.axiBrespIO.bits.bresp   := 0.U
+    */
   }
   .elsewhen(grant === 1.U || grant === 3.U) {
     io.axiRaddrIO <> dcache.io.axiRaddrIO
@@ -128,6 +142,13 @@ class JzCore extends Module {
     io.axiWaddrIO <> dcache.io.axiWaddrIO
     io.axiWdataIO <> dcache.io.axiWdataIO
     io.axiBrespIO <> dcache.io.axiBrespIO
+    /*
+    io.axiRaddrIO <> lsu.io.axiRaddrIO
+    io.axiRdataIO <> lsu.io.axiRdataIO
+    io.axiWaddrIO <> lsu.io.axiWaddrIO
+    io.axiWdataIO <> lsu.io.axiWdataIO
+    io.axiBrespIO <> lsu.io.axiBrespIO   
+    */
 
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
@@ -177,88 +198,110 @@ class JzCore extends Module {
     dcache.io.axiWdataIO.ready   := false.B
     dcache.io.axiBrespIO.valid   := false.B
     dcache.io.axiBrespIO.bits.bresp   := 0.U
+    /*
+    lsu.io.axiRaddrIO.ready   := false.B
+    lsu.io.axiRdataIO.valid   := false.B
+    lsu.io.axiRdataIO.bits.rdata := 0.U
+    lsu.io.axiRdataIO.bits.rlast   := true.B
+    lsu.io.axiRdataIO.bits.rresp   := 0.U
+    lsu.io.axiWaddrIO.ready   := false.B
+    lsu.io.axiWdataIO.ready   := false.B
+    lsu.io.axiBrespIO.valid   := false.B
+    lsu.io.axiBrespIO.bits.bresp   := 0.U
+    */
   }
   
   // ram, dataArray
   icache.io.sram0_rdata <> io.sram0_rdata
-  icache.io.sram0_cen <> io.sram0_cen
-  icache.io.sram0_wen <> io.sram0_wen
+  icache.io.sram0_cen   <> io.sram0_cen
+  icache.io.sram0_wen   <> io.sram0_wen
   icache.io.sram0_wmask <> io.sram0_wmask
-  icache.io.sram0_addr <> io.sram0_addr
+  icache.io.sram0_addr  <> io.sram0_addr
   icache.io.sram0_wdata <> io.sram0_wdata
 
   icache.io.sram1_rdata <> io.sram1_rdata
-  icache.io.sram1_cen <> io.sram1_cen
-  icache.io.sram1_wen <> io.sram1_wen
+  icache.io.sram1_cen   <> io.sram1_cen
+  icache.io.sram1_wen   <> io.sram1_wen
   icache.io.sram1_wmask <> io.sram1_wmask
-  icache.io.sram1_addr <> io.sram1_addr
+  icache.io.sram1_addr  <> io.sram1_addr
   icache.io.sram1_wdata <> io.sram1_wdata
 
   icache.io.sram2_rdata <> io.sram2_rdata
-  icache.io.sram2_cen <> io.sram2_cen
-  icache.io.sram2_wen <> io.sram2_wen
+  icache.io.sram2_cen   <> io.sram2_cen
+  icache.io.sram2_wen   <> io.sram2_wen
   icache.io.sram2_wmask <> io.sram2_wmask
-  icache.io.sram2_addr <> io.sram2_addr
+  icache.io.sram2_addr  <> io.sram2_addr
   icache.io.sram2_wdata <> io.sram2_wdata
 
   icache.io.sram3_rdata <> io.sram3_rdata
-  icache.io.sram3_cen <> io.sram3_cen
-  icache.io.sram3_wen <> io.sram3_wen
+  icache.io.sram3_cen   <> io.sram3_cen  //npc_cpu.pc = top->io_debug_pc;
+  //npc_cpu.npc = top->io_debug_nextPc;
+  icache.io.sram3_wen   <> io.sram3_wen
   icache.io.sram3_wmask <> io.sram3_wmask
-  icache.io.sram3_addr <> io.sram3_addr
+  icache.io.sram3_addr  <> io.sram3_addr
   icache.io.sram3_wdata <> io.sram3_wdata
 
   // dcache
   dcache.io.sram4_rdata <> io.sram4_rdata
-  dcache.io.sram4_cen <> io.sram4_cen
-  dcache.io.sram4_wen <> io.sram4_wen
+  dcache.io.sram4_cen   <> io.sram4_cen
+  dcache.io.sram4_wen   <> io.sram4_wen
   dcache.io.sram4_wmask <> io.sram4_wmask
-  dcache.io.sram4_addr <> io.sram4_addr
+  dcache.io.sram4_addr  <> io.sram4_addr
   dcache.io.sram4_wdata <> io.sram4_wdata
 
   dcache.io.sram5_rdata <> io.sram5_rdata
-  dcache.io.sram5_cen <> io.sram5_cen
-  dcache.io.sram5_wen <> io.sram5_wen
+  dcache.io.sram5_cen   <> io.sram5_cen
+  dcache.io.sram5_wen   <> io.sram5_wen
   dcache.io.sram5_wmask <> io.sram5_wmask
-  dcache.io.sram5_addr <> io.sram5_addr
+  dcache.io.sram5_addr  <> io.sram5_addr
   dcache.io.sram5_wdata <> io.sram5_wdata
 
   dcache.io.sram6_rdata <> io.sram6_rdata
-  dcache.io.sram6_cen <> io.sram6_cen
-  dcache.io.sram6_wen <> io.sram6_wen
+  dcache.io.sram6_cen   <> io.sram6_cen
+  dcache.io.sram6_wen   <> io.sram6_wen
   dcache.io.sram6_wmask <> io.sram6_wmask
-  dcache.io.sram6_addr <> io.sram6_addr
+  dcache.io.sram6_addr  <> io.sram6_addr
   dcache.io.sram6_wdata <> io.sram6_wdata
 
   dcache.io.sram7_rdata <> io.sram7_rdata
-  dcache.io.sram7_cen <> io.sram7_cen
-  dcache.io.sram7_wen <> io.sram7_wen
+  dcache.io.sram7_cen   <> io.sram7_cen
+  dcache.io.sram7_wen   <> io.sram7_wen
   dcache.io.sram7_wmask <> io.sram7_wmask
-  dcache.io.sram7_addr <> io.sram7_addr
+  dcache.io.sram7_addr  <> io.sram7_addr
   dcache.io.sram7_wdata <> io.sram7_wdata
 
-  ifu.io.out        <> idReg.io.in
-  ifu.io.redirect   <> exu.io.redirect
-  ifu.io.stall      <> ctrl.io.stallPc
-  ifu.io.valid      <> idReg.io.validIn
-  ifu.io.icacheCtrl <> icache.io.ctrlIO
-  ifu.io.icacheRead <> icache.io.rdataIO
-  ifu.io.icacheWrite<> icache.io.wdataIO
-  exReg.io.validIn  <> idReg.io.validOut
-  lsReg.io.validIn  <> exReg.io.validOut
-  wbReg.io.validIn  <> lsReg.io.validOut
+  ifu.io.out          <> icache.io.cpu2cache
+  icache.io.cache2cpu <> idReg.io.in
+  //ifu.io.out          <> idReg.io.in
+  ifu.io.exuRedirect  <> exu.io.redirect
+  ifu.io.icRedirect   <> icache.io.redirect
+  ifu.io.valid        <> icache.io.validIn
+  icache.io.validOut  <> idReg.io.validIn
+  //ifu.io.icacheCtrl <> icache.io.ctrlIO
+  //ifu.io.icacheRead <> icache.io.rdataIO
+  //ifu.io.icacheWrite<> icache.io.wdataIO
+  //idReg.io.validIn    <> ifu.io.valid
+  exReg.io.validIn    <> idReg.io.validOut
+  lsReg.io.validIn    <> exReg.io.validOut
+  wbReg.io.validIn    <> lsReg.io.validOut
 
   // 控制模块
-  ctrl.io.ifuReady  <> ifu.io.ready
-  ctrl.io.lsuReady  <> lsu.io.ready
-  ctrl.io.ifuGrant  := arbiter.io.grantIfu
-  ctrl.io.lsuGrant  := arbiter.io.grantLsu
-  ctrl.io.branch    := exu.io.redirect.valid
+  //ctrl.io.ifuReady  <> ifu.io.ready
+  ctrl.io.memRen      := exReg.io.ctrlOut.memRen
+  ctrl.io.exRd        := exReg.io.ctrlOut.rd
+  ctrl.io.rs1         := idu.io.ctrl.rs1
+  ctrl.io.rs2         := idu.io.ctrl.rs2
+  ctrl.io.icStall     <> icache.io.stallOut
+  ctrl.io.lsuReady    <> lsu.io.ready
+  ctrl.io.branch      := exu.io.redirect.valid
+  ctrl.io.stallICache <> icache.io.stallIn
   ctrl.io.stallIduReg <> idReg.io.stall
   ctrl.io.stallExuReg <> exReg.io.stall
   ctrl.io.stallLsuReg <> lsReg.io.stall
+  ctrl.io.stallWbuReg <> wbReg.io.stall
+  ctrl.io.stallPc     <> ifu.io.stall
+  ctrl.io.flushICache <> icache.io.flush
   ctrl.io.flushIduReg <> idReg.io.flush
-  ctrl.io.flushWbuReg <> wbReg.io.flush
   ctrl.io.flushExuReg <> exReg.io.flush
 
   forward.io.lsuRd  := lsReg.io.out.rd
@@ -269,6 +312,9 @@ class JzCore extends Module {
   forward.io.rs2    := exReg.io.ctrlOut.rs2
   forward.io.wbuCsrWen := wbReg.io.out.csrWen
   forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
+  forward.io.lsuCsrWen := lsReg.io.out.csrWen
+  forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
+  forward.io.csrWen   := exReg.io.ctrlOut.csrWen
   forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
 
   idu.io.in         <> idReg.io.out
@@ -283,7 +329,8 @@ class JzCore extends Module {
   exu.io.ctrl       <> exReg.io.ctrlOut
   exu.io.lsuForward := lsReg.io.out.exuOut
   exu.io.wbuForward := wbu.io.regWrite.value // 可能三lsuout或者exuout
-  exu.io.csrForward := wbReg.io.out.csrValue
+  exu.io.csrWbuForward := wbReg.io.out.csrValue
+  exu.io.csrLsuForward := lsReg.io.out.csrValue
   exu.io.out        <> lsReg.io.in
   exu.io.forwardA   <> forward.io.forwardA
   exu.io.forwardB   <> forward.io.forwardB
@@ -298,7 +345,9 @@ class JzCore extends Module {
   io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
   wbu.io.in         <> wbReg.io.out
 
-  idReg.io.debugIn  <> ifu.io.debug
+  ifu.io.debug      <> icache.io.debugIn
+  idReg.io.debugIn  <> icache.io.debugOut
+  //idReg.io.debugIn  <> ifu.io.debug
   exReg.io.debugIn  <> idReg.io.debugOut
   exu.io.debugIn    <> exReg.io.debugOut
   lsReg.io.debugIn  <> exu.io.debugOut

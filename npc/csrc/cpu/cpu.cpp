@@ -95,7 +95,7 @@ double sc_time_stamp () {
 
 // todo: watchpoint
 static void trace_and_difftest() {
-  IFDEF(CONFIG_ITRACE, log_write("%s\n", npc_cpu.logbuf));
+  IFDEF(CONFIG_ITRACE, npc_log_write("%s\n", npc_cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(npc_cpu.logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step());
 	// watchpoint
@@ -251,8 +251,8 @@ long init_cpu(char *dir) {
   top->clock = 0;
   reset(4);
 
-  npc_cpu.pc = top->io_debug_pc;
-  npc_cpu.npc = top->io_debug_nextPc;
+  npc_cpu.pc = RESET_ADDR;
+  npc_cpu.npc = RESET_ADDR + 4;
 
   // state is running
   npc_state.state = NPC_RUNNING;

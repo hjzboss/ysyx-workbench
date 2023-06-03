@@ -21,11 +21,15 @@ class Forwarding extends Module {
     // todo: csr的旁路信号
     val wbuCsrWen = Input(Bool())
     val wbuCsrAddr= Input(UInt(3.W))
+    val lsuCsrWen = Input(Bool())
+    val lsuCsrAddr= Input(UInt(3.W))
+    // 执行阶段的csr信号
+    val csrWen    = Input(Bool())
     val csrRaddr  = Input(UInt(3.W))
 
     // 旁路控制信号，用于控制alu的两个源操作数
-    val forwardA = Output(UInt(2.W))
-    val forwardB = Output(UInt(2.W))
+    val forwardA = Output(UInt(3.W))
+    val forwardB = Output(UInt(3.W))
   })
 
   val forwardALsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.rs1
@@ -34,8 +38,9 @@ class Forwarding extends Module {
   val forwardBWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.rs2
 
   // todo：csr信号的判断
-  val forwardACsr = io.wbuCsrWen && io.wbuCsrAddr =/= CsrAddr.nul && io.csrRaddr === io.wbuCsrAddr
+  val forwardACsrWbu = io.csrWen && io.wbuCsrWen && io.wbuCsrAddr =/= CsrAddr.nul && io.csrRaddr === io.wbuCsrAddr
+  val forwardACsrLsu = io.csrWen && io.lsuCsrWen && io.lsuCsrAddr =/= CsrAddr.nul && io.csrRaddr === io.lsuCsrAddr
 
-  io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsr, Forward.csrData, Forward.normal)))
+  io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsrWbu, Forward.csrWbuData, Mux(forwardACsrLsu, Forward.csrLsuData, Forward.normal))))
   io.forwardB := Mux(forwardBLsu, Forward.lsuData, Mux(forwardBWbu, Forward.wbuData, Forward.normal))
 }

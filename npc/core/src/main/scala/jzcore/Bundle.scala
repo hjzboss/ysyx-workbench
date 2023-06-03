@@ -10,6 +10,40 @@ class DebugIO extends Bundle {
   val inst      = Output(UInt(32.W))
 }
 
+// icache pipline
+class Stage1IO extends Bundle {
+  //val valid     = Output(Bool()) // 是否读icache
+  val addr      = Output(UInt(32.W))
+  val cacheable = Output(Bool())
+}
+
+class Stage2IO extends Bundle {
+  val pc        = Output(UInt(32.W))
+  val cacheable = Output(Bool())
+  val index     = Output(UInt(6.W))
+  val tag       = Output(UInt(22.W))
+  val align     = Output(UInt(2.W))
+}
+
+class Stage3IO extends Bundle {
+  val pc        = Output(UInt(32.W))
+  val index     = Output(UInt(6.W))
+  val tag       = Output(UInt(22.W))
+  val align     = Output(UInt(2.W))
+  val cacheline = Output(UInt(128.W))
+  val hit       = Output(Bool())
+  val allocAddr = Output(UInt(32.W))
+  val cacheable = Output(Bool())
+  val victim    = Output(UInt(2.W))
+}
+
+class MetaAllocIO extends Bundle {
+  val tag       = Output(UInt(22.W))
+  val index     = Output(UInt(6.W))
+  val victim    = Output(UInt(2.W))
+  val valid     = Output(Bool())
+}
+
 // todo: cpu需要返回一个ready信号给cache，代表成功接受数据，此bundle需要进一步分离
 class CacheCtrlIO extends Bundle {
   val addr      = Output(UInt(32.W))
@@ -26,17 +60,10 @@ class CacheReadIO extends Bundle {
   val rdata = Output(UInt(64.W))
 }
 
-class CacheDecode extends Bundle {
-  val index       = Input(UInt(6.W))
-  val tag         = Input(UInt(54.W))
-  val byte        = Input(Bool())
-}
-
 class MetaData extends Bundle {
   val valid         = Bool()
   val dirty         = Bool()
   val tag           = UInt(22.W)
-  //val cacheable     = Bool()
 }
 
 class RFReadIO extends Bundle {
