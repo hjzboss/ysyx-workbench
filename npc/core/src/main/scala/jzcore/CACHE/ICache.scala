@@ -619,8 +619,8 @@ class ICache extends Module {
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class ICache extends Module {
   val io = IO(new Bundle {
-    val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO
+    //val debugIn         = Flipped(new DebugIO)
+    //val debugOut        = new DebugIO
 
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
