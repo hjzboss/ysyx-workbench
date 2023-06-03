@@ -5,7 +5,7 @@
 
 FILE *npc_log_fp = NULL;
 
-void init_log(const char *log_file) {
+void npc_init_log(const char *log_file) {
   printf("log: %s\n", log_file);
   npc_log_fp = stdout;
   if (log_file != NULL) {
