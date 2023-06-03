@@ -20,6 +20,8 @@
 
 #define REG_SIZE (264 + (8 * CSR_NUM) + 4)
 
+void init_log(const char *log_file);
+
 void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
   if(direction == DIFFTEST_TO_REF) {
     memcpy(guest_to_host(addr), buf, n);
@@ -48,5 +50,6 @@ void difftest_raise_intr(word_t NO) {
 
 void difftest_init(int port) {
   /* Perform ISA dependent initialization. */
+  init_log("/home/hjz/ysyx-workbench/npc/build/nemu-log.txt");
   init_isa();
 }
