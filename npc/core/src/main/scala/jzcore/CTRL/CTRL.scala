@@ -24,7 +24,7 @@ class CTRL extends Module {
     val stallWbuReg = Output(Bool())
 
     // flush pipline reg
-    val flushICache = Output(Bool())
+    //val flushICache = Output(Bool())
     val flushIduReg = Output(Bool())
     //val flushWbuReg = Output(Bool()) // set when lsu is unready
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
