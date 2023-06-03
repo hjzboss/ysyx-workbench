@@ -313,6 +313,9 @@ class JzCore extends Module {
   forward.io.rs2    := exReg.io.ctrlOut.rs2
   forward.io.wbuCsrWen := wbReg.io.out.csrWen
   forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
+  forward.io.lsuCsrWen := lsReg.io.out.csrWen
+  forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
+  forward.io.csrWen   := exReg.io.csrWen
   forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
 
   idu.io.in         <> idReg.io.out
@@ -327,7 +330,8 @@ class JzCore extends Module {
   exu.io.ctrl       <> exReg.io.ctrlOut
   exu.io.lsuForward := lsReg.io.out.exuOut
   exu.io.wbuForward := wbu.io.regWrite.value // 可能三lsuout或者exuout
-  exu.io.csrForward := wbReg.io.out.csrValue
+  exu.io.csrWbuForward := wbReg.io.out.csrValue
+  exu.io.csrLsuForward := lsReg.io.out.csrValue
   exu.io.out        <> lsReg.io.in
   exu.io.forwardA   <> forward.io.forwardA
   exu.io.forwardB   <> forward.io.forwardB

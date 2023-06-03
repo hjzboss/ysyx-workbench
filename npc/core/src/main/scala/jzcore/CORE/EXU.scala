@@ -20,11 +20,12 @@ class EXU extends Module {
     // 旁路数据
     val lsuForward  = Input(UInt(64.W))
     val wbuForward  = Input(UInt(64.W))
-    val csrForward  = Input(UInt(64.W))
+    val csrWbuForward = Input(UInt(64.W))
+    val csrLsuForward = Input(UInt(64.W))
 
     // 旁路控制信号
-    val forwardA    = Input(UInt(2.W))
-    val forwardB    = Input(UInt(2.W))
+    val forwardA    = Input(UInt(3.W))
+    val forwardB    = Input(UInt(3.W))
 
     val debugIn     = Flipped(new DebugIO)
     val debugOut    = new DebugIO
@@ -36,16 +37,18 @@ class EXU extends Module {
   val aluSrc2 = io.aluCtrl.aluSrc2
 
   // forward
-  val opAPre = MuxLookup(io.forwardA, io.datasrc.src1, List(
-    Forward.lsuData -> io.lsuForward,
-    Forward.wbuData -> io.wbuForward,
-    Forward.csrData -> io.csrForward,
-    Forward.normal  -> io.datasrc.src1
+  val opAPre = LookupTreeDefault(io.forwardA, io.datasrc.src1, List(
+    Forward.lsuData     -> io.lsuForward,
+    Forward.wbuData     -> io.wbuForward,
+    Forward.csrWbuData  -> io.csrWbuForward,
+    Forward.csrLsuData  -> io.csrLsuForward,
+    Forward.normal      -> io.datasrc.src1
   ))
-  val opBPre = MuxLookup(io.forwardB, io.datasrc.src2, List(
+  val opBPre = LookupTreeDefault(io.forwardB, io.datasrc.src2, List(
     Forward.lsuData -> io.lsuForward,
     Forward.wbuData -> io.wbuForward,
-    Forward.csrData -> io.csrForward,
+    Forward.csrWbuData  -> io.csrWbuForward,
+    Forward.csrLsuData  -> io.csrLsuForward,
     Forward.normal  -> io.datasrc.src2
   ))
 
