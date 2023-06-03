@@ -121,7 +121,8 @@ class LSU extends Module {
 
   // 数据对齐
   val align              = Cat(addr(2, 0), 0.U(3.W))
-  val rdata              = io.dcacheRead.bits.rdata >> align
+  //val rdata              = io.dcacheRead.bits.rdata >> align
+  val rdata              = io.axiRdataIO.bits.rdata >> align
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
                             LsType.lw   -> SignExt(rdata(31, 0), 64),
