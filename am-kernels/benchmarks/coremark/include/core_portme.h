@@ -10,7 +10,7 @@
 #include <klib.h>
 #include <klib-macros.h>
 
-#define ITERATIONS 100
+#define ITERATIONS 10
 #define MEM_METHOD MEM_STATIC
 
 /************************/

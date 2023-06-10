@@ -7,6 +7,7 @@
 // Current simulation time (64-bit unsigned)
 vluint64_t main_time = 0;
 
+static uint64_t cycle = 0; // 统计时钟周期
 static VSoc* top;
 static VerilatedContext* contextp = NULL;
 static VerilatedVcdC* tfp = NULL;
@@ -290,7 +291,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 26) break;
+    if (cnt == 26) break; // 防止跑飞
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
@@ -298,6 +299,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
   *lsFlag = top->io_lsFlag;
   eval_wave();
   eval_wave();
+  cycle += (cnt + 1);
 }
 
 static void cpu_exec_once() {
@@ -361,7 +363,7 @@ static void statistic() {
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
-    Log("IPC = %lf\n", g_nr_guest_inst / (main_time / 2.0));
+    Log("IPC = %lf\n", g_nr_guest_inst / cycle / 1.0);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }
