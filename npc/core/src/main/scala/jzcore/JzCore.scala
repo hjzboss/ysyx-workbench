@@ -234,7 +234,8 @@ class JzCore extends Module {
   icache.io.sram2_wdata <> io.sram2_wdata
 
   icache.io.sram3_rdata <> io.sram3_rdata
-  icache.io.sram3_cen   <> io.sram3_cen
+  icache.io.sram3_cen   <> io.sram3_cen  //npc_cpu.pc = top->io_debug_pc;
+  //npc_cpu.npc = top->io_debug_nextPc;
   icache.io.sram3_wen   <> io.sram3_wen
   icache.io.sram3_wmask <> io.sram3_wmask
   icache.io.sram3_addr  <> io.sram3_addr

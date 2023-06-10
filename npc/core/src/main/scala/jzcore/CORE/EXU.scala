@@ -45,11 +45,11 @@ class EXU extends Module {
     Forward.normal      -> io.datasrc.src1
   ))
   val opBPre = LookupTreeDefault(io.forwardB, io.datasrc.src2, List(
-    Forward.lsuData -> io.lsuForward,
-    Forward.wbuData -> io.wbuForward,
+    Forward.lsuData     -> io.lsuForward,
+    Forward.wbuData     -> io.wbuForward,
     Forward.csrWbuData  -> io.csrWbuForward,
     Forward.csrLsuData  -> io.csrLsuForward,
-    Forward.normal  -> io.datasrc.src2
+    Forward.normal      -> io.datasrc.src2
   ))
 
   val pc = ZeroExt(io.datasrc.pc, 64)
