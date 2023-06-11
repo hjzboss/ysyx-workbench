@@ -57,7 +57,7 @@ object RV64IM extends HasInstrType {
   def SRAIW   = BitPat("b0100000_?????_?????_101_?????_0011011")
 
   def ECALL   = BitPat("b0000000_00000_00000_000_00000_1110011")
-  def MRET    = BitPat("b0011000_00010_00000_000_00000_1110011") // mepc + 4
+  def MRET    = BitPat("b0011000_00010_00000_000_00000_1110011") // mepc
   def EBREAK  = BitPat("b0000000_00001_00000_000_00000_1110011")
 
   def AUIPC   = BitPat("b???????_?????_?????_???_?????_0010111")
