@@ -68,7 +68,7 @@ class EXU extends Module {
   val brAddr            = brAddrOpA + io.datasrc.imm
 
   // ecall mret
-  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall, opAPre, Mux(io.ctrl.sysInsType === System.mret, aluOut, brAddr))
+  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, opAPre, brAddr)
   io.redirect.brAddr   := brAddrPre(31, 0)
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 

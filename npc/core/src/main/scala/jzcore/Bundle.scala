@@ -108,7 +108,8 @@ class CtrlFlow extends Bundle {
   //val wdata         = Output(UInt(64.W)) // 写数据
   val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
-  val csrWen        = Output(Bool()) // 是否是csr指令
+  val csrWen        = Output(Bool()) // csr写使能
+  val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
   val csrWaddr      = Output(UInt(3.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool()) // 系统指令的类型
