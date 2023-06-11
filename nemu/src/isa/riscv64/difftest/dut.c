@@ -25,8 +25,8 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   // check next pc
   if(ref_r->pc != pc) {
     Log("pc (next instruction) error:");
-    Log("ref pc: 0x%016lx\n", ref_r->pc);
-    Log("dut pc: 0x%016lx\n", pc);
+    Log("ref pc: 0x%016lx", ref_r->pc);
+    Log("dut pc: 0x%016lx", pc);
     same = false;
     err_list[32] = true;
   }
