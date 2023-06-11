@@ -40,8 +40,24 @@ void isa_reg_display() {
     printf("%s:\t0x%016lx\n", csrs[i], cpu.csr[i]);
   }
   printf("------------------------------\n");
-
 }
+
+void isa_reg_display_error(bool *err_list) {
+  int i;
+  printf(ANSI_FMT("CPU register state: \n", ANSI_FG_BLUE));
+  printf("------------------------------\n");
+  printf("reg \tvalue\n");
+  printf("------------------------------\n");
+  if (err_list[32]) printf(ANSI_FMT("pc:\t0x%016lx\n", ANSI_FG_RED), cpu.pc);
+  else printf("pc:\t0x%016lx\n", cpu.pc);
+
+  for (i=0; i<32; ++i) {
+    if (err_list[i]) printf(ANSI_FMT("%s:\t0x%016lx\n", ANSI_FG_RED), regs[i], cpu.gpr[i]);
+    else printf("%s:\t0x%016lx\n", regs[i], cpu.gpr[i]);
+  }
+  printf("------------------------------\n");
+}
+
 
 word_t isa_reg_str2val(const char *s, bool *success) {
   for (int i = 0; i < 32; i ++) {
