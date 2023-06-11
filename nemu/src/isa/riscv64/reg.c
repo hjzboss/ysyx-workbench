@@ -42,6 +42,7 @@ void isa_reg_display() {
   printf("------------------------------\n");
 }
 
+// for difftest
 void isa_reg_display_error(bool *err_list) {
   int i;
   printf(ANSI_FMT("CPU register state: \n", ANSI_FG_BLUE));
