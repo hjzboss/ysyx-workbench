@@ -24,7 +24,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   bool err_list[33] = {};
   // check next pc
   if(ref_r->pc != pc) {
-    Log(ANSI_FMT("pc (next instruction) error: \n", ANSI_FG_RED));
+    Log("pc (next instruction) error: \n");
     Log("ref pc: 0x%016lx\n", ref_r->pc);
     Log("dut pc: 0x%016lx\n", pc);
     same = false;
@@ -34,7 +34,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   // check reg
   for(int i = 0; i < 32; i++) {
     if(ref_r->gpr[i] != cpu.gpr[i]) {
-      Log(ANSI_FMT("reg[%d] %s error: \n", ANSI_FG_RED), i, reg_name(i, 0));
+      Log("reg[%d] %s error: \n", i, reg_name(i, 0));
       Log("ref %s: 0x%016lx\n", reg_name(i, 0), ref_r->gpr[i]);
       Log("dut %s: 0x%016lx\n", reg_name(i, 0), cpu.gpr[i]);
       same = false;
