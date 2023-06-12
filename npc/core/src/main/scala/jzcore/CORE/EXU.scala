@@ -57,8 +57,9 @@ class EXU extends Module {
   // 操作数选择
   val opA = Mux(aluSrc1 === SrcType.pc, pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
-  val aluOut  = alu.io.aluOut
 
+  // alu
+  val aluOut  = alu.io.aluOut
   alu.io.opA           := opA
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
@@ -72,6 +73,7 @@ class EXU extends Module {
   io.redirect.brAddr   := brAddrPre(31, 0)
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 
+  // to lsu
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
   io.out.lsuWen        := io.ctrl.memWen
@@ -79,7 +81,11 @@ class EXU extends Module {
   io.out.lsuAddr       := aluOut(31, 0)
   io.out.lsuWdata      := opBPre // todo:forward
   io.out.loadMem       := io.ctrl.loadMem
+
+  // exu output
   io.out.exuOut        := aluOut
+
+  // wbu
   io.out.rd            := io.ctrl.rd
   io.out.regWen        := io.ctrl.regWen
   io.out.pc            := io.datasrc.pc
@@ -91,6 +97,7 @@ class EXU extends Module {
   io.out.haltRet       := opAPre // todo: forward
   io.out.csrValue      := opAPre
 
+  // debug
   io.debugOut.inst     := io.debugIn.inst
   io.debugOut.pc       := io.debugIn.pc
   io.debugOut.nextPc   := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)

@@ -8,7 +8,6 @@
 #define CSR_NUM 4
 
 #define RESET_ADDR 0x80000000
-//#define MAX_SIM_TIME 1000 // max simulation time
 #define CONFIG_TRACE 1
 #define CONFIG_MBASE 0x80000000
 #define CONFIG_MSIZE 0x8000000

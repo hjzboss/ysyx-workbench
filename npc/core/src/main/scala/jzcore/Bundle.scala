@@ -204,3 +204,15 @@ class WdataIO extends Bundle {
 class BrespIO extends Bundle {
   val bresp         = Output(UInt(2.W))
 }
+
+class MultiInput extends Bundle {
+  val multiplicand    = Output(UInt(64.W)) // 被乘数
+  val multiplier      = Output(UInt(64.W)) // 乘数
+  val mulw            = Output(Bool()) // 是否为32位乘法
+  val mulSigned       = Output(UInt(2.W)) // 乘法类型
+}
+
+class MultiOutput extends Bundle {
+  val resultHi        = Output(UInt(64.W))
+  val resultLo        = Output(UInt(64.W))
+}
