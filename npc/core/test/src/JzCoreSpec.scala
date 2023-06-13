@@ -7,6 +7,7 @@ import chiseltest.formal.BoundedCheck
 import utest._
 import utils._
 
+/*
 class BoothTest1 extends Module {
   val io = IO(new Bundle {
     //val sign = Bool()
@@ -15,7 +16,7 @@ class BoothTest1 extends Module {
     val c = Output(UInt(128.W))
   })
 
-  val b1 = io.b(64) ## io.b ## false.B
+  val b1 = io.b(63) ## io.b ## false.B
 
   val p = RegInit(0.S(128.W)) // 部分积
 
@@ -53,9 +54,9 @@ class BoothTest1 extends Module {
     printf("io.c=%x, ref=%x\n", io.c, ref)
     chisel3.assert(io.c === ref)
   }
-}
+}*/
 
-/*
+// 部分积生成器
 class PGenerator extends Module {
   val io = IO(new Bundle {
     val yAdd  = Input(Bool())
@@ -66,28 +67,65 @@ class PGenerator extends Module {
     val p     = Output(UInt(68.W))
     val c     = Output(Bool())
   })
+  
+  val x = io.x ## false.B
 
   val selNegative = io.yAdd & (io.y & ~io.ySub | ~io.y & io.ySub)
   val selPositive = ~io.yAdd & (io.y & ~io.ySub | ~io.y & io.ySub)
   val selDoubleNegative = io.yAdd & ~io.y & ~io.ySub
   val selDoublePositive = ~io.yAdd & io.y & io.ySub
 
-  
+  val p_tmp = VecInit(List.fill(68)(false.B))
 
-  assign pi = ~(~(sel_negative & ~x) & ~(sel_double_negative & ~x_sub) 
-            & ~(sel_positive & x ) & ~(sel_double_positive &  x_sub));
+  (0 to 67).map(i => (p_tmp(i) := ~(~(selNegative & ~x(i+1)) & ~(selDoubleNegative & ~x(i)) & ~(selPositive & x(i+1)) & ~(selDoublePositive & x(i)))))
 
+  io.p := p_tmp.asUInt()
+  io.c := selNegative | selDoubleNegative
 } 
 
 class BoothTest2 extends Module {
   val io = IO(new Bundle {
+    val valid = Input(Bool())
     val a = Input(UInt(64.W))
     val b = Input(UInt(64.W))
     val c = Output(UInt(128.W))
+    val ready = Output(Bool())
   })
 
+  val idle :: busy :: Nil = Enum(2)
+  val state = RegInit(idle)
+  state := MuxLookup(state, idle, List(
+    idle -> Mux(io.valid, busy, idle),
+    busy -> Mux(io.ready, idle, busy)
+  ))
 
-}*/
+  val result = RegInit(0.U(132.W)) // 结果寄存器
+  val multiplicand = RegInit(0.U(132.W)) // 被乘数
+  val multiplier = RegInit(0.U(66.W)) // 乘数
+
+  val pg = Module(new PGenerator)
+  pg.io.yAdd := multiplier(2)
+  pg.io.y    := multiplier(1)
+  pg.io.ySub := multiplier(0)
+  pg.io.x    := multiplicand
+
+  when(state === idle && io.valid) {
+    result := 0.U
+    multiplicand := SignExt(io.a, 132) // todo
+    multiplier := io.b(63) ## io.a ## false.B
+  }.elsewhen(state === busy && !io.ready) {
+    result := pg.io.p + result + pg.io.c
+    multiplicand := multiplicand << 2.U
+    multiplier := multiplier >> 2.U
+  }.otherwise {
+    result := result
+    multiplicand := multiplicand
+    multiplier := multiplier
+  }
+
+  io.ready  := !multiplier.orR
+  io.c      := result
+}
 /*
 object JzCoreSpec extends TestSuite {
   val tests: Tests = Tests {
@@ -102,16 +140,19 @@ object JzCoreSpec extends TestSuite {
 object JzCoreSpec extends ChiselUtestTester {
   val tests = Tests {
     test("mul") {
-      testCircuit(new BoothTest1) {
+      testCircuit(new BoothTest2) {
         dut =>
-          var i = 1
-          dut.io.a.poke(89464.U(64.W))
+          dut.io.a.poke(894.U(64.W))
           dut.io.b.poke(99.U(64.W))
-          while(i < 67) {
+          var flag = true
+          dut.io.valid.poke(true.B)
+          while(flag) {
             dut.clock.step()
-            i += 2
+            when(dut.io.ready.peek() === true.B) {
+              flag = false
+            }
           }
-          //dut.io.c.expect(96252.U(128.W))
+          dut.io.c.expect((894 * 99).U(128.W))
       }
     }
   }
