@@ -102,16 +102,16 @@ class Alu extends Module {
   // 是否为乘法操作
   val mulOp                = aluOp === AluOp.mul || aluOp === AluOp.mulh || aluOp === AluOp.mulw || aluOp === AluOp.mulhsu || aluOp === AluOp.mulhu
   
-  mul.io.valid            := mulOp
-  mul.io.in.multiplicand  := io.opA
-  mul.io.in.multiplier    := io.opB
-  mul.io.in.mulw          := AluOp === mulw
-  mul.io.in.mulSigned     := LookupTreeDefault(aluOp, MulType.ss, List(
-                              AluOp.mulhu   -> MulType.uu,
-                              AluOp.mulhsu  -> MulType.su
-                            ))
-  mul.io.out.ready        := !io.stall
-  mul.io.flush            := io.flush
+  mul.io.in.valid               := mulOp
+  mul.io.in.bits.multiplicand   := io.opA
+  mul.io.in.bits.multiplier     := io.opB
+  mul.io.in.bits.mulw           := AluOp === mulw
+  mul.io.in.bits.mulSigned      := LookupTreeDefault(aluOp, MulType.ss, List(
+                                    AluOp.mulhu   -> MulType.uu,
+                                    AluOp.mulhsu  -> MulType.su
+                                  ))
+  mul.io.out.ready              := !io.stall
+  mul.io.flush                  := io.flush
 
   // xlen computation
   val opA = io.opA
@@ -137,11 +137,11 @@ class Alu extends Module {
     // todo
     AluOp.div       -> (opA.asSInt() / opB.asSInt()).asUInt(),
     AluOp.divu      -> (opA / opB),
-    AluOp.mul       -> mul.io.out.resultLo,
-    AluOp.mulw      -> mul.io.out.resultLo,
+    AluOp.mul       -> mul.io.out.bits.resultLo,
+    AluOp.mulw      -> mul.io.out.bits.resultLo,
     //AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
-    AluOp.mulh      -> mul.io.out.resultHi,
-    AluOp.mulhsu    -> mul.io.out.resultHi,
+    AluOp.mulh      -> mul.io.out.bits.resultHi,
+    AluOp.mulhsu    -> mul.io.out.bits.resultHi,
     AluOp.rem       -> (opA.asSInt() % opB.asSInt()).asUInt(),
     AluOp.remu      -> (opA % opB),
     AluOp.csrrw     -> opB,
