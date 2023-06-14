@@ -56,5 +56,4 @@ class CTRL extends Module {
   io.flushIduReg := io.branch
   //io.flushIduReg := !io.ifuReady || io.branch
   io.flushExuReg := io.branch | loadUse
-  //io.flushWbuReg := !io.lsuReady // todo
 }
