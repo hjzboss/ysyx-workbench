@@ -11,6 +11,7 @@ class CTRL extends Module {
     //val ifuReady = Input(Bool())
     val icStall     = Input(Bool())
     val lsuReady    = Input(Bool())
+    val exuReady    = Input(Bool())
 
     // 分支指令需要flush流水线
     val branch      = Input(Bool())
@@ -22,11 +23,11 @@ class CTRL extends Module {
     val stallExuReg = Output(Bool())
     val stallLsuReg = Output(Bool())
     val stallWbuReg = Output(Bool())
+    val stallExu    = Output(Bool())
 
     // flush pipline reg
     val flushICache = Output(Bool())
     val flushIduReg = Output(Bool())
-    //val flushWbuReg = Output(Bool()) // set when lsu is unready
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
 
     // todo: load-use停顿处理
@@ -41,18 +42,18 @@ class CTRL extends Module {
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallICache := !io.lsuReady | (loadUse & !io.branch)
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch)
+  io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady
+  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady
   //io.stallPc     := !io.lsuReady | (loadUse & !io.branch)
-  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch)
-  io.stallExuReg := !io.lsuReady
-  io.stallLsuReg := !io.lsuReady
-  io.stallWbuReg := !io.lsuReady
+  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady
+  io.stallExuReg := !io.lsuReady | !io.exuReady
+  io.stallLsuReg := !io.lsuReady | !io.exuReady
+  io.stallWbuReg := !io.lsuReady | !io.exuReady
+  io.stallExu    := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushICache := io.branch
   io.flushIduReg := io.branch
   //io.flushIduReg := !io.ifuReady || io.branch
   io.flushExuReg := io.branch | loadUse
-  //io.flushWbuReg := !io.lsuReady // todo
 }

@@ -78,11 +78,11 @@ class PGenerator extends Module {
   val p_tmp = VecInit(List.fill(132)(false.B))
 
   (0 to 131).map(i => (p_tmp(i) := ~(~(selNegative & ~x(i+1)) & ~(selDoubleNegative & ~x(i)) & ~(selPositive & x(i+1)) & ~(selDoublePositive & x(i)))))
-  //printf("io.p=%x\n", io.p)
   io.p := p_tmp.asUInt()
   io.c := selNegative | selDoubleNegative
 } 
 
+// booth算法，2位
 class BoothTest2 extends Module {
   val io = IO(new Bundle {
     val valid = Input(Bool())
@@ -111,8 +111,8 @@ class BoothTest2 extends Module {
 
   when(state === idle && io.valid) {
     result := 0.U
-    multiplicand := io.a // todo
-    multiplier := io.b(63) ## io.b ## false.B
+    multiplicand := SignExt(io.a, 132) // 当被乘数是有符号数时进行符号扩展，否则进行0扩展
+    multiplier := io.b(63) ## io.b ## false.B // 当为有符号数时，扩展符号位，否则扩展0
   }.elsewhen(state === busy && !io.ready) {
     result := pg.io.p + result + pg.io.c
     multiplicand := multiplicand << 2.U
@@ -148,8 +148,8 @@ object JzCoreSpec extends ChiselUtestTester {
     test("mul") {
       testCircuit(new BoothTest2) {
         dut =>
-          dut.io.a.poke("h12311231234fffff".U(64.W))
-          dut.io.b.poke("hfffffffffffffff".U(64.W))
+          dut.io.a.poke("h0".U(64.W))
+          dut.io.b.poke("hffffffffffffffff".U(64.W))
           var flag = true
           dut.io.valid.poke(true.B)
           while(flag) {

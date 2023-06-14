@@ -293,16 +293,20 @@ class JzCore extends Module {
   ctrl.io.rs2         := idu.io.ctrl.rs2
   ctrl.io.icStall     <> icache.io.stallOut
   ctrl.io.lsuReady    <> lsu.io.ready
+  ctrl.io.exuReady    <> exu.io.ready
   ctrl.io.branch      := exu.io.redirect.valid
   ctrl.io.stallICache <> icache.io.stallIn
   ctrl.io.stallIduReg <> idReg.io.stall
   ctrl.io.stallExuReg <> exReg.io.stall
   ctrl.io.stallLsuReg <> lsReg.io.stall
   ctrl.io.stallWbuReg <> wbReg.io.stall
+  ctrl.io.stallExu    <> exu.io.stall
   ctrl.io.stallPc     <> ifu.io.stall
   ctrl.io.flushICache <> icache.io.flush
   ctrl.io.flushIduReg <> idReg.io.flush
-  ctrl.io.flushExuReg <> exReg.io.flush
+  exReg.io.flush      := ctrl.io.flushExuReg
+  exu.io.flush        := ctrl.io.flushExuReg
+  //ctrl.io.flushExuReg <> exReg.io.flush
 
   forward.io.lsuRd  := lsReg.io.out.rd
   forward.io.wbuRd  := wbReg.io.out.rd

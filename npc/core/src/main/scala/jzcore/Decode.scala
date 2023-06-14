@@ -156,3 +156,12 @@ trait HasInstrType {
   def InstrE  = "b1010".U // exception
   def InstrD  = "b1011".U // ebreak, just for simulation
 }
+
+object MulType {
+  //def nop = "b00".U
+  def ss  = "b11".U
+  def su  = "b10".U
+  def uu  = "b00".U
+
+  def apply = UInt(2.W)
+}
