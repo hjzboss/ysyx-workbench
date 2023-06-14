@@ -95,11 +95,11 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Initialize devices. */
   //IFDEF(CONFIG_DEVICE, init_device());
-
+  printf("shit\n");
   IFDEF(CONFIG_FTRACE, init_elf(elf_file));
 
   npc_init_log(log_file);
-  printf("shit\n");
+
   /* Perform ISA dependent initialization. */
   //init_isa();
   
