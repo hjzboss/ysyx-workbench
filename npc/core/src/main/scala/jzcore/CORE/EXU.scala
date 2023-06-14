@@ -27,6 +27,12 @@ class EXU extends Module {
     val forwardA    = Input(UInt(3.W))
     val forwardB    = Input(UInt(3.W))
 
+    // alu
+    val stall       = Input(Bool())
+    val flush       = Input(Bool())
+    val ready       = Output(Bool())
+
+    // debug
     val debugIn     = Flipped(new DebugIO)
     val debugOut    = new DebugIO
   })
@@ -60,6 +66,8 @@ class EXU extends Module {
 
   // alu
   val aluOut  = alu.io.aluOut
+  alu.io.stall         := io.stall
+  alu.io.flush         := io.flush
   alu.io.opA           := opA
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
@@ -96,6 +104,8 @@ class EXU extends Module {
   io.out.ebreak        := io.ctrl.ebreak
   io.out.haltRet       := opAPre // todo: forward
   io.out.csrValue      := opAPre
+
+  io.ready             := alu.io.ready
 
   // debug
   io.debugOut.inst     := io.debugIn.inst
