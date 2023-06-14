@@ -22,7 +22,7 @@ NEMUCPUState cpu_diff = {};
 
 static void checkregs(NEMUCPUState *ref) {
   bool same = true;
-  int list_len = 34 + CSR_NUM;
+  int list_len = 33 + CSR_NUM;
   bool err_list[list_len] = {};
   // check next pc
   if(ref->pc != npc_cpu.pc) {
@@ -51,7 +51,7 @@ static void checkregs(NEMUCPUState *ref) {
       npc_log_write("ref %s: 0x%016lx\n", csrs[i], ref->csr[i]);
       npc_log_write("dut %s: 0x%016lx\n", csrs[i], cpu_csr[i]);
       same = false;
-      err_list[i+34] = true;
+      err_list[i+33] = true;
     }
   }
 

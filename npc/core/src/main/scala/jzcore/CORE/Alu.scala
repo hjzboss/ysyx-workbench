@@ -4,6 +4,21 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+
+/*
+// booth 2位乘法器
+sealed class Booth extends Module {
+  val io = IO(new Bundle{
+    val flush   = Input(Bool())
+    val in      = Flipped(Decoupled(new MultiInput))
+    val out     = Decoupled(new MultiOutput)
+  })
+
+
+}
+*/
+
+
 class Alu extends Module {
   val io = IO(new Bundle {
     val opA     = Input(UInt(64.W))

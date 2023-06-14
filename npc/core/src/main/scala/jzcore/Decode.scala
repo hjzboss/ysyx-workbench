@@ -118,10 +118,9 @@ object CsrAddr {
 }
 
 object System {
-  def ebreak = "b00".U
+  def nop    = "b00".U
   def mret   = "b01".U
   def ecall  = "b10".U
-  def nop    = "b11".U
 
   def apply() = UInt(2.W)
 }
@@ -153,6 +152,7 @@ trait HasInstrType {
   def InstrU  = "b0110".U
   def InstrJ  = "b0111".U
   def InstrIJ = "b1000".U
-  def InstrD  = "b1001".U
-  def InstrZ  = "b1010".U
+  def InstrZ  = "b1001".U // csr
+  def InstrE  = "b1010".U // exception
+  def InstrD  = "b1011".U // ebreak, just for simulation
 }

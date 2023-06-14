@@ -17,9 +17,36 @@
 #include <cpu/difftest.h>
 #include "../local-include/reg.h"
 
+void isa_reg_display_error(bool *err_list);
+
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  printf("fuck it!\n");
-  return false;
+  bool same = true;
+  bool err_list[33] = {};
+  // check next pc
+  if(ref_r->pc != pc) {
+    Log("pc (next instruction) error:");
+    Log("ref pc: 0x%016lx", ref_r->pc);
+    Log("dut pc: 0x%016lx", pc);
+    same = false;
+    err_list[32] = true;
+  }
+
+  // check reg
+  for(int i = 0; i < 32; i++) {
+    if(ref_r->gpr[i] != cpu.gpr[i]) {
+      Log("reg[%d] %s error:", i, reg_name(i, 0));
+      Log("ref %s: 0x%016lx", reg_name(i, 0), ref_r->gpr[i]);
+      Log("dut %s: 0x%016lx", reg_name(i, 0), cpu.gpr[i]);
+      same = false;
+      err_list[i] = true;
+    }
+  }
+
+  if(!same) {
+    // print all dut regs when error
+    isa_reg_display_error(err_list);
+  }
+  return same;
 }
 
 void isa_difftest_attach() {

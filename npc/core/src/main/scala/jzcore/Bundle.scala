@@ -105,10 +105,9 @@ class CtrlFlow extends Bundle {
   val regWen        = Output(Bool()) // 寄存器写使能
   val isJalr        = Output(Bool()) // 是否三jalr指令
   val lsType        = Output(UInt(4.W)) // 访存指令类型
-  //val wdata         = Output(UInt(64.W)) // 写数据
   val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
-  val csrWen        = Output(Bool()) // 是否是csr指令
+  val csrWen        = Output(Bool()) // csr写使能
   val csrWaddr      = Output(UInt(3.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool()) // 系统指令的类型
@@ -117,6 +116,7 @@ class CtrlFlow extends Bundle {
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val sysInsType    = Output(UInt(2.W))
   // 用于送给旁路单元
+  val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
   val rs1           = Output(UInt(5.W))
   val rs2           = Output(UInt(5.W))
 }
@@ -203,4 +203,16 @@ class WdataIO extends Bundle {
 
 class BrespIO extends Bundle {
   val bresp         = Output(UInt(2.W))
+}
+
+class MultiInput extends Bundle {
+  val multiplicand    = Output(UInt(64.W)) // 被乘数
+  val multiplier      = Output(UInt(64.W)) // 乘数
+  val mulw            = Output(Bool()) // 是否为32位乘法
+  val mulSigned       = Output(UInt(2.W)) // 乘法类型
+}
+
+class MultiOutput extends Bundle {
+  val resultHi        = Output(UInt(64.W))
+  val resultLo        = Output(UInt(64.W))
 }

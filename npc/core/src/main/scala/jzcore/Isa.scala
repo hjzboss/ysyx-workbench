@@ -57,7 +57,7 @@ object RV64IM extends HasInstrType {
   def SRAIW   = BitPat("b0100000_?????_?????_101_?????_0011011")
 
   def ECALL   = BitPat("b0000000_00000_00000_000_00000_1110011")
-  def MRET    = BitPat("b0011000_00010_00000_000_00000_1110011") // mepc + 4
+  def MRET    = BitPat("b0011000_00010_00000_000_00000_1110011") // mepc
   def EBREAK  = BitPat("b0000000_00001_00000_000_00000_1110011")
 
   def AUIPC   = BitPat("b???????_?????_?????_???_?????_0010111")
@@ -150,8 +150,9 @@ object RV64IM extends HasInstrType {
     BLTU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bltu),
     BGEU    -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bgeu),
 
-    ECALL   -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
-    MRET    -> List(InstrD, SrcType.reg, SrcType.plus4, AluOp.add),
+    ECALL   -> List(InstrE, SrcType.nul, SrcType.nul, AluOp.nop),
+    MRET    -> List(InstrE, SrcType.nul, SrcType.nul, AluOp.nop),
+
     EBREAK  -> List(InstrD, SrcType.nul, SrcType.nul, AluOp.nop),
 
     CSRRW   -> List(InstrZ, SrcType.reg, SrcType.reg, AluOp.csrrw),
@@ -184,8 +185,7 @@ object RV64IM extends HasInstrType {
 
   val systemCtrl = Array(
     ECALL   -> List(System.ecall),
-    MRET    -> List(System.mret),
-    EBREAK  -> List(System.ebreak),
+    MRET    -> List(System.mret)
   )
 }
 
