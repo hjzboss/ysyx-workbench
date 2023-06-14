@@ -61,8 +61,8 @@ sealed class Booth extends Module {
 
   when(state === idle && io.in.valid) {
     result := 0.U
-    multiplicand := Mux(io.in.mulSigned === MulType.uu, ZeroExt(io.in.multiplicand, 132), SignExt(io.in.multiplicand, 132))
-    multiplier := Mux(io.in.mulSigned === MulType.ss, io.b(63) ## io.in.multiplier ## false.B, false.B ## io.in.multiplier ## false.B)
+    multiplicand := Mux(io.in.bits.mulSigned === MulType.uu, ZeroExt(io.in.bits.multiplicand, 132), SignExt(io.in.bits.multiplicand, 132))
+    multiplier := Mux(io.in.bits.mulSigned === MulType.ss, io.b(63) ## io.in.bits.multiplier ## false.B, false.B ## io.in.bits.multiplier ## false.B)
   }.elsewhen(state === busy && !io.out.valid) {
     result := pg.io.p + result + pg.io.c
     multiplicand := multiplicand << 2.U
@@ -73,11 +73,11 @@ sealed class Booth extends Module {
     multiplier := multiplier
   }
 
-  io.in.ready := state === idle
-  io.out.valid := state === busy & !multiplier.orR
-  io.out.valid  := !multiplier.orR && state === busy
-  io.out.resultLo := Mux(io.in.mulw, SignExt(result(31, 0), 64), result(63, 0))
-  io.out.resultHi := result(127, 64)
+  io.in.ready          := state === idle
+  io.out.valid         := state === busy & !multiplier.orR
+  //io.out.bits.valid  := !multiplier.orR && state === busy
+  io.out.bits.resultLo := Mux(io.in.mulw, SignExt(result(31, 0), 64), result(63, 0))
+  io.out.bits.resultHi := result(127, 64)
 }
 
 
