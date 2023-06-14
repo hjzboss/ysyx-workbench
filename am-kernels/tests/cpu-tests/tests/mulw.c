@@ -3,9 +3,9 @@
 
 
 int main() {
-  int a = 234;
-  int b = 123131;
-  int c = a * b;
+  uint64_t a = 234;
+  uint64_t b = 123131;
+  uint32_t c = (uint32_t)a * (uint32_t)b;
 
   printf("%d\n", c);
 }
