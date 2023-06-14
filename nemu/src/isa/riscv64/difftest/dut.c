@@ -20,7 +20,6 @@
 void isa_reg_display_error(bool *err_list);
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  printf("shit\n");
   bool same = true;
   bool err_list[33] = {};
   // check next pc
