@@ -137,7 +137,7 @@ sealed class Wallace() extends Module {
       var k = 0
       while(cols(k).size == 1) k = k+1
       val carry = Cat(cols.drop(k).map(_(1)).reverse)
-      (sum, Cat(carry, 0.U(k.W)))
+      (sum, Cat(carry, 0.U(k.W)), valid)
     } else {
       val columns_next = Array.fill(128)(Seq[Bool]())
       var cout1, cout2 = Seq[Bool]()
@@ -172,7 +172,7 @@ sealed class Wallace() extends Module {
     ok    -> Mux(outFire || io.flush, idle, ok)
   ))
 
-  val (a, b) = (io.a, io.b)
+  val (a, b) = (io.in.bits.multiplicand, io.in.bits.multiplier)
 
   val columns: Array[Seq[Bool]] = Array.fill(128)(Seq()) // todo: 此处是组合逻辑
   var last_x = WireInit(0.U(3.W))
