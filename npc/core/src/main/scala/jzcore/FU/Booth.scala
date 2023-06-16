@@ -1,0 +1,79 @@
+package jzcore
+
+import chisel3._
+import chisel3.util._
+import utils._
+
+// 部分积生成器
+sealed class PGenerator extends Module {
+  val io = IO(new Bundle {
+    val yAdd  = Input(Bool())
+    val y     = Input(Bool())
+    val ySub  = Input(Bool())
+    val x     = Input(UInt(132.W))
+
+    val p     = Output(UInt(132.W))
+    val c     = Output(Bool())
+  })
+  
+  val x = io.x ## false.B
+
+  val selNegative = io.yAdd & (io.y & ~io.ySub | ~io.y & io.ySub)
+  val selPositive = ~io.yAdd & (io.y & ~io.ySub | ~io.y & io.ySub)
+  val selDoubleNegative = io.yAdd & ~io.y & ~io.ySub
+  val selDoublePositive = ~io.yAdd & io.y & io.ySub
+
+  val p_tmp = VecInit(List.fill(132)(false.B))
+
+  (0 to 131).map(i => (p_tmp(i) := ~(~(selNegative & ~x(i+1)) & ~(selDoubleNegative & ~x(i)) & ~(selPositive & x(i+1)) & ~(selDoublePositive & x(i)))))
+  io.p := p_tmp.asUInt()
+  io.c := selNegative | selDoubleNegative
+} 
+
+// booth2位乘法器
+class Booth extends Module {
+  val io = IO(new Bundle {
+    val flush   = Input(Bool())
+    val in      = Flipped(Decoupled(new MultiInput))
+    val out     = Decoupled(new MultiOutput)
+  })
+
+  val inFire = io.in.valid & io.in.ready
+  val outFire = io.out.valid & io.out.ready 
+
+  val idle :: busy :: Nil = Enum(2)
+  val state = RegInit(idle)
+  state := MuxLookup(state, idle, List(
+    idle -> Mux(inFire && !io.flush, busy, idle),
+    busy -> Mux(outFire || io.flush, idle, busy)
+  ))
+
+  val result = RegInit(0.U(132.W)) // 结果寄存器
+  val multiplicand = RegInit(0.U(132.W)) // 被乘数
+  val multiplier = RegInit(0.U(66.W)) // 乘数
+
+  val pg = Module(new PGenerator)
+  pg.io.yAdd := multiplier(2)
+  pg.io.y    := multiplier(1)
+  pg.io.ySub := multiplier(0)
+  pg.io.x    := multiplicand
+
+  when(state === idle && inFire) {
+    result := 0.U
+    multiplicand := Mux(io.in.bits.mulSigned === MulType.uu, ZeroExt(io.in.bits.multiplicand, 132), SignExt(io.in.bits.multiplicand, 132))
+    multiplier := Mux(io.in.bits.mulSigned === MulType.ss, io.in.bits.multiplier(63) ## io.in.bits.multiplier ## false.B, false.B ## io.in.bits.multiplier ## false.B)
+  }.elsewhen(state === busy && !io.out.valid) {
+    result := pg.io.p + result + pg.io.c
+    multiplicand := multiplicand << 2.U
+    multiplier := multiplier >> 2.U
+  }.otherwise {
+    result := result
+    multiplicand := multiplicand
+    multiplier := multiplier
+  }
+
+  io.in.ready          := state === idle
+  io.out.valid         := state === busy & !multiplier.orR
+  io.out.bits.resultLo := Mux(io.in.bits.mulw, SignExt(result(31, 0), 64), result(63, 0))
+  io.out.bits.resultHi := result(127, 64)
+}
