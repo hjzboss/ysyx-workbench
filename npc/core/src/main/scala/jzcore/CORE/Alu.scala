@@ -255,7 +255,9 @@ class Alu extends Module {
     val ready   = Output(Bool()) // alu操作是否完成，主要作用于乘除法
   })
 
-  val mul = if(Settings.get("lowpower")) Module(new Booth) else Module(new Wallace)
+  //val mul = if(Settings.get("lowpower")) Module(new Booth) else Module(new Wallace)
+
+  val mul = Module(new Wallace)
 
   val aluOp = io.aluOp
   // 是否为乘法操作
