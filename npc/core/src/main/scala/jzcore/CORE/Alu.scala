@@ -150,7 +150,7 @@ sealed class Wallace() extends Module {
       }
 
       // 有效信号传递
-      val toNextValid = RegInit(false.B)
+      val toNextValid = dontTouch(RegInit(false.B))
       toNextValid := Mux(flush, false.B, valid)
 
       val toNextLayer = columns_next.map(_.map(x => RegEnable(x, regEnables(depth))))
@@ -158,7 +158,7 @@ sealed class Wallace() extends Module {
     }
   }
 
-  val validTmp = WireDefault(false.B) // 有效乘法数据的信号
+  val validTmp = dontTouch(WireDefault(false.B)) // 有效乘法数据的信号
 
   // 握手信号
   val inFire = io.in.valid & io.in.ready
