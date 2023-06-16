@@ -154,7 +154,7 @@ sealed class Wallace() extends Module {
       toNextValid := Mux(flush, false.B, valid)
 
       val toNextLayer = columns_next.map(_.map(x => RegEnable(x, regEnables(depth))))
-      addAll(toNextLayer, depth+1, valid, flush)
+      addAll(toNextLayer, depth+1, toNextValid, flush)
     }
   }
 
