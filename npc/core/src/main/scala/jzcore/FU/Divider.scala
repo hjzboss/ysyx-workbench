@@ -13,8 +13,16 @@ class Divider extends Module {
     val out     = Decoupled(DivOutput)
   })
 
-  val idle :: busy :: Nil = Enum(3)
+  val inFire = io.in.valid & io.in.ready
+  val outFire = io.out.valid & io.out.ready
+
+  val idle :: busy :: ok :: Nil = Enum(3)
   val state = RegInit(idle)
+  state := MuxLookup(
+    idle -> Mux(inFire && !io.flush, busy, idle),
+    busy -> Mux(),
+    ok   -> Mux(outFire || io.in.flush, idle, ok)
+  )
 
   
 }

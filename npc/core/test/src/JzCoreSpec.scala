@@ -271,6 +271,72 @@ class Wallace(len: Int, doReg: Seq[Int]) extends Module {
   }
 }
 
+// 加减交替法
+class Divider extends Module {
+  val io = IO(new Bundle {
+    val flush   = Input(Bool())
+    val in      = Flipped(Decoupled(DivInput))
+    val out     = Decoupled(DivOutput)
+  })
+
+  val done = WireDefault(false.B) // 计算完成
+
+  val inFire = io.in.valid & io.in.ready
+  val outFire = io.out.valid & io.out.ready
+
+  val idle :: compute :: check :: ok :: Nil = Enum(3)
+  val state = RegInit(idle)
+  state := MuxLookup(
+    idle    -> Mux(inFire && !io.flush, busy, idle),
+    compute -> Mux(io.flush, idle, Mux(done, ok, busy)),
+    check   -> Mux(io.flush, idle, ok), // 结果校验阶段
+    ok      -> Mux(outFire || io.in.flush, idle, ok)
+  )
+
+  val cnt = RegInit(0.U(7.W)) // 除法计数器
+  cnt := Mux(io.flush || state =/= compute, 0.U(7.W), cnt + 1.U)
+
+  // 双写符号位
+  val dividend  = SignExt(io.in.bits.dividend, 65)
+  val divisor   = SignExt(io.in.bits.divisor, 65)
+  val divisorN  = ~divisor + 1.U(65.W) // 除数取反
+
+  val quotient  = RegInit(0.U(64.W))
+  val remainder = RegInit(0.U(65.W))
+
+  val signre    = remainder(64, 63)
+  val signdi    = divisor(64, 63)
+
+  when(state === idle && inFire) {
+    quotient  := 0.U(64.W)
+    remainder := dividend
+  }.elsewhen(state === compute) {
+    when(signre === signdi) {
+      quotient := quotient(62, 0) ## 1.U(1.W)
+      when(cnt === 63.U(7.W)) {
+        remainder := remainder
+      }.otherwise {
+        remainder := (remainder(63, 0) ## 0.U(1.W)) + divisorN
+      }
+    }.otherwise {
+      quotient := quotient(62, 0) ## 0.U(1.W)
+      when(cnt === 63.U(7.W)) {
+        remainder := remainder
+      }.otherwise {
+        remainder := (remainder(63, 0) ## 0.U(1.W)) + divisor
+      }
+    }
+  }.elsewhen(state === check) {
+    // todo: check
+    
+  }
+
+  done := cnt === 63.U(7.W)
+
+  io.out.valid := state === ok
+  io.in.ready  := state === idle
+}
+
 object JzCoreSpec extends ChiselUtestTester {
   val tests = Tests {
     test("mul") {
