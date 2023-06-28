@@ -17,5 +17,11 @@ int main() {
   for(i = 0; i < N; i ++)
     check(a[i] == i);
 
+  long long c = 123456;
+  long long d = 2;
+  long long e = c / d;
+  long long f = 61728;
+  check(e == f);
+
   return 0;
 }
