@@ -21,7 +21,7 @@ class Alu extends Module {
   })
 
   val mul = Module(new Mul)
-  val div = Module(new Divider)
+  val div = Module(new Divider(64))
  
   val aluOp = io.aluOp
 
