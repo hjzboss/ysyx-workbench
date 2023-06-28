@@ -17,5 +17,11 @@ int main() {
   for(i = 0; i < N; i ++)
     check(a[i] == i);
 
+  uint64_t c = 123456;
+  uint64_t d = 2;
+  uint64_t e = c / d;
+  uint64_t f = 61728;
+  check(e == f);
+
   return 0;
 }
