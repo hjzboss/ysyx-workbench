@@ -43,7 +43,7 @@ class Alu extends Module {
   div.io.in.bits.divisor        := io.opB
   div.io.in.bits.divw           := aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.remuw || aluOp === AluOp.remw
   div.io.in.bits.divSigned      := aluOp === AluOp.div || aluOp === AluOp.divw || aluOp === AluOp.rem || aluOp === AluOp.remw
-  div.io.out.bits.ready         := !io.stall
+  div.io.out.ready              := !io.stall
   div.io.flush                  := io.flush
 
   // xlen computation
