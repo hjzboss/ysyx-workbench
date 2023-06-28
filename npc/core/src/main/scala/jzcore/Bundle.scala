@@ -216,3 +216,15 @@ class MultiOutput extends Bundle {
   val resultHi        = Output(UInt(64.W))
   val resultLo        = Output(UInt(64.W))
 }
+
+class DivInput extends Bundle {
+  val dividend        = Output(UInt(64.W))
+  val divisor         = Output(UInt(64.W))
+  val divw            = Output(Bool())
+  val divSigned       = Output(Bool())
+}
+
+class DivOutput extends Bundle {
+  val quotient        = Output(UInt(64.W))
+  val remainder       = Output(UInt(64.W))
+}

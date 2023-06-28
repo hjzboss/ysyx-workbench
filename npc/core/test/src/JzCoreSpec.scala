@@ -6,6 +6,7 @@ import chiseltest.formal._
 import chiseltest.formal.BoundedCheck
 import utest._
 import utils._
+import jzcore._
 
 /*
 class BoothTest1 extends Module {
@@ -271,10 +272,249 @@ class Wallace(len: Int, doReg: Seq[Int]) extends Module {
   }
 }
 
+// booth除法，适用于定点数
+class Divider(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val flush   = Input(Bool())
+    val in      = Flipped(Decoupled(new DivInput))
+    val out     = Decoupled(new DivOutput)
+  })
+
+  val done = WireDefault(false.B) // 计算完成
+
+  val inFire = io.in.valid & io.in.ready
+  val outFire = io.out.valid & io.out.ready
+
+  val idle :: compute :: check :: ok :: Nil = Enum(4)
+  val state = RegInit(idle)
+  state := MuxLookup(state, idle, List(
+      idle    -> Mux(inFire && !io.flush, compute, idle),
+      compute -> Mux(io.flush, idle, Mux(done, check, compute)),
+      check   -> Mux(io.flush, idle, ok), // 结果校验阶段
+      ok      -> Mux(outFire || io.flush, idle, ok)
+    )
+  )
+
+  val cnt = RegInit(0.U(7.W)) // 除法计数器
+  cnt := Mux(io.flush || state =/= compute, 0.U(7.W), cnt + 1.U)
+  done := cnt === (len-1).U(7.W)
+
+  // 双写符号位
+  val dividend  = SignExt(io.in.bits.dividend, len+1)
+  val divisor   = SignExt(io.in.bits.divisor, len+1)
+  val divisorN  = ~divisor + 1.U((len+1).W)
+
+  val quotient  = RegInit(0.U(len.W))
+  val remainder = RegInit(0.U((len+1).W))
+
+  val signre    = remainder(len, len-1)
+  val signdi    = divisor(len, len-1)
+  val zero      = !remainder.orR 
+  val quoTmp    = WireDefault(0.U(len.W))
+
+  when(state === idle && inFire) {
+    quotient  := 0.U(len.W)
+    remainder := dividend
+  }.elsewhen(state === compute) {
+    when(signre === signdi) {
+      quoTmp := quotient(len-2, 0) ## 1.U(1.W)
+      when(cnt === 7.U(7.W)) {
+        quotient  := ~quoTmp(len-1) ## quoTmp(len-2, 0)  // 符号位取反
+        remainder := remainder
+      }.otherwise {
+        quotient  := quoTmp
+        remainder := (remainder(len-1, 0) ## 0.U(1.W)) + divisorN
+      }
+    }.otherwise {
+      quoTmp := quotient(len-2, 0) ## 0.U(1.W)
+      when(cnt === 7.U(7.W)) {
+        quotient  := ~quoTmp(len-1) ## quoTmp(len-2, 0)  // 符号位取反
+        remainder := remainder
+      }.otherwise {
+        quotient  := quoTmp
+        remainder := (remainder(len-1, 0) ## 0.U(1.W)) + divisor
+      }
+    }
+  }.elsewhen(state === check) {
+    quotient := Mux((zero && signdi === 3.U(2.W)) || (!zero && quotient(len-1)), quotient + 1.U, quotient) // 修正商
+    remainder := Mux(zero && remainder(len, len-1) === signdi, remainder + divisorN, Mux(!zero && remainder(len, len-1) =/= signdi, remainder + divisor, remainder)) // 修正余数
+  }.otherwise {
+    quotient := quotient
+    remainder := remainder
+  }
+
+  io.in.ready := state === idle
+  io.out.valid := state === ok
+  io.out.bits.quotient := quotient
+  io.out.bits.remainder := remainder
+
+  printf("quotient=%x, remainder=%x\n", quotient, remainder)
+  when(state === ok) {
+    val ref = io.in.bits.dividend / io.in.bits.divisor
+    val rem = io.in.bits.dividend % io.in.bits.divisor
+    printf("quotient: dut=%x, ref=%x\n", quotient, ref)
+    printf("remainder: dut=%x, ref=%x\n", remainder, rem)
+    chisel3.assert(io.out.bits.quotient === ref)
+    chisel3.assert(io.out.bits.remainder === rem)
+  }
+}
+
+// 恢复余数法
+class Div(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val flush   = Input(Bool())
+    val in      = Flipped(Decoupled(new DivInput))
+    val out     = Decoupled(new DivOutput)
+  })
+
+  // 取反函数
+  def getN(num: UInt): UInt = ~num + 1.U
+
+  val done = WireDefault(false.B) // 除法结束标志
+  val inFire = io.in.valid & io.in.ready
+  val outFire = io.out.valid & io.out.ready
+
+  val idle :: compute :: recover :: ok :: Nil = Enum(4)
+  val state = RegInit(idle)
+  state := MuxLookup(state, idle, List(
+    idle    -> Mux(inFire && !io.flush, compute, idle),
+    compute -> Mux(io.flush, idle, Mux(done, recover, compute)),
+    recover -> Mux(io.flush, idle, ok),
+    ok      -> Mux(io.flush || outFire, idle, ok)
+  ))
+
+  val neg       = Wire(Bool())
+  val dividend  = RegInit(0.U((2*len).W))
+  val divisor   = RegInit(0.U(len.W))
+  val quotient  = RegInit(0.U(len.W))
+  val remainder = RegInit(0.U(len.W))
+  val cnt       = RegInit(0.U(8.W))
+  cnt          := Mux(state === compute, cnt + 1.U, 0.U)
+
+  io.in.ready := state === idle
+  io.out.valid := state === ok
+
+  when(io.in.bits.divw) {
+    val tmp     = WireDefault(0.U((len/2+1).W)) // 中间相减的结果
+    done       := cnt === (len/2-1).U
+    neg        := io.in.bits.dividend(len/2-1) ^ io.in.bits.divisor(len/2-1)
+
+    divisor    := Mux(state === idle && inFire, Mux(io.in.bits.divisor(len/2-1) && io.in.bits.divSigned, getN(io.in.bits.divisor), io.in.bits.divisor), divisor)
+
+    when(state === idle && inFire) {
+      quotient  := 0.U(len.W)
+      // 取绝对值
+      dividend := Mux(io.in.bits.dividend(len/2-1) && io.in.bits.divSigned, ZeroExt(getN(io.in.bits.dividend(len/2-1, 0)), 2*len), ZeroExt(io.in.bits.dividend(len/2-1, 0), 2*len))
+    }.elsewhen(state === compute) {
+      tmp := dividend(len-1, len/2-1) - (0.U(1.W) ## divisor(len/2-1, 0))
+      when(tmp(len/2)) {
+        // 为负数被除数保持不变, 商0
+        dividend := dividend ## 0.U(1.W)
+        quotient  := quotient(len-2, 0) ## 0.U(1.W)
+      }.otherwise {
+        val remTmp = tmp ## dividend(len/2-2, 0)
+        dividend := remTmp(len-2) ## 0.U(1.W) // 左移一位
+        quotient  := quotient(len-2, 0) ## 1.U(1.W)
+      }
+    }.elsewhen(state === recover) {
+      // 修正
+      when(neg) {
+        quotient := Mux(quotient(len/2-1), quotient, getN(quotient))
+      }.otherwise {
+        quotient := Mux(quotient(len/2-1), getN(quotient), quotient)
+      }
+    }.otherwise {
+      dividend := dividend
+      quotient := quotient
+    }
+
+    // 余数
+    when(state === idle) {
+      remainder := 0.U(len.W)
+    }.elsewhen(state === recover) {
+      remainder := Mux(dividend(len-1) ^ io.in.bits.dividend(len/2-1), getN(dividend(len-1, len/2)), dividend(len-1, len/2))
+    }.otherwise {
+      remainder := remainder
+    }
+
+    io.out.bits.quotient := SignExt(quotient(len/2-1, 0), len)
+    io.out.bits.remainder := SignExt(remainder(len/2-1, 0), len)
+
+    when(state === ok) {
+      //val ref = io.in.bits.dividend / io.in.bits.divisor
+      //val rem = io.in.bits.dividend % io.in.bits.divisor
+      val ref = 2.U(64.W)
+      val rem = 0.U(64.W)
+      printf("quotient: dut=%x, ref=%x\n", quotient, ref)
+      printf("remainder: dut=%x, ref=%x\n", remainder, rem)
+      chisel3.assert(io.out.bits.quotient === ref)
+      chisel3.assert(io.out.bits.remainder === rem)
+    }
+  }.otherwise {
+    val tmp     = WireDefault(0.U((len+1).W)) // 中间相减的结果
+    done       := cnt === (len-1).U
+    neg        := io.in.bits.dividend(len-1) ^ io.in.bits.divisor(len-1)
+
+    divisor    := Mux(state === idle && inFire, Mux(io.in.bits.divisor(len-1) && io.in.bits.divSigned, getN(io.in.bits.divisor), io.in.bits.divisor), divisor)
+
+    when(state === idle && inFire) {
+      quotient  := 0.U(len.W)
+      // 取绝对值
+      dividend := Mux(io.in.bits.dividend(len-1) && io.in.bits.divSigned, 0.U(len.W) ## getN(io.in.bits.dividend), 0.U(len.W) ## io.in.bits.dividend)
+    }.elsewhen(state === compute) {
+      tmp := dividend(2*len-1, len-1) - (0.U(1.W) ## divisor)
+      when(tmp(len)) {
+        // 为负数被除数保持不变, 商0
+        dividend := dividend ## 0.U(1.W)
+        quotient  := quotient(len-2, 0) ## 0.U(1.W)
+      }.otherwise {
+        val remTmp = tmp ## dividend(len-2, 0)
+        dividend := remTmp(2*len-2, 0) ## 0.U(1.W) // 左移一位
+        quotient  := quotient(len-2, 0) ## 1.U(1.W)
+      }
+    }.elsewhen(state === recover) {
+      // 修正
+      when(neg) {
+        quotient := Mux(quotient(len-1), quotient, getN(quotient))
+      }.otherwise {
+        quotient := Mux(quotient(len-1), getN(quotient), quotient)
+      }
+    }.otherwise {
+      dividend := dividend
+      quotient := quotient
+    }
+
+    // 余数
+    when(state === idle) {
+      remainder := 0.U(len.W)
+    }.elsewhen(state === recover) {
+      remainder := Mux(dividend(2*len-1) ^ io.in.bits.dividend(len-1), getN(dividend(2*len-1, len)), dividend(2*len-1, len))
+    }.otherwise {
+      remainder := remainder
+    }
+
+    io.out.bits.quotient := quotient
+    io.out.bits.remainder := remainder
+
+    when(state === ok) {
+      //val ref = io.in.bits.dividend / io.in.bits.divisor
+      //val rem = io.in.bits.dividend % io.in.bits.divisor
+      val ref = ~1.U(64.W)
+      val rem = ~0.U(64.W)
+      printf("quotient: dut=%x, ref=%x\n", quotient, ref)
+      printf("remainder: dut=%x, ref=%x\n", remainder, rem)
+      chisel3.assert(io.out.bits.quotient === ref)
+      chisel3.assert(io.out.bits.remainder === rem)
+    }
+  }
+
+  printf("quotient=%x, dividend=%x\n", quotient, dividend)
+}
+
 object JzCoreSpec extends ChiselUtestTester {
   val tests = Tests {
     test("mul") {
-      testCircuit(new Wallace(64, Seq[Int](0, 1, 2, 3, 4))) {
+      testCircuit(new Div(64)) {
         dut =>
           /*
           dut.io.a.poke("h0".U(64.W))
@@ -289,12 +529,17 @@ object JzCoreSpec extends ChiselUtestTester {
           }
           dut.clock.step()
           */
-          dut.io.a.poke(8.U(64.W))
-          dut.io.b.poke(9.U(64.W))
+          dut.io.in.valid.poke(true.B)
+          dut.io.in.bits.dividend.poke("hffff_ffff_0000_0004".U(64.W))
+          //dut.io.in.bits.dividend.poke("h0000_0000_0000_0100".U(64.W))
+          dut.io.in.bits.divisor.poke(2.U(64.W))
+          dut.io.in.bits.divSigned.poke(true.B)
+          dut.io.in.bits.divw.poke(true.B)
+          dut.io.out.ready.poke(false.B)
           while(true) {
             dut.clock.step()
           }
-          dut.io.result.expect(72.U)
+          //dut.io.result.expect(72.U)
       }
     }
   }

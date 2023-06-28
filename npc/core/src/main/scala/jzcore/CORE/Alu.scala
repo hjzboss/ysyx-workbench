@@ -21,11 +21,11 @@ class Alu extends Module {
   })
 
   val mul = Module(new Mul)
-
+  val div = Module(new Divider)
+ 
   val aluOp = io.aluOp
-  // 是否为乘法操作
+
   val mulOp                      = aluOp === AluOp.mul || aluOp === AluOp.mulh || aluOp === AluOp.mulw || aluOp === AluOp.mulhsu || aluOp === AluOp.mulhu
-  
   mul.io.in.valid               := mulOp
   mul.io.in.bits.multiplicand   := io.opA
   mul.io.in.bits.multiplier     := io.opB
@@ -36,6 +36,15 @@ class Alu extends Module {
                                   ))
   mul.io.out.ready              := !io.stall
   mul.io.flush                  := io.flush
+
+  val divOp                      = aluOp === AluOp.div || aluOp === AluOp.divu || aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.rem || aluOp === AluOp.remu || aluOp === AluOp.remuw || aluOp === AluOp.remw
+  div.io.in.valid               := divOp
+  div.io.in.bits.dividend       := io.opA
+  div.io.in.bits.divisor        := io.opB
+  div.io.in.bits.divw           := aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.remuw || aluOp === AluOp.remw
+  div.io.in.bits.divSigned      := aluOp === AluOp.div || aluOp === AluOp.divw || aluOp === AluOp.rem || aluOp === AluOp.remw
+  div.io.out.bits.ready         := !io.stall
+  div.io.flush                  := io.flush
 
   // xlen computation
   val opA = io.opA
@@ -59,8 +68,16 @@ class Alu extends Module {
     AluOp.srl       -> (opA >> opB(5, 0)),
     AluOp.sra       -> (opA.asSInt() >> opB(5, 0)).asUInt(),
     // todo
-    AluOp.div       -> (opA.asSInt() / opB.asSInt()).asUInt(),
-    AluOp.divu      -> (opA / opB),
+    //AluOp.div       -> (opA.asSInt() / opB.asSInt()).asUInt(),
+    //AluOp.divu      -> (opA / opB),
+    AluOp.div       -> div.io.out.bits.quotient,
+    AluOp.divu      -> div.io.out.bits.quotient,
+    AluOp.divw      -> div.io.out.bits.quotient,
+    AluOp.divuw     -> div.io.out.bits.quotient,
+    AluOp.rem       -> div.io.out.bits.remainder,
+    AluOp.remu      -> div.io.out.bits.remainder,
+    AluOp.remw      -> div.io.out.bits.remainder,
+    AluOp.remuw     -> div.io.out.bits.remainder,
     AluOp.mul       -> mul.io.out.bits.resultLo,
     AluOp.mulw      -> mul.io.out.bits.resultLo,
     //AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
@@ -80,20 +97,20 @@ class Alu extends Module {
     AluOp.addw      -> (opAw + opBw),
     AluOp.subw      -> (opAw.asSInt() - opBw.asSInt()).asUInt(),
     //AluOp.mulw      -> (opAw * opBw),
-    AluOp.divw      -> (opAw.asSInt() / opBw.asSInt()).asUInt(), // todo
-    AluOp.divuw     -> (opAw / opBw),
+    //AluOp.divw      -> (opAw.asSInt() / opBw.asSInt()).asUInt(), // todo
+    //AluOp.divuw     -> (opAw / opBw),
     AluOp.sllw      -> (opAw << opBw(4, 0)),
     AluOp.srlw      -> (opAw >> opBw(4, 0)),
     AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0)).asUInt(),
-    AluOp.remw      -> (opAw.asSInt() % opBw.asSInt()).asUInt(),
-    AluOp.remuw     -> (opAw % opBw),
+    //AluOp.remw      -> (opAw.asSInt() % opBw.asSInt()).asUInt(),
+    //AluOp.remuw     -> (opAw % opBw),
   ))
 
   val aluOutw = SignExt(aluW(31, 0), 64)
   val isOne = aluOut.asUInt() === 1.U(64.W)
   // isWop 不会包含mulw的情况，mulw由乘法器的输出决定
-  val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.divw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw || aluOp === AluOp.remw || aluOp === AluOp.divuw || aluOp === AluOp.remuw
+  val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw
   io.aluOut := Mux(isWop, aluOutw, aluOut)
   io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(aluOp === AluOp.beq || aluOp === AluOp.bne || aluOp === AluOp.blt || aluOp === AluOp.bltu || aluOp === AluOp.bge || aluOp === AluOp.bgeu, isOne, false.B))
-  io.ready  := Mux(mulOp, mul.io.out.valid, true.B) // todo
+  io.ready  := Mux(mulOp, mul.io.out.valid, Mux(divOp, div.io.out.valid, true.B)) // todo
 }
