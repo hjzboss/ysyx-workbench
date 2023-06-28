@@ -79,7 +79,7 @@ class Divider(len: Int) extends Module {
         quotient  := quotient(len-2, 0) ## 0.U(1.W)
       }.otherwise {
         val remTmp = tmp ## dividend(len/2-2, 0)
-        dividend := remTmp(len-2) ## 0.U(1.W)
+        dividend := remTmp(len-2, 0) ## 0.U(1.W)
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
     }.elsewhen(state === recover) {

@@ -413,7 +413,7 @@ class Div(len: Int) extends Module {
         quotient  := quotient(len-2, 0) ## 0.U(1.W)
       }.otherwise {
         val remTmp = tmp ## dividend(len/2-2, 0)
-        dividend := remTmp(len-2) ## 0.U(1.W) // 左移一位
+        dividend := remTmp(len-2, 0) ## 0.U(1.W) // 左移一位
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
     }.elsewhen(state === recover) {
@@ -443,7 +443,7 @@ class Div(len: Int) extends Module {
     when(state === ok) {
       //val ref = io.in.bits.dividend / io.in.bits.divisor
       //val rem = io.in.bits.dividend % io.in.bits.divisor
-      val ref = 2.U(64.W)
+      val ref = "h0000000000375f00".U(64.W)
       val rem = 0.U(64.W)
       printf("quotient: dut=%x, ref=%x\n", quotient, ref)
       printf("remainder: dut=%x, ref=%x\n", remainder, rem)
@@ -530,9 +530,9 @@ object JzCoreSpec extends ChiselUtestTester {
           dut.clock.step()
           */
           dut.io.in.valid.poke(true.B)
-          dut.io.in.bits.dividend.poke("hffff_ffff_0000_0004".U(64.W))
+          dut.io.in.bits.dividend.poke("h0000000000375f00".U(64.W))
           //dut.io.in.bits.dividend.poke("h0000_0000_0000_0100".U(64.W))
-          dut.io.in.bits.divisor.poke(2.U(64.W))
+          dut.io.in.bits.divisor.poke(1.U(64.W))
           dut.io.in.bits.divSigned.poke(true.B)
           dut.io.in.bits.divw.poke(true.B)
           dut.io.out.ready.poke(false.B)
