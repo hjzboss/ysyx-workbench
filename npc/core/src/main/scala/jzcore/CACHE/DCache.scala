@@ -220,10 +220,10 @@ class DCache extends Module {
   (0 to 3).map(i => (arbList64(i).io.tagIn := arb64Tag(i)))
 
   val arb4 = Module(new CohArbiter(4))
-  val arb4CenIn = Wire(Vec(4, Bool()))
-  val arb4TagIn = Wire(Vec(4, UInt(22.W)))
-  val arb4NoIn  = Wire(Vec(4, UInt(2.W)))
-  val arb4IndexIn = Wire(Vec(4, UInt(6.W)))
+  val arb4CenIn = VecInit(List.fill(4)(false.B))
+  val arb4TagIn = VecInit(List.fill(4)(0.U(22.W)))
+  val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
+  val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
   (0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
   arb4.io.cenIn := arb4CenIn
   arb4.io.indexIn := arb4IndexIn
@@ -370,13 +370,13 @@ class DCache extends Module {
   when(state === coherence1) {
     // coherence
     io.sram4_addr := arb4.io.indexOut
-    io.sram4_cen  := ramCen(0)
+    io.sram4_cen  := !ramCen(0)
     io.sram5_addr := arb4.io.indexOut
-    io.sram5_cen  := ramCen(1)
+    io.sram5_cen  := !ramCen(1)
     io.sram6_addr := arb4.io.indexOut
-    io.sram6_cen  := ramCen(2)
+    io.sram6_cen  := !ramCen(2)
     io.sram7_addr := arb4.io.indexOut
-    io.sram7_cen  := ramCen(3)
+    io.sram7_cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire) {
     // read data
     io.sram4_addr := io.ctrlIO.bits.addr(9, 4)
