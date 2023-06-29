@@ -285,9 +285,26 @@ class DCache extends Module {
     dataBlock := dataBlock
   }
 
+  // flush mate array
   when(state === writeback2 && brespFire && io.coherence.valid) {
-    metaArray(colNoReg)(colIndexReg).valid := false.B
-    metaArray(colNoReg)(colIndexReg).dirty := false.B
+    switch(colNoReg) {
+      is(0.U) {
+        metaArray(0)(colIndexReg).valid := false.B
+        metaArray(0)(colIndexReg).dirty := false.B
+      }
+      is(1.U) {
+        metaArray(1)(colIndexReg).valid := false.B
+        metaArray(1)(colIndexReg).dirty := false.B
+      }
+      is(2.U) {
+        metaArray(2)(colIndexReg).valid := false.B
+        metaArray(2)(colIndexReg).dirty := false.B
+      }
+      is(3.U) {
+        metaArray(3)(colIndexReg).valid := false.B
+        metaArray(3)(colIndexReg).dirty := false.B
+      }
+    }
   }
 
   // ----------------------------write back and allocate--------------------------------
