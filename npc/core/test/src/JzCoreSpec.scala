@@ -497,10 +497,10 @@ class Div(len: Int) extends Module {
     io.out.bits.remainder := remainder
 
     when(state === ok) {
-      //val ref = io.in.bits.dividend / io.in.bits.divisor
-      //val rem = io.in.bits.dividend % io.in.bits.divisor
-      val ref = ~1.U(64.W)
-      val rem = ~0.U(64.W)
+      val ref = io.in.bits.dividend / io.in.bits.divisor
+      val rem = io.in.bits.dividend % io.in.bits.divisor
+      //val ref = ~1.U(64.W)
+      //val rem = ~0.U(64.W)
       printf("quotient: dut=%x, ref=%x\n", quotient, ref)
       printf("remainder: dut=%x, ref=%x\n", remainder, rem)
       chisel3.assert(io.out.bits.quotient === ref)
@@ -509,6 +509,33 @@ class Div(len: Int) extends Module {
   }
 
   printf("quotient=%x, dividend=%x\n", quotient, dividend)
+}
+
+// 一致性写回的多路选择器（仲裁）
+class CohArbiter(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val cenIn   = Input(Vec(len, Bool())) // valid & dirty
+    val noIn    = Input(Vec(len, UInt(2.W)))
+    val indexIn = Input(Vec(len, UInt(6.W)))
+    val tagIn   = Input(Vec(len, UInt(22.W)))
+
+    val noOut   = Output(UInt(2.W))
+    val indexOut= Output(UInt(6.W))
+    val tagOut  = Output(UInt(22.W))
+  })
+
+  var flag: Boolean = false
+
+  for (i <- 0 until len) {
+    if(!flag) {
+      when(io.cenIn(i) === true.B) {
+        io.noOut := io.noIn(i)
+        io.indexOut := io.indexIn(i)
+        io.tagOut := io.tagIn(i)
+        flag = true
+      }
+    }
+  }
 }
 
 object JzCoreSpec extends ChiselUtestTester {
@@ -530,11 +557,11 @@ object JzCoreSpec extends ChiselUtestTester {
           dut.clock.step()
           */
           dut.io.in.valid.poke(true.B)
-          dut.io.in.bits.dividend.poke("h0000000000375f00".U(64.W))
+          dut.io.in.bits.dividend.poke(123456123.U(64.W))
           //dut.io.in.bits.dividend.poke("h0000_0000_0000_0100".U(64.W))
-          dut.io.in.bits.divisor.poke(1.U(64.W))
+          dut.io.in.bits.divisor.poke(1231234.U(64.W))
           dut.io.in.bits.divSigned.poke(true.B)
-          dut.io.in.bits.divw.poke(true.B)
+          dut.io.in.bits.divw.poke(false.B)
           dut.io.out.ready.poke(false.B)
           while(true) {
             dut.clock.step()

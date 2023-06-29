@@ -35,6 +35,8 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.csrWaddr    := CsrAddr.nul
   exuOutReset.csrWen      := false.B
   exuOutReset.csrValue    := 0.U(64.W)
+  exuOutReset.coherence   := false.B
+  // debug
   exuOutReset.ebreak      := false.B
   exuOutReset.haltRet     := 0.U(64.W)
 
