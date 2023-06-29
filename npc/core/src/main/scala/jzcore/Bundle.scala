@@ -233,5 +233,5 @@ class DivOutput extends Bundle {
 
 class CoherenceIO extends Bundle {
   val valid           = Output(Bool())
-  val ready           = Output(Bool())
+  val ready           = Input(Bool())
 }
