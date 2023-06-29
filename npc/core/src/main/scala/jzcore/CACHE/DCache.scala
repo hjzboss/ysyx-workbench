@@ -150,7 +150,7 @@ class DCache extends Module {
     ok          -> Mux(cwdataFire, idle, ok)
   ))
 
-  victimWay             := Mux(state === tagCompare, randCount, victimWay)
+  victimWay          := Mux(state === tagCompare, randCount, victimWay)
 
   // meta data
   val metaInit        = Wire(new MetaData)
@@ -243,6 +243,13 @@ class DCache extends Module {
   val ramCen = VecInit(List.fill(4)(false.B))
   (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.cenOut))
 
+  val colTagReg = RegInit(0.U(22.W))
+  val colIndexReg = RegInit(0.U(6.W))
+  val colNoReg  = RegInit(0.U(2.W))
+  colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
+  colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
+  colNoReg  := Mux(state === coherence2, arb4.io.colNoReg, colNoReg)
+
   val colOver = Wire(Bool()) // coherence over
   colOver := !(dirtyArray(0).asUInt.orR | dirtyArray(1).asUInt.orR | dirtyArray(2).asUInt.orR | dirtyArray(3).asUInt.orR) 
   io.coherence.ready := colOver
@@ -276,6 +283,11 @@ class DCache extends Module {
                   ))
   }.otherwise {
     dataBlock := dataBlock
+  }
+
+  when(state === writeback2 && brespFire && io.coherence.valid) {
+    metaArray(colNoReg)(colIndexReg).valid := false.B
+    metaArray(colNoReg)(colIndexReg).dirty := false.B
   }
 
   // ----------------------------write back and allocate--------------------------------
@@ -320,7 +332,7 @@ class DCache extends Module {
   io.axiWaddrIO.valid     := state === writeback1 || wState === addr_trans
   //io.axiWaddrIO.bits.addr := burstAddr
   //io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
-  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(arb4.io.tagOut, arb4.io.indexOut, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), burstAddr)
+  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), burstAddr)
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
