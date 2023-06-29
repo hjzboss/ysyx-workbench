@@ -20,7 +20,7 @@ class LSU extends Module {
     val dcacheCtrl  = Decoupled(new CacheCtrlIO)
     val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
     val dcacheWrite = Decoupled(new CacheWriteIO)
-    val dcacheCoh   = Decoupled(Bool())
+    val dcacheCoh   = new CoherenceIO
 
     /*
     // axi总线访存接口，用于外设的访问
@@ -90,7 +90,7 @@ class LSU extends Module {
   io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
 
   // coherence
-  io.dcacheCoh.valid            := 
+  io.dcacheCoh.valid            := io.in.coherence
 
   /*
   // load状态机
