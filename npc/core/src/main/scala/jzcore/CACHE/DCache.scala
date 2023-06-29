@@ -203,7 +203,7 @@ class DCache extends Module {
   // -----------------------------------coherence---------------------------------------
   val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
   val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
-  for(i <- 0 to 64; j <- 0 to 3) {
+  for(i <- 0 to 63; j <- 0 to 3) {
     dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
   }
   val arb64Index = List.fill(4)(Wire(Vec(64, UInt(6.W))))
