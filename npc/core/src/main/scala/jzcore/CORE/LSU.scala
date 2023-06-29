@@ -89,6 +89,9 @@ class LSU extends Module {
   io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
 
+  // coherence
+  io.dcacheCoh.valid            := 
+
   /*
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)

@@ -41,7 +41,7 @@ class DCache extends Module {
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
     val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
     val rdataIO         = Decoupled(new CacheReadIO)
-    val coherence       = Flipped(Decoupled(Bool()))
+    val coherence       = Flipped(Decoupled)
 
     // ram, dataArray
     val sram4_rdata     = Input(UInt(128.W))
