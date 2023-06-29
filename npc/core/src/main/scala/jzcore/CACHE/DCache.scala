@@ -248,7 +248,7 @@ class DCache extends Module {
   val colNoReg  = RegInit(0.U(2.W))
   colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
   colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
-  colNoReg  := Mux(state === coherence2, arb4.io.colNoReg, colNoReg)
+  colNoReg  := Mux(state === coherence2, arb4.io.noOut, colNoReg)
 
   val colOver = Wire(Bool()) // coherence over
   colOver := !(dirtyArray(0).asUInt.orR | dirtyArray(1).asUInt.orR | dirtyArray(2).asUInt.orR | dirtyArray(3).asUInt.orR) 
