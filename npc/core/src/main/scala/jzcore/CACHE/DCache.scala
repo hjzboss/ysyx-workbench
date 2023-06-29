@@ -20,6 +20,10 @@ sealed class CohArbiter(len: Int) extends Module {
 
   var flag: Boolean = false
 
+  io.noOut := 0.U
+  io.tagOut := 0.U
+  io.indexOut := 0.U
+  io.cenOut := false.B
   for (i <- 0 until len) {
     if(!flag) {
       when(io.cenIn(i) === true.B) {
