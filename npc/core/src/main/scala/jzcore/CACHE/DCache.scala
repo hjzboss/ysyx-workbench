@@ -231,7 +231,7 @@ class DCache extends Module {
   arb4.io.tagIn := arb4TagIn
 
   val ramCenPre = WireDefault(0.U(4.W))
-  ramCenPre := ListLookup(arb4.io.noOut, List(
+  ramCenPre := LookupTree(arb4.io.noOut, List(
     0.U -> 1.U,
     1.U -> 2.U,
     2.U -> 4.U,
