@@ -416,7 +416,7 @@ class Div(len: Int) extends Module {
         dividend := remTmp(len-2, 0) ## 0.U(1.W) // 左移一位
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
-    }.elsewhen(state === recover) {
+    }.elsewhen(state === recover && io.in.bits.divSigned) {
       // 修正
       when(neg) {
         quotient := Mux(quotient(len/2-1), quotient, getN(quotient))
@@ -432,7 +432,7 @@ class Div(len: Int) extends Module {
     when(state === idle) {
       remainder := 0.U(len.W)
     }.elsewhen(state === recover) {
-      remainder := Mux(dividend(len-1) ^ io.in.bits.dividend(len/2-1), getN(dividend(len-1, len/2)), dividend(len-1, len/2))
+      remainder := Mux(io.in.bits.divSigned && (dividend(len-1) ^ io.in.bits.dividend(len/2-1)), getN(dividend(len-1, len/2)), dividend(len-1, len/2))
     }.otherwise {
       remainder := remainder
     }
@@ -472,7 +472,7 @@ class Div(len: Int) extends Module {
         dividend := remTmp(2*len-2, 0) ## 0.U(1.W) // 左移一位
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
-    }.elsewhen(state === recover) {
+    }.elsewhen(state === recover && io.in.bits.divSigned) {
       // 修正
       when(neg) {
         quotient := Mux(quotient(len-1), quotient, getN(quotient))
@@ -488,7 +488,7 @@ class Div(len: Int) extends Module {
     when(state === idle) {
       remainder := 0.U(len.W)
     }.elsewhen(state === recover) {
-      remainder := Mux(dividend(2*len-1) ^ io.in.bits.dividend(len-1), getN(dividend(2*len-1, len)), dividend(2*len-1, len))
+      remainder := Mux(io.in.bits.divSigned && (dividend(2*len-1) ^ io.in.bits.dividend(len-1)), getN(dividend(2*len-1, len)), dividend(2*len-1, len))
     }.otherwise {
       remainder := remainder
     }
@@ -557,10 +557,10 @@ object JzCoreSpec extends ChiselUtestTester {
           dut.clock.step()
           */
           dut.io.in.valid.poke(true.B)
-          dut.io.in.bits.dividend.poke(123456123.U(64.W))
+          dut.io.in.bits.dividend.poke("h8000000000000000".U(64.W))
           //dut.io.in.bits.dividend.poke("h0000_0000_0000_0100".U(64.W))
-          dut.io.in.bits.divisor.poke(1231234.U(64.W))
-          dut.io.in.bits.divSigned.poke(true.B)
+          dut.io.in.bits.divisor.poke("h000000000000000a".U(64.W))
+          dut.io.in.bits.divSigned.poke(false.B)
           dut.io.in.bits.divw.poke(false.B)
           dut.io.out.ready.poke(false.B)
           while(true) {
