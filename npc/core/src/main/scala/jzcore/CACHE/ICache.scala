@@ -128,7 +128,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   /*
   val validReg           = RegInit(false.B)
   validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, Mux(io.stage3Stall, validReg, io.validIn)))*/
-  io.validOut           := validReg
+  //io.validOut           := validReg
 
   // pipline reg
   val regInit            = Wire(new Stage2IO)

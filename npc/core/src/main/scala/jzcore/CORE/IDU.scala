@@ -104,8 +104,8 @@ class IDU extends Module with HasInstrType{
   rf.io.wen           := io.regWrite.wen
   rf.io.waddr         := io.regWrite.rd
   rf.io.wdata         := io.regWrite.value
-  rf.io.clock         := clock
-  rf.io.reset         := reset
+  //rf.io.clock         := clock
+  //rf.io.reset         := reset
   
   val csrRaddr         = Wire(UInt(3.W))
   csrRaddr            := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddrPre))
@@ -113,8 +113,8 @@ class IDU extends Module with HasInstrType{
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
-  csrReg.io.clock     := clock
-  csrReg.io.reset     := reset
+  //csrReg.io.clock     := clock
+  //csrReg.io.reset     := reset
   // exception
   csrReg.io.exception := io.csrWrite.exception
   csrReg.io.epc       := io.csrWrite.epc(31, 0)
