@@ -36,7 +36,7 @@ class ID_REG extends Module with HasResetVector {
   //val validReg = RegInit(false.B)
   //validReg := Mux(io.stall, validReg, Mux(io.flush, false.B, io.validIn))
 
-  //io.out := idReg
+  io.out := idReg
   //io.validOut := validReg
 
   /*
