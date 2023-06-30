@@ -10,7 +10,7 @@ object Elaborate extends App {
   } else {
     //(new chisel3.stage.ChiselStage).execute(args, generator)
     (new chisel3.stage.ChiselStage).execute(args, Seq(
-      chisel3.stage.ChiselGeneratorAnnotation(() => new GCD()),
+      chisel3.stage.ChiselGeneratorAnnotation(() => new JzCore()),
       firrtl.stage.RunFirrtlTransformAnnotation(new AddModulePrefix()),
       ModulePrefixAnnotation("ysyx_22050853_")
     ))
