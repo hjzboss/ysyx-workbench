@@ -535,10 +535,10 @@ class JzCore extends Module {
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 
+  wbu.io.in         <> wbReg.io.out
   /*
   wbReg.io.lsFlagIn <> lsu.io.lsFlag
   io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
-  wbu.io.in         <> wbReg.io.out
 
   ifu.io.debug      <> icache.io.debugIn
   idReg.io.debugIn  <> icache.io.debugOut
