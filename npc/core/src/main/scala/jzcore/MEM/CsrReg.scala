@@ -2,6 +2,7 @@ package jzcore
 
 import chisel3._
 import chisel3.util._
+import utils._
 
 /*
 class CsrReg extends BlackBox {
