@@ -95,12 +95,13 @@ sealed class CacheStage1 extends Module {
 
 sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
+    /*
     // debug
     val debugIn         = Flipped(new DebugIO)
     val debugOut        = new DebugIO
 
     val validIn         = Input(Bool())
-    val validOut        = Output(Bool())
+    val validOut        = Output(Bool())*/
 
     // cache
     val toStage2        = Flipped(new Stage2IO)
@@ -124,8 +125,9 @@ sealed class CacheStage2 extends Module with HasResetVector {
     val metaAlloc       = Flipped(new MetaAllocIO)
   })
 
+  /*
   val validReg           = RegInit(false.B)
-  validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, Mux(io.stage3Stall, validReg, io.validIn)))   
+  validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, Mux(io.stage3Stall, validReg, io.validIn)))*/
   io.validOut           := validReg
 
   // pipline reg
@@ -136,20 +138,17 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.cacheable     := true.B
   regInit.pc            := 0.U(32.W)
   val stage2Reg          = RegInit(regInit)
-  //stage2Reg             := Mux(flush || io.flushIn, regInit, Mux(io.stallIn, stage2Reg, io.toStage2))
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
 
+  /*
   val debugReset         = Wire(new DebugIO)
   debugReset.pc         := 0.U(32.W)
   debugReset.nextPc     := 0.U(32.W)
   debugReset.inst       := Instruction.NOP
 
   val debugReg           = RegInit(debugReset)
-  //val stallDebug         = dontTouch(Wire(new DebugIO))
-  //stallDebug            := Mux(io.stallIn, debugReg, io.debugIn)
-  //debugReg              := Mux(io.flushIn || flush, debugReset, stallDebug)
   debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn))
-  io.debugOut           := debugReg
+  io.debugOut           := debugReg*/
 
   //io.sram0_addr         := stage2Reg.index
   //io.sram1_addr         := stage2Reg.index
@@ -217,11 +216,12 @@ sealed class CacheStage2 extends Module with HasResetVector {
 
 sealed class CacheStage3 extends Module with HasResetVector {
   val io = IO(new Bundle {
+    /*
     // debug
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
     val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO
+    val debugOut        = new DebugIO*/
 
     val toStage3        = Flipped(new Stage3IO)
 
@@ -289,9 +289,9 @@ sealed class CacheStage3 extends Module with HasResetVector {
   regInit.tag          := 0.U(22.W)
   regInit.index        := 0.U(6.W)
   val stage3Reg         = RegInit(regInit)
-  //stage3Reg            := Mux(io.flushIn, regInit, Mux(io.stallOut || io.stallIn, stage3Reg, io.toStage3))
   stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
+  /*
   val debugReset        = Wire(new DebugIO)
   debugReset.pc        := 0.U(32.W)
   debugReset.nextPc    := 0.U(32.W)
@@ -303,7 +303,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   //debugReg             := Mux(io.flushIn, debugReset, stallDebug)
   debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
   io.debugOut.pc       := debugReg.pc
-  io.debugOut.nextPc   := debugReg.nextPc
+  io.debugOut.nextPc   := debugReg.nextPc*/
 
   val align             = stage3Reg.align
 
@@ -330,7 +330,6 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.stallOut             := stallOut && !flushReg
 
   io.axiReq               := state === addr
-  //io.axiReq               := state === idle && (!stage3Reg.hit || !stage3Reg.cacheable) && !io.flushIn
   io.axiReady             := (state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast
 
   // allocate axi, burst read
@@ -441,19 +440,21 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.out.inst := inst
   io.out.pc   := stage3Reg.pc
 
+  /*
   val validReg      = RegInit(false.B)
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    
   io.validOut      := validReg && !io.flushIn && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
-  io.debugOut.inst := inst
+  io.debugOut.inst := inst*/
 }
 
 class ICache extends Module {
   val io = IO(new Bundle {
+    /*
     // todo: 是否需要valid信号来提示是一条有效指令?
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
     val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO
+    val debugOut        = new DebugIO*/
 
     // cpu
     val cpu2cache       = Flipped(new Stage1IO)
@@ -517,13 +518,14 @@ class ICache extends Module {
   val dataArb2 = Module(new IcArbiter)
   val dataArb3 = Module(new IcArbiter)
   
+  /*
   // debug
   stage2.io.validIn     <> io.validIn
   stage3.io.validIn     <> stage2.io.validOut
   io.validOut           <> stage3.io.validOut
   stage2.io.debugIn     <> io.debugIn
   stage2.io.debugOut    <> stage3.io.debugIn
-  stage3.io.debugOut    <> io.debugOut
+  stage3.io.debugOut    <> io.debugOut*/
 
   io.cpu2cache          <> stage1.io.toStage1
   stage1.io.toStage2    <> stage2.io.toStage2
@@ -773,34 +775,7 @@ class ICache extends Module {
                     "b0100".U   -> io.sram2_rdata,
                     "b1000".U   -> io.sram3_rdata,
                   ))
-    }.otherwise {
-      // random choose
-      dataBlock := LookupTree(randCount, List(
-                    0.U   -> io.sram0_rdata,
-                    1.U   -> io.sram1_rdata,
-                    2.U   -> io.sram2_rdata,
-                    3.U   -> io.sram3_rdata,
-                  ))
-    }
-  }.otherwise {
-    dataBlock := dataBlock
-  }
-
-    // ----------------------------write back and allocate--------------------------------
-  val allocTag = RegInit(false.B)
-  allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
-
-  // axi
-  io.axiReq := state === writeback1 || state === allocate1
-  io.axiReady := state === allocate2 && rdataFire && io.axiRdataIO.bits.rlast
-
-  val burstAddr            = addr & "hfffffff8".U
-
-  // allocate axi, burst read
-  io.axiRaddrIO.valid     := state === allocate1
-  io.axiRaddrIO.bits.addr := burstAddr
-  io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
-  io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
+    }.otherwise {io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap// 8B
   io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
   io.axiRdataIO.ready     := state === allocate2
 

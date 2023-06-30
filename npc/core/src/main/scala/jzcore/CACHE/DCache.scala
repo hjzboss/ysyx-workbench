@@ -322,13 +322,15 @@ class DCache extends Module {
   io.axiRaddrIO.bits.addr := burstAddr
   //io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiRaddrIO.bits.len  := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
-  io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
-  io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
+  //io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
+  io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), 2.U(3.W))
+  //io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
+  io.axiRaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
   io.axiRdataIO.ready     := state === allocate2 || rState === data_trans
 
   // 锁存axi读取的值
-  val axiDataReg           = RegInit(0.U(64.W))
-  axiDataReg              := Mux(rState === data_trans && rdataFire, io.axiRdataIO.bits.rdata, axiDataReg)
+  val axiDataReg           = RegInit(0.U(32.W))
+  axiDataReg              := Mux(rState === data_trans && rdataFire, io.axiRdataIO.bits.rdata(31, 0), axiDataReg)
 
   val rblockBuffer         = RegInit(0.U(64.W))
   rblockBuffer            := MuxLookup(state, rblockBuffer, List(
@@ -352,9 +354,10 @@ class DCache extends Module {
   io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), burstAddr)
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
-  io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
-  io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
-
+  //io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
+  io.axiWaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U, 2.U)
+  //io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
+  io.axiWaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
   io.axiWdataIO.valid     := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
   io.axiWdataIO.bits.wlast:= (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
   //io.axiWdataIO.bits.wstrb:= "b11111111".U
@@ -542,7 +545,7 @@ class DCache extends Module {
   //io.rdataIO.bits.rdata    := Mux(state === data, alignData, 0.U(64.W))
   //io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits,rdata, 0.U(64.W)))
   io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
-  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits.rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
+  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits.rdata(31, 0), Mux(rState === ok, axiDataReg, 0.U(64.W))))
 
   //io.ctrlIO.ready          := state === idle // todo
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle

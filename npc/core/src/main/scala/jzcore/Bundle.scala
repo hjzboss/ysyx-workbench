@@ -113,7 +113,7 @@ class CtrlFlow extends Bundle {
   val exception     = Output(Bool()) // 系统指令的类型
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
-  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val sysInsType    = Output(UInt(2.W))
   val coherence     = Output(Bool())
   // 用于送给旁路单元
@@ -143,8 +143,8 @@ class ExuOut extends Bundle {
   val csrValue      = Output(UInt(64.W))
   val coherence     = Output(Bool())
 
-  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-  val haltRet       = Output(UInt(64.W))
+  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  //val haltRet       = Output(UInt(64.W))
 }
 
 class LsuOut extends Bundle {
@@ -160,8 +160,8 @@ class LsuOut extends Bundle {
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
 
-  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-  val haltRet       = Output(UInt(64.W))
+  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  //val haltRet       = Output(UInt(64.W))
 }
 
 class InstrFetch extends Bundle {

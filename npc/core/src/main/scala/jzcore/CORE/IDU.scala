@@ -140,7 +140,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.exception   := systemCtrl === System.ecall // todo: type of exception, just for ecall now
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
-  io.ctrl.ebreak      := instrtype === InstrD // ebreak
+  //io.ctrl.ebreak      := instrtype === InstrD // ebreak
   io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)

@@ -36,7 +36,7 @@ class LSU extends Module {
     val axiReady    = Output(Bool())
     */
 
-    val lsFlag      = Output(Bool())
+    //val lsFlag      = Output(Bool())
   })
 
   /*
@@ -77,8 +77,9 @@ class LSU extends Module {
     coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
-  val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
+  //val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
 
+  val cacheable                  = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
@@ -152,8 +153,8 @@ class LSU extends Module {
   io.out.exception      := io.in.exception
   io.out.csrWaddr       := io.in.csrWaddr
   io.out.csrWen         := io.in.csrWen
-  io.out.ebreak         := io.in.ebreak
-  io.out.haltRet        := io.in.haltRet
+  //io.out.ebreak         := io.in.ebreak
+  //io.out.haltRet        := io.in.haltRet
   io.out.csrValue       := io.in.csrValue
 
 
@@ -164,5 +165,5 @@ class LSU extends Module {
   //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
 
   // 传给仿真环境，用于外设访问的判定
-  io.lsFlag             := io.in.lsuRen || io.in.lsuWen
+  //io.lsFlag             := io.in.lsuRen || io.in.lsuWen
 }
