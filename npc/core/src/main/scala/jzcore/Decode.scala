@@ -155,6 +155,7 @@ trait HasInstrType {
   def InstrZ  = "b1001".U // csr
   def InstrE  = "b1010".U // exception
   def InstrD  = "b1011".U // ebreak, just for simulation
+  def InstrF  = "b1100".U // fencei
 }
 
 object MulType {

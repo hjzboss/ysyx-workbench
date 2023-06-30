@@ -57,6 +57,7 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.sysInsType    := System.nop
   ctrlReset.rs1           := 0.U(5.W)
   ctrlReset.rs2           := 0.U(5.W)
+  ctrlReset.coherence     := false.B
 
   val datasrcReg           = RegInit(datasrcReset)
   //val stallDatasrc         = dontTouch(Wire(new DataSrcIO))
@@ -95,7 +96,6 @@ class EX_REG extends Module with HasResetVector {
   //stallDebug := Mux(io.stall, debugReg, io.debugIn)
   //debugReg := Mux(io.flush, debugReset, stallDebug)
   debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn))
-
 
   io.debugOut := debugReg
 }

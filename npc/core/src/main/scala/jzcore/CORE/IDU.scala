@@ -144,6 +144,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
+  io.ctrl.coherence   := instrtype === InstrF
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2

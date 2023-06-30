@@ -71,6 +71,7 @@ class EXU extends Module {
   alu.io.opA           := opA
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
+  io.ready             := alu.io.ready
 
   // todo: branch addr
   val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, pc)
@@ -101,11 +102,11 @@ class EXU extends Module {
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
   io.out.csrWen        := io.ctrl.csrWen
+  io.out.csrValue      := opAPre
+  io.out.coherence     := io.ctrl.coherence
+  // debug
   io.out.ebreak        := io.ctrl.ebreak
   io.out.haltRet       := opAPre // todo: forward
-  io.out.csrValue      := opAPre
-
-  io.ready             := alu.io.ready
 
   // debug
   io.debugOut.inst     := io.debugIn.inst

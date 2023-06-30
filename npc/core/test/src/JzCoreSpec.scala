@@ -416,7 +416,7 @@ class Div(len: Int) extends Module {
         dividend := remTmp(len-2, 0) ## 0.U(1.W) // 左移一位
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
-    }.elsewhen(state === recover) {
+    }.elsewhen(state === recover && io.in.bits.divSigned) {
       // 修正
       when(neg) {
         quotient := Mux(quotient(len/2-1), quotient, getN(quotient))
@@ -432,7 +432,7 @@ class Div(len: Int) extends Module {
     when(state === idle) {
       remainder := 0.U(len.W)
     }.elsewhen(state === recover) {
-      remainder := Mux(dividend(len-1) ^ io.in.bits.dividend(len/2-1), getN(dividend(len-1, len/2)), dividend(len-1, len/2))
+      remainder := Mux(io.in.bits.divSigned && (dividend(len-1) ^ io.in.bits.dividend(len/2-1)), getN(dividend(len-1, len/2)), dividend(len-1, len/2))
     }.otherwise {
       remainder := remainder
     }
@@ -472,7 +472,7 @@ class Div(len: Int) extends Module {
         dividend := remTmp(2*len-2, 0) ## 0.U(1.W) // 左移一位
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
-    }.elsewhen(state === recover) {
+    }.elsewhen(state === recover && io.in.bits.divSigned) {
       // 修正
       when(neg) {
         quotient := Mux(quotient(len-1), quotient, getN(quotient))
@@ -488,7 +488,7 @@ class Div(len: Int) extends Module {
     when(state === idle) {
       remainder := 0.U(len.W)
     }.elsewhen(state === recover) {
-      remainder := Mux(dividend(2*len-1) ^ io.in.bits.dividend(len-1), getN(dividend(2*len-1, len)), dividend(2*len-1, len))
+      remainder := Mux(io.in.bits.divSigned && (dividend(2*len-1) ^ io.in.bits.dividend(len-1)), getN(dividend(2*len-1, len)), dividend(2*len-1, len))
     }.otherwise {
       remainder := remainder
     }
@@ -511,6 +511,33 @@ class Div(len: Int) extends Module {
   printf("quotient=%x, dividend=%x\n", quotient, dividend)
 }
 
+// 一致性写回的多路选择器（仲裁）
+class CohArbiter(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val cenIn   = Input(Vec(len, Bool())) // valid & dirty
+    val noIn    = Input(Vec(len, UInt(2.W)))
+    val indexIn = Input(Vec(len, UInt(6.W)))
+    val tagIn   = Input(Vec(len, UInt(22.W)))
+
+    val noOut   = Output(UInt(2.W))
+    val indexOut= Output(UInt(6.W))
+    val tagOut  = Output(UInt(22.W))
+  })
+
+  var flag: Boolean = false
+
+  for (i <- 0 until len) {
+    if(!flag) {
+      when(io.cenIn(i) === true.B) {
+        io.noOut := io.noIn(i)
+        io.indexOut := io.indexIn(i)
+        io.tagOut := io.tagIn(i)
+        flag = true
+      }
+    }
+  }
+}
+
 object JzCoreSpec extends ChiselUtestTester {
   val tests = Tests {
     test("mul") {
@@ -530,10 +557,10 @@ object JzCoreSpec extends ChiselUtestTester {
           dut.clock.step()
           */
           dut.io.in.valid.poke(true.B)
-          dut.io.in.bits.dividend.poke(123456123.U(64.W))
+          dut.io.in.bits.dividend.poke("h8000000000000000".U(64.W))
           //dut.io.in.bits.dividend.poke("h0000_0000_0000_0100".U(64.W))
-          dut.io.in.bits.divisor.poke(1231234.U(64.W))
-          dut.io.in.bits.divSigned.poke(true.B)
+          dut.io.in.bits.divisor.poke("h000000000000000a".U(64.W))
+          dut.io.in.bits.divSigned.poke(false.B)
           dut.io.in.bits.divw.poke(false.B)
           dut.io.out.ready.poke(false.B)
           while(true) {

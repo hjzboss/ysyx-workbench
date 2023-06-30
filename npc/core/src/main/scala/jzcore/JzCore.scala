@@ -342,6 +342,7 @@ class JzCore extends Module {
   lsu.io.dcacheCtrl <> dcache.io.ctrlIO
   lsu.io.dcacheRead <> dcache.io.rdataIO
   lsu.io.dcacheWrite<> dcache.io.wdataIO
+  lsu.io.dcacheCoh  <> dcache.io.coherence
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 

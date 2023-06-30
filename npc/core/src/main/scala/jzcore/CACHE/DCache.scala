@@ -4,14 +4,47 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-// todo: cacheable处理, 81aeadd0
+// 一致性写回的多路选择器（仲裁）
+sealed class CohArbiter(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val cenIn   = Input(Vec(len, Bool())) // valid & dirty
+    val noIn    = Input(Vec(len, UInt(2.W)))
+    val indexIn = Input(Vec(len, UInt(6.W)))
+    val tagIn   = Input(Vec(len, UInt(22.W)))
+
+    val noOut   = Output(UInt(2.W))
+    val indexOut= Output(UInt(6.W))
+    val tagOut  = Output(UInt(22.W))
+    val cenOut  = Output(Bool())
+  })
+
+  var flag: Boolean = false
+
+  io.noOut := 0.U
+  io.tagOut := 0.U
+  io.indexOut := 0.U
+  for (i <- 0 until len) {
+    if(!flag) {
+      when(io.cenIn(i) === true.B) {
+        io.noOut := io.noIn(i)
+        io.indexOut := io.indexIn(i)
+        io.tagOut := io.tagIn(i)
+        flag = true
+      }
+    }
+  }
+  io.cenOut := io.cenIn.asUInt.orR
+}
+
+// todo: fencei指令的处理，cache流水化改造
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class DCache extends Module {
   val io = IO(new Bundle {
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
     val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
-    val rdataIO         = Decoupled(new CacheReadIO) 
+    val rdataIO         = Decoupled(new CacheReadIO)
+    val coherence       = Flipped(new CoherenceIO)
 
     // ram, dataArray
     val sram4_rdata     = Input(UInt(128.W))
@@ -81,23 +114,25 @@ class DCache extends Module {
   val ctrlFire           = io.ctrlIO.valid && io.ctrlIO.ready
   val cwdataFire         = io.wdataIO.valid && io.wdataIO.ready
   val crdataFire         = io.rdataIO.valid && io.rdataIO.ready
+  val coherenceFire      = io.coherence.valid && io.coherence.ready
 
   // cache state machine，cacheable access
-  val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(11)
+  val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: addr_trans :: data_trans :: wait_resp :: ok :: coherence1 :: coherence2 :: Nil = Enum(13)
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle        -> Mux(ctrlFire && io.ctrlIO.bits.cacheable, tagCompare, idle),
+    idle        -> Mux(io.coherence.valid, coherence1, Mux(ctrlFire && io.ctrlIO.bits.cacheable, tagCompare, idle)),
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
     data        -> Mux(crdataFire || cwdataFire, idle, data),
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // addr
-    writeback2  -> Mux(brespFire, allocate1, writeback2), // data and resp
+    writeback2  -> Mux(brespFire, Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // addr 
-    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2) // data
+    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2), // data
+    coherence1  -> Mux(coherenceFire, idle, coherence2),
+    coherence2  -> writeback1, // data array read
   ))
 
   // not cacheable access
-  //val addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(4)
   val rState = RegInit(idle)
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
@@ -115,7 +150,7 @@ class DCache extends Module {
     ok          -> Mux(cwdataFire, idle, ok)
   ))
 
-  victimWay             := Mux(state === tagCompare, randCount, victimWay)
+  victimWay          := Mux(state === tagCompare, randCount, victimWay)
 
   // meta data
   val metaInit        = Wire(new MetaData)
@@ -168,6 +203,57 @@ class DCache extends Module {
     wtag := wtag
   }
 
+  // -----------------------------------coherence---------------------------------------
+  val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
+  val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
+  for(i <- 0 to 63; j <- 0 to 3) {
+    dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
+  }
+  val arb64Index = List.fill(4)(Wire(Vec(64, UInt(6.W))))
+  val arb64Tag   = List.fill(4)(Wire(Vec(64, UInt(22.W))))
+  val arb64No    = List.fill(4)(Wire(Vec(64, UInt(2.W))))
+  for(i <- 0 to 3; j <- 0 to 63) {
+    arb64Index(i)(j) := j.U(6.W)
+    arb64Tag(i)(j)   := metaArray(i)(j).tag
+    arb64No(i)(j)    := i.U(2.W)
+  }
+  (0 to 3).map(i => (arbList64(i).io.cenIn := dirtyArray(i)))
+  (0 to 3).map(i => (arbList64(i).io.noIn := arb64No(i)))
+  (0 to 3).map(i => (arbList64(i).io.indexIn := arb64Index(i)))
+  (0 to 3).map(i => (arbList64(i).io.tagIn := arb64Tag(i)))
+
+  val arb4 = Module(new CohArbiter(4))
+  val arb4CenIn = VecInit(List.fill(4)(false.B))
+  val arb4TagIn = VecInit(List.fill(4)(0.U(22.W)))
+  val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
+  val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
+  (0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
+  arb4.io.cenIn := arb4CenIn
+  arb4.io.indexIn := arb4IndexIn
+  arb4.io.noIn := arb4NoIn
+  arb4.io.tagIn := arb4TagIn
+
+  val ramCenPre = WireDefault(0.U(4.W))
+  ramCenPre := LookupTree(arb4.io.noOut, List(
+    0.U -> 1.U,
+    1.U -> 2.U,
+    2.U -> 4.U,
+    3.U -> 8.U
+  ))
+  val ramCen = VecInit(List.fill(4)(false.B))
+  (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.cenOut))
+
+  val colTagReg = RegInit(0.U(22.W))
+  val colIndexReg = RegInit(0.U(6.W))
+  val colNoReg  = RegInit(0.U(2.W))
+  colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
+  colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
+  colNoReg  := Mux(state === coherence2, arb4.io.noOut, colNoReg)
+
+  val colOver = Wire(Bool()) // coherence over
+  colOver := !(dirtyArray(0).asUInt.orR | dirtyArray(1).asUInt.orR | dirtyArray(2).asUInt.orR | dirtyArray(3).asUInt.orR) 
+  io.coherence.ready := colOver
+
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {
@@ -187,8 +273,38 @@ class DCache extends Module {
                     3.U   -> io.sram7_rdata,
                   ))
     }
+  }.elsewhen(state === coherence2) {
+    dataBlock := LookupTree(ramCen.asUInt, List(
+                    0.U   -> dataBlock,
+                    1.U   -> io.sram4_rdata,
+                    2.U   -> io.sram5_rdata,
+                    4.U   -> io.sram6_rdata,
+                    8.U   -> io.sram7_rdata,
+                  ))
   }.otherwise {
     dataBlock := dataBlock
+  }
+
+  // flush mate array
+  when(state === writeback2 && brespFire && io.coherence.valid) {
+    switch(colNoReg) {
+      is(0.U) {
+        metaArray(0)(colIndexReg).valid := false.B
+        metaArray(0)(colIndexReg).dirty := false.B
+      }
+      is(1.U) {
+        metaArray(1)(colIndexReg).valid := false.B
+        metaArray(1)(colIndexReg).dirty := false.B
+      }
+      is(2.U) {
+        metaArray(2)(colIndexReg).valid := false.B
+        metaArray(2)(colIndexReg).dirty := false.B
+      }
+      is(3.U) {
+        metaArray(3)(colIndexReg).valid := false.B
+        metaArray(3)(colIndexReg).dirty := false.B
+      }
+    }
   }
 
   // ----------------------------write back and allocate--------------------------------
@@ -232,7 +348,8 @@ class DCache extends Module {
 
   io.axiWaddrIO.valid     := state === writeback1 || wState === addr_trans
   //io.axiWaddrIO.bits.addr := burstAddr
-  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
+  //io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
+  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), burstAddr)
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
   io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
@@ -247,9 +364,9 @@ class DCache extends Module {
   
   // burst write
   when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
-    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
+    io.axiWdataIO.bits.wdata := Mux(align && !io.coherence.valid, dataBlock(127, 64), dataBlock(63, 0))
   }.elsewhen(state === writeback2 && wburst === 1.U(2.W)) {
-    io.axiWdataIO.bits.wdata := Mux(align, dataBlock(63, 0), dataBlock(127, 64))
+    io.axiWdataIO.bits.wdata := Mux(align && !io.coherence.valid, dataBlock(63, 0), dataBlock(127, 64))
   }.elsewhen(wState === addr_trans || wState === data_trans) {
     io.axiWdataIO.bits.wdata := io.wdataIO.bits.wdata
   }.otherwise {
@@ -282,7 +399,17 @@ class DCache extends Module {
   io.sram6_wmask  := ~0.U(128.W)
   io.sram7_wdata  := 0.U
   io.sram7_wmask  := ~0.U(128.W)
-  when(state === idle && ctrlFire) {
+  when(state === coherence1) {
+    // coherence
+    io.sram4_addr := arb4.io.indexOut
+    io.sram4_cen  := !ramCen(0)
+    io.sram5_addr := arb4.io.indexOut
+    io.sram5_cen  := !ramCen(1)
+    io.sram6_addr := arb4.io.indexOut
+    io.sram6_cen  := !ramCen(2)
+    io.sram7_addr := arb4.io.indexOut
+    io.sram7_cen  := !ramCen(3)
+  }.elsewhen(state === idle && ctrlFire) {
     // read data
     io.sram4_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram4_cen  := false.B

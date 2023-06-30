@@ -115,6 +115,7 @@ class CtrlFlow extends Bundle {
   val memRen        = Output(Bool()) // 存储器读使能
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val sysInsType    = Output(UInt(2.W))
+  val coherence     = Output(Bool())
   // 用于送给旁路单元
   val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
   val rs1           = Output(UInt(5.W))
@@ -140,6 +141,7 @@ class ExuOut extends Bundle {
   val csrWaddr      = Output(UInt(3.W))
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
+  val coherence     = Output(Bool())
 
   val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val haltRet       = Output(UInt(64.W))
@@ -227,4 +229,9 @@ class DivInput extends Bundle {
 class DivOutput extends Bundle {
   val quotient        = Output(UInt(64.W))
   val remainder       = Output(UInt(64.W))
+}
+
+class CoherenceIO extends Bundle {
+  val valid           = Output(Bool())
+  val ready           = Input(Bool())
 }

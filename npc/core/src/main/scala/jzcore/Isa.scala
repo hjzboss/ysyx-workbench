@@ -85,6 +85,8 @@ object RV64IM extends HasInstrType {
   def CSRRSI  = BitPat("b???????_?????_?????_110_?????_1110011")
   def CSRRCI  = BitPat("b???????_?????_?????_111_?????_1110011")
 
+  def FENCEI  = BitPat("b???????_?????_?????_001_?????_0001111")
+
 
   val table = Array(
     ADD     -> List(InstrR, SrcType.reg, SrcType.reg, AluOp.add),
@@ -166,6 +168,8 @@ object RV64IM extends HasInstrType {
     SW      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
     SH      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
     SB      -> List(InstrS, SrcType.reg, SrcType.imm, AluOp.add),
+  
+    FENCEI  -> List(InstrF, SrcType.nul, SrcType.nul, AluOp.nop)
   )
 
   val lsTypeTable = Array(
@@ -185,7 +189,7 @@ object RV64IM extends HasInstrType {
 
   val systemCtrl = Array(
     ECALL   -> List(System.ecall),
-    MRET    -> List(System.mret)
+    MRET    -> List(System.mret),
   )
 }
 

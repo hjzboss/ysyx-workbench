@@ -20,6 +20,7 @@ class LSU extends Module {
     val dcacheCtrl  = Decoupled(new CacheCtrlIO)
     val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
     val dcacheWrite = Decoupled(new CacheWriteIO)
+    val dcacheCoh   = new CoherenceIO
 
     /*
     // axi总线访存接口，用于外设的访问
@@ -65,13 +66,15 @@ class LSU extends Module {
   val ctrlFire    = io.dcacheCtrl.valid && io.dcacheCtrl.ready
   val readFire    = io.dcacheRead.valid && io.dcacheRead.ready
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
+  val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
 
-  val idle :: ctrl :: data :: Nil = Enum(3)
+  val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle -> Mux(hasTrans, ctrl, idle),
+    idle -> Mux(hasTrans, ctrl, Mux(io.in.coherence, coherence, idle)),
     ctrl -> Mux(ctrlFire, data, ctrl),
-    data -> Mux(readFire || writeFire, idle, data) // todo
+    data -> Mux(readFire || writeFire, idle, data), // todo
+    coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
   val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
@@ -85,6 +88,9 @@ class LSU extends Module {
   io.dcacheWrite.valid          := state === data
   io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
+
+  // coherence
+  io.dcacheCoh.valid            := io.in.coherence
 
   /*
   // load状态机
