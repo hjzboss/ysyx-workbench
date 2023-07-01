@@ -106,11 +106,14 @@ class Alu extends Module {
     //AluOp.remuw     -> (opAw % opBw),
   ))
 
+  val mulFire = mul.io.out.valid && mul.io.out.ready
+  val divFire = div.io.out.valid && div.io.out.ready
+
   val aluOutw = SignExt(aluW(31, 0), 64)
   val isOne = aluOut.asUInt() === 1.U(64.W)
   // isWop 不会包含mulw的情况，mulw由乘法器的输出决定
   val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw
   io.aluOut := Mux(isWop, aluOutw, aluOut)
   io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(aluOp === AluOp.beq || aluOp === AluOp.bne || aluOp === AluOp.blt || aluOp === AluOp.bltu || aluOp === AluOp.bge || aluOp === AluOp.bgeu, isOne, false.B))
-  io.ready  := Mux(mulOp, mul.io.out.valid, Mux(divOp, div.io.out.valid, true.B)) // todo
+  io.ready  := Mux(mulOp, mulFire, Mux(divOp, divFire, true.B)) // todo
 }
