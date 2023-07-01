@@ -49,7 +49,8 @@ class Alu extends Module {
   // xlen computation
   val opA = io.opA
   val opB = io.opB
-  val aluOut = LookupTree(io.aluOp, List(
+  val aluOut = Wire(UInt(64.W))
+  aluOut    := LookupTree(io.aluOp, List(
     AluOp.add       -> (opA + opB),
     AluOp.jump      -> (opA + opB),
     AluOp.sub       -> (opA - opB),
