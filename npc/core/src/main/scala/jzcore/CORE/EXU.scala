@@ -75,7 +75,8 @@ class EXU extends Module {
 
   // todo: branch addr
   val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, pc)
-  val brAddr            = brAddrOpA + io.datasrc.imm
+  val brAddr            = Wire(UInt(32.W))
+  brAddr               := brAddrOpA + io.datasrc.imm
 
   // ecall mret
   val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, opAPre(31, 0), brAddr(31, 0))
