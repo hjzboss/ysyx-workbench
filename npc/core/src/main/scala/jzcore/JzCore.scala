@@ -108,7 +108,7 @@ class JzCore extends Module {
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
     val axiBrespIO  = Flipped(Decoupled(new BrespIO))*/
-    val io_interrupt   = Input(Bool())
+    val interrupt      = Input(Bool())
     val master         = new AxiMaster
     val slave          = Flipped(new AxiMaster)
 

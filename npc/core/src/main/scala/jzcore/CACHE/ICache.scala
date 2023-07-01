@@ -313,11 +313,12 @@ sealed class CacheStage3 extends Module with HasResetVector {
 
   // 分配和flash取指状态机
   val idle :: addr :: data :: flush :: stall :: Nil = Enum(5)
+  val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
     idle  -> Mux(io.flushIn || io.stallIn, idle, Mux(!stage3Reg.hit || !stage3Reg.cacheable, addr, idle)),
     addr  -> Mux(io.flushIn, Mux(io.axiGrant, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
-    data  -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
+    data  -> Mux(rdataFire && io.axiRdataIO.bits.rlast && io.axiRdataIO.bits.rresp === okay, Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
     stall -> Mux(io.stallIn, stall, idle),
     flush -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), flush)
   ))

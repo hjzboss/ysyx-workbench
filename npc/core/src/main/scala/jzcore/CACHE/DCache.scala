@@ -125,9 +125,9 @@ class DCache extends Module {
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
     data        -> Mux(crdataFire || cwdataFire, idle, data),
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // addr
-    writeback2  -> Mux(brespFire, Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
+    writeback2  -> Mux(brespFire && io.axiBrespIO.bits.bresp === okay, Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // addr 
-    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2), // data
+    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast && io.axiRdataIO.bits.rresp === okay, data, allocate2), // data
     coherence1  -> Mux(coherenceFire, idle, coherence2),
     coherence2  -> writeback1, // data array read
   ))
@@ -137,7 +137,7 @@ class DCache extends Module {
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(raddrFire && io.axiGrant, data_trans, addr_trans),
-    data_trans  -> Mux(rdataFire, Mux(crdataFire, idle, ok), data_trans), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    data_trans  -> Mux(rdataFire && io.axiRdataIO.bits.rresp === okay, Mux(crdataFire, idle, ok), data_trans), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
     ok          -> Mux(crdataFire, idle, ok)
   ))
 
@@ -146,7 +146,7 @@ class DCache extends Module {
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(waddrFire && io.axiGrant, Mux(wdataFire, wait_resp, data_trans), addr_trans),
     data_trans  -> Mux(wdataFire, wait_resp, data_trans),
-    wait_resp   -> Mux(brespFire, Mux(cwdataFire, idle, ok), wait_resp), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    wait_resp   -> Mux(brespFire && io.axiBrespIO.bits.bresp === okay, Mux(cwdataFire, idle, ok), wait_resp), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
     ok          -> Mux(cwdataFire, idle, ok)
   ))
 
