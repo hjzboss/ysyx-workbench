@@ -67,7 +67,7 @@ class IFU extends Module with HasResetVector {
   
   io.out.addr     := pc 
   //io.out.cacheable:= true.B // todo: 接入soc时需要更改
-  io.out.cacheable:= pc <= "hffff_ffff".U && pc >= "h8000_0000".U && pc =/= 0.U
+  io.out.cacheable:= pc <= "hffff_ffff".U && pc >= "h8000_0000".U
 
   /*
   io.debug.pc     := pc 
