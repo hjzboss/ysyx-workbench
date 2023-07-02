@@ -135,7 +135,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.index         := 0.U(6.W)
   regInit.tag           := 0.U(22.W)
   regInit.align         := false.B
-  regInit.cacheable     := false.B
+  regInit.cacheable     := true.B
   regInit.pc            := 0.U(32.W)
   val stage2Reg          = RegInit(regInit)
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
@@ -284,7 +284,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   regInit.cacheline    := 0.U(128.W)
   regInit.hit          := true.B
   regInit.allocAddr    := 0.U(32.W)
-  regInit.cacheable    := false.B
+  regInit.cacheable    := true.B
   regInit.victim       := 0.U(2.W)
   regInit.align        := 0.U(2.W)
   regInit.tag          := 0.U(22.W)
