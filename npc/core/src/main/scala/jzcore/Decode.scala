@@ -166,3 +166,12 @@ object MulType {
 
   def apply = UInt(2.W)
 }
+
+object AxiWidth {
+  def byte = "b00".U
+  def half = "b01".U
+  def word = "b10".U
+  def double = "b11".U
+
+  def apply = UInt(2.W)
+}

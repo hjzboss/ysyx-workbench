@@ -84,11 +84,29 @@ class LSU extends Module {
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
   io.dcacheCtrl.bits.cacheable  := cacheable
+  // 指定cache访问axi的size
+  val width                      = LookupTree(io.in.lsType, Seq(
+                                      LsType.ld   -> AxiWidth.double,
+                                      LsType.lw   -> AxiWidth.word,
+                                      LsType.lh   -> AxiWidth.half,
+                                      LsType.lb   -> AxiWidth.byte,
+                                      LsType.lbu  -> AxiWidth.byte,
+                                      LsType.lhu  -> AxiWidth.half,
+                                      LsType.lwu  -> AxiWidth.word,
+                                      LsType.sd   -> AxiWidth.double,
+                                      LsType.sw   -> AxiWidth.word,
+                                      LsType.sh   -> AxiWidth.half,
+                                      LsType.sb   -> AxiWidth.byte,
+                                      LsType.nop  -> AxiWidth.double
+                                    ))
+  io.dcacheCtrl.bits.width      := Mux(cacheable, AxiWidth.double, width)
 
   io.dcacheRead.ready           := state === data
   io.dcacheWrite.valid          := state === data
-  io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
-  io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
+  io.dcacheCtrl.bits.wdata      := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata)
+  io.dcacheWrite.bits.wmask     := Mux(cacheable, io.in.wmask << addr(2, 0), io.in.wmask)
+  //io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
+  //io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
 
   // coherence
   io.dcacheCoh.valid            := io.in.coherence
@@ -126,7 +144,8 @@ class LSU extends Module {
 
   // 数据对齐
   val align              = Cat(addr(2, 0), 0.U(3.W))
-  val rdata              = io.dcacheRead.bits.rdata >> align
+  //val rdata              = io.dcacheRead.bits.rdata >> align
+  val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align, io.dcacheCtrl.bits.rdata)
   //val rdata              = io.axiRdataIO.bits.rdata >> align
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,

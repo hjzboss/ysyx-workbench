@@ -49,6 +49,7 @@ class CacheCtrlIO extends Bundle {
   val addr      = Output(UInt(32.W))
   val wen       = Output(Bool())
   val cacheable = Output(Bool()) // cacheable or uncacheable, just for dcache
+  val width     = Output(UInt(2.W)) // 外设访问时需要指定宽度
 }
 
 class CacheWriteIO extends Bundle {
