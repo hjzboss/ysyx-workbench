@@ -103,7 +103,7 @@ class LSU extends Module {
 
   io.dcacheRead.ready           := state === data
   io.dcacheWrite.valid          := state === data
-  io.dcacheCtrl.bits.wdata      := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata)
+  io.dcacheWrite.bits.wdata      := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata)
   io.dcacheWrite.bits.wmask     := Mux(cacheable, io.in.wmask << addr(2, 0), io.in.wmask)
   //io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   //io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
@@ -145,7 +145,7 @@ class LSU extends Module {
   // 数据对齐
   val align              = Cat(addr(2, 0), 0.U(3.W))
   //val rdata              = io.dcacheRead.bits.rdata >> align
-  val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align, io.dcacheCtrl.bits.rdata)
+  val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align, io.dcacheRead.bits.rdata)
   //val rdata              = io.axiRdataIO.bits.rdata >> align
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
