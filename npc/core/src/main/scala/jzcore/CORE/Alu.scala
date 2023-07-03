@@ -23,7 +23,7 @@ class Alu extends Module {
   val mul = Module(new Mul)
   val div = Module(new Divider(64))
  
-  val aluOp = io.aluOp
+  val aluOp = dontTouch(io.aluOp)
 
   val mulOp                      = aluOp === AluOp.mul || aluOp === AluOp.mulh || aluOp === AluOp.mulw || aluOp === AluOp.mulhsu || aluOp === AluOp.mulhu
   mul.io.in.valid               := mulOp
