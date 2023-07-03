@@ -85,7 +85,7 @@ class LSU extends Module {
   io.dcacheCtrl.bits.addr       := addr
   io.dcacheCtrl.bits.cacheable  := cacheable
   // 指定cache访问axi的size
-  val width                      = LookupTree(io.in.lsType, Seq(
+  val size                      = LookupTree(io.in.lsType, Seq(
                                       LsType.ld   -> AxiWidth.double,
                                       LsType.lw   -> AxiWidth.word,
                                       LsType.lh   -> AxiWidth.half,
@@ -99,7 +99,7 @@ class LSU extends Module {
                                       LsType.sb   -> AxiWidth.byte,
                                       LsType.nop  -> AxiWidth.double
                                     ))
-  io.dcacheCtrl.bits.width      := Mux(cacheable, AxiWidth.double, width)
+  io.dcacheCtrl.bits.size       := Mux(cacheable, AxiWidth.double, size)
 
   io.dcacheRead.ready           := state === data
   io.dcacheWrite.valid          := state === data

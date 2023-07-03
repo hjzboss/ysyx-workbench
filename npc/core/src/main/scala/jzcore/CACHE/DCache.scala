@@ -324,7 +324,7 @@ class DCache extends Module {
   //io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiRaddrIO.bits.len  := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
   //io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), 2.U(3.W)) // todo: 根据lbu这些类型来决定，当访问外设的时候
-  io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.width)
+  io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
   //io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
   io.axiRaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
   io.axiRdataIO.ready     := state === allocate2 || rState === data_trans
@@ -356,7 +356,7 @@ class DCache extends Module {
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiWaddrIO.bits.len  := Mux(io.ctrlIO.bits.cacheable, 1.U(8.W), 0.U(8.W))
   //io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
-  io.axiWaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U, io.ctrlIO.bits.width)
+  io.axiWaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U, io.ctrlIO.bits.size)
   //io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
   io.axiWaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
   io.axiWdataIO.valid     := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
