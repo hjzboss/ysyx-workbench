@@ -20,6 +20,9 @@ sealed class CohArbiter(len: Int) extends Module {
 
   var flag: Boolean = false
 
+  val indexTmp = dontTouch(Wire(Vec(len, UInt(6.W))))
+  indexTmp := io.indexIn
+
   io.noOut := 0.U
   io.tagOut := 0.U
   io.indexOut := 0.U
@@ -27,7 +30,7 @@ sealed class CohArbiter(len: Int) extends Module {
     if(!flag) {
       when(io.cenIn(i) === true.B) {
         io.noOut := io.noIn(i)
-        io.indexOut := io.indexIn(i)
+        io.indexOut := indexTmp(i)
         io.tagOut := io.tagIn(i)
         flag = true
       }
