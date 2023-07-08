@@ -230,7 +230,7 @@ class DCache extends Module {
   (0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
   (0 to 3).map(i => (arb4TagIn(i) := arbList64(i).io.tagOut))
   (0 to 3).map(i => (arb4NoIn(i)  := arbList64(i).io.noOut))
-  (0 to 3).map(i => (arb4IndexIn(i) := arb64Index(i).io.indexOut))
+  (0 to 3).map(i => (arb4IndexIn(i) := arbList64(i).io.indexOut))
   arb4.io.cenIn := arb4CenIn
   arb4.io.indexIn := arb4IndexIn
   arb4.io.noIn := arb4NoIn
