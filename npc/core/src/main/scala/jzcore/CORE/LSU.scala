@@ -105,8 +105,8 @@ class LSU extends Module {
   io.dcacheRead.ready           := state === data
   io.dcacheWrite.valid          := state === data
   // todo：sdram需不需要对齐？
-  io.dcacheWrite.bits.wdata     := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata)
-  io.dcacheWrite.bits.wmask     := Mux(cacheable, io.in.wmask << addr(2, 0), io.in.wmask)
+  io.dcacheWrite.bits.wdata     := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata << (ZeroExt(addr(1, 0), 4) << 3.U))
+  io.dcacheWrite.bits.wmask     := Mux(cacheable, io.in.wmask << addr(2, 0), io.in.wmask << addr(1, 0))
   //io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   //io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
 
