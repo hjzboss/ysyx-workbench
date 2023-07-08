@@ -23,9 +23,6 @@ sealed class CohArbiter(len: Int) extends Module {
   val indexTmp = dontTouch(Wire(Vec(len, UInt(6.W))))
   indexTmp := io.indexIn
 
-  io.noOut := 0.U
-  io.tagOut := 0.U
-  io.indexOut := 0.U
   for (i <- 0 until len) {
     if(!flag) {
       when(io.cenIn(i) === true.B) {
