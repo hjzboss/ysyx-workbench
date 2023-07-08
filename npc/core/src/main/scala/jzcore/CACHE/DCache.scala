@@ -20,9 +20,13 @@ sealed class CohArbiter(len: Int) extends Module {
 
   def getIndex(cen: UInt, len: Int): Int = {
     var index = 0
+    var flag = true
     for(i <- 0 until len) {
       when(cen(i) === 1.U) {
-        index = i
+        if(flag) {
+          index = i
+          flag = false
+        }
       }
     }
     index
