@@ -209,9 +209,9 @@ class DCache extends Module {
   for(i <- 0 to 63; j <- 0 to 3) {
     dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
   }
-  val arb64Index = List.fill(4)(Wire(Vec(64, UInt(6.W))))
-  val arb64Tag   = List.fill(4)(Wire(Vec(64, UInt(22.W))))
-  val arb64No    = List.fill(4)(Wire(Vec(64, UInt(2.W))))
+  val arb64Index = dontTouch(List.fill(4)(Wire(Vec(64, UInt(6.W)))))
+  val arb64Tag   = dontTouch(List.fill(4)(Wire(Vec(64, UInt(22.W)))))
+  val arb64No    = dontTouch(List.fill(4)(Wire(Vec(64, UInt(2.W)))))
   for(i <- 0 to 3; j <- 0 to 63) {
     arb64Index(i)(j) := j.U(6.W)
     arb64Tag(i)(j)   := metaArray(i)(j).tag
