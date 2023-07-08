@@ -18,11 +18,29 @@ sealed class CohArbiter(len: Int) extends Module {
     val cenOut  = Output(Bool())
   })
 
+  def getIndex(cen: UInt, len: Int): Int = {
+    var index = 0
+    for(i <- 0 until len) {
+      when(cen(i) === 1.U) {
+        index = i
+      }
+    }
+    index
+  }
+
   var flag: Boolean = false
 
   val indexTmp = dontTouch(Wire(Vec(len, UInt(6.W))))
   indexTmp := io.indexIn
 
+  val i = getIndex(io.cenIn.asUInt, len)
+
+  io.noOut := io.noIn(i)
+  io.tagOut := io.tagIn(i)
+  io.indexOut := io.indexIn(i)
+  io.cenOut := io.cenIn.asUInt.orR
+  // todo：此处有问题，永远都是初值
+  /*
   for (i <- 0 until len) {
     if(!flag) {
       when(io.cenIn(i) === true.B) {
@@ -32,8 +50,7 @@ sealed class CohArbiter(len: Int) extends Module {
         flag = true
       }
     }
-  }
-  io.cenOut := io.cenIn.asUInt.orR
+  }*/
 }
 
 // todo: fencei指令的处理，cache流水化改造
