@@ -243,9 +243,9 @@ class DCache extends Module {
   val ramCen = VecInit(List.fill(4)(false.B))
   (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.cenOut))
 
-  val colTagReg = RegInit(0.U(22.W))
-  val colIndexReg = RegInit(0.U(6.W))
-  val colNoReg  = RegInit(0.U(2.W))
+  val colTagReg = dontTouch(RegInit(0.U(22.W)))
+  val colIndexReg = dontTouch(RegInit(0.U(6.W)))
+  val colNoReg  = dontTouch(RegInit(0.U(2.W)))
   colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
   colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
   colNoReg  := Mux(state === coherence2, arb4.io.noOut, colNoReg)
