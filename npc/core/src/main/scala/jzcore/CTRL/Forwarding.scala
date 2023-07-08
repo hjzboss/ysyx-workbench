@@ -1,7 +1,6 @@
 package jzcore
 
 import chisel3._
-import top.Settings
 import chisel3.util._
 
 // 旁路单元
