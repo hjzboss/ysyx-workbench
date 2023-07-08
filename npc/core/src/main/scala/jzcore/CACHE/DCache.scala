@@ -228,6 +228,9 @@ class DCache extends Module {
   val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
   val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
   (0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
+  (0 to 3).map(i => (arb4TagIn(i) := arbList64(i).io.tagOut))
+  (0 to 3).map(i => (arb4NoIn(i)  := arbList64(i).io.noOut))
+  (0 to 3).map(i => (arb4IndexIn(i) := arb64Index(i).io.indexOut))
   arb4.io.cenIn := arb4CenIn
   arb4.io.indexIn := arb4IndexIn
   arb4.io.noIn := arb4NoIn
@@ -243,9 +246,9 @@ class DCache extends Module {
   val ramCen = VecInit(List.fill(4)(false.B))
   (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.cenOut))
 
-  val colTagReg = dontTouch(RegInit(0.U(22.W)))
-  val colIndexReg = dontTouch(RegInit(0.U(6.W)))
-  val colNoReg  = dontTouch(RegInit(0.U(2.W)))
+  val colTagReg = RegInit(0.U(22.W))
+  val colIndexReg = RegInit(0.U(6.W))
+  val colNoReg  = RegInit(0.U(2.W))
   colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
   colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
   colNoReg  := Mux(state === coherence2, arb4.io.noOut, colNoReg)
