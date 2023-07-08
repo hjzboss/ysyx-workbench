@@ -79,7 +79,8 @@ class LSU extends Module {
 
   //val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
 
-  val cacheable                  = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
+  val cacheable                  = addr <= "hfbff_ffff".U && addr >= "h8000_0000".U
+  val flash                      = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
@@ -103,6 +104,7 @@ class LSU extends Module {
 
   io.dcacheRead.ready           := state === data
   io.dcacheWrite.valid          := state === data
+  // todo：sdram需不需要对齐？
   io.dcacheWrite.bits.wdata     := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata)
   io.dcacheWrite.bits.wmask     := Mux(cacheable, io.in.wmask << addr(2, 0), io.in.wmask)
   //io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
@@ -143,10 +145,9 @@ class LSU extends Module {
   */
 
   // 数据对齐
-  val align              = Cat(addr(2, 0), 0.U(3.W))
-  //val rdata              = io.dcacheRead.bits.rdata >> align
-  val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align, io.dcacheRead.bits.rdata)
-  //val rdata              = io.axiRdataIO.bits.rdata >> align
+  val align64            = Cat(addr(2, 0), 0.U(3.W))
+  val align32            = Mux(flash, addr(1, 0), 0.U(3.W), 0.U) // todo: sdram的访问可能需要配置
+  val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32)
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
                             LsType.lw   -> SignExt(rdata(31, 0), 64),
