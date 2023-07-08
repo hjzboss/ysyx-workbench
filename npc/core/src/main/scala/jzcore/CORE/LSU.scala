@@ -146,7 +146,7 @@ class LSU extends Module {
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
-  val align32            = Mux(flash, addr(1, 0), 0.U(3.W), 0.U) // todo: sdram的访问可能需要配置
+  val align32            = Mux(flash,Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
   val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32)
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
