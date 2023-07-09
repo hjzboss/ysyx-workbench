@@ -358,11 +358,11 @@ class DCache extends Module {
   //io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
   io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr))
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
-  io.axiWaddrIO.bits.len  := Mux(io.ctrlIO.bits.cacheable, 1.U(8.W), 0.U(8.W))
+  io.axiWaddrIO.bits.len  := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 1.U(8.W), 0.U(8.W))
   //io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
-  io.axiWaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U, io.ctrlIO.bits.size)
+  io.axiWaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 3.U, io.ctrlIO.bits.size)
   //io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
-  io.axiWaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
+  io.axiWaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 2.U, 0.U)
   io.axiWdataIO.valid     := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
   io.axiWdataIO.bits.wlast:= (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
   //io.axiWdataIO.bits.wstrb:= "b11111111".U
@@ -417,7 +417,7 @@ class DCache extends Module {
     io.sram6_cen  := !ramCen(2)
     io.sram7_addr := arb4.io.out.bits.index
     io.sram7_cen  := !ramCen(3)
-  }.elsewhen(state === idle && ctrlFire) {
+  }.elsewhen(state === idle && ctrlFire && io.ctrlIO.bits.cacheable) {
     // read data
     io.sram4_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram4_cen  := false.B

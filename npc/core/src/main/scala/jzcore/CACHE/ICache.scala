@@ -321,15 +321,15 @@ sealed class CacheStage3 extends Module with HasResetVector {
     addr  -> Mux(io.flushIn, Mux(io.axiGrant, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
     data  -> Mux(rdataFire && io.axiRdataIO.bits.rlast && io.axiRdataIO.bits.rresp === okay, Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
     stall -> Mux(io.stallIn, stall, idle),
-    flush -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), flush)
+    flush -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), flush) // todo: 此处有问题
   ))
 
   // todo
   flushReg                := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
   io.flushOut             := flushReg
 
-  val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall
-  io.stallOut             := stallOut && !flushReg
+  val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall || state === flush
+  io.stallOut             := stallOut && !flushReg 
 
   io.axiReq               := state === addr
   io.axiReady             := (state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast

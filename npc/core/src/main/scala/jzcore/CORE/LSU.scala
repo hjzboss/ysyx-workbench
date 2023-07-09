@@ -84,7 +84,7 @@ class LSU extends Module {
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
-  io.dcacheCtrl.bits.cacheable  := cacheable | io.in.coherence
+  io.dcacheCtrl.bits.cacheable  := cacheable
   // 指定cache访问axi的size
   val size                      = LookupTree(io.in.lsType, Seq(
                                       LsType.ld   -> AxiWidth.double,
