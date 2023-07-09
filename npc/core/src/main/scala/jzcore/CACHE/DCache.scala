@@ -234,7 +234,7 @@ class DCache extends Module {
   //arb4.io.tagIn := arb4TagIn
   val arb4IO = Wire(Vec(4, Decoupled(new ArbiterIO)))
   (0 to 3).map(i => (arb4IO(i) := arbList64(i).io.out))
-  arb4.io.in := arb4IO
+  arb4.io.in <> arb4IO
   arb4.io.out.ready := true.B
 
   val ramCenPre = WireDefault(0.U(4.W))
