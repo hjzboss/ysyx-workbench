@@ -410,13 +410,13 @@ class DCache extends Module {
   io.sram7_wmask  := ~0.U(128.W)
   when(state === coherence1) {
     // coherence
-    io.sram4_addr := arb4.io.out.index
+    io.sram4_addr := arb4.io.out.bits.index
     io.sram4_cen  := !ramCen(0)
-    io.sram5_addr := arb4.io.out.index
+    io.sram5_addr := arb4.io.out.bits.index
     io.sram5_cen  := !ramCen(1)
-    io.sram6_addr := arb4.io.out.index
+    io.sram6_addr := arb4.io.out.bits.index
     io.sram6_cen  := !ramCen(2)
-    io.sram7_addr := arb4.io.out.index
+    io.sram7_addr := arb4.io.out.bits.index
     io.sram7_cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire) {
     // read data
