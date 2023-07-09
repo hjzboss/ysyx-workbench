@@ -18,7 +18,7 @@ sealed class CohArbiter(len: Int) extends Module {
     val out = Decoupled(new ArbiterIO)
   })
 
-  val arbiter = Module(new Arbiter(new ArbiterIO, 4))
+  val arbiter = Module(new Arbiter(new ArbiterIO, len))
   arbiter.io.in <> io.in
   arbiter.io.out <> io.out
 }
