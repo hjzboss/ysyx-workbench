@@ -317,7 +317,7 @@ class DCache extends Module {
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1 || rState === addr_trans || wState === addr_trans // todo: 可以提前申请总线请求
-  io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.axiRdataIO.bits.rlast) || (wState === wait_resp && brespFire)
+  io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.axiRdataIO.bits.rlast) || (wState === wait_resp && brespFire) || (state === coherence1 && coherenceFire)
 
   val burstAddr            = addr & "hfffffff8".U
 
