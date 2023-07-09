@@ -198,7 +198,6 @@ class DCache extends Module {
   }
 
   val arbIOList64 = List.fill(4)(Wire(Vec(64, Decoupled(new ArbiterIO))))
-  val readyfuck = List.fill(4)(VecInit(List.fill(64)(false.B)))
   //val arb64Index = List.fill(4)(dontTouch(Wire(Vec(64, UInt(6.W)))))
   //val arb64Tag   = List.fill(4)(dontTouch(Wire(Vec(64, UInt(22.W)))))
   //val arb64No    = List.fill(4)(dontTouch(Wire(Vec(64, UInt(2.W)))))
@@ -208,13 +207,12 @@ class DCache extends Module {
       arbIOList64(i)(j).bits.no := i.U(2.W)
       arbIOList64(i)(j).bits.tag := metaArray(i)(j).tag
       arbIOList64(i)(j).bits.index := j.U(6.W)
-      readyfuck(i)(j) := arbIOList64(i)(j).ready
       //arb64Index(i)(j) := j.U(6.W)
       //arb64Tag(i)(j)   := metaArray(i)(j).tag
       //arb64No(i)(j)    := i.U(2.W)
     }
   }
-  (0 to 3).map(i => (arbList64(i).io.in := arbIOList64(i)))
+  (0 to 3).map(i => (arbList64(i).io.in <> arbIOList64(i)))
   (0 to 3).map(i => (arbList64(i).io.out.ready := true.B))
   //(0 to 3).map(i => (arbList64(i).io.cenIn := dirtyArray(i)))
   //(0 to 3).map(i => (arbList64(i).io.noIn := arb64No(i)))
