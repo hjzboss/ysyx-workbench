@@ -343,7 +343,7 @@ class DCache extends Module {
                               allocate2 -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)
                             ))
   val wburst = RegInit(0.U(2.W))
-  when(state === tagCompare) {
+  when(state === tagCompare || state === coherence2) {
     wburst := 0.U(2.W)
   }.elsewhen(state === writeback1 && wdataFire && waddrFire && io.axiGrant) {
     wburst := wburst + 1.U(2.W)
