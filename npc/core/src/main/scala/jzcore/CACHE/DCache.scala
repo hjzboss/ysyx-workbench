@@ -14,7 +14,7 @@ class ArbiterIO extends Bundle {
 // 一致性写回的多路选择器（仲裁）
 sealed class CohArbiter(len: Int) extends Module {
   val io = IO(new Bundle {
-    val in = Flipped(Vec(len, Decoupled(new ArbiterIO)))
+    val in = Vec(len, Flipped(Decoupled(new ArbiterIO)))
     val out = Decoupled(new ArbiterIO)
   })
 
