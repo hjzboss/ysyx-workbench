@@ -4,57 +4,23 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+class ArbiterIO extends Bundle {
+  //val cen   = Output(Vec(len, Bool())) // valid & dirty
+  val no    = Output(UInt(2.W))
+  val index = Output(UInt(6.W))
+  val tag   = Output(UInt(22.W))
+}
+
 // 一致性写回的多路选择器（仲裁）
 sealed class CohArbiter(len: Int) extends Module {
   val io = IO(new Bundle {
-    val cenIn   = Input(Vec(len, Bool())) // valid & dirty
-    val noIn    = Input(Vec(len, UInt(2.W)))
-    val indexIn = Input(Vec(len, UInt(6.W)))
-    val tagIn   = Input(Vec(len, UInt(22.W)))
-
-    val noOut   = Output(UInt(2.W))
-    val indexOut= Output(UInt(6.W))
-    val tagOut  = Output(UInt(22.W))
-    val cenOut  = Output(Bool())
+    val in = Flipped(Decoupled(Vec(len, new ArbiterIO)))
+    val out = Decoupled(new ArbiterIO)
   })
 
-  def getIndex(cen: UInt, len: Int): Int = {
-    var index = 0
-    var flag = true
-    for(i <- 0 until len) {
-      when(cen(i) === 1.U) {
-        if(flag) {
-          index = i
-          flag = false
-        }
-      }
-    }
-    index
-  }
-
-  var flag: Boolean = false
-
-  val indexTmp = dontTouch(Wire(Vec(len, UInt(6.W))))
-  indexTmp := io.indexIn
-
-  val i = getIndex(io.cenIn.asUInt, len)
-
-  io.noOut := io.noIn(i)
-  io.tagOut := io.tagIn(i)
-  io.indexOut := io.indexIn(i)
-  io.cenOut := io.cenIn.asUInt.orR
-  // todo：此处有问题，永远都是初值
-  /*
-  for (i <- 0 until len) {
-    if(!flag) {
-      when(io.cenIn(i) === true.B) {
-        io.noOut := io.noIn(i)
-        io.indexOut := indexTmp(i)
-        io.tagOut := io.tagIn(i)
-        flag = true
-      }
-    }
-  }*/
+  val arbiter = Module(new Arbiter(new ArbiterIO, 4))
+  arbiter.io.in <> io.in
+  arbiter.io.out <> io.out
 }
 
 // todo: fencei指令的处理，cache流水化改造
@@ -230,54 +196,67 @@ class DCache extends Module {
   for(i <- 0 to 63; j <- 0 to 3) {
     dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
   }
-  val arb64Index = List.fill(4)(dontTouch(Wire(Vec(64, UInt(6.W)))))
-  val arb64Tag   = List.fill(4)(dontTouch(Wire(Vec(64, UInt(22.W)))))
-  val arb64No    = List.fill(4)(dontTouch(Wire(Vec(64, UInt(2.W)))))
+
+  val arbIOList64 = List.fill(4)(Wire(Vec(64, Decoupled(new ArbiterIO))))
+
+  //val arb64Index = List.fill(4)(dontTouch(Wire(Vec(64, UInt(6.W)))))
+  //val arb64Tag   = List.fill(4)(dontTouch(Wire(Vec(64, UInt(22.W)))))
+  //val arb64No    = List.fill(4)(dontTouch(Wire(Vec(64, UInt(2.W)))))
   for(i <- 0 to 3) {
     for(j <- 0 to 63) {
-      arb64Index(i)(j) := j.U(6.W)
-      arb64Tag(i)(j)   := metaArray(i)(j).tag
-      arb64No(i)(j)    := i.U(2.W)
+      arbIOList64(i)(j).valid := dirtyArray(i)(j)
+      arbIOList64(i)(j).bits.no := i.U(2.W)
+      arbIOList64(i)(j).bits.tag := metaArray(i)(j).tag
+      arbIOList64(i)(j).bits.index := j.U(6.W)
+      //arb64Index(i)(j) := j.U(6.W)
+      //arb64Tag(i)(j)   := metaArray(i)(j).tag
+      //arb64No(i)(j)    := i.U(2.W)
     }
   }
-  (0 to 3).map(i => (arbList64(i).io.cenIn := dirtyArray(i)))
-  (0 to 3).map(i => (arbList64(i).io.noIn := arb64No(i)))
-  (0 to 3).map(i => (arbList64(i).io.indexIn := arb64Index(i)))
-  (0 to 3).map(i => (arbList64(i).io.tagIn := arb64Tag(i)))
+  (0 to 3).map(i => (arbList64(i).io.in := arbIOList64(i)))
+  (0 to 3).map(i => (arbList64(i).io.out.ready := true.B))
+  //(0 to 3).map(i => (arbList64(i).io.cenIn := dirtyArray(i)))
+  //(0 to 3).map(i => (arbList64(i).io.noIn := arb64No(i)))
+  //(0 to 3).map(i => (arbList64(i).io.indexIn := arb64Index(i)))
+  //(0 to 3).map(i => (arbList64(i).io.tagIn := arb64Tag(i)))
 
   val arb4 = Module(new CohArbiter(4))
-  val arb4CenIn = VecInit(List.fill(4)(false.B))
-  val arb4TagIn = VecInit(List.fill(4)(0.U(22.W)))
-  val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
-  val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
-  (0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
-  (0 to 3).map(i => (arb4TagIn(i) := arbList64(i).io.tagOut))
-  (0 to 3).map(i => (arb4NoIn(i)  := arbList64(i).io.noOut))
-  (0 to 3).map(i => (arb4IndexIn(i) := arbList64(i).io.indexOut))
-  arb4.io.cenIn := arb4CenIn
-  arb4.io.indexIn := arb4IndexIn
-  arb4.io.noIn := arb4NoIn
-  arb4.io.tagIn := arb4TagIn
+  //val arb4CenIn = VecInit(List.fill(4)(false.B))
+  //val arb4TagIn = VecInit(List.fill(4)(0.U(22.W)))
+  //val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
+  //val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
+  //(0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
+  //(0 to 3).map(i => (arb4TagIn(i) := arbList64(i).io.tagOut))
+  //(0 to 3).map(i => (arb4NoIn(i)  := arbList64(i).io.noOut))
+  //(0 to 3).map(i => (arb4IndexIn(i) := arbList64(i).io.indexOut))
+  //arb4.io.cenIn := arb4CenIn
+  //arb4.io.indexIn := arb4IndexIn
+  //arb4.io.noIn := arb4NoIn
+  //arb4.io.tagIn := arb4TagIn
+  val arb4IO = Wire(Vec(4, Decoupled(new ArbiterIO)))
+  (0 to 3).map(i => (arb4IO(i) := arbList64(i).io.out))
+  arb4.io.in := arb4IO
+  arb4.io.out.ready := true.B
 
   val ramCenPre = WireDefault(0.U(4.W))
-  ramCenPre := LookupTree(arb4.io.noOut, List(
+  ramCenPre := LookupTree(arb4.io.out.bits.no, List(
     0.U -> 1.U,
     1.U -> 2.U,
     2.U -> 4.U,
     3.U -> 8.U
   ))
   val ramCen = VecInit(List.fill(4)(false.B))
-  (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.cenOut))
+  (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.out.valid))
 
   val colTagReg = RegInit(0.U(22.W))
   val colIndexReg = RegInit(0.U(6.W))
   val colNoReg  = RegInit(0.U(2.W))
-  colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
-  colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
-  colNoReg  := Mux(state === coherence2, arb4.io.noOut, colNoReg)
+  colTagReg := Mux(state === coherence2, arb4.io.out.bits.tag, colTagReg)
+  colIndexReg := Mux(state === coherence2, arb4.io.out.bits.index, colIndexReg)
+  colNoReg  := Mux(state === coherence2, arb4.io.out.bits.no, colNoReg)
 
   val colOver = Wire(Bool()) // coherence over
-  colOver := !(dirtyArray(0).asUInt.orR | dirtyArray(1).asUInt.orR | dirtyArray(2).asUInt.orR | dirtyArray(3).asUInt.orR) 
+  colOver := !(arbList64(0).io.out.valid | arbList64(1).io.out.valid | arbList64(2).io.out.valid | arbList64(3).io.out.valid)
   io.coherence.ready := colOver
 
   // dataArray lookup
@@ -431,13 +410,13 @@ class DCache extends Module {
   io.sram7_wmask  := ~0.U(128.W)
   when(state === coherence1) {
     // coherence
-    io.sram4_addr := arb4.io.indexOut
+    io.sram4_addr := arb4.io.out.index
     io.sram4_cen  := !ramCen(0)
-    io.sram5_addr := arb4.io.indexOut
+    io.sram5_addr := arb4.io.out.index
     io.sram5_cen  := !ramCen(1)
-    io.sram6_addr := arb4.io.indexOut
+    io.sram6_addr := arb4.io.out.index
     io.sram6_cen  := !ramCen(2)
-    io.sram7_addr := arb4.io.indexOut
+    io.sram7_addr := arb4.io.out.index
     io.sram7_cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire) {
     // read data
