@@ -318,7 +318,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
     idle  -> Mux(io.flushIn || io.stallIn, idle, Mux(!stage3Reg.hit || !stage3Reg.cacheable, addr, idle)),
-    addr  -> Mux(io.flushIn, Mux(io.axiGrant, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
+    addr  -> Mux(io.flushIn, Mux(io.axiGrant && raddrFire, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
     data  -> Mux(rdataFire && io.axiRdataIO.bits.rlast && io.axiRdataIO.bits.rresp === okay, Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
     stall -> Mux(io.stallIn, stall, idle),
     flush -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), flush) // todo: 此处有问题
@@ -335,7 +335,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.axiReady             := (state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast
 
   // allocate axi, burst read
-  io.axiRaddrIO.valid     := state === addr || state === flush
+  io.axiRaddrIO.valid     := state === addr
   io.axiRaddrIO.bits.addr := stage3Reg.allocAddr
   io.axiRaddrIO.bits.len  := Mux(stage3Reg.cacheable, 1.U(8.W), 0.U(8.W))
   io.axiRaddrIO.bits.size := Mux(stage3Reg.cacheable, 3.U(3.W), 2.U(3.W))
