@@ -79,7 +79,7 @@ class LSU extends Module {
 
   //val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
 
-  val cacheable                  = addr <= "hfbff_ffff".U && addr >= "h8000_0000".U
+  val cacheable                  = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
   val flash                      = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
