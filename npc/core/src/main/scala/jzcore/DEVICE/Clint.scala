@@ -36,7 +36,7 @@ class Clint extends Module {
     }
   }
 
-  io.clintIO.rdata := ListLookupDefault(io.clintIO.addr, 0.U, List(
+  io.clintIO.rdata := LookupTreeDefault(io.clintIO.addr, 0.U, List(
     MTIMECMP.U -> mtimecmp,
     MTIME.U    -> mtime
   ))
