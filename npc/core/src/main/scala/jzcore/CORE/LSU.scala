@@ -23,7 +23,7 @@ class LSU extends Module {
     val dcacheCoh   = new CoherenceIO
 
     // clint接口
-    val clintIO     = new ClintIO
+    val clintIO     = Flipped(new ClintIO)
 
     /*
     // axi总线访存接口，用于外设的访问
