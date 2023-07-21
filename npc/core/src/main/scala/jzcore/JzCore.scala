@@ -195,7 +195,7 @@ class JzCore extends Module {
   val forward = Module(new Forwarding)
 
   clint.io.clintIO    <> lsu.io.clintIO
-  idu.io.timerInt     <> csr.io.timerInt
+  idu.io.timerInt     <> idu.io.timerInt
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁
