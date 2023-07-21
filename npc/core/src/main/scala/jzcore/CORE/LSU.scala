@@ -22,6 +22,9 @@ class LSU extends Module {
     val dcacheWrite = Decoupled(new CacheWriteIO)
     val dcacheCoh   = new CoherenceIO
 
+    // clint接口
+    val clintIO     = new ClintIO
+
     /*
     // axi总线访存接口，用于外设的访问
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -144,6 +147,13 @@ class LSU extends Module {
   io.axiBrespIO.ready      := wState === wait_resp
   */
 
+  // clint访问
+  val clintSel           = (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U)
+  io.clintIO.addr       := addr
+  io.clintIO.wen        := writeTrans && clintSel
+  io.clintIO.wdata      := io.in.lsuWdata
+  io.clintIO.wmask      := io.in.wmask
+
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
   val align32            = Mux(flash,Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
@@ -163,7 +173,7 @@ class LSU extends Module {
                             LsType.nop  -> rdata
                           ))
 
-  io.out.lsuOut         := lsuOut
+  io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, rdata)
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd

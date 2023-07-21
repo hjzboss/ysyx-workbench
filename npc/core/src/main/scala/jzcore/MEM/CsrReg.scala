@@ -38,18 +38,57 @@ class CsrReg extends Module {
     val waddr     = Input(UInt(3.W))
     val wen       = Input(Bool())
     val wdata     = Input(UInt(64.W))
+
+    val timerInt  = Input(Bool()) // clint interrupt
   })
 
-  val csr = RegInit(VecInit(List.fill(4)(0.U(64.W))))
+  // csr0: mstatus, csr1: mtvec, csr2: mepc, csr3: mcause
+  //val csr = RegInit(VecInit(List.fill(4)(0.U(64.W))))
 
-  io.rdata := Mux(io.wen && io.waddr === io.raddr, io.wdata, csr(io.raddr(1, 0)))
+  val mstatus = RegInit(0.U(64.W))
+  val mtvec   = RegInit(0.U(64.W))
+  val mepc    = RegInit(0.U(64.W))
+  val mip     = RegInit(0.U(16.W))
+  val mie     = RegInit(0.U(16.W))
+
+  when(io.wen && io.waddr === io.raddr) {
+    // forward
+    io.rdata := io.wdata
+  }.otherwise {
+    io.rdata = ListLookupDefault(io.raddr, 0.U, List(
+      "h300".U -> mstatus,
+      "h305".U -> mtvec,
+      "h341".U -> mepc,
+      "h342".U -> mcause,
+      "h304".U -> mie,
+      "h344".U -> mip
+    ))
+  }
 
   when(io.wen) {
-    csr(io.waddr(1, 0)) := io.wdata
+    switch(io.waddr) {
+      is("h300".U) { mstatus := io.wdata }
+      is("h305".U) { mtvec   := io.wdata }
+      is("h341".U) { mepc    := io.wdata }
+      is("h342".U) { mcause  := io.wdata }
+      is("h304".U) { mie     := io.wdata }
+    }
+  }
+
+  /*
+  io.rdata := Mux(io.wen && io.waddr === io.raddr, io.wdata, csr(io.raddr(2, 0)))
+
+  when(io.wen && (io.waddr(2, 0) =/= 5.U)) {
+    csr(io.waddr(2, 0)) := io.wdata
   }
 
   when(io.exception) {
     csr(2) := io.epc
     csr(3) := ZeroExt(io.no, 64)
-  }
+  }*/
+
+  // timer int
+  val mipVec = VecInit(mip.asBools)
+  mipVec(7) := io.timerInt
+  mip       := mipVec.asUInt
 }

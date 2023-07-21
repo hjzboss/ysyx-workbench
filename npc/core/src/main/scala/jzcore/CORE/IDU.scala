@@ -4,6 +4,8 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+
+// 在idu阶段处理计时器中断， todo
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
     // 来自ifu
@@ -62,12 +64,15 @@ class IDU extends Module with HasInstrType{
                     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
                     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
                   ))
+  /*
   val csrRaddrPre = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
     CsrId.mepc    -> CsrAddr.mepc,
-    CsrId.mcause  -> CsrAddr.mcause
-  ))
+    CsrId.mcause  -> CsrAddr.mcause,
+    CsrId.mie     -> CsrAddr.mie,
+    CsrId.mip     -> CsrAddr.mip
+  ))*/
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
 /*
@@ -108,7 +113,7 @@ class IDU extends Module with HasInstrType{
   //rf.io.reset         := reset
   
   val csrRaddr         = Wire(UInt(3.W))
-  csrRaddr            := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddrPre))
+  csrRaddr            := Mux(systemCtrl === System.ecall, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
   csrReg.io.raddr     := csrRaddr
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
@@ -120,7 +125,6 @@ class IDU extends Module with HasInstrType{
   csrReg.io.epc       := io.csrWrite.epc(31, 0)
   csrReg.io.no        := io.csrWrite.no
 
-  // 输出信息
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)

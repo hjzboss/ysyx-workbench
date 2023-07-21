@@ -103,6 +103,8 @@ object CsrId {
   def mtvec   = "h305".U
   def mepc    = "h341".U
   def mcause  = "h342".U
+  def mie     = "h304".U
+  def mip     = "h344".U
 
   def apply() = UInt(12.W)
 }
@@ -112,7 +114,9 @@ object CsrAddr {
   def mtvec   = "b001".U
   def mepc    = "b010".U
   def mcause  = "b011".U
-  def nul     = "b100".U
+  def mie     = "b100".U
+  def mip     = "b101".U
+  def nul     = "b110".U
 
   def apply() = UInt(3.W)
 }

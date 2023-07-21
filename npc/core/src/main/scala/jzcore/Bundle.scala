@@ -236,3 +236,11 @@ class CoherenceIO extends Bundle {
   val valid           = Output(Bool())
   val ready           = Input(Bool())
 }
+
+class ClintIO extends Bundle {
+  val addr            = Input(UInt(32.W))
+  val rdata           = Output(UInt(64.W))
+  val wen             = Input(Bool())
+  val wdata           = Input(UInt(64.W))
+  val wmask           = Input(UInt(8.W))
+}
