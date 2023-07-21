@@ -55,7 +55,7 @@ class CsrReg extends Module {
     // forward
     io.rdata := io.wdata
   }.otherwise {
-    io.rdata := ListLookupDefault(io.raddr, 0.U, List(
+    io.rdata := LookupTreeDefault(io.raddr, 0.U, List(
       "h300".U -> mstatus,
       "h305".U -> mtvec,
       "h341".U -> mepc,
