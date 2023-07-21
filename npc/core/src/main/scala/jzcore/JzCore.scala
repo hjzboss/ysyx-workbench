@@ -194,8 +194,8 @@ class JzCore extends Module {
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
 
-  clint.io.clintIO <> lsu.io.clintIO
-  clint.io.int     <> csr.io.timerInt
+  clint.io.clintIO    <> lsu.io.clintIO
+  idu.io.timerInt     <> csr.io.timerInt
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁

@@ -67,11 +67,11 @@ class CsrReg extends Module {
 
   when(io.wen) {
     switch(io.waddr) {
-      is("h300".U) { mstatus := io.wdata }
-      is("h305".U) { mtvec   := io.wdata }
-      is("h341".U) { mepc    := io.wdata }
-      is("h342".U) { mcause  := io.wdata }
-      is("h304".U) { mie     := io.wdata }
+      is("h300".U) { CsrAddr.mstatus := io.wdata }
+      is("h305".U) { CsrAddr.mtvec   := io.wdata }
+      is("h341".U) { CsrAddr.mepc    := io.wdata }
+      is("h342".U) { CsrAddr.mcause  := io.wdata }
+      is("h304".U) { CsrAddr.mie     := io.wdata }
     }
   }
 

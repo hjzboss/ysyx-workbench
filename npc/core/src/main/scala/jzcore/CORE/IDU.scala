@@ -30,6 +30,8 @@ class IDU extends Module with HasInstrType{
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
+
+    val timerInt  = Input(Bool()) // clint int
   })
 
   val rf        = Module(new RF)
@@ -124,6 +126,7 @@ class IDU extends Module with HasInstrType{
   csrReg.io.exception := io.csrWrite.exception
   csrReg.io.epc       := io.csrWrite.epc(31, 0)
   csrReg.io.no        := io.csrWrite.no
+  csrReg.io.timerInt  := io.timerInt
 
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
