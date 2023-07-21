@@ -7,7 +7,7 @@ import utils._
 // todo: 定时器中断在什么时候处理？
 class Clint extends Module {
   val io = IO(new Bundle {
-    val clintIO = (new ClintIO)
+    val clintIO = new ClintIO
     val int  = Output(Bool()) // 中断信号，与mip.mtip直接相连
   })
 
