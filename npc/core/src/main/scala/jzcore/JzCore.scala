@@ -186,7 +186,7 @@ class JzCore extends Module {
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
   val dcache  = Module(new DCache)
-  //val clint   = Module(new Clint)
+  val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
   val exReg   = Module(new EX_REG)
@@ -194,8 +194,8 @@ class JzCore extends Module {
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
 
-  //clint.io.clintIO    <> lsu.io.clintIO
-  //clint.io.int        <> idu.io.timerInt
+  clint.io.clintIO    <> lsu.io.clintIO
+  clint.io.int        <> idu.io.timerInt
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁

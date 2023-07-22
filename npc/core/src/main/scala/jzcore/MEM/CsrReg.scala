@@ -1,4 +1,3 @@
-/*
 package jzcore
 
 import chisel3._
@@ -93,9 +92,9 @@ class CsrReg extends Module {
   val mipVec = VecInit(mip.asBools)
   mipVec(7) := io.timerInt
   mip       := mipVec.asUInt
-}*/
+}
 
-
+/*
 package jzcore
 
 import chisel3._
@@ -129,4 +128,4 @@ class CsrReg extends Module {
     csr(2) := io.epc
     csr(3) := ZeroExt(io.no, 64)
   }
-}
+}*/

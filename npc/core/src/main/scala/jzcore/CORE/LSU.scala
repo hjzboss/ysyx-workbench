@@ -23,7 +23,7 @@ class LSU extends Module {
     val dcacheCoh   = new CoherenceIO
 
     // clint接口
-    //val clintIO     = Flipped(new ClintIO)
+    val clintIO     = Flipped(new ClintIO)
 
     /*
     // axi总线访存接口，用于外设的访问
@@ -71,13 +71,13 @@ class LSU extends Module {
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
   val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
 
-  //val clintSel                   = dontTouch(WireDefault(false.B))
-  //clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint select
+  val clintSel                   = dontTouch(WireDefault(false.B))
+  clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint select
 
   val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle -> Mux(hasTrans, ctrl, Mux(io.in.coherence, coherence, idle)),
+    idle -> Mux(hasTrans && !clintSel, ctrl, Mux(io.in.coherence, coherence, idle)),
     ctrl -> Mux(ctrlFire, data, ctrl),
     data -> Mux(readFire || writeFire, idle, data), // todo
     coherence -> Mux(coherenceFire, idle, coherence)
@@ -150,10 +150,10 @@ class LSU extends Module {
   */
 
   // clint访问
-  //io.clintIO.addr       := addr
-  //io.clintIO.wen        := writeTrans && clintSel
-  //io.clintIO.wdata      := io.in.lsuWdata
-  //io.clintIO.wmask      := io.in.wmask
+  io.clintIO.addr       := addr
+  io.clintIO.wen        := writeTrans && clintSel
+  io.clintIO.wdata      := io.in.lsuWdata
+  io.clintIO.wmask      := io.in.wmask
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
@@ -177,8 +177,8 @@ class LSU extends Module {
   val pc                 = dontTouch(Wire(UInt(32.W)))
   pc                    := io.in.pc
 
-  //io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, rdata)
-  io.out.lsuOut         := rdata
+  io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, rdata)
+  //io.out.lsuOut         := rdata
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
@@ -193,7 +193,7 @@ class LSU extends Module {
   io.out.csrValue       := io.in.csrValue
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
-  io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire)
+  io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
   // 仲裁信号
   //io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
   //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
