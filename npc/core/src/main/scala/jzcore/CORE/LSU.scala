@@ -181,7 +181,7 @@ class LSU extends Module {
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
   io.out.regWen         := io.in.regWen
-  io.out.pc             := io.in.pc
+  io.out.pc             := pc
   io.out.excepNo        := io.in.excepNo
   io.out.exception      := io.in.exception
   io.out.csrWaddr       := io.in.csrWaddr
