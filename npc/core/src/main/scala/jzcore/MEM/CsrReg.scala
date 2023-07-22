@@ -57,22 +57,22 @@ class CsrReg extends Module {
     io.rdata := io.wdata
   }.otherwise {
     io.rdata := LookupTreeDefault(io.raddr, 0.U, List(
-      "h300".U -> mstatus,
-      "h305".U -> mtvec,
-      "h341".U -> mepc,
-      "h342".U -> mcause,
-      "h304".U -> mie,
-      "h344".U -> mip
+      CsrId.mstatus -> mstatus,
+      CsrId.mtvec   -> mtvec,
+      CsrId.mepc    -> mepc,
+      CsrId.mcause  -> mcause,
+      CsrId.mie     -> mie,
+      CsrId.mip     -> mip
     ))
   }
 
   when(io.wen) {
     switch(io.waddr) {
-      is("h300".U) { mstatus := io.wdata }
-      is("h305".U) { mtvec   := io.wdata }
-      is("h341".U) { mepc    := io.wdata }
-      is("h342".U) { mcause  := io.wdata }
-      is("h304".U) { mie     := io.wdata }
+      is(CsrId.mstatus) { mstatus := io.wdata }
+      is(CsrId.mtvec)   { mtvec   := io.wdata }
+      is(CsrId.mepc)    { mepc    := io.wdata }
+      is(CsrId.mcause)  { mcause  := io.wdata }
+      is(CsrId.mie)     { mie     := io.wdata }
     }
   }
 

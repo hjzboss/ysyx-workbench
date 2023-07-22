@@ -109,6 +109,7 @@ object CsrId {
   def apply() = UInt(12.W)
 }
 
+/*
 object CsrAddr {
   def mstatus = "b000".U
   def mtvec   = "b001".U
@@ -119,7 +120,7 @@ object CsrAddr {
   def nul     = "b110".U
 
   def apply() = UInt(3.W)
-}
+}*/
 
 object System {
   def nop    = "b00".U
