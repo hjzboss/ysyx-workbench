@@ -66,7 +66,6 @@ class IDU extends Module with HasInstrType{
                     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
                     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
                   ))
-  /*
   val csrRaddrPre = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
@@ -74,7 +73,7 @@ class IDU extends Module with HasInstrType{
     CsrId.mcause  -> CsrAddr.mcause,
     CsrId.mie     -> CsrAddr.mie,
     CsrId.mip     -> CsrAddr.mip
-  ))*/
+  ))
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
 /*
@@ -115,7 +114,8 @@ class IDU extends Module with HasInstrType{
   //rf.io.reset         := reset
   
   val csrRaddr         = Wire(UInt(3.W))
-  csrRaddr            := Mux(systemCtrl === System.ecall, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
+  //csrRaddr            := Mux(systemCtrl === System.ecall, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
+  csrRaddr            := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddrPre))
   csrReg.io.raddr     := csrRaddr
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
