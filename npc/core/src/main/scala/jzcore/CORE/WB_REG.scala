@@ -31,7 +31,7 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.pc         := 0.U(32.W)
   lsuReset.excepNo    := 0.U(4.W)
   lsuReset.exception  := false.B
-  lsuReset.csrWaddr   := CsrAddr.nul
+  lsuReset.csrWaddr   := CsrId.nul
   lsuReset.csrWen     := false.B
   lsuReset.csrValue   := 0.U(64.W)
   //lsuReset.ebreak     := false.B
