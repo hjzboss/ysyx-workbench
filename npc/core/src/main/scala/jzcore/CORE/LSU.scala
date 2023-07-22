@@ -173,6 +173,9 @@ class LSU extends Module {
                             LsType.nop  -> rdata
                           ))
 
+  val pc                 = dontTouch(Wire(UInt(32.W)))
+  pc                    := io.in.pc
+
   io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, rdata)
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
