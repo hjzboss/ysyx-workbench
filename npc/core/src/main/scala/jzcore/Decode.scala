@@ -99,12 +99,12 @@ object RegWrite {
 }
 
 object CsrId {
-  def mstatus = "h300".U
-  def mtvec   = "h305".U
-  def mepc    = "h341".U
-  def mcause  = "h342".U
-  def mie     = "h304".U
-  def mip     = "h344".U
+  def mstatus = 0x300.U
+  def mtvec   = 0x305.U
+  def mepc    = 0x341.U
+  def mcause  = 0x342.U
+  def mie     = 0x304.U
+  def mip     = 0x344.U
 
   def apply() = UInt(12.W)
 }
