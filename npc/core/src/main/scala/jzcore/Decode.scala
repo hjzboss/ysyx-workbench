@@ -114,9 +114,9 @@ object CsrAddr {
   def mtvec   = "b001".U
   def mepc    = "b010".U
   def mcause  = "b011".U
-  def mie     = "b100".U
-  def mip     = "b101".U
-  def nul     = "b110".U
+  //def mie     = "b100".U
+  //def mip     = "b101".U
+  //def nul     = "b110".U
 
   def apply() = UInt(3.W)
 }
