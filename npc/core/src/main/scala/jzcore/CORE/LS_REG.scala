@@ -32,7 +32,7 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.pc          := 0.U(32.W)
   exuOutReset.excepNo     := 0.U(4.W)
   exuOutReset.exception   := false.B
-  exuOutReset.csrWaddr    := CsrAddr.nul
+  exuOutReset.csrWaddr    := CsrId.nul
   exuOutReset.csrWen      := false.B
   exuOutReset.csrValue    := 0.U(64.W)
   exuOutReset.coherence   := false.B

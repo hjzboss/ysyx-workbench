@@ -49,7 +49,7 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.csrRen        := false.B
   ctrlReset.excepNo       := 0.U(4.W)
   ctrlReset.exception     := false.B
-  ctrlReset.csrWaddr      := CsrAddr.nul
+  ctrlReset.csrWaddr      := CsrId.nul
   ctrlReset.memWen        := false.B
   ctrlReset.memRen        := false.B
   //ctrlReset.ebreak        := false.B

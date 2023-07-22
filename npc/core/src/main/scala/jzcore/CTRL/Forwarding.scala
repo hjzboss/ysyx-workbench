@@ -37,8 +37,8 @@ class Forwarding extends Module {
   val forwardBWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.rs2
 
   // todo：csr信号的判断
-  val forwardACsrWbu = io.csrRen && io.wbuCsrWen && io.wbuCsrAddr =/= CsrAddr.nul && io.csrRaddr === io.wbuCsrAddr
-  val forwardACsrLsu = io.csrRen && io.lsuCsrWen && io.lsuCsrAddr =/= CsrAddr.nul && io.csrRaddr === io.lsuCsrAddr
+  val forwardACsrWbu = io.csrRen && io.wbuCsrWen && io.wbuCsrAddr =/= CsrId.nul && io.csrRaddr === io.wbuCsrAddr
+  val forwardACsrLsu = io.csrRen && io.lsuCsrWen && io.lsuCsrAddr =/= CsrId.nul && io.csrRaddr === io.lsuCsrAddr
 
   io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsrWbu, Forward.csrWbuData, Mux(forwardACsrLsu, Forward.csrLsuData, Forward.normal))))
   io.forwardB := Mux(forwardBLsu, Forward.lsuData, Mux(forwardBWbu, Forward.wbuData, Forward.normal))
