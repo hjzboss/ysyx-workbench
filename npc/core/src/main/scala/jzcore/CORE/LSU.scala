@@ -71,17 +71,18 @@ class LSU extends Module {
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
   val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
 
+  val clintSel                   = (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint
+
   val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle -> Mux(hasTrans, ctrl, Mux(io.in.coherence, coherence, idle)),
+    idle -> Mux(hasTrans && !clintSel, ctrl, Mux(io.in.coherence, coherence, idle)),
     ctrl -> Mux(ctrlFire, data, ctrl),
     data -> Mux(readFire || writeFire, idle, data), // todo
     coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
   //val cacheable                  = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
-
   val cacheable                  = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
   val flash                      = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
   io.dcacheCtrl.valid           := state === ctrl
@@ -148,7 +149,6 @@ class LSU extends Module {
   */
 
   // clint访问
-  val clintSel           = (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U)
   io.clintIO.addr       := addr
   io.clintIO.wen        := writeTrans && clintSel
   io.clintIO.wdata      := io.in.lsuWdata
