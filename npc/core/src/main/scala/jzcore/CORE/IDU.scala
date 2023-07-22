@@ -31,7 +31,7 @@ class IDU extends Module with HasInstrType{
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
 
-    val timerInt  = Input(Bool()) // clint int
+    //val timerInt  = Input(Bool()) // clint int
   })
 
   val rf        = Module(new RF)
