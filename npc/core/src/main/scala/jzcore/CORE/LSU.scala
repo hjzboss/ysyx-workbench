@@ -72,7 +72,7 @@ class LSU extends Module {
   val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
 
   val clintSel                   = dontTouch(WireDefault(false.B))
-  clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint
+  clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint select
 
   val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
   val state = RegInit(idle)
@@ -157,7 +157,7 @@ class LSU extends Module {
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
-  val align32            = Mux(flash,Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
+  val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
   val rdata              = Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32)
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
@@ -177,7 +177,8 @@ class LSU extends Module {
   val pc                 = dontTouch(Wire(UInt(32.W)))
   pc                    := io.in.pc
 
-  io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, rdata)
+  //io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, rdata)
+  io.out.lsuOut         := rdata
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
