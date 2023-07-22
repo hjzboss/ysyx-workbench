@@ -71,7 +71,8 @@ class LSU extends Module {
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
   val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
 
-  val clintSel                   = (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint
+  val clintSel                   = dontTouch(WireDefault(false.B))
+  clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint
 
   val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
   val state = RegInit(idle)
