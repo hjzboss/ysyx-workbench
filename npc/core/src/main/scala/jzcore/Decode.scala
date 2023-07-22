@@ -105,6 +105,7 @@ object CsrId {
   def mcause  = 0x342.U
   def mie     = 0x304.U
   def mip     = 0x344.U
+  def nul     = 0x000.U
 
   def apply() = UInt(12.W)
 }
