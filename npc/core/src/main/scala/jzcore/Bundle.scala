@@ -49,6 +49,7 @@ class CacheCtrlIO extends Bundle {
   val addr      = Output(UInt(32.W))
   val wen       = Output(Bool())
   val cacheable = Output(Bool()) // cacheable or uncacheable, just for dcache
+  val size      = Output(UInt(2.W)) // 外设访问时需要指定宽度
 }
 
 class CacheWriteIO extends Bundle {
@@ -79,7 +80,7 @@ class RFWriteIO extends Bundle {
 
 class CSRWriteIO extends Bundle {
   val wen       = Output(Bool())
-  val waddr     = Output(UInt(3.W))
+  val waddr     = Output(UInt(12.W))
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
   val epc       = Output(UInt(32.W))
@@ -108,12 +109,12 @@ class CtrlFlow extends Bundle {
   val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
   val csrWen        = Output(Bool()) // csr写使能
-  val csrWaddr      = Output(UInt(3.W))
+  val csrWaddr      = Output(UInt(12.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool()) // 系统指令的类型
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
-  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   val sysInsType    = Output(UInt(2.W))
   val coherence     = Output(Bool())
   // 用于送给旁路单元
@@ -138,13 +139,13 @@ class ExuOut extends Bundle {
   val pc            = Output(UInt(32.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
-  val csrWaddr      = Output(UInt(3.W))
+  val csrWaddr      = Output(UInt(12.W))
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
   val coherence     = Output(Bool())
 
-  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-  val haltRet       = Output(UInt(64.W))
+  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  //val haltRet       = Output(UInt(64.W))
 }
 
 class LsuOut extends Bundle {
@@ -156,12 +157,12 @@ class LsuOut extends Bundle {
   val pc            = Output(UInt(32.W))
   val excepNo       = Output(UInt(4.W))
   val exception     = Output(Bool())
-  val csrWaddr      = Output(UInt(3.W))
+  val csrWaddr      = Output(UInt(12.W))
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
 
-  val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-  val haltRet       = Output(UInt(64.W))
+  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  //val haltRet       = Output(UInt(64.W))
 }
 
 class InstrFetch extends Bundle {
@@ -234,4 +235,12 @@ class DivOutput extends Bundle {
 class CoherenceIO extends Bundle {
   val valid           = Output(Bool())
   val ready           = Input(Bool())
+}
+
+class ClintIO extends Bundle {
+  val addr            = Input(UInt(32.W))
+  val rdata           = Output(UInt(64.W))
+  val wen             = Input(Bool())
+  val wdata           = Input(UInt(64.W))
+  val wmask           = Input(UInt(8.W))
 }

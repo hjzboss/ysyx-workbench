@@ -8,14 +8,14 @@ class LS_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     val stall = Input(Bool())
 
-    val validIn = Input(Bool())
-    val validOut = Output(Bool())
-
     val in = Flipped(new ExuOut)
     val out = new ExuOut
 
+    /*
+    val validIn = Input(Bool())
+    val validOut = Output(Bool())
     val debugIn = Flipped(new DebugIO)
-    val debugOut = new DebugIO
+    val debugOut = new DebugIO*/
   })
 
   val exuOutReset          = Wire(new ExuOut)
@@ -32,23 +32,23 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.pc          := 0.U(32.W)
   exuOutReset.excepNo     := 0.U(4.W)
   exuOutReset.exception   := false.B
-  exuOutReset.csrWaddr    := CsrAddr.nul
+  exuOutReset.csrWaddr    := CsrId.nul
   exuOutReset.csrWen      := false.B
   exuOutReset.csrValue    := 0.U(64.W)
   exuOutReset.coherence   := false.B
   // debug
-  exuOutReset.ebreak      := false.B
-  exuOutReset.haltRet     := 0.U(64.W)
+  //exuOutReset.ebreak      := false.B
+  //exuOutReset.haltRet     := 0.U(64.W)
 
   val memCtrlReg           = RegInit(exuOutReset)
-  val stallMemCtrl         = dontTouch(Wire(new ExuOut))
-  stallMemCtrl            := Mux(io.stall, memCtrlReg, io.in)
-  memCtrlReg              := stallMemCtrl
+  //val stallMemCtrl         = Wire(new ExuOut)
+  //stallMemCtrl            := Mux(io.stall, memCtrlReg, io.in)
+  memCtrlReg              := Mux(io.stall, memCtrlReg, io.in)
+  io.out                  := memCtrlReg
 
+  /*
   val validReg             = RegInit(false.B)
   validReg                := Mux(io.stall, validReg, io.validIn)
-
-  io.out                  := memCtrlReg
   io.validOut             := validReg
 
   val debugReset = Wire(new DebugIO)
@@ -61,5 +61,5 @@ class LS_REG extends Module with HasResetVector {
   stallDebug := Mux(io.stall, debugReg, io.debugIn)
   debugReg := stallDebug
 
-  io.debugOut := debugReg
+  io.debugOut := debugReg*/
 }

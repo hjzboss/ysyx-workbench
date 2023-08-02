@@ -4,6 +4,10 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+
+// 在idu阶段处理计时器中断， todo，发现mip和mie对应位置为1时取出mtvec，跳转到mtvec执行
+// rtthread在一段时间内设置了mtvec，清除了mip和mie，然后设置了clint mtimecmp，说明在发生定时器中断时是需要跳转到mtvec执行的
+// 但是还有个mhartid csr寄存器需要实现，todo
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
     // 来自ifu
@@ -28,6 +32,8 @@ class IDU extends Module with HasInstrType{
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
+
+    val timerInt  = Input(Bool()) // clint int
   })
 
   val rf        = Module(new RF)
@@ -62,12 +68,15 @@ class IDU extends Module with HasInstrType{
                     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
                     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
                   ))
+  /*
   val csrRaddrPre = LookupTree(csr, List(
     CsrId.mstatus -> CsrAddr.mstatus,
     CsrId.mtvec   -> CsrAddr.mtvec,
     CsrId.mepc    -> CsrAddr.mepc,
-    CsrId.mcause  -> CsrAddr.mcause
-  ))
+    CsrId.mcause  -> CsrAddr.mcause,
+    CsrId.mie     -> CsrAddr.mie,
+    CsrId.mip     -> CsrAddr.mip
+  ))*/
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
 /*
@@ -104,23 +113,23 @@ class IDU extends Module with HasInstrType{
   rf.io.wen           := io.regWrite.wen
   rf.io.waddr         := io.regWrite.rd
   rf.io.wdata         := io.regWrite.value
-  rf.io.clock         := clock
-  rf.io.reset         := reset
+  //rf.io.clock         := clock
+  //rf.io.reset         := reset
   
-  val csrRaddr         = Wire(UInt(3.W))
-  csrRaddr            := Mux(systemCtrl === System.ecall, CsrAddr.mtvec, Mux(systemCtrl === System.mret, CsrAddr.mepc, csrRaddrPre))
+  val csrRaddr         = Wire(UInt(12.W))
+  csrRaddr            := Mux(systemCtrl === System.ecall, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
   csrReg.io.raddr     := csrRaddr
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
-  csrReg.io.clock     := clock
-  csrReg.io.reset     := reset
+  //csrReg.io.clock     := clock
+  //csrReg.io.reset     := reset
   // exception
   csrReg.io.exception := io.csrWrite.exception
   csrReg.io.epc       := io.csrWrite.epc(31, 0)
   csrReg.io.no        := io.csrWrite.no
+  csrReg.io.timerInt  := io.timerInt
 
-  // 输出信息
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
@@ -140,7 +149,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.exception   := systemCtrl === System.ecall // todo: type of exception, just for ecall now
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
-  io.ctrl.ebreak      := instrtype === InstrD // ebreak
+  //io.ctrl.ebreak      := instrtype === InstrD // ebreak
   io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)

@@ -8,18 +8,18 @@ class WB_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     //val flush = Input(Bool())
     val stall = Input(Bool())
-
-    val validIn = Input(Bool())
-    val validOut = Output(Bool())
   
     val in = Flipped(new LsuOut)
     val out = new LsuOut
 
+    /*
+    val validIn = Input(Bool())
+    val validOut = Output(Bool())
     val debugIn = Flipped(new DebugIO)
     val debugOut = new DebugIO
 
     val lsFlagIn = Input(Bool())
-    val lsFlagOut = Output(Bool())
+    val lsFlagOut = Output(Bool())*/
   })
 
   val lsuReset = Wire(new LsuOut)
@@ -31,16 +31,17 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.pc         := 0.U(32.W)
   lsuReset.excepNo    := 0.U(4.W)
   lsuReset.exception  := false.B
-  lsuReset.csrWaddr   := CsrAddr.nul
+  lsuReset.csrWaddr   := CsrId.nul
   lsuReset.csrWen     := false.B
   lsuReset.csrValue   := 0.U(64.W)
-  lsuReset.ebreak     := false.B
-  lsuReset.haltRet    := 0.U(64.W)
+  //lsuReset.ebreak     := false.B
+  //lsuReset.haltRet    := 0.U(64.W)
 
   val lsuReg           = RegInit(lsuReset)
   lsuReg              := Mux(io.stall, lsuReg, io.in)
   io.out              := lsuReg
 
+  /*
   val validReg         = RegInit(false.B)
   validReg            := Mux(io.stall, false.B, io.validIn) // todo
   io.validOut         := validReg
@@ -56,5 +57,5 @@ class WB_REG extends Module with HasResetVector {
 
   val lsFlagReg = RegInit(false.B)
   lsFlagReg := Mux(io.stall, lsFlagReg, io.lsFlagIn)
-  io.lsFlagOut := lsFlagReg
+  io.lsFlagOut := lsFlagReg*/
 }

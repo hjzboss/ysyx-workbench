@@ -33,8 +33,8 @@ class EXU extends Module {
     val ready       = Output(Bool())
 
     // debug
-    val debugIn     = Flipped(new DebugIO)
-    val debugOut    = new DebugIO
+    //val debugIn     = Flipped(new DebugIO)
+    //val debugOut    = new DebugIO
   })
 
   val alu   = Module(new Alu)
@@ -78,8 +78,8 @@ class EXU extends Module {
   val brAddr            = brAddrOpA + io.datasrc.imm
 
   // ecall mret
-  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, opAPre, brAddr)
-  io.redirect.brAddr   := brAddrPre(31, 0)
+  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, opAPre(31, 0), brAddr(31, 0))
+  io.redirect.brAddr   := brAddrPre
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
 
   // to lsu
@@ -104,6 +104,7 @@ class EXU extends Module {
   io.out.csrWen        := io.ctrl.csrWen
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
+/*
   // debug
   io.out.ebreak        := io.ctrl.ebreak
   io.out.haltRet       := opAPre // todo: forward
@@ -111,5 +112,5 @@ class EXU extends Module {
   // debug
   io.debugOut.inst     := io.debugIn.inst
   io.debugOut.pc       := io.debugIn.pc
-  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)
+  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)*/
 }

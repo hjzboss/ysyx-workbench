@@ -4,36 +4,23 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+class ArbiterIO extends Bundle {
+  //val cen   = Output(Vec(len, Bool())) // valid & dirty
+  val no    = Output(UInt(2.W))
+  val index = Output(UInt(6.W))
+  val tag   = Output(UInt(22.W))
+}
+
 // 一致性写回的多路选择器（仲裁）
 sealed class CohArbiter(len: Int) extends Module {
   val io = IO(new Bundle {
-    val cenIn   = Input(Vec(len, Bool())) // valid & dirty
-    val noIn    = Input(Vec(len, UInt(2.W)))
-    val indexIn = Input(Vec(len, UInt(6.W)))
-    val tagIn   = Input(Vec(len, UInt(22.W)))
-
-    val noOut   = Output(UInt(2.W))
-    val indexOut= Output(UInt(6.W))
-    val tagOut  = Output(UInt(22.W))
-    val cenOut  = Output(Bool())
+    val in = Vec(len, Flipped(Decoupled(new ArbiterIO)))
+    val out = Decoupled(new ArbiterIO)
   })
 
-  var flag: Boolean = false
-
-  io.noOut := 0.U
-  io.tagOut := 0.U
-  io.indexOut := 0.U
-  for (i <- 0 until len) {
-    if(!flag) {
-      when(io.cenIn(i) === true.B) {
-        io.noOut := io.noIn(i)
-        io.indexOut := io.indexIn(i)
-        io.tagOut := io.tagIn(i)
-        flag = true
-      }
-    }
-  }
-  io.cenOut := io.cenIn.asUInt.orR
+  val arbiter = Module(new Arbiter(new ArbiterIO, len))
+  arbiter.io.in <> io.in
+  arbiter.io.out <> io.out
 }
 
 // todo: fencei指令的处理，cache流水化改造
@@ -125,9 +112,9 @@ class DCache extends Module {
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)),
     data        -> Mux(crdataFire || cwdataFire, idle, data),
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // addr
-    writeback2  -> Mux(brespFire, Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
+    writeback2  -> Mux(brespFire && (io.axiBrespIO.bits.bresp === okay || io.axiBrespIO.bits.bresp === exokay), Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // addr 
-    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast, data, allocate2), // data
+    allocate2   -> Mux(rdataFire && io.axiRdataIO.bits.rlast && (io.axiRdataIO.bits.rresp === okay || io.axiRdataIO.bits.rresp === okay), data, allocate2), // data
     coherence1  -> Mux(coherenceFire, idle, coherence2),
     coherence2  -> writeback1, // data array read
   ))
@@ -137,7 +124,7 @@ class DCache extends Module {
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(raddrFire && io.axiGrant, data_trans, addr_trans),
-    data_trans  -> Mux(rdataFire, Mux(crdataFire, idle, ok), data_trans), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    data_trans  -> Mux(rdataFire && (io.axiRdataIO.bits.rresp === okay || io.axiRdataIO.bits.rresp === exokay), Mux(crdataFire, idle, ok), data_trans), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
     ok          -> Mux(crdataFire, idle, ok)
   ))
 
@@ -146,7 +133,7 @@ class DCache extends Module {
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(waddrFire && io.axiGrant, Mux(wdataFire, wait_resp, data_trans), addr_trans),
     data_trans  -> Mux(wdataFire, wait_resp, data_trans),
-    wait_resp   -> Mux(brespFire, Mux(cwdataFire, idle, ok), wait_resp), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    wait_resp   -> Mux(brespFire && (io.axiBrespIO.bits.bresp === okay || io.axiBrespIO.bits.bresp === exokay), Mux(cwdataFire, idle, ok), wait_resp), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
     ok          -> Mux(cwdataFire, idle, ok)
   ))
 
@@ -209,49 +196,66 @@ class DCache extends Module {
   for(i <- 0 to 63; j <- 0 to 3) {
     dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
   }
-  val arb64Index = List.fill(4)(Wire(Vec(64, UInt(6.W))))
-  val arb64Tag   = List.fill(4)(Wire(Vec(64, UInt(22.W))))
-  val arb64No    = List.fill(4)(Wire(Vec(64, UInt(2.W))))
-  for(i <- 0 to 3; j <- 0 to 63) {
-    arb64Index(i)(j) := j.U(6.W)
-    arb64Tag(i)(j)   := metaArray(i)(j).tag
-    arb64No(i)(j)    := i.U(2.W)
+
+  val arbIOList64 = List.fill(4)(Wire(Vec(64, Decoupled(new ArbiterIO))))
+  //val arb64Index = List.fill(4)(dontTouch(Wire(Vec(64, UInt(6.W)))))
+  //val arb64Tag   = List.fill(4)(dontTouch(Wire(Vec(64, UInt(22.W)))))
+  //val arb64No    = List.fill(4)(dontTouch(Wire(Vec(64, UInt(2.W)))))
+  for(i <- 0 to 3) {
+    for(j <- 0 to 63) {
+      arbIOList64(i)(j).valid := dirtyArray(i)(j)
+      arbIOList64(i)(j).bits.no := i.U(2.W)
+      arbIOList64(i)(j).bits.tag := metaArray(i)(j).tag
+      arbIOList64(i)(j).bits.index := j.U(6.W)
+      //arb64Index(i)(j) := j.U(6.W)
+      //arb64Tag(i)(j)   := metaArray(i)(j).tag
+      //arb64No(i)(j)    := i.U(2.W)
+    }
   }
-  (0 to 3).map(i => (arbList64(i).io.cenIn := dirtyArray(i)))
-  (0 to 3).map(i => (arbList64(i).io.noIn := arb64No(i)))
-  (0 to 3).map(i => (arbList64(i).io.indexIn := arb64Index(i)))
-  (0 to 3).map(i => (arbList64(i).io.tagIn := arb64Tag(i)))
+  (0 to 3).map(i => (arbList64(i).io.in <> arbIOList64(i)))
+  (0 to 3).map(i => (arbList64(i).io.out.ready := true.B))
+  //(0 to 3).map(i => (arbList64(i).io.cenIn := dirtyArray(i)))
+  //(0 to 3).map(i => (arbList64(i).io.noIn := arb64No(i)))
+  //(0 to 3).map(i => (arbList64(i).io.indexIn := arb64Index(i)))
+  //(0 to 3).map(i => (arbList64(i).io.tagIn := arb64Tag(i)))
 
   val arb4 = Module(new CohArbiter(4))
-  val arb4CenIn = VecInit(List.fill(4)(false.B))
-  val arb4TagIn = VecInit(List.fill(4)(0.U(22.W)))
-  val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
-  val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
-  (0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
-  arb4.io.cenIn := arb4CenIn
-  arb4.io.indexIn := arb4IndexIn
-  arb4.io.noIn := arb4NoIn
-  arb4.io.tagIn := arb4TagIn
+  //val arb4CenIn = VecInit(List.fill(4)(false.B))
+  //val arb4TagIn = VecInit(List.fill(4)(0.U(22.W)))
+  //val arb4NoIn  = VecInit(List.fill(4)(0.U(2.W)))
+  //val arb4IndexIn = VecInit(List.fill(4)(0.U(6.W)))
+  //(0 to 3).map(i => (arb4CenIn(i) := arbList64(i).io.cenOut))
+  //(0 to 3).map(i => (arb4TagIn(i) := arbList64(i).io.tagOut))
+  //(0 to 3).map(i => (arb4NoIn(i)  := arbList64(i).io.noOut))
+  //(0 to 3).map(i => (arb4IndexIn(i) := arbList64(i).io.indexOut))
+  //arb4.io.cenIn := arb4CenIn
+  //arb4.io.indexIn := arb4IndexIn
+  //arb4.io.noIn := arb4NoIn
+  //arb4.io.tagIn := arb4TagIn
+  val arb4IO = Wire(Vec(4, Decoupled(new ArbiterIO)))
+  (0 to 3).map(i => (arb4IO(i) := arbList64(i).io.out))
+  arb4.io.in <> arb4IO
+  arb4.io.out.ready := true.B
 
   val ramCenPre = WireDefault(0.U(4.W))
-  ramCenPre := LookupTree(arb4.io.noOut, List(
+  ramCenPre := LookupTree(arb4.io.out.bits.no, List(
     0.U -> 1.U,
     1.U -> 2.U,
     2.U -> 4.U,
     3.U -> 8.U
   ))
   val ramCen = VecInit(List.fill(4)(false.B))
-  (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.cenOut))
+  (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.out.valid))
 
   val colTagReg = RegInit(0.U(22.W))
   val colIndexReg = RegInit(0.U(6.W))
   val colNoReg  = RegInit(0.U(2.W))
-  colTagReg := Mux(state === coherence2, arb4.io.tagOut, colTagReg)
-  colIndexReg := Mux(state === coherence2, arb4.io.indexOut, colIndexReg)
-  colNoReg  := Mux(state === coherence2, arb4.io.noOut, colNoReg)
+  colTagReg := Mux(state === coherence2, arb4.io.out.bits.tag, colTagReg)
+  colIndexReg := Mux(state === coherence2, arb4.io.out.bits.index, colIndexReg)
+  colNoReg  := Mux(state === coherence2, arb4.io.out.bits.no, colNoReg)
 
   val colOver = Wire(Bool()) // coherence over
-  colOver := !(dirtyArray(0).asUInt.orR | dirtyArray(1).asUInt.orR | dirtyArray(2).asUInt.orR | dirtyArray(3).asUInt.orR) 
+  colOver := !(arbList64(0).io.out.valid | arbList64(1).io.out.valid | arbList64(2).io.out.valid | arbList64(3).io.out.valid)
   io.coherence.ready := colOver
 
   // dataArray lookup
@@ -313,17 +317,20 @@ class DCache extends Module {
 
   // axi
   io.axiReq := state === writeback1 || state === allocate1 || rState === addr_trans || wState === addr_trans // todo: 可以提前申请总线请求
-  io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.axiRdataIO.bits.rlast) || (wState === wait_resp && brespFire)
+  io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.axiRdataIO.bits.rlast) || (wState === wait_resp && brespFire) || (state === coherence1 && coherenceFire)
 
   val burstAddr            = addr & "hfffffff8".U
 
   // allocate axi, burst read
   io.axiRaddrIO.valid     := state === allocate1 || rState === addr_trans
-  io.axiRaddrIO.bits.addr := burstAddr
+  //io.axiRaddrIO.bits.addr := burstAddr
+  io.axiRaddrIO.bits.addr := Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)
   //io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
   io.axiRaddrIO.bits.len  := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
-  io.axiRaddrIO.bits.size := 3.U(3.W) // 8B
-  io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
+  //io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), 2.U(3.W)) // todo: 根据lbu这些类型来决定，当访问外设的时候
+  io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
+  //io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
+  io.axiRaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
   io.axiRdataIO.ready     := state === allocate2 || rState === data_trans
 
   // 锁存axi读取的值
@@ -336,7 +343,7 @@ class DCache extends Module {
                               allocate2 -> Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)
                             ))
   val wburst = RegInit(0.U(2.W))
-  when(state === tagCompare) {
+  when(state === tagCompare || state === coherence2) {
     wburst := 0.U(2.W)
   }.elsewhen(state === writeback1 && wdataFire && waddrFire && io.axiGrant) {
     wburst := wburst + 1.U(2.W)
@@ -349,12 +356,13 @@ class DCache extends Module {
   io.axiWaddrIO.valid     := state === writeback1 || wState === addr_trans
   //io.axiWaddrIO.bits.addr := burstAddr
   //io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
-  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), burstAddr)
+  io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr))
   //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
-  io.axiWaddrIO.bits.len  := Mux(wState === addr_trans, 0.U(8.W), 1.U(8.W))
-  io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
-  io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
-
+  io.axiWaddrIO.bits.len  := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 1.U(8.W), 0.U(8.W))
+  //io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
+  io.axiWaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 3.U, io.ctrlIO.bits.size)
+  //io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
+  io.axiWaddrIO.bits.burst:= Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 2.U, 0.U)
   io.axiWdataIO.valid     := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
   io.axiWdataIO.bits.wlast:= (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
   //io.axiWdataIO.bits.wstrb:= "b11111111".U
@@ -401,15 +409,15 @@ class DCache extends Module {
   io.sram7_wmask  := ~0.U(128.W)
   when(state === coherence1) {
     // coherence
-    io.sram4_addr := arb4.io.indexOut
+    io.sram4_addr := arb4.io.out.bits.index
     io.sram4_cen  := !ramCen(0)
-    io.sram5_addr := arb4.io.indexOut
+    io.sram5_addr := arb4.io.out.bits.index
     io.sram5_cen  := !ramCen(1)
-    io.sram6_addr := arb4.io.indexOut
+    io.sram6_addr := arb4.io.out.bits.index
     io.sram6_cen  := !ramCen(2)
-    io.sram7_addr := arb4.io.indexOut
+    io.sram7_addr := arb4.io.out.bits.index
     io.sram7_cen  := !ramCen(3)
-  }.elsewhen(state === idle && ctrlFire) {
+  }.elsewhen(state === idle && ctrlFire && io.ctrlIO.bits.cacheable) {
     // read data
     io.sram4_addr := io.ctrlIO.bits.addr(9, 4)
     io.sram4_cen  := false.B

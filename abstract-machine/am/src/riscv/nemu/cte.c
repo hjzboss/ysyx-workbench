@@ -13,8 +13,6 @@ Context* __am_irq_handle(Context *c) {
       case 0xb:
         if (c->GPR1 == -1) ev.event = EVENT_YIELD;
         else ev.event = EVENT_SYSCALL;
-        // riscv使用软件来将epc+4，因为epc保存的是异常指令本身的地址，需要软件来判断是否+4(缺页错误就不需要+4)
-        c->mepc += 4;
         break;
       default: ev.event = EVENT_ERROR; break;
     }

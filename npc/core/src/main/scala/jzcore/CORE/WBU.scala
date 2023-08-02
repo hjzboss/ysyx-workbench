@@ -14,7 +14,7 @@ class WBU extends Module {
     val csrWrite  = new CSRWriteIO
   })
 
-  val stop              = Module(new Stop)
+  //val stop              = Module(new Stop)
 
   // 寄存器文件写回
   io.regWrite.rd       := io.in.rd
@@ -31,6 +31,6 @@ class WBU extends Module {
   io.csrWrite.no       := io.in.excepNo
 
   // ebreak
-  stop.io.valid        := io.in.ebreak
-  stop.io.haltRet      := io.in.haltRet
+  //stop.io.valid        := io.in.ebreak
+  //stop.io.haltRet      := io.in.haltRet
 }

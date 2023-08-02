@@ -4,11 +4,44 @@ import chisel3._
 import chisel3.util._
 import utils._
 
+
+class AxiMaster extends Bundle {
+  val awready = Input(Bool())
+  val awvalid = Output(Bool())
+  val awid    = Output(UInt(4.W))
+  val awaddr  = Output(UInt(32.W))
+  val awlen   = Output(UInt(8.W))
+  val awsize  = Output(UInt(3.W))
+  val awburst = Output(UInt(2.W))
+  val wready  = Input(Bool())
+  val wvalid  = Output(Bool())
+  val wdata   = Output(UInt(64.W))
+  val wstrb   = Output(UInt(8.W))
+  val wlast   = Output(Bool())
+  val bready  = Output(Bool())
+  val bvalid  = Input(Bool())
+  val bid     = Input(UInt(4.W))
+  val bresp   = Input(UInt(2.W))
+  val arready = Input(Bool())
+  val arvalid = Output(Bool())
+  val arid    = Output(UInt(4.W))
+  val araddr  = Output(UInt(32.W))
+  val arlen   = Output(UInt(8.W))
+  val arsize  = Output(UInt(3.W))
+  val arburst = Output(UInt(2.W))
+  val rready  = Output(Bool())
+  val rvalid  = Input(Bool())
+  val rid     = Input(UInt(4.W))
+  val rdata   = Input(UInt(64.W))
+  val rresp   = Input(UInt(2.W))
+  val rlast   = Input(Bool())
+}
+
 class JzCore extends Module {
   val io = IO(new Bundle {
     // 传给仿真环境
-    val debug       = new DebugIO
-    val finish      = Output(Bool())
+    //val debug       = new DebugIO
+    //val finish      = Output(Bool())
 
     // icache data array
     val sram0_rdata     = Input(UInt(128.W))
@@ -69,13 +102,79 @@ class JzCore extends Module {
     val sram7_wdata     = Output(UInt(128.W)) 
 
     // axi访存接口
+    /*
     val axiRaddrIO  = Decoupled(new RaddrIO)
     val axiRdataIO  = Flipped(Decoupled(new RdataIO))
     val axiWaddrIO  = Decoupled(new WaddrIO)
     val axiWdataIO  = Decoupled(new WdataIO)
-    val axiBrespIO  = Flipped(Decoupled(new BrespIO))   
+    val axiBrespIO  = Flipped(Decoupled(new BrespIO))*/
+    val interrupt      = Input(Bool())
+    val master         = new AxiMaster
+    val slave          = Flipped(new AxiMaster)
 
-    val lsFlag      = Output(Bool())
+    /*
+    val master_awready = Input(Bool())
+    val master_awvalid = Output(Bool())
+    val master_awid    = Output(UInt(4.W))
+    val master_awaddr  = Output(UInt(32.W))
+    val master_awlen   = Output(UInt(8.W))
+    val master_awsize  = Output(UInt(3.W))
+    val master_awburst = Output(UInt(2.W))
+    val master_wready  = Input(Bool())
+    val master_wvalid  = Output(Bool())
+    val master_wdata   = Output(UInt(64.W))
+    val master_wstrb   = Output(UInt(8.W))
+    val master_wlast   = Output(Bool())
+    val master_bready  = Output(Bool())
+    val master_bvalid  = Input(Bool())
+    val master_bid     = Input(UInt(4.W))
+    val master_bresp   = Input(UInt(2.W))
+    val master_arready = Input(Bool())
+    val master_arvalid = Output(Bool())
+    val master_arid    = Output(UInt(4.W))
+    val master_araddr  = Output(UInt(32.W))
+    val master_arlen   = Output(UInt(8.W))
+    val master_arsize  = Output(UInt(3.W))
+    val master_arburst = Output(UInt(2.W))
+    val master_rready  = Output(Bool())
+    val master_rvalid  = Input(Bool())
+    val master_rid     = Input(UInt(4.W))
+    val master_rdata   = Input(UInt(64.W))
+    val master_rresp   = Input(UInt(2.W))
+    val master_rlast   = Input(Bool())
+
+    // useless
+    val slave_awready  = Input(Bool())
+    val slave_awvalid  = Output(Bool())
+    val slave_awid     = Output(UInt(4.W))
+    val slave_awaddr   = Output(UInt(32.W))
+    val slave_awlen    = Output(UInt(8.W))
+    val slave_awsize   = Output(UInt(3.W))
+    val slave_awburst  = Output(UInt(2.W))
+    val slave_wready   = Input(Bool())
+    val slave_wvalid   = Output(Bool())
+    val slave_wdata    = Output(UInt(64.W))
+    val slave_wstrb    = Output(UInt(8.W))
+    val slave_wlast    = Output(Bool())
+    val slave_bready   = Output(Bool())
+    val slave_bvalid   = Input(Bool())
+    val slave_bid      = Input(UInt(4.W))
+    val slave_bresp    = Input(UInt(2.W))
+    val slave_arready  = Input(Bool())
+    val slave_arvalid  = Output(Bool())
+    val slave_arid     = Output(UInt(4.W))
+    val slave_araddr   = Output(UInt(32.W))
+    val slave_arlen    = Output(UInt(8.W))
+    val slave_arsize   = Output(UInt(3.W))
+    val slave_arburst  = Output(UInt(2.W))
+    val slave_rready   = Output(Bool())
+    val slave_rvalid   = Input(Bool())
+    val slave_rid      = Input(UInt(4.W))
+    val slave_rdata    = Input(UInt(64.W))
+    val slave_rresp    = Input(UInt(2.W))
+    val slave_rlast    = Input(Bool())    
+    */
+    //val lsFlag      = Output(Bool())
   })
 
   val ifu     = Module(new IFU)
@@ -87,12 +186,16 @@ class JzCore extends Module {
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
   val dcache  = Module(new DCache)
+  val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
   val exReg   = Module(new EX_REG)
   val lsReg   = Module(new LS_REG)
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
+
+  clint.io.clintIO    <> lsu.io.clintIO
+  clint.io.int        <> idu.io.timerInt
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁
@@ -106,14 +209,55 @@ class JzCore extends Module {
   //arbiter.io.grantLsu <> lsu.io.axiGrant
   //arbiter.io.lsuReady <> lsu.io.axiReady
 
+  // todo: axi总线替换，axi中burst的判断（外设无法burst），外设无法超过4字节请求
   // axi访问接口
+  io.slave.awready := false.B
+  io.slave.wready := false.B
+  io.slave.bvalid := false.B
+  io.slave.bid    := 0.U
+  io.slave.bresp  := 0.U
+  io.slave.arready:= false.B
+  io.slave.rvalid := false.B
+  io.slave.rid    := 0.U
+  io.slave.rdata  := 0.U
+  io.slave.rresp  := 0.U
+  io.slave.rlast  := false.B
   val grant = Cat(arbiter.io.grantIfu, arbiter.io.grantLsu)
   when(grant === 2.U) {
+    /*
     io.axiRaddrIO <> icache.io.axiRaddrIO
     io.axiRdataIO <> icache.io.axiRdataIO
     io.axiWaddrIO <> icache.io.axiWaddrIO
     io.axiWdataIO <> icache.io.axiWdataIO
-    io.axiBrespIO <> icache.io.axiBrespIO
+    io.axiBrespIO <> icache.io.axiBrespIO*/
+    
+    io.master.awid := 0.U
+    io.master.awvalid := icache.io.axiWaddrIO.valid
+    io.master.awaddr := icache.io.axiWaddrIO.bits.addr
+    io.master.awlen := icache.io.axiWaddrIO.bits.len
+    io.master.awsize := icache.io.axiWaddrIO.bits.size
+    io.master.awburst := icache.io.axiWaddrIO.bits.burst
+    icache.io.axiWaddrIO.ready := io.master.awready
+    icache.io.axiWdataIO.ready := io.master.wready
+    io.master.wvalid := icache.io.axiWdataIO.valid
+    io.master.wdata := icache.io.axiWdataIO.bits.wdata
+    io.master.wstrb := icache.io.axiWdataIO.bits.wstrb
+    io.master.wlast := icache.io.axiWdataIO.bits.wlast
+    icache.io.axiBrespIO.valid := io.master.bvalid
+    icache.io.axiBrespIO.bits.bresp := io.master.bresp
+    io.master.bready := icache.io.axiBrespIO.ready
+    io.master.arid := 0.U
+    io.master.araddr := icache.io.axiRaddrIO.bits.addr
+    io.master.arvalid := icache.io.axiRaddrIO.valid
+    icache.io.axiRaddrIO.ready := io.master.arready
+    io.master.arlen := icache.io.axiRaddrIO.bits.len
+    io.master.arsize := icache.io.axiRaddrIO.bits.size
+    io.master.arburst := icache.io.axiRaddrIO.bits.burst
+    io.master.rready := icache.io.axiRdataIO.ready
+    icache.io.axiRdataIO.valid := io.master.rvalid
+    icache.io.axiRdataIO.bits.rdata := io.master.rdata
+    icache.io.axiRdataIO.bits.rlast := io.master.rlast
+    icache.io.axiRdataIO.bits.rresp := io.master.rresp
 
     dcache.io.axiRaddrIO.ready   := false.B
     dcache.io.axiRdataIO.valid   := false.B
@@ -137,11 +281,12 @@ class JzCore extends Module {
     */
   }
   .elsewhen(grant === 1.U || grant === 3.U) {
+    /*
     io.axiRaddrIO <> dcache.io.axiRaddrIO
     io.axiRdataIO <> dcache.io.axiRdataIO
     io.axiWaddrIO <> dcache.io.axiWaddrIO
     io.axiWdataIO <> dcache.io.axiWdataIO
-    io.axiBrespIO <> dcache.io.axiBrespIO
+    io.axiBrespIO <> dcache.io.axiBrespIO*/
     /*
     io.axiRaddrIO <> lsu.io.axiRaddrIO
     io.axiRdataIO <> lsu.io.axiRdataIO
@@ -149,6 +294,33 @@ class JzCore extends Module {
     io.axiWdataIO <> lsu.io.axiWdataIO
     io.axiBrespIO <> lsu.io.axiBrespIO   
     */
+    io.master.awid := 0.U
+    io.master.awvalid := dcache.io.axiWaddrIO.valid
+    io.master.awaddr := dcache.io.axiWaddrIO.bits.addr
+    io.master.awlen := dcache.io.axiWaddrIO.bits.len
+    io.master.awsize := dcache.io.axiWaddrIO.bits.size
+    io.master.awburst := dcache.io.axiWaddrIO.bits.burst
+    dcache.io.axiWaddrIO.ready := io.master.awready
+    dcache.io.axiWdataIO.ready := io.master.wready
+    io.master.wvalid := dcache.io.axiWdataIO.valid
+    io.master.wdata := dcache.io.axiWdataIO.bits.wdata
+    io.master.wstrb := dcache.io.axiWdataIO.bits.wstrb
+    io.master.wlast := dcache.io.axiWdataIO.bits.wlast
+    dcache.io.axiBrespIO.valid := io.master.bvalid
+    dcache.io.axiBrespIO.bits.bresp := io.master.bresp
+    io.master.bready := dcache.io.axiBrespIO.ready
+    io.master.arid := 0.U
+    io.master.araddr := dcache.io.axiRaddrIO.bits.addr
+    io.master.arvalid := dcache.io.axiRaddrIO.valid
+    dcache.io.axiRaddrIO.ready := io.master.arready
+    io.master.arlen := dcache.io.axiRaddrIO.bits.len
+    io.master.arsize := dcache.io.axiRaddrIO.bits.size
+    io.master.arburst := dcache.io.axiRaddrIO.bits.burst
+    io.master.rready := dcache.io.axiRdataIO.ready
+    dcache.io.axiRdataIO.valid := io.master.rvalid
+    dcache.io.axiRdataIO.bits.rdata := io.master.rdata
+    dcache.io.axiRdataIO.bits.rlast := io.master.rlast
+    dcache.io.axiRdataIO.bits.rresp := io.master.rresp
 
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
@@ -162,6 +334,7 @@ class JzCore extends Module {
   }
   .otherwise {
     // 没有请求
+    /*
     io.axiRaddrIO.valid       := false.B
     io.axiRaddrIO.bits.addr   := 0.U
     io.axiRaddrIO.bits.len    := 0.U
@@ -177,7 +350,26 @@ class JzCore extends Module {
     io.axiWdataIO.bits.wdata  := 0.U
     io.axiWdataIO.bits.wstrb  := 0.U
     io.axiWdataIO.bits.wlast  := true.B
-    io.axiBrespIO.ready       := false.B
+    io.axiBrespIO.ready       := false.B*/
+
+    io.master.awid := 0.U
+    io.master.awvalid := false.B
+    io.master.awaddr := 0.U
+    io.master.awlen := 0.U
+    io.master.awsize := 0.U
+    io.master.awburst := 0.U
+    io.master.wvalid := false.B
+    io.master.wdata := 0.U
+    io.master.wstrb := 0.U
+    io.master.wlast := false.B
+    io.master.bready := false.B
+    io.master.arid := 0.U
+    io.master.araddr := 0.U
+    io.master.arvalid := false.B
+    io.master.arlen := 0.U
+    io.master.arsize := 0.U
+    io.master.arburst := 0.U
+    io.master.rready := false.B
 
     icache.io.axiRaddrIO.ready   := false.B
     icache.io.axiRdataIO.valid   := false.B
@@ -275,6 +467,7 @@ class JzCore extends Module {
   //ifu.io.out          <> idReg.io.in
   ifu.io.exuRedirect  <> exu.io.redirect
   ifu.io.icRedirect   <> icache.io.redirect
+  /*
   ifu.io.valid        <> icache.io.validIn
   icache.io.validOut  <> idReg.io.validIn
   //ifu.io.icacheCtrl <> icache.io.ctrlIO
@@ -283,7 +476,7 @@ class JzCore extends Module {
   //idReg.io.validIn    <> ifu.io.valid
   exReg.io.validIn    <> idReg.io.validOut
   lsReg.io.validIn    <> exReg.io.validOut
-  wbReg.io.validIn    <> lsReg.io.validOut
+  wbReg.io.validIn    <> lsReg.io.validOut*/
 
   // 控制模块
   //ctrl.io.ifuReady  <> ifu.io.ready
@@ -346,9 +539,10 @@ class JzCore extends Module {
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
 
+  wbu.io.in         <> wbReg.io.out
+  /*
   wbReg.io.lsFlagIn <> lsu.io.lsFlag
   io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
-  wbu.io.in         <> wbReg.io.out
 
   ifu.io.debug      <> icache.io.debugIn
   idReg.io.debugIn  <> icache.io.debugOut
@@ -358,5 +552,5 @@ class JzCore extends Module {
   lsReg.io.debugIn  <> exu.io.debugOut
   wbReg.io.debugIn  <> lsReg.io.debugOut
   io.debug          <> wbReg.io.debugOut
-  io.finish         <> wbReg.io.validOut
+  io.finish         <> wbReg.io.validOut*/
 }

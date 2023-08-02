@@ -99,23 +99,29 @@ object RegWrite {
 }
 
 object CsrId {
-  def mstatus = "h300".U
-  def mtvec   = "h305".U
-  def mepc    = "h341".U
-  def mcause  = "h342".U
+  def mstatus = 0x300.U
+  def mtvec   = 0x305.U
+  def mepc    = 0x341.U
+  def mcause  = 0x342.U
+  def mie     = 0x304.U
+  def mip     = 0x344.U
+  def nul     = 0x000.U
 
   def apply() = UInt(12.W)
 }
 
+/*
 object CsrAddr {
   def mstatus = "b000".U
   def mtvec   = "b001".U
   def mepc    = "b010".U
   def mcause  = "b011".U
-  def nul     = "b100".U
+  def mie     = "b100".U
+  def mip     = "b101".U
+  def nul     = "b110".U
 
   def apply() = UInt(3.W)
-}
+}*/
 
 object System {
   def nop    = "b00".U
@@ -163,6 +169,15 @@ object MulType {
   def ss  = "b11".U
   def su  = "b10".U
   def uu  = "b00".U
+
+  def apply = UInt(2.W)
+}
+
+object AxiWidth {
+  def byte = "b00".U
+  def half = "b01".U
+  def word = "b10".U
+  def double = "b11".U
 
   def apply = UInt(2.W)
 }

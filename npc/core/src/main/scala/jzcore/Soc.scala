@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -111,4 +112,4 @@ class Soc extends Module {
 
   io.lsFlag       := core.io.lsFlag
   //io.csrAddr      := core.io.csrAddr 
-}
+}*/
