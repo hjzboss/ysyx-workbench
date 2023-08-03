@@ -117,7 +117,7 @@ class IDU extends Module with HasInstrType{
   //rf.io.reset         := reset
   
   val csrRaddr         = Wire(UInt(12.W))
-  csrRaddr            := Mux(systemCtrl === System.ecall, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
+  csrRaddr            := Mux(systemCtrl === System.ecall || csrReg.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
   csrReg.io.raddr     := csrRaddr
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
@@ -131,12 +131,12 @@ class IDU extends Module with HasInstrType{
   csrReg.io.timerInt  := io.timerInt
 
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src1     := Mux(csrReg.io.int || systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
   io.ctrl.rd          := rd
-  io.ctrl.br          := instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
+  io.ctrl.br          := (instrtype === InstrIJ) | (instrtype === InstrJ) | (instrtype === InstrB)
   io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN && instrtype =/= InstrE
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
@@ -145,8 +145,8 @@ class IDU extends Module with HasInstrType{
   io.ctrl.csrWen      := instrtype === InstrZ
   io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE // just for forwarding
   io.ctrl.csrWaddr    := csrRaddr
-  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, 0.U) // todo: only syscall
-  io.ctrl.exception   := systemCtrl === System.ecall // todo: type of exception, just for ecall now
+  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
+  io.ctrl.exception   := systemCtrl === System.ecall | csrReg.io.int // type of exception
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
   //io.ctrl.ebreak      := instrtype === InstrD // ebreak
