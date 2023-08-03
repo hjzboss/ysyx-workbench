@@ -51,6 +51,7 @@ class CsrReg extends Module {
   val mip     = RegInit(0.U(16.W))
   val mie     = RegInit(0.U(16.W))
   val mcause  = RegInit(0.U(64.W))
+  val mhartid = RegInit(0.U(64.W)) // todo
 
   when(io.wen && io.waddr === io.raddr) {
     // forward

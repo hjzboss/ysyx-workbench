@@ -5,7 +5,9 @@ import chisel3.util._
 import utils._
 
 
-// 在idu阶段处理计时器中断， todo
+// 在idu阶段处理计时器中断， todo，发现mip和mie对应位置为1时取出mtvec，跳转到mtvec执行
+// rtthread在一段时间内设置了mtvec，清除了mip和mie，然后设置了clint mtimecmp，说明在发生定时器中断时是需要跳转到mtvec执行的
+// 但是还有个mhartid csr寄存器需要实现，todo
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
     // 来自ifu
