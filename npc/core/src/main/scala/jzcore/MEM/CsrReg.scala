@@ -27,6 +27,8 @@ class CsrReg extends BlackBox {
 
 class CsrReg extends Module {
   val io = IO(new Bundle {
+    val stall     = Input(Bool())
+
     // exception
     val exception = Input(Bool())
     val epc       = Input(UInt(64.W))
@@ -100,8 +102,11 @@ class CsrReg extends Module {
   mip       := mipVec.asUInt
 
   // interrupt, just for timer int now
+  val int    = RegInit(false.B)
+  int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT))
+
   //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
-  io.int    := io.timerInt & mie(MIP_CLINT)
+  io.int    := int
 
   // clear other interrupt
   when(io.int) {
