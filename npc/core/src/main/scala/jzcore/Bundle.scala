@@ -121,6 +121,7 @@ class CtrlFlow extends Bundle {
   val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
   val rs1           = Output(UInt(5.W))
   val rs2           = Output(UInt(5.W))
+  val int           = Output(Bool())
 }
 
 class ExuOut extends Bundle {
