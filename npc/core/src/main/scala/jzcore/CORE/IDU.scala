@@ -10,6 +10,7 @@ import utils._
 // 但是还有个mhartid csr寄存器需要实现，todo
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
+    val stall     = Input(Bool())
     // 来自ifu
     val in        = Flipped(new InstrFetch)
 
@@ -38,6 +39,7 @@ class IDU extends Module with HasInstrType{
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
+  csrReg.io.stall := io.stall
   //val brAlu     = Module(new BrAlu)
 
   val inst      = io.in.inst
@@ -117,7 +119,7 @@ class IDU extends Module with HasInstrType{
   //rf.io.reset         := reset
   
   val csrRaddr         = Wire(UInt(12.W))
-  csrRaddr            := Mux(systemCtrl === System.ecall, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
+  csrRaddr            := Mux(systemCtrl === System.ecall || csrReg.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
   csrReg.io.raddr     := csrRaddr
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
@@ -131,7 +133,7 @@ class IDU extends Module with HasInstrType{
   csrReg.io.timerInt  := io.timerInt
 
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src1     := Mux(csrReg.io.int || systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
@@ -145,8 +147,8 @@ class IDU extends Module with HasInstrType{
   io.ctrl.csrWen      := instrtype === InstrZ
   io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE // just for forwarding
   io.ctrl.csrWaddr    := csrRaddr
-  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, 0.U) // todo: only syscall and timer
-  io.ctrl.exception   := systemCtrl === System.ecall // type of exception
+  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
+  io.ctrl.exception   := systemCtrl === System.ecall | csrReg.io.int // type of exception
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
   //io.ctrl.ebreak      := instrtype === InstrD // ebreak
@@ -154,6 +156,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF
+  io.ctrl.int         := csrReg.io.int
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
