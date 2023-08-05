@@ -27,8 +27,6 @@ class CsrReg extends BlackBox {
 
 class CsrReg extends Module {
   val io = IO(new Bundle {
-    val stall     = Input(Bool())
-
     // exception
     val exception = Input(Bool())
     val epc       = Input(UInt(64.W))
@@ -43,11 +41,10 @@ class CsrReg extends Module {
 
     // clint interrupt
     val timerInt  = Input(Bool())
-    val int       = Output(Bool())
+    //val int       = Output(Bool())
   })
 
   // csr0: mstatus, csr1: mtvec, csr2: mepc, csr3: mcause
-  //val csr = RegInit(VecInit(List.fill(4)(0.U(64.W))))
 
   val mstatus = RegInit(0.U(64.W))
   val mtvec   = RegInit(0.U(64.W))
@@ -84,34 +81,21 @@ class CsrReg extends Module {
     }
   }
 
-  /*
-  io.rdata := Mux(io.wen && io.waddr === io.raddr, io.wdata, csr(io.raddr(2, 0)))
-
-  when(io.wen && (io.waddr(2, 0) =/= 5.U)) {
-    csr(io.waddr(2, 0)) := io.wdata
-  }
-
-  when(io.exception) {
-    csr(2) := io.epc
-    csr(3) := ZeroExt(io.no, 64)
-  }*/
-
   // timer int
   val mipVec = VecInit(mip.asBools)
-  mipVec(7) := io.timerInt
-  mip       := mipVec.asUInt
+  mipVec(MIP_CLINT) := io.timerInt
+  mip               := mipVec.asUInt
 
   // interrupt, just for timer int now
-  val int    = RegInit(false.B)
-  int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE))
+  //val int    = RegInit(false.B)
+  //int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE))
 
-  //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
-  io.int    := int
+  //io.int    := int
 
   // clear other interrupt
-  when(io.int) {
-    mie := 0.U
-  }
+  //when(io.int) {
+  //  mie := 0.U
+  //}
 }
 
 /*
