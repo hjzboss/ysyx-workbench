@@ -108,7 +108,7 @@ class CsrReg extends Module {
   //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
   io.int    := int
 
-  // clear other interrupt
+  // clear other interrupt，可能有问题，mie不会恢复
   when(int) {
     mie := 0.U
   }
