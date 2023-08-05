@@ -109,9 +109,9 @@ class CsrReg extends Module {
   io.int    := int
 
   // clear other interrupt
-  //when(int) {
-  //  mie := 0.U
-  //}
+  when(int) {
+    mie := 0.U
+  }
 }
 
 /*
