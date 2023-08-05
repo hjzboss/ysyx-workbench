@@ -10,6 +10,7 @@ import utils._
 // 但是还有个mhartid csr寄存器需要实现，todo
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
+    val stall     = Input(Bool())
     // 来自ifu
     val in        = Flipped(new InstrFetch)
 
@@ -38,6 +39,7 @@ class IDU extends Module with HasInstrType{
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
+  csrReg.io.stall := io.stall
   //val brAlu     = Module(new BrAlu)
 
   val inst      = io.in.inst
