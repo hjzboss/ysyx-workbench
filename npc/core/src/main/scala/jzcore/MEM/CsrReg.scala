@@ -57,7 +57,7 @@ class CsrReg extends Module {
   val mcause  = RegInit(0.U(64.W))
   val mhartid = RegInit(0.U(64.W)) // todo
 
-  val MSTATUS_MIE     = 3
+  val MSTATUS_MIE     = 7
   val MIP_CLINT       = 7
 
   when(io.wen && io.waddr === io.raddr) {
