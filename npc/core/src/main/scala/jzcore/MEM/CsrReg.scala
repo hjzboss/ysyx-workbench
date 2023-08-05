@@ -57,7 +57,7 @@ class CsrReg extends Module {
   val mcause  = RegInit(0.U(64.W))
   val mhartid = RegInit(0.U(64.W)) // todo
 
-  val MSTATUS_MIE     = 7
+  val MSTATUS_MIE     = 3
   val MIP_CLINT       = 7
 
   when(io.wen && io.waddr === io.raddr) {
@@ -103,7 +103,7 @@ class CsrReg extends Module {
 
   // interrupt, just for timer int now
   val int    = RegInit(false.B)
-  int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE))
+  int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT))
 
   //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
   io.int    := int
