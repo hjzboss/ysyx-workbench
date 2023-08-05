@@ -103,7 +103,7 @@ class CsrReg extends Module {
 
   // interrupt, just for timer int now
   val int    = RegInit(false.B)
-  int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT))
+  int       := Mux(io.stall, int, io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE))
 
   //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
   io.int    := int
