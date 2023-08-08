@@ -8,10 +8,8 @@ import utils._
 // 在idu阶段处理计时器中断， todo，发现mip和mie对应位置为1时取出mtvec，跳转到mtvec执行
 // rtthread在一段时间内设置了mtvec，清除了mip和mie，然后设置了clint mtimecmp，说明在发生定时器中断时是需要跳转到mtvec执行的
 // 但是还有个mhartid csr寄存器需要实现，todo
-// 线程切换是否真的是通过中断来进行的？
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
-    val stall     = Input(Bool())
     // 来自ifu
     val in        = Flipped(new InstrFetch)
 
@@ -40,7 +38,6 @@ class IDU extends Module with HasInstrType{
 
   val rf        = Module(new RF)
   val csrReg    = Module(new CsrReg)
-  csrReg.io.stall := io.stall
   //val brAlu     = Module(new BrAlu)
 
   val inst      = io.in.inst
@@ -145,7 +142,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
-  io.ctrl.csrWen      := instrtype === InstrZ | csrReg.io.int // todo: 异常指令会导致跳转，在写回阶段才会写回csr寄存器，可能有问题
+  io.ctrl.csrWen      := instrtype === InstrZ
   io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE // just for forwarding
   io.ctrl.csrWaddr    := csrRaddr
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
@@ -157,7 +154,6 @@ class IDU extends Module with HasInstrType{
   io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF
-  io.ctrl.int         := csrReg.io.int
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
