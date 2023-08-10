@@ -18,6 +18,7 @@ class IFU extends Module with HasResetVector {
     // from exu
     val exuRedirect   = Flipped(new RedirectIO)
     val icRedirect    = Flipped(new RedirectIO)
+    val wbuRedirect   = Flipped(new RedirectIO)
 
     // to idu
     val out           = new Stage1IO
@@ -63,7 +64,7 @@ class IFU extends Module with HasResetVector {
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
 
-  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+  pc              := Mux(io.stall, pc, Mux(io.wbuRedirect.valid, io.wbuRedirect.brAddr, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc))))
   
   io.out.addr     := pc 
   //io.out.cacheable:= true.B // todo: 接入soc时需要更改

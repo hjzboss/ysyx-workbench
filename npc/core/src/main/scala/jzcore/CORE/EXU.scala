@@ -104,6 +104,7 @@ class EXU extends Module {
   io.out.csrWen        := io.ctrl.csrWen
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
+  io.out.int           := io.ctrl.int
 /*
   // debug
   io.out.ebreak        := io.ctrl.ebreak

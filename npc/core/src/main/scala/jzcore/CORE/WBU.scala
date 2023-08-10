@@ -12,6 +12,8 @@ class WBU extends Module {
     // 写回regfile 和 csrfile
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
+
+    val redirect  = new RedirectIO
   })
 
   //val stop              = Module(new Stop)
@@ -29,6 +31,9 @@ class WBU extends Module {
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.excepNo
+
+  io.redirect.valid    := io.in.int
+  io.redirect.brAddr   := io.in.csrValue
 
   // ebreak
   //stop.io.valid        := io.in.ebreak

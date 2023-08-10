@@ -121,6 +121,7 @@ class CtrlFlow extends Bundle {
   val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
   val rs1           = Output(UInt(5.W))
   val rs2           = Output(UInt(5.W))
+  val int           = Output(Bool())
 }
 
 class ExuOut extends Bundle {
@@ -143,6 +144,7 @@ class ExuOut extends Bundle {
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
   val coherence     = Output(Bool())
+  val int           = Output(Bool())
 
   //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   //val haltRet       = Output(UInt(64.W))
@@ -160,6 +162,7 @@ class LsuOut extends Bundle {
   val csrWaddr      = Output(UInt(12.W))
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
+  val int           = Output(Bool())
 
   //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
   //val haltRet       = Output(UInt(64.W))
