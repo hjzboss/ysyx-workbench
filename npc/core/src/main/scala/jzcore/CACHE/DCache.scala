@@ -23,7 +23,6 @@ sealed class CohArbiter(len: Int) extends Module {
   arbiter.io.out <> io.out
 }
 
-// todo: fencei指令的处理，cache流水化改造
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 class DCache extends Module {
   val io = IO(new Bundle {

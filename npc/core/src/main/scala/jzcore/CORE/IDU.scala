@@ -142,7 +142,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
-  io.ctrl.csrWen      := instrtype === InstrZ || csrReg.io.int
+  io.ctrl.csrWen      := instrtype === InstrZ
   io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE // just for forwarding
   io.ctrl.csrWaddr    := csrRaddr
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer

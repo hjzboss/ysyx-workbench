@@ -4,7 +4,8 @@ import chisel3._
 import chisel3.util._
 import utils._
 
-
+// todo: flush信号的处理，现在的想法：在idu阶段检测中断，在wbu阶段进行异常号等等的写回和异常地址的跳转
+// todo：wbu阶段跳转的优先级高于exu阶段
 class LSU extends Module {
   val io = IO(new Bundle {
     // exu传入
@@ -191,6 +192,7 @@ class LSU extends Module {
   //io.out.ebreak         := io.in.ebreak
   //io.out.haltRet        := io.in.haltRet
   io.out.csrValue       := io.in.csrValue
+  io.out.int            := io.in.int
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
   io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
