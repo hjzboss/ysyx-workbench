@@ -40,7 +40,7 @@ class WB_REG extends Module with HasResetVector {
   //lsuReset.haltRet    := 0.U(64.W)
 
   val lsuReg           = RegInit(lsuReset)
-  lsuReg               = Mux(io.stall, lsuReg, Mux(io.flush, lsuReset, io.in))
+  lsuReg              := Mux(io.stall, lsuReg, Mux(io.flush, lsuReset, io.in))
   io.out              := lsuReg
 
   /*
