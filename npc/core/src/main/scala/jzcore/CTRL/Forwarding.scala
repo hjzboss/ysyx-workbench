@@ -50,10 +50,8 @@ class Forwarding extends Module {
   val forwardACsrWbu = io.csrRen && (io.wbuCsrWen || io.wbuException) && io.wbuCsrAddr =/= CsrId.nul && io.csrRaddr === io.wbuCsrAddr
   val forwardACsrLsu = io.csrRen && (io.lsuCsrWen || io.lsuException) && io.lsuCsrAddr =/= CsrId.nul && io.csrRaddr === io.lsuCsrAddr
 
-  val excepSel = Wire(Bool())
-  excepSel := Mux(io.csrRaddr === CsrId.mepc, Forward.mepc, Forward.no)
   //io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsrWbu, Forward.csrWbuData, Mux(forwardACsrLsu, Forward.csrLsuData, Forward.normal))))
-  io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsrWbu, Mux(io.wbuException, excepSel, Forward.csrWbuData), Mux(forwardACsrLsu, Mux(io.lsuException, excepSel, Forward.csrLsuData), Forward.normal))))
+  io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsrWbu, Mux(io.wbuException, Mux(io.csrRaddr === CsrId.mepc, Forward.wbuMepc, Forward.wbuNo), Forward.csrWbuData), Mux(forwardACsrLsu, Mux(io.lsuException, Mux(io.csrRaddr === CsrId.mepc, Forward.lsuMepc, Forward.lsuNo), Forward.csrLsuData), Forward.normal))))
   io.forwardB := Mux(forwardBLsu, Forward.lsuData, Mux(forwardBWbu, Forward.wbuData, Forward.normal))
 
   io.flushExuCsr := io.mret && io.csrRaddr === CsrId.mstatus
