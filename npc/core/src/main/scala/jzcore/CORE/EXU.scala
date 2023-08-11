@@ -10,6 +10,7 @@ class EXU extends Module {
     val datasrc     = Flipped(new DataSrcIO)
     val aluCtrl     = Flipped(new AluIO)
     val ctrl        = Flipped(new CtrlFlow)
+    val flushCsr    = Input(Bool())
     
     // 传给Lsu
     val out         = new ExuOut
@@ -22,10 +23,14 @@ class EXU extends Module {
     val wbuForward  = Input(UInt(64.W))
     val csrWbuForward = Input(UInt(64.W))
     val csrLsuForward = Input(UInt(64.W))
+    val lsuMepc     = Input(UInt(32.W))
+    val wbuMepc     = Input(UInt(32.W))
+    val lsuNo       = Input(UInt(64.W))
+    val wbuNo       = Input(UInt(64.W))
 
     // 旁路控制信号
-    val forwardA    = Input(UInt(3.W))
-    val forwardB    = Input(UInt(3.W))
+    val forwardA    = Input(UInt(4.W))
+    val forwardB    = Input(UInt(4.W))
 
     // alu
     val stall       = Input(Bool())
@@ -48,6 +53,10 @@ class EXU extends Module {
     Forward.wbuData     -> io.wbuForward,
     Forward.csrWbuData  -> io.csrWbuForward,
     Forward.csrLsuData  -> io.csrLsuForward,
+    Forward.wbuMepc     -> ZeroExt(io.wbuMepc, 64),
+    Forward.lsuMepc     -> ZeroExt(io.lsuMepc, 64),
+    Forward.wbuNo       -> io.wbuNo,
+    Forward.lsuNo       -> io.lsuNo,
     Forward.normal      -> io.datasrc.src1
   ))
   val opBPre = LookupTreeDefault(io.forwardB, io.datasrc.src2, List(
@@ -101,7 +110,7 @@ class EXU extends Module {
   io.out.excepNo       := io.ctrl.excepNo
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
-  io.out.csrWen        := io.ctrl.csrWen
+  io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
   io.out.int           := io.ctrl.int

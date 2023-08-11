@@ -5,9 +5,7 @@ import chisel3.util._
 import utils._
 
 
-// 在idu阶段处理计时器中断， todo，发现mip和mie对应位置为1时取出mtvec，跳转到mtvec执行
-// rtthread在一段时间内设置了mtvec，清除了mip和mie，然后设置了clint mtimecmp，说明在发生定时器中断时是需要跳转到mtvec执行的
-// 但是还有个mhartid csr寄存器需要实现，todo
+// todo: mret指令需要处理，mret会设置mstatus中的mie为mpie
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
     // 来自ifu
@@ -34,6 +32,8 @@ class IDU extends Module with HasInstrType{
     val ctrl      = new CtrlFlow
 
     val timerInt  = Input(Bool()) // clint int
+    
+    val mret      = Output(Bool())
   })
 
   val rf        = Module(new RF)
@@ -122,6 +122,7 @@ class IDU extends Module with HasInstrType{
   csrReg.io.waddr     := io.csrWrite.waddr
   csrReg.io.wen       := io.csrWrite.wen
   csrReg.io.wdata     := io.csrWrite.wdata
+  csrReg.io.mret      := systemCtrl === System.mret
   //csrReg.io.clock     := clock
   //csrReg.io.reset     := reset
   // exception
@@ -145,7 +146,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.csrWen      := instrtype === InstrZ
   io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE // just for forwarding
   io.ctrl.csrWaddr    := csrRaddr
-  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U, Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
+  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
   io.ctrl.exception   := systemCtrl === System.ecall | csrReg.io.int // type of exception
   io.ctrl.memWen      := memEn === MemEn.store
   io.ctrl.memRen      := memEn === MemEn.load
@@ -159,4 +160,6 @@ class IDU extends Module with HasInstrType{
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := aluOp
+
+  io.mret             := systemCtrl === System.mret
 }

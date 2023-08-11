@@ -467,7 +467,7 @@ class JzCore extends Module {
   //ifu.io.out          <> idReg.io.in
   ifu.io.exuRedirect  <> exu.io.redirect
   ifu.io.icRedirect   <> icache.io.redirect
-  ifu.io.wbuRedirect  <> wbu.io.redirect
+  //ifu.io.wbuRedirect  <> wbu.io.redirect
   /*
   ifu.io.valid        <> icache.io.validIn
   icache.io.validOut  <> idReg.io.validIn
@@ -498,15 +498,15 @@ class JzCore extends Module {
   ctrl.io.stallPc     <> ifu.io.stall
   ctrl.io.flushICache <> icache.io.flush
   ctrl.io.flushIduReg <> idReg.io.flush
-  ctrl.io.iduInt      <> idu.io.ctrl.int
-  ctrl.io.exuInt      := exReg.io.ctrlOut.int
-  ctrl.io.lsuInt      := lsReg.io.out.int
-  ctrl.io.wbuInt      := wbReg.io.out.int
+  //ctrl.io.iduInt      <> idu.io.ctrl.int
+  //ctrl.io.exuInt      := exReg.io.ctrlOut.int
+  //ctrl.io.lsuInt      := lsReg.io.out.int
+  //ctrl.io.wbuInt      := wbReg.io.out.int
   idReg.io.flush      <> ctrl.io.flushIduReg
   exReg.io.flush      := ctrl.io.flushExuReg
   exu.io.flush        := ctrl.io.flushExuReg
-  lsReg.io.flush      <> ctrl.io.flushLsuReg
-  wbReg.io.flush      <> ctrl.io.flushWbuReg
+  //lsReg.io.flush      <> ctrl.io.flushLsuReg
+  //wbReg.io.flush      <> ctrl.io.flushWbuReg
   //ctrl.io.flushExuReg <> exReg.io.flush
 
   forward.io.lsuRd  := lsReg.io.out.rd
@@ -521,6 +521,12 @@ class JzCore extends Module {
   forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
   forward.io.csrRen   := exReg.io.ctrlOut.csrRen
   forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
+  forward.io.mret     <> idu.io.mret
+  forward.io.flushExuCsr <> exu.io.flushCsr
+  forward.io.flushLsuCsr <> lsu.io.flushCsr
+  forward.io.flushWbuCsr <> wbu.io.flushCsr
+  forward.io.lsuException := lsReg.io.out.exception
+  forward.io.wbuException := wbReg.io.out.exception
 
   idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite
@@ -539,6 +545,10 @@ class JzCore extends Module {
   exu.io.out        <> lsReg.io.in
   exu.io.forwardA   <> forward.io.forwardA
   exu.io.forwardB   <> forward.io.forwardB
+  exu.io.wbuMepc    := wbReg.io.out.pc
+  exu.io.lsuMepc    := lsReg.io.out.pc
+  exu.io.lsuNo      := lsReg.io.out.excepNo
+  exu.io.wbuNo      := wbReg.io.out.excepNo
 
   lsu.io.dcacheCtrl <> dcache.io.ctrlIO
   lsu.io.dcacheRead <> dcache.io.rdataIO
