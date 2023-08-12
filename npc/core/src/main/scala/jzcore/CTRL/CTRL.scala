@@ -14,14 +14,7 @@ class CTRL extends Module {
 
     // 分支指令需要flush流水线
     val branch      = Input(Bool())
-
-    // 中断信号
-    /*
-    val iduInt      = Input(Bool())
-    val exuInt      = Input(Bool())
-    val lsuInt      = Input(Bool())
-    val wbuInt      = Input(Bool())*/
-
+  
     // stall pipline reg and pc
     val stallPc     = Output(Bool())
     val stallICache = Output(Bool())

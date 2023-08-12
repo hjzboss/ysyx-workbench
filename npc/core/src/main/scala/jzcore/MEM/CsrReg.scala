@@ -94,12 +94,6 @@ class CsrReg extends Module {
     mcause := io.no
   }
 
-  when(io.mret) {
-    // mret指令会导致mie更新为mpie,mpie更新为1
-    val mpie = mstatus(MSTATUS_MPIE)
-    mstatus := mstatus(63, MSTATUS_MPIE+1) ## true.B ## mstatus(MSTATUS_MPIE-1, MSTATUS_MIE+1) ## mpie ## mstatus(MSTATUS_MIE-1, 0)
-  }
-
   /*
   io.rdata := Mux(io.wen && io.waddr === io.raddr, io.wdata, csr(io.raddr(2, 0)))
 
@@ -120,9 +114,15 @@ class CsrReg extends Module {
   // interrupt, just for timer int now
   io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
 
-  // clear other interrupt
-  when(io.int && io.intResp) {
-    mie := 0.U
+  // interrupt
+  when(io.mret) {
+    // mret指令会导致mie更新为mpie,mpie更新为1
+    val mpie = mstatus(MSTATUS_MPIE)
+    mstatus := mstatus(63, MSTATUS_MPIE+1) ## true.B ## mstatus(MSTATUS_MPIE-1, MSTATUS_MIE+1) ## mpie ## mstatus(MSTATUS_MIE-1, 0)
+  }.elsewhen(io.int && io.intResp) {
+    // 将mstatus的mie字段保存到mpie，mie字段设置为0
+    val mstatusMie = mstatus(MSTATUS_MIE)
+    mstatus := mstatus(63, MSTATUS_MPIE+1) ## mstatusMie ## mstatus(MSTATUS_MPIE-1, MSTATUS_MIE+1) ## false.B ## mstatus(MSTATUS_MIE-1, 0)
   }
 }
 
