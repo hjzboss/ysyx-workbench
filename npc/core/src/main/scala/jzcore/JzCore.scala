@@ -467,14 +467,15 @@ class JzCore extends Module {
   //ifu.io.out          <> idReg.io.in
   ifu.io.exuRedirect  <> exu.io.redirect
   ifu.io.icRedirect   <> icache.io.redirect
-  //ifu.io.wbuRedirect  <> wbu.io.redirect
-  /*
+
   ifu.io.valid        <> icache.io.validIn
   icache.io.validOut  <> idReg.io.validIn
+  idReg.io.validOut   <> idu.io.validIn
   //ifu.io.icacheCtrl <> icache.io.ctrlIO
   //ifu.io.icacheRead <> icache.io.rdataIO
   //ifu.io.icacheWrite<> icache.io.wdataIO
   //idReg.io.validIn    <> ifu.io.valid
+  /*
   exReg.io.validIn    <> idReg.io.validOut
   lsReg.io.validIn    <> exReg.io.validOut
   wbReg.io.validIn    <> lsReg.io.validOut*/

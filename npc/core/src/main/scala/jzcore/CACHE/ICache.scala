@@ -98,10 +98,10 @@ sealed class CacheStage2 extends Module with HasResetVector {
     /*
     // debug
     val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO
+    val debugOut        = new DebugIO*/
 
     val validIn         = Input(Bool())
-    val validOut        = Output(Bool())*/
+    val validOut        = Output(Bool())
 
     // cache
     val toStage2        = Flipped(new Stage2IO)
@@ -125,10 +125,10 @@ sealed class CacheStage2 extends Module with HasResetVector {
     val metaAlloc       = Flipped(new MetaAllocIO)
   })
 
-  /*
+
   val validReg           = RegInit(false.B)
-  validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, Mux(io.stage3Stall, validReg, io.validIn)))*/
-  //io.validOut           := validReg
+  validReg              := Mux(io.stallIn, validReg, Mux(io.flushIn, false.B, Mux(io.stage3Stall, validReg, io.validIn)))
+  io.validOut           := validReg
 
   // pipline reg
   val regInit            = Wire(new Stage2IO)
@@ -217,10 +217,10 @@ sealed class CacheStage2 extends Module with HasResetVector {
 
 sealed class CacheStage3 extends Module with HasResetVector {
   val io = IO(new Bundle {
-    /*
     // debug
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
+    /*
     val debugIn         = Flipped(new DebugIO)
     val debugOut        = new DebugIO*/
 
@@ -442,19 +442,20 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.out.inst := inst
   io.out.pc   := stage3Reg.pc
 
-  /*
   val validReg      = RegInit(false.B)
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    
-  io.validOut      := validReg && !io.flushIn && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
-  io.debugOut.inst := inst*/
+  io.validOut      := validReg && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || (state === data && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
+  // for npc verilator simulation env
+  //io.validOut      := validReg && !io.flushIn && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
+  //io.debugOut.inst := inst
 }
 
 class ICache extends Module {
   val io = IO(new Bundle {
-    /*
     // todo: 是否需要valid信号来提示是一条有效指令?
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
+    /*
     val debugIn         = Flipped(new DebugIO)
     val debugOut        = new DebugIO*/
 
@@ -520,11 +521,12 @@ class ICache extends Module {
   val dataArb2 = Module(new IcArbiter)
   val dataArb3 = Module(new IcArbiter)
   
-  /*
+
   // debug
   stage2.io.validIn     <> io.validIn
   stage3.io.validIn     <> stage2.io.validOut
   io.validOut           <> stage3.io.validOut
+  /*
   stage2.io.debugIn     <> io.debugIn
   stage2.io.debugOut    <> stage3.io.debugIn
   stage3.io.debugOut    <> io.debugOut*/
