@@ -39,11 +39,15 @@ class CsrReg extends Module {
     val wen       = Input(Bool())
     val wdata     = Input(UInt(64.W))
 
+    // mret
     val mret      = Input(Bool()) 
 
     // clint interrupt
     val timerInt  = Input(Bool())
+
+    // interrupt
     val int       = Output(Bool())
+    val intResp   = Input(Bool())
   })
 
   // csr0: mstatus, csr1: mtvec, csr2: mepc, csr3: mcause
@@ -117,7 +121,7 @@ class CsrReg extends Module {
   io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
 
   // clear other interrupt
-  when(io.int) {
+  when(io.int && io.intResp) {
     mie := 0.U
   }
 }

@@ -30,7 +30,7 @@ class Forwarding extends Module {
     val lsuException = Input(Bool())
     val wbuException = Input(Bool())
 
-    // idu阶段的mret指令会更新mstatus，之前未写回指令的csr写使能
+    // idu阶段的mret指令会更新mstatus，之前未写回指令的csr写使能无效
     val mret       = Input(Bool())
     val flushExuCsr= Output(Bool())
     val flushLsuCsr= Output(Bool())

@@ -8,6 +8,9 @@ import utils._
 // todo: mret指令需要处理，mret会设置mstatus中的mie为mpie
 class IDU extends Module with HasInstrType{
   val io = IO(new Bundle {
+    val flush     = Input(Bool())
+    val stall     = Input(Bool())
+
     // 来自ifu
     val in        = Flipped(new InstrFetch)
 
@@ -130,6 +133,7 @@ class IDU extends Module with HasInstrType{
   csrReg.io.epc       := io.csrWrite.epc(31, 0)
   csrReg.io.no        := io.csrWrite.no
   csrReg.io.timerInt  := io.timerInt
+  csrReg.io.intResp   := !io.flush && !io.stall
 
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(csrReg.io.int || systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)

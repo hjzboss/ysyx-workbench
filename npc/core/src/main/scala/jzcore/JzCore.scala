@@ -490,14 +490,16 @@ class JzCore extends Module {
   ctrl.io.exuReady    <> exu.io.ready
   ctrl.io.branch      := exu.io.redirect.valid
   ctrl.io.stallICache <> icache.io.stallIn
-  ctrl.io.stallIduReg <> idReg.io.stall
+  idReg.io.stall      := ctrl.io.stallIduReg
+  idu.io.stall        := ctrl.io.stallIduReg
   ctrl.io.stallExuReg <> exReg.io.stall
   ctrl.io.stallLsuReg <> lsReg.io.stall
   ctrl.io.stallWbuReg <> wbReg.io.stall
   ctrl.io.stallExu    <> exu.io.stall
   ctrl.io.stallPc     <> ifu.io.stall
   ctrl.io.flushICache <> icache.io.flush
-  ctrl.io.flushIduReg <> idReg.io.flush
+  idReg.io.flush      := ctrl.io.flushIduReg
+  idu.io.flush        := ctrl.io.flushIduReg
   //ctrl.io.iduInt      <> idu.io.ctrl.int
   //ctrl.io.exuInt      := exReg.io.ctrlOut.int
   //ctrl.io.lsuInt      := lsReg.io.out.int
