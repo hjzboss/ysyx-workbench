@@ -48,6 +48,9 @@ class CsrReg extends Module {
     // interrupt
     val int       = Output(Bool())
     val intResp   = Input(Bool())
+
+    // ecall
+    val ecall     = Input(Bool())
   })
 
   // csr0: mstatus, csr1: mtvec, csr2: mepc, csr3: mcause
@@ -120,7 +123,7 @@ class CsrReg extends Module {
     // mret指令会导致mie更新为mpie,mpie更新为1
     val mpie = mstatus(MSTATUS_MPIE)
     mstatus := mstatus(63, MSTATUS_MPIE+1) ## true.B ## mstatus(MSTATUS_MPIE-1, MSTATUS_MIE+1) ## mpie ## mstatus(MSTATUS_MIE-1, 0)
-  }.elsewhen(io.int && io.intResp) {
+  }.elsewhen((io.int && io.intResp) || io.ecall) {
     // 将mstatus的mie字段保存到mpie，mie字段设置为0
     val mstatusMie = mstatus(MSTATUS_MIE)
     mstatus := mstatus(63, MSTATUS_MPIE+1) ## mstatusMie ## mstatus(MSTATUS_MPIE-1, MSTATUS_MIE+1) ## false.B ## mstatus(MSTATUS_MIE-1, 0)

@@ -136,36 +136,39 @@ class IDU extends Module with HasInstrType{
   csrReg.io.no        := io.csrWrite.no
   csrReg.io.timerInt  := io.timerInt
   csrReg.io.intResp   := io.validIn && !io.flush && !io.stall
+  csrReg.io.ecall     := systemCtrl === System.ecall
 
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csrReg.io.int || systemCtrl === System.mret || instrtype === InstrZ || systemCtrl === System.ecall, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src1     := Mux(csrReg.io.int || instrtype === InstrE || instrtype === InstrZ, csrReg.io.rdata, rf.io.src1)
   io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
+  // 当一条指令产生中断时，其向寄存器写回的信和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := (instrtype === InstrIJ) | (instrtype === InstrJ) | (instrtype === InstrB)
-  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN && instrtype =/= InstrE
+  io.ctrl.br          := (instrtype === InstrIJ) | (instrtype === InstrJ) | (instrtype === InstrB) | !io.ctrl.int
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN && instrtype =/= InstrE && !io.ctrl.int
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
-  io.ctrl.csrWen      := instrtype === InstrZ
-  io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE // just for forwarding
+  io.ctrl.csrWen      := instrtype === InstrZ & !io.ctrl.int
+  io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE || io.ctrl.int // just for csr forwarding
   io.ctrl.csrWaddr    := csrRaddr
+  // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
   io.ctrl.exception   := systemCtrl === System.ecall | csrReg.io.int // type of exception
-  io.ctrl.memWen      := memEn === MemEn.store
-  io.ctrl.memRen      := memEn === MemEn.load
+  io.ctrl.memWen      := memEn === MemEn.store & !io.ctrl.int
+  io.ctrl.memRen      := memEn === MemEn.load & !io.ctrl.int
   //io.ctrl.ebreak      := instrtype === InstrD // ebreak
   io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
-  io.ctrl.coherence   := instrtype === InstrF
+  io.ctrl.coherence   := instrtype === InstrF & !io.ctrl.int
   io.ctrl.int         := csrReg.io.int && io.validIn
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
-  io.aluCtrl.aluOp    := aluOp
+  io.aluCtrl.aluOp    := Mux(!io.ctrl.int, aluOp, AluOp.nop)
 
   io.mret             := systemCtrl === System.mret
 }
