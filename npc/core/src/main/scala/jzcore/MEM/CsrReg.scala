@@ -115,8 +115,8 @@ class CsrReg extends Module {
   mip       := mipVec.asUInt
 
   // interrupt, just for timer int now
-  //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
-  io.int := false.B
+  io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
+  //io.int := false.B
 
   // interrupt
   when(io.mret) {
