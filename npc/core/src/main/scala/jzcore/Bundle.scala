@@ -212,6 +212,7 @@ class BrespIO extends Bundle {
 }
 
 class MultiInput extends Bundle {
+  val valid           = Input(Bool())
   val multiplicand    = Output(UInt(64.W)) // 被乘数
   val multiplier      = Output(UInt(64.W)) // 乘数
   val mulw            = Output(Bool()) // 是否为32位乘法

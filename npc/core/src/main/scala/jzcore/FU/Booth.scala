@@ -71,7 +71,6 @@ class Booth extends Module {
     multiplier := multiplier
   }
 
-  io.in.ready          := state === idle
   io.out.valid         := state === busy & !multiplier.orR
   io.out.bits.resultLo := Mux(io.in.mulw, SignExt(result(31, 0), 64), result(63, 0))
   io.out.bits.resultHi := result(127, 64)
