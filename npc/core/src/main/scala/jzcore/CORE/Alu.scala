@@ -102,7 +102,7 @@ class Alu extends Module {
 
   val aluOutw = SignExt(aluW(31, 0), 64)
   val isOne = aluOut.asUInt() === 1.U(64.W)
-  // isWop 不会包含mulw的情况，mulw由乘法器的输出决定
+  // isWop 不会包含mulw，remw等的情况，mulw由乘法器的输出决定
   val isWop = aluOp === AluOp.addw || aluOp === AluOp.subw || aluOp === AluOp.sllw || aluOp === AluOp.srlw || aluOp === AluOp.sraw
   io.aluOut := Mux(isWop, aluOutw, aluOut)
   io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(aluOp === AluOp.beq || aluOp === AluOp.bne || aluOp === AluOp.blt || aluOp === AluOp.bltu || aluOp === AluOp.bge || aluOp === AluOp.bgeu, isOne, false.B))
