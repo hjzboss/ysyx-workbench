@@ -67,10 +67,8 @@ class EXU extends Module {
     Forward.normal      -> io.datasrc.src2
   ))
 
-  val pc = ZeroExt(io.datasrc.pc, 64)
-
   // 操作数选择
-  val opA = Mux(aluSrc1 === SrcType.pc, pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
+  val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
   // alu
@@ -84,7 +82,7 @@ class EXU extends Module {
 
   // todo: branch addrint
   val brAddr            = Wire(UInt(32.W))
-  brAddr               := Mux(io.ctrl.isJalr, opAPre, pc) + io.datasrc.imm
+  brAddr               := Mux(io.ctrl.isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm
 
   // ecall mret
   val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, opAPre(31, 0), brAddr(31, 0))
