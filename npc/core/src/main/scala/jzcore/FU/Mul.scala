@@ -9,7 +9,7 @@ import top._
 class Mul extends Module {
   val io = IO(new Bundle {
     val flush   = Input(Bool())
-    val in      = Flipped(Decoupled(new MultiInput))
+    val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
 
