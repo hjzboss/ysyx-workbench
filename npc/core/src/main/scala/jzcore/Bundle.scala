@@ -224,6 +224,7 @@ class MultiOutput extends Bundle {
 }
 
 class DivInput extends Bundle {
+  val valid           = Output(Bool())
   val dividend        = Output(UInt(64.W))
   val divisor         = Output(UInt(64.W))
   val divw            = Output(Bool())

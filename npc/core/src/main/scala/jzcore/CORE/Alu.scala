@@ -39,10 +39,10 @@ class Alu extends Module {
 
   val divOp                      = aluOp === AluOp.div || aluOp === AluOp.divu || aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.rem || aluOp === AluOp.remu || aluOp === AluOp.remuw || aluOp === AluOp.remw
   div.io.in.valid               := divOp
-  div.io.in.bits.dividend       := io.opA
-  div.io.in.bits.divisor        := io.opB
-  div.io.in.bits.divw           := aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.remuw || aluOp === AluOp.remw
-  div.io.in.bits.divSigned      := aluOp === AluOp.div || aluOp === AluOp.divw || aluOp === AluOp.rem || aluOp === AluOp.remw
+  div.io.in.dividend            := io.opA
+  div.io.in.divisor             := io.opB
+  div.io.in.divw                := aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.remuw || aluOp === AluOp.remw
+  div.io.in.divSigned           := aluOp === AluOp.div || aluOp === AluOp.divw || aluOp === AluOp.rem || aluOp === AluOp.remw
   div.io.out.ready              := !io.stall
   div.io.flush                  := io.flush
 

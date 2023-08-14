@@ -30,7 +30,7 @@ class WBU extends Module {
   io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
   // exception
   io.csrWrite.exception:= io.in.exception
-  io.csrWrite.epc      := ZeroExt(io.in.pc, 64)
+  io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.excepNo
 
   //io.redirect.valid    := io.in.int
