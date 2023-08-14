@@ -52,7 +52,7 @@ class Divider(len: Int) extends Module {
         dividend := dividend ## 0.U(1.W)
         quotient  := quotient(len-2, 0) ## 0.U(1.W)
       }.otherwise {
-        val remTmp = tmp ## dividend(len/2-2, 0)
+        val remTmp = tmp(len/2-1, 0) ## dividend(len/2-2, 0)
         dividend := remTmp(len-2, 0) ## 0.U(1.W)
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
@@ -94,7 +94,7 @@ class Divider(len: Int) extends Module {
         dividend  := dividend ## 0.U(1.W)
         quotient  := quotient(len-2, 0) ## 0.U(1.W)
       }.otherwise {
-        val remTmp = tmp ## dividend(len-2, 0)
+        val remTmp = tmp(len-1, 0) ## dividend(len-2, 0)
         dividend  := remTmp(2*len-2, 0) ## 0.U(1.W) // 左移一位
         quotient  := quotient(len-2, 0) ## 1.U(1.W)
       }
