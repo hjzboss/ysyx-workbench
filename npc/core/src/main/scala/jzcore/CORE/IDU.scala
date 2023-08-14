@@ -161,7 +161,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.memRen      := memEn === MemEn.load & !io.ctrl.int
   //io.ctrl.ebreak      := instrtype === InstrD // ebreak
   io.ctrl.sysInsType  := systemCtrl
-  io.ctrl.rs1         := Mux(instrtype === InstrZ, 0.U(5.W), rs1)
+  io.ctrl.rs1         := Mux(instrtype === InstrZ || io.ctrl.int, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF & !io.ctrl.int
   io.ctrl.int         := csrReg.io.int && io.validIn
