@@ -156,7 +156,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.csrWaddr    := csrRaddr
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
-  io.ctrl.exception   := systemCtrl === System.ecall | csrReg.io.int // type of exception
+  io.ctrl.exception   := systemCtrl === System.ecall | io.ctrl.int // type of exception
   io.ctrl.memWen      := memEn === MemEn.store & !io.ctrl.int
   io.ctrl.memRen      := memEn === MemEn.load & !io.ctrl.int
   //io.ctrl.ebreak      := instrtype === InstrD // ebreak

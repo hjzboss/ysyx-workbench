@@ -82,7 +82,7 @@ class EXU extends Module {
   alu.io.aluOp         := io.aluCtrl.aluOp
   io.ready             := alu.io.ready
 
-  // todo: branch addr
+  // todo: branch addrint
   val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, pc)
   val brAddr            = brAddrOpA + io.datasrc.imm
 
@@ -91,7 +91,7 @@ class EXU extends Module {
   io.redirect.brAddr   := brAddrPre
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, true.B, false.B)
 
-  // to lsu
+  // to lsuopa
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
   io.out.lsuWen        := io.ctrl.memWen
