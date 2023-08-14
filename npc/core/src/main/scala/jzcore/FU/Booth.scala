@@ -34,17 +34,16 @@ sealed class PGenerator extends Module {
 class Booth extends Module {
   val io = IO(new Bundle {
     val flush   = Input(Bool())
-    val in      = Flipped(Decoupled(new MultiInput))
+    val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
 
-  val inFire = io.in.valid & io.in.ready
   val outFire = io.out.valid & io.out.ready 
 
   val idle :: busy :: Nil = Enum(2)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle -> Mux(inFire && !io.flush, busy, idle),
+    idle -> Mux(io.in.valid && !io.flush, busy, idle),
     busy -> Mux(outFire || io.flush, idle, busy)
   ))
 
@@ -58,10 +57,10 @@ class Booth extends Module {
   pg.io.ySub := multiplier(0)
   pg.io.x    := multiplicand
 
-  when(state === idle && inFire) {
+  when(state === idle && io.in.valid) {
     result := 0.U
-    multiplicand := Mux(io.in.bits.mulSigned === MulType.uu, ZeroExt(io.in.bits.multiplicand, 132), SignExt(io.in.bits.multiplicand, 132))
-    multiplier := Mux(io.in.bits.mulSigned === MulType.ss, io.in.bits.multiplier(63) ## io.in.bits.multiplier ## false.B, false.B ## io.in.bits.multiplier ## false.B)
+    multiplicand := Mux(io.in.mulSigned === MulType.uu, ZeroExt(io.in.multiplicand, 132), SignExt(io.in.multiplicand, 132))
+    multiplier := Mux(io.in.mulSigned === MulType.ss, io.in.multiplier(63) ## io.in.multiplier ## false.B, false.B ## io.in.multiplier ## false.B)
   }.elsewhen(state === busy && !io.out.valid) {
     result := pg.io.p + result + pg.io.c
     multiplicand := multiplicand << 2.U
@@ -74,6 +73,6 @@ class Booth extends Module {
 
   io.in.ready          := state === idle
   io.out.valid         := state === busy & !multiplier.orR
-  io.out.bits.resultLo := Mux(io.in.bits.mulw, SignExt(result(31, 0), 64), result(63, 0))
+  io.out.bits.resultLo := Mux(io.in.mulw, SignExt(result(31, 0), 64), result(63, 0))
   io.out.bits.resultHi := result(127, 64)
 }

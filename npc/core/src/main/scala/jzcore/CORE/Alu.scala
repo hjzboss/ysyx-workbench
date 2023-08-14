@@ -27,10 +27,10 @@ class Alu extends Module {
 
   val mulOp                      = aluOp === AluOp.mul || aluOp === AluOp.mulh || aluOp === AluOp.mulw || aluOp === AluOp.mulhsu || aluOp === AluOp.mulhu
   mul.io.in.valid               := mulOp
-  mul.io.in.bits.multiplicand   := io.opA
-  mul.io.in.bits.multiplier     := io.opB
-  mul.io.in.bits.mulw           := aluOp === AluOp.mulw
-  mul.io.in.bits.mulSigned      := LookupTreeDefault(aluOp, MulType.ss, List(
+  mul.io.in.multiplicand        := io.opA
+  mul.io.in.multiplier          := io.opB
+  mul.io.in.mulw                := aluOp === AluOp.mulw
+  mul.io.in.mulSigned           := LookupTreeDefault(aluOp, MulType.ss, List(
                                     AluOp.mulhu   -> MulType.uu,
                                     AluOp.mulhsu  -> MulType.su
                                   ))
@@ -94,7 +94,8 @@ class Alu extends Module {
   // word computation
   val opAw = opA(31, 0)
   val opBw = opB(31, 0)
-  val aluW = LookupTree(io.aluOp, List(
+  val aluW = Wire(UInt(32.W))
+  aluW    := LookupTree(io.aluOp, List(
     AluOp.addw      -> (opAw + opBw),
     AluOp.subw      -> (opAw.asSInt() - opBw.asSInt()).asUInt(),
     //AluOp.mulw      -> (opAw * opBw),
