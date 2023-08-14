@@ -92,9 +92,9 @@ class Alu extends Module {
   aluW    := LookupTree(io.aluOp, List(
     AluOp.addw      -> (opAw + opBw),
     AluOp.subw      -> (opAw.asSInt() - opBw.asSInt()).asUInt(),
-    AluOp.sllw      -> (opAw << opBw(4, 0)),
-    AluOp.srlw      -> (opAw >> opBw(4, 0)),
-    AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0)).asUInt(),
+    AluOp.sllw      -> (opAw << opBw(4, 0))(31, 0),
+    AluOp.srlw      -> (opAw >> opBw(4, 0))(31, 0),
+    AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0))(31, 0).asUInt(),
   ))
 
   val mulFire = mul.io.out.valid && mul.io.out.ready
