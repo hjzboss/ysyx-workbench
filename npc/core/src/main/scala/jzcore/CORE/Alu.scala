@@ -68,9 +68,6 @@ class Alu extends Module {
     AluOp.sll       -> (opA << opB(5, 0)),
     AluOp.srl       -> (opA >> opB(5, 0)),
     AluOp.sra       -> (opA.asSInt() >> opB(5, 0)).asUInt(),
-    // todo
-    //AluOp.div       -> (opA.asSInt() / opB.asSInt()).asUInt(),
-    //AluOp.divu      -> (opA / opB),
     AluOp.div       -> div.io.out.bits.quotient,
     AluOp.divu      -> div.io.out.bits.quotient,
     AluOp.divw      -> div.io.out.bits.quotient,
@@ -81,11 +78,8 @@ class Alu extends Module {
     AluOp.remuw     -> div.io.out.bits.remainder,
     AluOp.mul       -> mul.io.out.bits.resultLo,
     AluOp.mulw      -> mul.io.out.bits.resultLo,
-    //AluOp.mulh      -> ((SignExt(opA, 128).asSInt() * SignExt(opB, 128).asSInt()).asSInt() >> 64.U)(63, 0).asUInt(), // todo
     AluOp.mulh      -> mul.io.out.bits.resultHi,
     AluOp.mulhsu    -> mul.io.out.bits.resultHi,
-    AluOp.rem       -> (opA.asSInt() % opB.asSInt()).asUInt(),
-    AluOp.remu      -> (opA % opB),
     AluOp.csrrw     -> opB,
     AluOp.csrrs     -> (opA | opB),
     AluOp.csrrc     -> (opA & ~opB)
@@ -98,14 +92,9 @@ class Alu extends Module {
   aluW    := LookupTree(io.aluOp, List(
     AluOp.addw      -> (opAw + opBw),
     AluOp.subw      -> (opAw.asSInt() - opBw.asSInt()).asUInt(),
-    //AluOp.mulw      -> (opAw * opBw),
-    //AluOp.divw      -> (opAw.asSInt() / opBw.asSInt()).asUInt(), // todo
-    //AluOp.divuw     -> (opAw / opBw),
     AluOp.sllw      -> (opAw << opBw(4, 0)),
     AluOp.srlw      -> (opAw >> opBw(4, 0)),
     AluOp.sraw      -> (opAw.asSInt() >> opBw(4, 0)).asUInt(),
-    //AluOp.remw      -> (opAw.asSInt() % opBw.asSInt()).asUInt(),
-    //AluOp.remuw     -> (opAw % opBw),
   ))
 
   val mulFire = mul.io.out.valid && mul.io.out.ready
