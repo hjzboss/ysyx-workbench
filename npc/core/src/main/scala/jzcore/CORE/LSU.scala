@@ -11,6 +11,8 @@ class LSU extends Module {
     // exu传入
     val in          = Flipped(new ExuOut)
 
+    val flushCsr    = Input(Bool())
+
     // 传给wbu
     val out         = new LsuOut
 
@@ -188,7 +190,7 @@ class LSU extends Module {
   io.out.excepNo        := io.in.excepNo
   io.out.exception      := io.in.exception
   io.out.csrWaddr       := io.in.csrWaddr
-  io.out.csrWen         := io.in.csrWen
+  io.out.csrWen         := Mux(io.flushCsr, false.B, io.in.csrWen)
   //io.out.ebreak         := io.in.ebreak
   //io.out.haltRet        := io.in.haltRet
   io.out.csrValue       := io.in.csrValue

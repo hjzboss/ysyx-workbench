@@ -84,7 +84,7 @@ class CSRWriteIO extends Bundle {
   val wdata     = Output(UInt(64.W))
   val exception = Output(Bool())
   val epc       = Output(UInt(32.W))
-  val no        = Output(UInt(4.W))
+  val no        = Output(UInt(64.W))
 }
 
 class DataSrcIO extends Bundle {
@@ -110,7 +110,7 @@ class CtrlFlow extends Bundle {
   val wmask         = Output(UInt(8.W)) // 写腌码
   val csrWen        = Output(Bool()) // csr写使能
   val csrWaddr      = Output(UInt(12.W))
-  val excepNo       = Output(UInt(4.W))
+  val excepNo       = Output(UInt(64.W))
   val exception     = Output(Bool()) // 系统指令的类型
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
@@ -138,7 +138,7 @@ class ExuOut extends Bundle {
   val regWen        = Output(Bool())
 
   val pc            = Output(UInt(32.W))
-  val excepNo       = Output(UInt(4.W))
+  val excepNo       = Output(UInt(64.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(12.W))
   val csrWen        = Output(Bool())
@@ -157,7 +157,7 @@ class LsuOut extends Bundle {
   val rd            = Output(UInt(5.W))
   val regWen        = Output(Bool())
   val pc            = Output(UInt(32.W))
-  val excepNo       = Output(UInt(4.W))
+  val excepNo       = Output(UInt(64.W))
   val exception     = Output(Bool())
   val csrWaddr      = Output(UInt(12.W))
   val csrWen        = Output(Bool())
@@ -212,6 +212,7 @@ class BrespIO extends Bundle {
 }
 
 class MultiInput extends Bundle {
+  val valid           = Output(Bool())
   val multiplicand    = Output(UInt(64.W)) // 被乘数
   val multiplier      = Output(UInt(64.W)) // 乘数
   val mulw            = Output(Bool()) // 是否为32位乘法
@@ -224,6 +225,7 @@ class MultiOutput extends Bundle {
 }
 
 class DivInput extends Bundle {
+  val valid           = Output(Bool())
   val dividend        = Output(UInt(64.W))
   val divisor         = Output(UInt(64.W))
   val divw            = Output(Bool())

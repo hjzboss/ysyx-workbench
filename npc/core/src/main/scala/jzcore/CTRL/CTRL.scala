@@ -14,13 +14,7 @@ class CTRL extends Module {
 
     // 分支指令需要flush流水线
     val branch      = Input(Bool())
-
-    // 中断信号
-    val iduInt      = Input(Bool())
-    val exuInt      = Input(Bool())
-    val lsuInt      = Input(Bool())
-    val wbuInt      = Input(Bool())
-
+  
     // stall pipline reg and pc
     val stallPc     = Output(Bool())
     val stallICache = Output(Bool())
@@ -34,8 +28,8 @@ class CTRL extends Module {
     val flushICache = Output(Bool())
     val flushIduReg = Output(Bool())
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
-    val flushLsuReg = Output(Bool())
-    val flushWbuReg = Output(Bool())
+    //val flushLsuReg = Output(Bool())
+    //val flushWbuReg = Output(Bool())
 
     // todo: load-use停顿处理
     val memRen      = Input(Bool()) // 来自exu
@@ -48,11 +42,11 @@ class CTRL extends Module {
   val loadUse     = dontTouch(WireDefault(false.B))
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
-  val int         = io.iduInt | io.exuInt | io.lsuInt
+  //val int         = io.iduInt | io.exuInt | io.lsuInt
 
   // 当取指未完成时停顿之前所有阶段
   io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady | int
+  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady
   //io.stallPc     := !io.lsuReady | (loadUse & !io.branch)
   io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady
   io.stallExuReg := !io.lsuReady | !io.exuReady
@@ -61,10 +55,10 @@ class CTRL extends Module {
   io.stallExu    := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
-  io.flushICache := io.branch | io.iduInt | io.exuInt | io.lsuInt | io.wbuInt
-  io.flushIduReg := io.branch | io.iduInt | io.exuInt | io.lsuInt | io.wbuInt
+  io.flushICache := io.branch
+  io.flushIduReg := io.branch
   //io.flushIduReg := !io.ifuReady || io.branch
-  io.flushExuReg := io.branch | loadUse | io.exuInt | io.lsuInt | io.wbuInt
-  io.flushLsuReg := io.wbuInt | io.lsuInt
-  io.flushWbuReg := io.wbuInt
+  io.flushExuReg := io.branch | loadUse
+  //io.flushLsuReg := io.wbuInt | io.lsuInt
+  //io.flushWbuReg := io.wbuInt
 }

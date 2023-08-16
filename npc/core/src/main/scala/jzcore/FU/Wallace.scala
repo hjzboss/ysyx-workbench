@@ -10,7 +10,7 @@ import utils._
 class Wallace extends Module {
   val io = IO(new Bundle() {
     val flush   = Input(Bool())
-    val in      = Flipped(Decoupled(new MultiInput))
+    val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
 
@@ -86,19 +86,18 @@ class Wallace extends Module {
   val validTmp = dontTouch(WireDefault(false.B)) // 有效乘法数据的信号
 
   // 握手信号
-  val inFire = io.in.valid & io.in.ready
   val outFire = io.out.valid & io.out.ready 
 
   val idle :: start :: busy :: ok :: Nil = Enum(4)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle  -> Mux(inFire && !io.flush, start, idle),
+    idle  -> Mux(io.in.valid && !io.flush, start, idle),
     start -> Mux(io.flush, idle, busy),
     busy  -> Mux(io.flush, idle, Mux(validTmp, ok, busy)),
     ok    -> Mux(outFire || io.flush, idle, ok)
   ))
 
-  val (a, b) = (io.in.bits.multiplicand, io.in.bits.multiplier)
+  val (a, b) = (io.in.multiplicand, io.in.multiplier)
 
   val columns: Array[Seq[Bool]] = Array.fill(128)(Seq()) // todo: 此处是组合逻辑
   var last_x = WireInit(0.U(3.W))
@@ -157,8 +156,7 @@ class Wallace extends Module {
   val resultReg = RegInit(0.U(128.W))
   resultReg := Mux(io.flush, 0.U(128.W), Mux(state === busy && validTmp, result, resultReg))
 
-  io.out.bits.resultLo := Mux(io.in.bits.mulw, SignExt(resultReg(31, 0), 64), resultReg(63, 0))
+  io.out.bits.resultLo := Mux(io.in.mulw, SignExt(resultReg(31, 0), 64), resultReg(63, 0))
   io.out.bits.resultHi := resultReg(127, 64)
   io.out.valid := state === ok
-  io.in.ready := state === idle
 }

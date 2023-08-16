@@ -13,7 +13,8 @@ class WBU extends Module {
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
 
-    val redirect  = new RedirectIO
+    val flushCsr  = Input(Bool())
+    //val redirect  = new RedirectIO
   })
 
   //val stop              = Module(new Stop)
@@ -26,14 +27,14 @@ class WBU extends Module {
   // csr文件写回
   io.csrWrite.waddr    := io.in.csrWaddr
   io.csrWrite.wdata    := io.in.exuOut
-  io.csrWrite.wen      := io.in.csrWen
+  io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
   // exception
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.excepNo
 
-  io.redirect.valid    := io.in.int
-  io.redirect.brAddr   := io.in.csrValue
+  //io.redirect.valid    := io.in.int
+  //io.redirect.brAddr   := io.in.csrValue
 
   // ebreak
   //stop.io.valid        := io.in.ebreak

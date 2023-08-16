@@ -11,7 +11,7 @@ class WB_REG extends Module with HasResetVector {
   
     val in = Flipped(new LsuOut)
     val out = new LsuOut
-    val flush = Input(Bool())
+    //val flush = Input(Bool())
 
     /*
     val validIn = Input(Bool())
@@ -30,7 +30,7 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.rd         := 0.U(5.W)
   lsuReset.regWen     := false.B
   lsuReset.pc         := 0.U(32.W)
-  lsuReset.excepNo    := 0.U(4.W)
+  lsuReset.excepNo    := 0.U(64.W)
   lsuReset.exception  := false.B
   lsuReset.csrWaddr   := CsrId.nul
   lsuReset.csrWen     := false.B
@@ -40,7 +40,7 @@ class WB_REG extends Module with HasResetVector {
   //lsuReset.haltRet    := 0.U(64.W)
 
   val lsuReg           = RegInit(lsuReset)
-  lsuReg              := Mux(io.stall, lsuReg, Mux(io.flush, lsuReset, io.in))
+  lsuReg              := Mux(io.stall, lsuReg, io.in)
   io.out              := lsuReg
 
   /*

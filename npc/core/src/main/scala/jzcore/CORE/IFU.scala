@@ -13,12 +13,12 @@ class IFU extends Module with HasResetVector {
   val io = IO(new Bundle {
     // 用于仿真环境
     //val debug         = new DebugIO
-    //val valid         = Output(Bool()) // 是否是一条有效指令，用于提示仿真环境
+    val valid         = Output(Bool()) // 是否是一条有效指令
 
     // from exu
     val exuRedirect   = Flipped(new RedirectIO)
     val icRedirect    = Flipped(new RedirectIO)
-    val wbuRedirect   = Flipped(new RedirectIO)
+    //val wbuRedirect   = Flipped(new RedirectIO)
 
     // to idu
     val out           = new Stage1IO
@@ -64,11 +64,15 @@ class IFU extends Module with HasResetVector {
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
 
-  pc              := Mux(io.stall, pc, Mux(io.wbuRedirect.valid, io.wbuRedirect.brAddr, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc))))
+  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
   
   io.out.addr     := pc 
   //io.out.cacheable:= true.B // todo: 接入soc时需要更改
   io.out.cacheable:= pc <= "hffff_ffff".U && pc >= "h8000_0000".U
+
+  val valid        = dontTouch(WireDefault(false.B))
+  valid           := !io.stall && !io.exuRedirect.valid && !io.icRedirect.valid
+  io.valid        := valid
 
   /*
   io.debug.pc     := pc 

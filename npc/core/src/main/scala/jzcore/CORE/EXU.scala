@@ -10,6 +10,7 @@ class EXU extends Module {
     val datasrc     = Flipped(new DataSrcIO)
     val aluCtrl     = Flipped(new AluIO)
     val ctrl        = Flipped(new CtrlFlow)
+    val flushCsr    = Input(Bool())
     
     // 传给Lsu
     val out         = new ExuOut
@@ -22,10 +23,14 @@ class EXU extends Module {
     val wbuForward  = Input(UInt(64.W))
     val csrWbuForward = Input(UInt(64.W))
     val csrLsuForward = Input(UInt(64.W))
+    val lsuMepc     = Input(UInt(32.W))
+    val wbuMepc     = Input(UInt(32.W))
+    val lsuNo       = Input(UInt(64.W))
+    val wbuNo       = Input(UInt(64.W))
 
     // 旁路控制信号
-    val forwardA    = Input(UInt(3.W))
-    val forwardB    = Input(UInt(3.W))
+    val forwardA    = Input(UInt(4.W))
+    val forwardB    = Input(UInt(4.W))
 
     // alu
     val stall       = Input(Bool())
@@ -48,6 +53,10 @@ class EXU extends Module {
     Forward.wbuData     -> io.wbuForward,
     Forward.csrWbuData  -> io.csrWbuForward,
     Forward.csrLsuData  -> io.csrLsuForward,
+    Forward.wbuMepc     -> ZeroExt(io.wbuMepc, 64),
+    Forward.lsuMepc     -> ZeroExt(io.lsuMepc, 64),
+    Forward.wbuNo       -> io.wbuNo,
+    Forward.lsuNo       -> io.lsuNo,
     Forward.normal      -> io.datasrc.src1
   ))
   val opBPre = LookupTreeDefault(io.forwardB, io.datasrc.src2, List(
@@ -58,10 +67,8 @@ class EXU extends Module {
     Forward.normal      -> io.datasrc.src2
   ))
 
-  val pc = ZeroExt(io.datasrc.pc, 64)
-
   // 操作数选择
-  val opA = Mux(aluSrc1 === SrcType.pc, pc, Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
+  val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
   val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
   // alu
@@ -73,16 +80,16 @@ class EXU extends Module {
   alu.io.aluOp         := io.aluCtrl.aluOp
   io.ready             := alu.io.ready
 
-  // todo: branch addr
-  val brAddrOpA         = Mux(io.ctrl.isJalr, opAPre, pc)
-  val brAddr            = brAddrOpA + io.datasrc.imm
+  // todo: branch addrint
+  val brAddr            = Wire(UInt(32.W))
+  brAddr               := Mux(io.ctrl.isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm(31, 0)
 
   // ecall mret
-  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, opAPre(31, 0), brAddr(31, 0))
+  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, opAPre(31, 0), brAddr(31, 0))
   io.redirect.brAddr   := brAddrPre
-  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret, true.B, false.B)
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, true.B, false.B)
 
-  // to lsu
+  // to lsuopa
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
   io.out.lsuWen        := io.ctrl.memWen
@@ -101,7 +108,7 @@ class EXU extends Module {
   io.out.excepNo       := io.ctrl.excepNo
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
-  io.out.csrWen        := io.ctrl.csrWen
+  io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
   io.out.int           := io.ctrl.int

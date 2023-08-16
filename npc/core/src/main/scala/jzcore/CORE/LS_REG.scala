@@ -10,7 +10,7 @@ class LS_REG extends Module with HasResetVector {
 
     val in = Flipped(new ExuOut)
     val out = new ExuOut
-    val flush = Input(Bool())
+    //val flush = Input(Bool())
 
     /*
     val validIn = Input(Bool())
@@ -31,7 +31,7 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.rd          := 0.U(5.W)
   exuOutReset.regWen      := false.B
   exuOutReset.pc          := 0.U(32.W)
-  exuOutReset.excepNo     := 0.U(4.W)
+  exuOutReset.excepNo     := 0.U(64.W)
   exuOutReset.exception   := false.B
   exuOutReset.csrWaddr    := CsrId.nul
   exuOutReset.csrWen      := false.B
@@ -45,7 +45,7 @@ class LS_REG extends Module with HasResetVector {
   val memCtrlReg           = RegInit(exuOutReset)
   //val stallMemCtrl         = Wire(new ExuOut)
   //stallMemCtrl            := Mux(io.stall, memCtrlReg, io.in)
-  memCtrlReg              := Mux(io.stall, memCtrlReg, Mux(io.flush, exuOutReset, io.in))
+  memCtrlReg              := Mux(io.stall, memCtrlReg, io.in)
   io.out                  := memCtrlReg
 
   /*
