@@ -64,7 +64,7 @@ class IDU extends Module with HasInstrType{
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
   val memEn     = lsctrl(3)
-  val imm       = LookupTree(instrtype, List(
+  val imm       = LookupTreeDefault(instrtype, 0.U, List(
                     InstrZ    -> ZeroExt(inst(19, 15), 64),
                     InstrI    -> SignExt(inst(31, 20), 64),
                     InstrIJ   -> SignExt(inst(31, 20), 64),
