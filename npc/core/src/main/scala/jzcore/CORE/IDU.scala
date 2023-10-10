@@ -55,7 +55,7 @@ class IDU extends Module with HasInstrType{
   // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
-  val instrtype = ctrlList(0)
+  val instrtype = dontTouch(ctrlList(0))
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
