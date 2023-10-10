@@ -146,7 +146,7 @@ class IDU extends Module with HasInstrType{
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := isBr(instrtype) & !io.ctrl.int
+  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int
   io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
