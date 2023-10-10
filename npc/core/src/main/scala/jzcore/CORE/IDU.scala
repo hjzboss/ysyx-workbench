@@ -59,7 +59,7 @@ class IDU extends Module with HasInstrType{
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = dontTouch(Wire(UInt(4.W))) // 防止信号被优化
+  val lsType    = Wire(UInt(4.W)) // 防止信号被优化
   lsType       := lsctrl(0)
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
@@ -146,7 +146,7 @@ class IDU extends Module with HasInstrType{
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int
+  io.ctrl.br          := isBr(instrtype) & !io.ctrl.int
   io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
