@@ -163,7 +163,7 @@ trait HasInstrType {
   def InstrB  = "b00101".U
   def InstrU  = "b10110".U
   def InstrJ  = "b10111".U
-  def InstrIJ = "b11101".U
+  def InstrIJ = "b10101".U
   def InstrZ  = "b11001".U // csr
   def InstrE  = "b01010".U // exception
   def InstrD  = "b01011".U // ebreak, just for simulation
