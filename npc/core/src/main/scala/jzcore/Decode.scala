@@ -40,28 +40,30 @@ object AluOp {
   def bltu      = "b010011".U
   def bgeu      = "b010100".U
 
-  def addw      = "b010101".U
-  def subw      = "b010110".U
-  def mulw      = "b010111".U
-  def divw      = "b011000".U
-  def sllw      = "b011001".U
-  def srlw      = "b011010".U
-  def sraw      = "b011011".U
-  def remw      = "b011100".U
+  def addw      = "b110101".U
+  def subw      = "b110110".U
+  def mulw      = "b110111".U
+  def divw      = "b111000".U
+  def sllw      = "b111001".U
+  def srlw      = "b111010".U
+  def sraw      = "b111011".U
+  def remw      = "b111100".U
 
   def mulh      = "b011101".U
   def mulhsu    = "b011110".U
   def mulhu     = "b011111".U
-  def divu      = "b100000".U
-  def remu      = "b100001".U
+  def divu      = "b011000".U
+  def remu      = "b011001".U
   def divuw     = "b100010".U
   def remuw     = "b100011".U
 
-  def csrrw     = "b100100".U
-  def csrrs     = "b100101".U
-  def csrrc     = "b100110".U
+  def csrrw     = "b010110".U
+  def csrrs     = "b010111".U
+  def csrrc     = "b010101".U
 
   def apply() = UInt(6.W)
+  def isWordOp(op: UInt): Bool = op(5)
+  // TODO: 乘除法类型用几位来确定
 }
 
 object Wmask {
@@ -154,18 +156,22 @@ object Forward {
 }
 
 trait HasInstrType {
-  def InstrN  = "b0000".U
-  def InstrI  = "b0100".U
-  def InstrR  = "b0101".U
-  def InstrS  = "b0010".U
-  def InstrB  = "b0001".U
-  def InstrU  = "b0110".U
-  def InstrJ  = "b0111".U
-  def InstrIJ = "b1000".U
-  def InstrZ  = "b1001".U // csr
-  def InstrE  = "b1010".U // exception
-  def InstrD  = "b1011".U // ebreak, just for simulation
-  def InstrF  = "b1100".U // fencei
+  def InstrN  = "b00000".U
+  def InstrI  = "b10100".U
+  def InstrR  = "b10001".U
+  def InstrS  = "b00010".U
+  def InstrB  = "b00101".U
+  def InstrU  = "b10110".U
+  def InstrJ  = "b10111".U
+  def InstrIJ = "b11101".U
+  def InstrZ  = "b11001".U // csr
+  def InstrE  = "b01010".U // exception
+  def InstrD  = "b01011".U // ebreak, just for simulation
+  def InstrF  = "b01100".U // fencei
+
+  def regWen(instr: UInt): Bool = instr(4)
+  def isCsr(instr: UInt): Bool = { instr(4) & instr(3) }
+  def isBr(instr: UInt): Bool = { instr(0) & instr(2) }
 }
 
 object MulType {

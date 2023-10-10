@@ -64,6 +64,7 @@ class IDU extends Module with HasInstrType{
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
   val memEn     = lsctrl(3)
+  val csrType   = isCsr(instrtype)
   val imm       = LookupTreeDefault(instrtype, 0.U, List(
                     InstrZ    -> ZeroExt(inst(19, 15), 64),
                     InstrI    -> SignExt(inst(31, 20), 64),
@@ -139,20 +140,20 @@ class IDU extends Module with HasInstrType{
   csrReg.io.ecall     := systemCtrl === System.ecall
 
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csrReg.io.int || instrtype === InstrE || instrtype === InstrZ, csrReg.io.rdata, rf.io.src1)
-  io.datasrc.src2     := Mux(instrtype === InstrZ, rf.io.src1, rf.io.src2)
+  io.datasrc.src1     := Mux(csrReg.io.int || instrtype === InstrE || csrType, csrReg.io.rdata, rf.io.src1)
+  io.datasrc.src2     := Mux(csrType, rf.io.src1, rf.io.src2)
   io.datasrc.imm      := imm
 
-  // 当一条指令产生中断时，其向寄存器写回的信和访存信号都要清零
+  // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := (instrtype === InstrIJ) | (instrtype === InstrJ) | (instrtype === InstrB) | !io.ctrl.int
-  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN && instrtype =/= InstrE && !io.ctrl.int
+  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int
+  io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
-  io.ctrl.csrWen      := instrtype === InstrZ & !io.ctrl.int
-  io.ctrl.csrRen      := instrtype === InstrZ || instrtype === InstrE || io.ctrl.int // just for csr forwarding
+  io.ctrl.csrWen      := csrType & !io.ctrl.int
+  io.ctrl.csrRen      := csrType || instrtype === InstrE || io.ctrl.int // just for csr forwarding
   io.ctrl.csrWaddr    := csrRaddr
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
@@ -161,8 +162,8 @@ class IDU extends Module with HasInstrType{
   io.ctrl.memRen      := memEn === MemEn.load & !io.ctrl.int
   //io.ctrl.ebreak      := instrtype === InstrD // ebreak
   io.ctrl.sysInsType  := systemCtrl
-  io.ctrl.rs1         := Mux(instrtype === InstrZ || io.ctrl.int, 0.U(5.W), rs1)
-  io.ctrl.rs2         := Mux(instrtype === InstrZ, rs1, rs2)
+  io.ctrl.rs1         := Mux(csrType || io.ctrl.int, 0.U(5.W), rs1)
+  io.ctrl.rs2         := Mux(csrType, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF & !io.ctrl.int
   io.ctrl.int         := csrReg.io.int && io.validIn
 
