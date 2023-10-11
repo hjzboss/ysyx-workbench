@@ -55,7 +55,7 @@ class IDU extends Module with HasInstrType{
   // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
-  val instrtype = dontTouch(ctrlList(0))
+  val instrtype = ctrlList(0)
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
@@ -146,8 +146,12 @@ class IDU extends Module with HasInstrType{
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int
-  io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
+  io.ctrl.br          := (instrtype === InstrIJ) | (instrtype === InstrJ) | (instrtype === InstrB) | !io.ctrl.int
+  io.ctrl.regWen      := instrtype =/= InstrB && instrtype =/= InstrS && instrtype =/= InstrD && instrtype =/= InstrN && instrtype =/= InstrE && !io.ctrl.int
+  /*
+    io.ctrl.br          := isBr(instrtype) | !io.ctrl.int // ?
+    io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
+  */
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
