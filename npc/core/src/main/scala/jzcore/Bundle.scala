@@ -97,7 +97,7 @@ class DataSrcIO extends Bundle {
 class AluIO extends Bundle {
   val aluSrc1 = Output(UInt(3.W))
   val aluSrc2 = Output(UInt(3.W))
-  val aluOp   = Output(UInt(6.W))
+  val aluOp   = Output(AluOp())
 }
 
 class CtrlFlow extends Bundle {

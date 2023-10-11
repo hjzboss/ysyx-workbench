@@ -12,7 +12,7 @@ class Alu extends Module {
 
     val opA     = Input(UInt(64.W))
     val opB     = Input(UInt(64.W))
-    val aluOp   = Input(UInt(6.W))
+    val aluOp   = Input(AluOp())
 
     val aluOut  = Output(UInt(64.W))
     val brMark  = Output(Bool())
@@ -26,7 +26,7 @@ class Alu extends Module {
   val aluOp = io.aluOp
   val isWop = AluOp.isWordOp(aluOp)
 
-  val mulOp                      = aluOp === AluOp.mul || aluOp === AluOp.mulh || aluOp === AluOp.mulw || aluOp === AluOp.mulhsu || aluOp === AluOp.mulhu
+  val mulOp                      = AluOp.mulOp(aluOp)
   mul.io.in.valid               := mulOp
   mul.io.in.multiplicand        := io.opA
   mul.io.in.multiplier          := io.opB
@@ -38,12 +38,12 @@ class Alu extends Module {
   mul.io.out.ready              := !io.stall
   mul.io.flush                  := io.flush
 
-  val divOp                      = aluOp === AluOp.div || aluOp === AluOp.divu || aluOp === AluOp.divw || aluOp === AluOp.divuw || aluOp === AluOp.rem || aluOp === AluOp.remu || aluOp === AluOp.remuw || aluOp === AluOp.remw
+  val divOp                      = AluOp.divOp(aluOp)
   div.io.in.valid               := divOp
   div.io.in.dividend            := io.opA
   div.io.in.divisor             := io.opB
   div.io.in.divw                := isWop
-  div.io.in.divSigned           := aluOp === AluOp.div || aluOp === AluOp.divw || aluOp === AluOp.rem || aluOp === AluOp.remw
+  div.io.in.divSigned           := AluOp.divSigned(aluOp)
   div.io.out.ready              := !io.stall
   div.io.flush                  := io.flush
 
@@ -97,6 +97,6 @@ class Alu extends Module {
   val aluOutw = SignExt(aluOut(31, 0), 64)
   val isOne = aluOut.asUInt() === 1.U(64.W)
   io.aluOut := Mux(isWop, aluOutw, aluOut)
-  io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(aluOp === AluOp.beq || aluOp === AluOp.bne || aluOp === AluOp.blt || aluOp === AluOp.bltu || aluOp === AluOp.bge || aluOp === AluOp.bgeu, isOne, false.B))
+  io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(AluOp.Bop(aluOp), isOne, false.B))
   io.ready  := Mux(mulOp, mulFire, Mux(divOp, divFire, true.B))
 }
