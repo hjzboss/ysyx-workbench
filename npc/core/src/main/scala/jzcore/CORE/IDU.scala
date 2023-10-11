@@ -175,12 +175,6 @@ class IDU extends Module with HasInstrType{
 }
 */
 
-package jzcore
-
-import chisel3._
-import chisel3.util._
-import utils._
-
 
 // todo: mret指令需要处理，mret会设置mstatus中的mie为mpie
 class IDU extends Module with HasInstrType{
