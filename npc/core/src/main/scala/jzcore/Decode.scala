@@ -14,54 +14,59 @@ object SrcType {
 }
 
 object AluOp {
-  def add       = "b000000".U
-  def sub       = "b000001".U
-  def and       = "b000010".U
-  def or        = "b000011".U
-  def xor       = "b000100".U
-  def slt       = "b000101".U
-  def sltu      = "b000110".U
-  def sll       = "b000111".U
-  def srl       = "b001000".U
-  def sra       = "b001001".U
-  def rem       = "b001101".U
+  def add       = "b0000000".U
+  def sub       = "b0000001".U
+  def and       = "b0000010".U
+  def or        = "b0001101".U
+  def xor       = "b0011110".U
+  def slt       = "b0000101".U
+  def sltu      = "b0000110".U
+  def sll       = "b0000100".U
+  def srl       = "b0001000".U
+  def sra       = "b0001001".U
   // todo
-  def div       = "b001010".U
-  def mul       = "b001011".U
+  def nop       = "b0001100".U
 
-  def nop       = "b001100".U
+  def jump      = "b0001110".U
 
-  def jump      = "b001110".U
+  def beq       = "b0011111".U
+  def bne       = "b0010111".U
+  def bge       = "b0001011".U
+  def blt       = "b0011011".U
+  def bltu      = "b0010011".U
+  def bgeu      = "b0001111".U
 
-  def beq       = "b001111".U
-  def bne       = "b010000".U
-  def bge       = "b010001".U
-  def blt       = "b010010".U
-  def bltu      = "b010011".U
-  def bgeu      = "b010100".U
+  def addw      = "b1010101".U
+  def subw      = "b1010110".U
+  def sllw      = "b1011001".U
+  def srlw      = "b1011010".U
+  def sraw      = "b1011101".U
 
-  def addw      = "b010101".U
-  def subw      = "b010110".U
-  def mulw      = "b010111".U
-  def divw      = "b011000".U
-  def sllw      = "b011001".U
-  def srlw      = "b011010".U
-  def sraw      = "b011011".U
-  def remw      = "b011100".U
+  def mul       = "b0111000".U
+  def mulw      = "b1111101".U
+  def mulh      = "b0111110".U
+  def mulhsu    = "b0111010".U
+  def mulhu     = "b0110000".U
 
-  def mulh      = "b011101".U
-  def mulhsu    = "b011110".U
-  def mulhu     = "b011111".U
-  def divu      = "b100000".U
-  def remu      = "b100001".U
-  def divuw     = "b100010".U
-  def remuw     = "b100011".U
+  def div       = "b0101010".U
+  def divw      = "b1101010".U
+  def divu      = "b0101100".U
+  def divuw     = "b1101000".U
+  def rem       = "b0101110".U
+  def remw      = "b1100010".U
+  def remu      = "b0101001".U
+  def remuw     = "b1101001".U
 
-  def csrrw     = "b100100".U
-  def csrrs     = "b100101".U
-  def csrrc     = "b100110".U
+  def csrrw     = "b0010110".U
+  def csrrs     = "b0001010".U
+  def csrrc     = "b0010101".U
 
-  def apply() = UInt(6.W)
+  def apply() = UInt(7.W)
+  def isWordOp(op: UInt): Bool = op(6)
+  def mulOp(op: UInt): Bool = { op(5) & op(4) } 
+  def divOp(op: UInt): Bool = { op(5) & ~op(4) }
+  def Bop(op: UInt): Bool = { op(0) & op(1) }
+  def divSigned(op: UInt): Bool = op(1)
 }
 
 object Wmask {
@@ -154,18 +159,22 @@ object Forward {
 }
 
 trait HasInstrType {
-  def InstrN  = "b0000".U
-  def InstrI  = "b0100".U
-  def InstrR  = "b0101".U
-  def InstrS  = "b0010".U
-  def InstrB  = "b0001".U
-  def InstrU  = "b0110".U
-  def InstrJ  = "b0111".U
-  def InstrIJ = "b1000".U
-  def InstrZ  = "b1001".U // csr
-  def InstrE  = "b1010".U // exception
-  def InstrD  = "b1011".U // ebreak, just for simulation
-  def InstrF  = "b1100".U // fencei
+  def InstrN  = "b00000".U
+  def InstrI  = "b10100".U
+  def InstrR  = "b10001".U
+  def InstrS  = "b00010".U
+  def InstrB  = "b00101".U
+  def InstrU  = "b10110".U
+  def InstrJ  = "b10111".U
+  def InstrIJ = "b10101".U
+  def InstrZ  = "b11001".U // csr
+  def InstrE  = "b01010".U // exception
+  def InstrD  = "b01011".U // ebreak, just for simulation
+  def InstrF  = "b01100".U // fencei
+
+  def regWen(instr: UInt): Bool = instr(4)
+  def isCsr(instr: UInt): Bool = { instr(4) & instr(3) }
+  def isBr(instr: UInt): Bool = { instr(0) & instr(2) }
 }
 
 object MulType {
