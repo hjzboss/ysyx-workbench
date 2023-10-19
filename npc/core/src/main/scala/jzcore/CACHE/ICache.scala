@@ -84,7 +84,7 @@ sealed class CacheStage1 extends Module {
 
 sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
-    if(Settings.get("sim")) {
+    if(true) {
       val debugIn         = Flipped(new DebugIO)
       val debugOut        = new DebugIO
     }
@@ -124,7 +124,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
 
   // just for verilator
-  if(false) {
+  if(Settings.get("sim")) {
     val debugReset         = Wire(new DebugIO)
     debugReset.pc         := 0.U(32.W)
     debugReset.nextPc     := 0.U(32.W)
