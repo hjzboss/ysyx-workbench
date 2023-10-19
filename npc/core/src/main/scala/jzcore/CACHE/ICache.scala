@@ -130,7 +130,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
     debugReset.valid      := false.B
 
     val debugReg           = RegInit(debugReset)
-    debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn))
+    debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn.get()))
     io.debugOut           := debugReg
   }
 
