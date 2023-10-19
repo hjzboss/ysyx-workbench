@@ -84,8 +84,10 @@ sealed class CacheStage1 extends Module {
 
 sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
+    {
       val debugIn         = Flipped(new DebugIO)
       val debugOut        = new DebugIO
+    }
 
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
