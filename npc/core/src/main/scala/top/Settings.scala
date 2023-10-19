@@ -8,8 +8,7 @@ object DefaultSettings {
     "ResetVector" -> 0x80000000L,
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
-    "lowpower"    -> true,
-    "sim"         -> false
+    "lowpower"    -> true
   )
 }
 
