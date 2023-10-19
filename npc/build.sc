@@ -14,6 +14,7 @@ object core extends ScalaModule with ScalafmtModule { m =>
     "-feature",
     "-Xcheckinit",
     "-P:chiselplugin:genBundleElements"
+    "-Xsource:2.11"
   )
   override def ivyDeps = Agg(
     ivy"edu.berkeley.cs::chisel3:3.5.4",
