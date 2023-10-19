@@ -37,10 +37,8 @@ class EXU extends Module {
     val flush       = Input(Bool())
     val ready       = Output(Bool())
 
-    if(Settings.get("sim")) {
-      val debugIn     = Flipped(new DebugIO)
-      val debugOut    = new DebugIO
-    }
+    val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut    = if(Settings.get("sim")) Some(new DebugIO) else None
   })
 
   val alu   = Module(new Alu)

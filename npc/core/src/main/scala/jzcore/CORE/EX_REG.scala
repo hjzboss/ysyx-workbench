@@ -18,10 +18,8 @@ class EX_REG extends Module with HasResetVector {
     val aluCtrlOut  = new AluIO
     val ctrlOut     = new CtrlFlow
     
-    if(Settings.get("sim")) {
-      val debugIn = Flipped(new DebugIO)
-      val debugOut = new DebugIO
-    }
+    val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut    = if(Settings.get("sim")) Some(new DebugIO) else None
   })
 
   // 复位值

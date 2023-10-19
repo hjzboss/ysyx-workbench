@@ -11,12 +11,10 @@ class WB_REG extends Module with HasResetVector {
     val in = Flipped(new LsuOut)
     val out = new LsuOut
 
-    if(Settings.get("sim")) {
-      val debugIn = Flipped(new DebugIO)
-      val debugOut = new DebugIO
-      val lsFlagIn = Input(Bool())
-      val lsFlagOut = Output(Bool())
-    }
+    val debugIn  = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut = if(Settings.get("sim")) Some(new DebugIO) else None
+    val lsFlagIn  = if(Settings.get("sim")) Some(Input(Bool())) else None
+    val lsFlagOut = if(Settings.get("sim")) Some(Output(Bool())) else None
   })
 
   val lsuReset = Wire(new LsuOut)

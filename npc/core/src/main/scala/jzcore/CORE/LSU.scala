@@ -42,9 +42,7 @@ class LSU extends Module {
     val axiReady    = Output(Bool())
     */
 
-    if(Settings.get("sim")) {
-      val lsFlag      = Output(Bool())
-    }
+    val lsFlag        = if(Settings.get("sim")) Some(Output(Bool())) else None
   })
 
   /*

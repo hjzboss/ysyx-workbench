@@ -7,11 +7,8 @@ import utils._
 
 class JzCore extends Module {
   val io = IO(new Bundle {
-    if(Settings.get("sim")) {
-      // 传给仿真环境
-      val debug         = new DebugIO
-      val lsFlag        = Output(Bool())
-    }
+    val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
+    val lsFlag          = if(Settings.get("sim")) Some(Output(Bool())) else None
 
     // icache data array
     val sram0           = new RamIO
