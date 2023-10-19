@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 // dpi-c csrreg
 class CsrReg extends BlackBox {
