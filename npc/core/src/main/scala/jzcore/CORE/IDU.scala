@@ -30,8 +30,7 @@ class IDU extends Module with HasInstrType{
     val mret      = Output(Bool())
   })
 
-  val grf       = if(Settings.get("sim")) Module(new SimGRF) else Module(new GRF)
-
+  val grf       = Module(new GRF)
   val csr       = Module(new CSR)
 
   val inst      = io.in.inst
@@ -71,8 +70,10 @@ class IDU extends Module with HasInstrType{
   grf.io.wen           := io.regWrite.wen
   grf.io.waddr         := io.regWrite.rd
   grf.io.wdata         := io.regWrite.value
-  grf.io.clock         := clock
-  grf.io.reset         := reset
+  if(Settings.get("sim")) {
+    grf.io.clock         := clock
+    grf.io.reset         := reset
+  }
   
   val csrRaddr         = Wire(UInt(12.W))
   csrRaddr            := Mux(systemCtrl === System.ecall || csr.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csrReg))
