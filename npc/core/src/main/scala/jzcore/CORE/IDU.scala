@@ -70,11 +70,7 @@ class IDU extends Module with HasInstrType{
   grf.io.wen           := io.regWrite.wen
   grf.io.waddr         := io.regWrite.rd
   grf.io.wdata         := io.regWrite.value
-  if(Settings.get("sim")) {
-    grf.io.clock         := clock
-    grf.io.reset         := reset
-  }
-  
+
   val csrRaddr         = Wire(UInt(12.W))
   csrRaddr            := Mux(systemCtrl === System.ecall || csr.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csrReg))
   csr.io.raddr        := csrRaddr
