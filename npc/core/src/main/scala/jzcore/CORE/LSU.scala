@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 // todo: flush信号的处理，现在的想法：在idu阶段检测中断，在wbu阶段进行异常号等等的写回和异常地址的跳转
 // todo：wbu阶段跳转的优先级高于exu阶段

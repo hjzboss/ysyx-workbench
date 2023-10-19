@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 // ifu_idu的流水线寄存器
 class ID_REG extends Module with HasResetVector {

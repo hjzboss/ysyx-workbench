@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 class ArbiterIO extends Bundle {
   //val cen   = Output(Vec(len, Bool())) // valid & dirty
