@@ -284,11 +284,11 @@ sealed class CacheStage3 extends Module with HasResetVector {
     debugReset.valid     := false.B
 
     val debugReg          = RegInit(debugReset)
-    debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
-    io.debugOut.pc       := io.out.pc
-    io.debugOut.nextPc   := debugReg.nextPc
-    io.debugOut.valid    := io.validOut
-    io.debugOut.inst     := io.out.inst
+    debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn.get)))
+    io.debugOut.get.pc       := io.out.pc
+    io.debugOut.get.nextPc   := debugReg.nextPc
+    io.debugOut.get.valid    := io.validOut
+    io.debugOut.get.inst     := io.out.inst
   }
 
   val align             = stage3Reg.align
@@ -518,9 +518,9 @@ class ICache extends Module {
   io.validOut           <> stage3.io.validOut
 
   if(Settings.get("sim")) {
-    stage2.io.debugIn   <> io.debugIn
-    stage3.io.debugIn   <> stage2.io.debugOut
-    stage3.io.debugOut  <> io.debugOut
+    stage2.io.debugIn.get   <> io.debugIn.get
+    stage3.io.debugIn.get   <> stage2.io.debugOut.get
+    stage3.io.debugOut.get  <> io.debugOut.get
   }
 
   io.cpu2cache          <> stage1.io.toStage1
