@@ -30,7 +30,7 @@ sealed class IcArbiter extends Module {
   io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
 }
 
-sealed class CacheStage1 extends Module {
+class CacheStage1 extends Module {
   val io = IO(new Bundle {
     val toStage1        = Flipped(new Stage1IO)
     val toStage2        = new Stage2IO
@@ -82,7 +82,7 @@ sealed class CacheStage1 extends Module {
   io.toStage2.cacheable := io.toStage1.cacheable
 }
 
-sealed class CacheStage2 extends Module with HasResetVector {
+class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
     if(Settings.get("sim")) {
       val debugIn         = Flipped(new DebugIO)
@@ -201,7 +201,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   io.toStage3.tag       := stage2Reg.tag
 }
 
-sealed class CacheStage3 extends Module with HasResetVector {
+class CacheStage3 extends Module with HasResetVector {
   val io = IO(new Bundle {
     // debug
     val validIn         = Input(Bool())
