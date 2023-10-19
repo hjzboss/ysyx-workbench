@@ -65,16 +65,14 @@ class IDU extends Module with HasInstrType{
                   ))
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
-  // registerfile
+  // register file
   grf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
   grf.io.rs2           := rs2
   grf.io.wen           := io.regWrite.wen
   grf.io.waddr         := io.regWrite.rd
   grf.io.wdata         := io.regWrite.value
-  if(Settings.get("sim")) {
-    grf.io.clock         := clock
-    grf.io.reset         := reset
-  }
+  grf.io.clock         := clock
+  grf.io.reset         := reset
   
   val csrRaddr         = Wire(UInt(12.W))
   csrRaddr            := Mux(systemCtrl === System.ecall || csr.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csrReg))

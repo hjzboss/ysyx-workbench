@@ -5,6 +5,9 @@ import chisel3.util._
 
 class GRF extends Module {
   val io = IO(new Bundle {
+    val clock = Input(Clock())
+    val reset = Input(Bool())
+    
     val rs1   = Input(UInt(5.W))
     val rs2   = Input(UInt(5.W))
     val src1  = Output(UInt(64.W))
