@@ -30,7 +30,7 @@ class IDU extends Module with HasInstrType{
     val mret      = Output(Bool())
   })
 
-  val grf       = if(Settings.get("sim")) Module(new SimGRF) else Module(new GRF)
+  val grf       = Module(if(Settings.get("sim")) new SimGRF else new GRF)
   val csr       = Module(new CSR)
 
   val inst      = io.in.inst

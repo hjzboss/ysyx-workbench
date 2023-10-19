@@ -84,10 +84,8 @@ sealed class CacheStage1 extends Module {
 
 sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
-    {
-      val debugIn         = Flipped(new DebugIO)
-      val debugOut        = new DebugIO
-    }
+    val debugIn         = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut        = if(Settings.get("sim")) Some(new DebugIO) else None
 
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
@@ -207,10 +205,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
   
-    if(Settings.get("sim")) {
-      val debugIn         = Flipped(new DebugIO)
-      val debugOut        = new DebugIO
-    }
+    val debugIn         = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut        = if(Settings.get("sim")) Some(new DebugIO) else None
 
     val toStage3        = Flipped(new Stage3IO)
 
@@ -445,10 +441,8 @@ class ICache extends Module {
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
 
-    if(Settings.get("sim")) {
-      val debugIn       = new DebugIO
-      val debugOut      = new DebugIO
-    }
+    val debugIn         = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut        = if(Settings.get("sim")) Some(new DebugIO) else None
 
     // cpu
     val cpu2cache       = Flipped(new Stage1IO)
