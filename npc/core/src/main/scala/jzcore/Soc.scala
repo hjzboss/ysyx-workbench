@@ -10,16 +10,9 @@ class Soc extends Module {
     // 传给仿真环境
     val debug      = new DebugIO
     val finish     = Output(Bool())
-
-    // 防止被优化
-    val valid1     = Output(Bool())
-    val valid2     = Output(Bool())
-    //val csrAddr    = Output(UInt(3.W))
-
     val lsFlag     = Output(Bool())
   })
 
-  //val rsram = Module(new Sram)
   val sram = Module(new Sram)
   val ram0 = Module(new Ram)
   val ram1 = Module(new Ram)
@@ -47,69 +40,64 @@ class Soc extends Module {
   ram7.io.CLK := clock
 
   // ram, dataArray
-  core.io.sram0_rdata <> ram0.io.Q
-  core.io.sram0_cen <> ram0.io.CEN
-  core.io.sram0_wen <> ram0.io.WEN
-  core.io.sram0_wmask <> ram0.io.BWEN
-  core.io.sram0_addr <> ram0.io.A
-  core.io.sram0_wdata <> ram0.io.D
+  core.io.sram0.rdata <> ram0.io.Q
+  core.io.sram0.cen <> ram0.io.CEN
+  core.io.sram0.wen <> ram0.io.WEN
+  core.io.sram0.wmask <> ram0.io.BWEN
+  core.io.sram0.addr <> ram0.io.A
+  core.io.sram0.wdata <> ram0.io.D
 
-  core.io.sram1_rdata <> ram1.io.Q
-  core.io.sram1_cen <> ram1.io.CEN
-  core.io.sram1_wen <> ram1.io.WEN
-  core.io.sram1_wmask <> ram1.io.BWEN
-  core.io.sram1_addr <> ram1.io.A
-  core.io.sram1_wdata <> ram1.io.D
+  core.io.sram1.rdata <> ram1.io.Q
+  core.io.sram1.cen <> ram1.io.CEN
+  core.io.sram1.wen <> ram1.io.WEN
+  core.io.sram1.wmask <> ram1.io.BWEN
+  core.io.sram1.addr <> ram1.io.A
+  core.io.sram1.wdata <> ram1.io.D
 
-  core.io.sram2_rdata <> ram2.io.Q
-  core.io.sram2_cen <> ram2.io.CEN
-  core.io.sram2_wen <> ram2.io.WEN
-  core.io.sram2_wmask <> ram2.io.BWEN
-  core.io.sram2_addr <> ram2.io.A
-  core.io.sram2_wdata <> ram2.io.D
+  core.io.sram2.rdata <> ram2.io.Q
+  core.io.sram2.cen <> ram2.io.CEN
+  core.io.sram2.wen <> ram2.io.WEN
+  core.io.sram2.wmask <> ram2.io.BWEN
+  core.io.sram2.addr <> ram2.io.A
+  core.io.sram2.wdata <> ram2.io.D
 
-  core.io.sram3_rdata <> ram3.io.Q
-  core.io.sram3_cen <> ram3.io.CEN
-  core.io.sram3_wen <> ram3.io.WEN
-  core.io.sram3_wmask <> ram3.io.BWEN
-  core.io.sram3_addr <> ram3.io.A
-  core.io.sram3_wdata <> ram3.io.D
+  core.io.sram3.rdata <> ram3.io.Q
+  core.io.sram3.cen <> ram3.io.CEN
+  core.io.sram3.wen <> ram3.io.WEN
+  core.io.sram3.wmask <> ram3.io.BWEN
+  core.io.sram3.addr <> ram3.io.A
+  core.io.sram3.wdata <> ram3.io.D
 
 
-  core.io.sram4_rdata <> ram4.io.Q
-  core.io.sram4_cen <> ram4.io.CEN
-  core.io.sram4_wen <> ram4.io.WEN
-  core.io.sram4_wmask <> ram4.io.BWEN
-  core.io.sram4_addr <> ram4.io.A
-  core.io.sram4_wdata <> ram4.io.D
+  core.io.sram4.rdata <> ram4.io.Q
+  core.io.sram4.cen <> ram4.io.CEN
+  core.io.sram4.wen <> ram4.io.WEN
+  core.io.sram4.wmask <> ram4.io.BWEN
+  core.io.sram4.addr <> ram4.io.A
+  core.io.sram4.wdata <> ram4.io.D
 
-  core.io.sram5_rdata <> ram5.io.Q
-  core.io.sram5_cen <> ram5.io.CEN
-  core.io.sram5_wen <> ram5.io.WEN
-  core.io.sram5_wmask <> ram5.io.BWEN
-  core.io.sram5_addr <> ram5.io.A
-  core.io.sram5_wdata <> ram5.io.D
+  core.io.sram5.rdata <> ram5.io.Q
+  core.io.sram5.cen <> ram5.io.CEN
+  core.io.sram5.wen <> ram5.io.WEN
+  core.io.sram5.wmask <> ram5.io.BWEN
+  core.io.sram5.addr <> ram5.io.A
+  core.io.sram5.wdata <> ram5.io.D
 
-  core.io.sram6_rdata <> ram6.io.Q
-  core.io.sram6_cen <> ram6.io.CEN
-  core.io.sram6_wen <> ram6.io.WEN
-  core.io.sram6_wmask <> ram6.io.BWEN
-  core.io.sram6_addr <> ram6.io.A
-  core.io.sram6_wdata <> ram6.io.D
+  core.io.sram6.rdata <> ram6.io.Q
+  core.io.sram6.cen <> ram6.io.CEN
+  core.io.sram6.wen <> ram6.io.WEN
+  core.io.sram6.wmask <> ram6.io.BWEN
+  core.io.sram6.addr <> ram6.io.A
+  core.io.sram6.wdata <> ram6.io.D
 
-  core.io.sram7_rdata <> ram7.io.Q
-  core.io.sram7_cen <> ram7.io.CEN
-  core.io.sram7_wen <> ram7.io.WEN
-  core.io.sram7_wmask <> ram7.io.BWEN
-  core.io.sram7_addr <> ram7.io.A
-  core.io.sram7_wdata <> ram7.io.D
+  core.io.sram7.rdata <> ram7.io.Q
+  core.io.sram7.cen <> ram7.io.CEN
+  core.io.sram7.wen <> ram7.io.WEN
+  core.io.sram7.wmask <> ram7.io.BWEN
+  core.io.sram7.addr <> ram7.io.A
+  core.io.sram7.wdata <> ram7.io.D
 
   // 仿真环境
   io.debug        := core.io.debug
-  io.valid1       := core.io.axiWaddrIO.valid
-  io.valid2       := sram.io.waddrIO.valid
-  io.finish       := core.io.finish
-
   io.lsFlag       := core.io.lsFlag
-  //io.csrAddr      := core.io.csrAddr 
 }*/

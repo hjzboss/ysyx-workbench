@@ -38,32 +38,21 @@ sealed class CacheStage1 extends Module {
     val stall           = Input(Bool())
 
     // data array
-    //val sram0_rdata     = Input(UInt(128.W))
     val sram0_cen       = Output(Bool())
     val sram0_wen       = Output(Bool())
-    //val sram0_wmask     = Output(UInt(128.W))
     val sram0_addr      = Output(UInt(6.W))
-    //val sram0_wdata     = Output(UInt(128.W)) 
 
-    //val sram1_rdata     = Input(UInt(128.W))
     val sram1_cen       = Output(Bool())
     val sram1_wen       = Output(Bool())
-    //val sram1_wmask     = Output(UInt(128.W))
     val sram1_addr      = Output(UInt(6.W))
-    //val sram1_wdata     = Output(UInt(128.W)) 
 
-    //val sram2_rdata     = Input(UInt(128.W))
     val sram2_cen       = Output(Bool())
     val sram2_wen       = Output(Bool())
-    //val srvalidam2_wdata     = Output(UInt(128.W)) 
     val sram2_addr      = Output(UInt(6.W))
 
-    //val sram3_rdata     = Input(UInt(128.W))
     val sram3_cen       = Output(Bool())
     val sram3_wen       = Output(Bool())
-    //val sram3_wmask     = Output(UInt(128.W))
     val sram3_addr      = Output(UInt(6.W))
-    //val sram3_wdata     = Output(UInt(128.W)) 
   })
 
   // decode
@@ -95,10 +84,10 @@ sealed class CacheStage1 extends Module {
 
 sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
-    /*
-    // debug
-    val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO*/
+    if(Settings.get("sim")) {
+      val debugIn         = Flipped(new DebugIO)
+      val debugOut        = new DebugIO
+    }
 
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
@@ -108,14 +97,8 @@ sealed class CacheStage2 extends Module with HasResetVector {
     val toStage3        = new Stage3IO
 
     val flushIn         = Input(Bool())
-    //val stallOut        = Output(Bool())
     val stallIn         = Input(Bool()) // lsu的stall，优先级最高
     val stage3Stall     = Input(Bool()) // cache stage3的stall，优先级最低
-
-    //val sram0_addr      = Output(UInt(6.W))
-    //val sram1_addr      = Output(UInt(6.W))
-    //val sram2_addr      = Output(UInt(6.W))
-    //val sram3_addr      = Output(UInt(6.W))
 
     val sram0_rdata     = Input(UInt(128.W))
     val sram1_rdata     = Input(UInt(128.W))
@@ -140,15 +123,18 @@ sealed class CacheStage2 extends Module with HasResetVector {
   val stage2Reg          = RegInit(regInit)
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
 
-  /*
-  val debugReset         = Wire(new DebugIO)
-  debugReset.pc         := 0.U(32.W)
-  debugReset.nextPc     := 0.U(32.W)
-  debugReset.inst       := Instruction.NOP
+  // just for verilator
+  if(Settings.get("sim")) {
+    val debugReset         = Wire(new DebugIO)
+    debugReset.pc         := 0.U(32.W)
+    debugReset.nextPc     := 0.U(32.W)
+    debugReset.inst       := Instruction.NOP
+    debugReset.valid      := false.B
 
-  val debugReg           = RegInit(debugReset)
-  debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn))
-  io.debugOut           := debugReg*/
+    val debugReg           = RegInit(debugReset)
+    debugReg              := Mux(io.stallIn, debugReg, Mux(io.flushIn, debugReset, io.debugIn))
+    io.debugOut           := debugReg
+  }
 
   //io.sram0_addr         := stage2Reg.index
   //io.sram1_addr         := stage2Reg.index
@@ -220,9 +206,11 @@ sealed class CacheStage3 extends Module with HasResetVector {
     // debug
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
-    /*
-    val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO*/
+  
+    if(Settings.get("sim")) {
+      val debugIn         = Flipped(new DebugIO)
+      val debugOut        = new DebugIO
+    }
 
     val toStage3        = Flipped(new Stage3IO)
 
@@ -292,19 +280,20 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val stage3Reg         = RegInit(regInit)
   stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
-  /*
-  val debugReset        = Wire(new DebugIO)
-  debugReset.pc        := 0.U(32.W)
-  debugReset.nextPc    := 0.U(32.W)
-  debugReset.inst      := Instruction.NOP
+  if(Settings.get("sim")) {
+    val debugReset        = Wire(new DebugIO)
+    debugReset.pc        := 0.U(32.W)
+    debugReset.nextPc    := 0.U(32.W)
+    debugReset.inst      := Instruction.NOP
+    debugReset.valid     := false.B
 
-  val debugReg          = RegInit(debugReset)
-  //val stallDebug        = dontTouch(Wire(new DebugIO))
-  //stallDebug           := Mux(io.stallIn || io.stallOut, debugReg, io.debugIn)
-  //debugReg             := Mux(io.flushIn, debugReset, stallDebug)
-  debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
-  io.debugOut.pc       := debugReg.pc
-  io.debugOut.nextPc   := debugReg.nextPc*/
+    val debugReg          = RegInit(debugReset)
+    debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn)))
+    io.debugOut.pc       := io.out.pc
+    io.debugOut.nextPc   := debugReg.nextPc
+    io.debugOut.valid    := io.validOut
+    io.debugOut.inst     := io.out.inst
+  }
 
   val align             = stage3Reg.align
 
@@ -455,9 +444,11 @@ class ICache extends Module {
     // todo: 是否需要valid信号来提示是一条有效指令?
     val validIn         = Input(Bool())
     val validOut        = Output(Bool())
-    /*
-    val debugIn         = Flipped(new DebugIO)
-    val debugOut        = new DebugIO*/
+
+    if(Settings.get("sim")) {
+      val debugIn       = new DebugIO
+      val debugOut      = new DebugIO
+    }
 
     // cpu
     val cpu2cache       = Flipped(new Stage1IO)
@@ -465,6 +456,12 @@ class ICache extends Module {
     val redirect        = new RedirectIO
 
     // ram, dataArray
+    val sram0           = new RamIO
+    val sram1           = new RamIO
+    val sram2           = new RamIO
+    val sram3           = new RamIO
+
+    /*
     val sram0_rdata     = Input(UInt(128.W))
     val sram0_cen       = Output(Bool())
     val sram0_wen       = Output(Bool())
@@ -491,7 +488,7 @@ class ICache extends Module {
     val sram3_wen       = Output(Bool())
     val sram3_wmask     = Output(UInt(128.W))
     val sram3_addr      = Output(UInt(6.W))
-    val sram3_wdata     = Output(UInt(128.W)) 
+    val sram3_wdata     = Output(UInt(128.W))*/
 
     // axi
     val axiRaddrIO      = Decoupled(new RaddrIO)
@@ -520,16 +517,17 @@ class ICache extends Module {
   val dataArb1 = Module(new IcArbiter)
   val dataArb2 = Module(new IcArbiter)
   val dataArb3 = Module(new IcArbiter)
-  
 
   // debug
   stage2.io.validIn     <> io.validIn
   stage3.io.validIn     <> stage2.io.validOut
   io.validOut           <> stage3.io.validOut
-  /*
-  stage2.io.debugIn     <> io.debugIn
-  stage2.io.debugOut    <> stage3.io.debugIn
-  stage3.io.debugOut    <> io.debugOut*/
+
+  if(Settings.get("sim")) {
+    stage2.io.debugIn   <> io.debugIn
+    stage3.io.debugIn   <> stage2.io.debugOut
+    stage3.io.debugOut  <> io.debugOut
+  }
 
   io.cpu2cache          <> stage1.io.toStage1
   stage1.io.toStage2    <> stage2.io.toStage2
@@ -542,26 +540,22 @@ class ICache extends Module {
   stage2.io.flushIn     := io.flush | stage3.io.flushOut
   stage2.io.stallIn     := io.stallIn
   stage2.io.stage3Stall := stage3.io.stallOut
-  stage2.io.sram0_rdata <> io.sram0_rdata
-  stage2.io.sram1_rdata <> io.sram1_rdata
-  stage2.io.sram2_rdata <> io.sram2_rdata
-  stage2.io.sram3_rdata <> io.sram3_rdata
+  stage2.io.sram0_rdata <> io.sram0.rdata
+  stage2.io.sram1_rdata <> io.sram1.rdata
+  stage2.io.sram2_rdata <> io.sram2.rdata
+  stage2.io.sram3_rdata <> io.sram3.rdata
   stage2.io.metaAlloc   <> stage3.io.metaAlloc
   stage3.io.stallIn     := io.stallIn
   stage3.io.flushIn     := io.flush
   io.stallOut           := stage3.io.stallOut
 
-  //dataArb0.io.redirect   := stage3.io.redirect
-  //dataArb0.io.stage2Addr := stage2.io.sram0_addr
   dataArb0.io.stage3Addr := stage3.io.sram0_addr
   dataArb0.io.stage3Cen  := stage3.io.sram0_cen
   dataArb0.io.stage3Wen  := stage3.io.sram0_wen
   dataArb0.io.stage1Addr := stage1.io.sram0_addr
   dataArb0.io.stage1Cen  := stage1.io.sram0_cen
   dataArb0.io.stage1Wen  := stage1.io.sram0_wen
-  
-  //dataArb1.io.redirect   := stage3.io.redirect
-  //dataArb1.io.stage2Addr := stage2.io.sram0_addr
+
   dataArb1.io.stage3Addr := stage3.io.sram1_addr
   dataArb1.io.stage3Cen  := stage3.io.sram1_cen
   dataArb1.io.stage3Wen  := stage3.io.sram1_wen
@@ -569,8 +563,6 @@ class ICache extends Module {
   dataArb1.io.stage1Cen  := stage1.io.sram1_cen
   dataArb1.io.stage1Wen  := stage1.io.sram1_wen
 
-  //dataArb2.io.redirect   := stage3.io.redirect
-  //dataArb2.io.stage2Addr := stage2.io.sram0_addr
   dataArb2.io.stage3Addr := stage3.io.sram2_addr
   dataArb2.io.stage3Cen  := stage3.io.sram2_cen
   dataArb2.io.stage3Wen  := stage3.io.sram2_wen
@@ -578,8 +570,6 @@ class ICache extends Module {
   dataArb2.io.stage1Cen  := stage1.io.sram2_cen
   dataArb2.io.stage1Wen  := stage1.io.sram2_wen
 
-  //dataArb3.io.redirect   := stage3.io.redirect
-  //dataArb3.io.stage2Addr := stage2.io.sram0_addr
   dataArb3.io.stage3Addr := stage3.io.sram3_addr
   dataArb3.io.stage3Cen  := stage3.io.sram3_cen
   dataArb3.io.stage3Wen  := stage3.io.sram3_wen
@@ -587,26 +577,26 @@ class ICache extends Module {
   dataArb3.io.stage1Cen  := stage1.io.sram3_cen
   dataArb3.io.stage1Wen  := stage1.io.sram3_wen 
 
-  io.sram0_addr          := dataArb0.io.arbAddr
-  io.sram0_cen           := dataArb0.io.arbCen
-  io.sram0_wen           := dataArb0.io.arbWen
-  io.sram0_wmask         := stage3.io.sram0_wmask
-  io.sram0_wdata         := stage3.io.sram0_wdata
-  io.sram1_addr          := dataArb1.io.arbAddr
-  io.sram1_cen           := dataArb1.io.arbCen
-  io.sram1_wen           := dataArb1.io.arbWen
-  io.sram1_wmask         := stage3.io.sram1_wmask
-  io.sram1_wdata         := stage3.io.sram1_wdata
-  io.sram2_addr          := dataArb2.io.arbAddr
-  io.sram2_cen           := dataArb2.io.arbCen
-  io.sram2_wen           := dataArb2.io.arbWen
-  io.sram2_wmask         := stage3.io.sram2_wmask
-  io.sram2_wdata         := stage3.io.sram2_wdata
-  io.sram3_addr          := dataArb3.io.arbAddr
-  io.sram3_cen           := dataArb3.io.arbCen
-  io.sram3_wen           := dataArb3.io.arbWen
-  io.sram3_wmask         := stage3.io.sram3_wmask
-  io.sram3_wdata         := stage3.io.sram3_wdata
+  io.sram0.addr          := dataArb0.io.arbAddr
+  io.sram0.cen           := dataArb0.io.arbCen
+  io.sram0.wen           := dataArb0.io.arbWen
+  io.sram0.wmask         := stage3.io.sram0_wmask
+  io.sram0.wdata         := stage3.io.sram0_wdata
+  io.sram1.addr          := dataArb1.io.arbAddr
+  io.sram1.cen           := dataArb1.io.arbCen
+  io.sram1.wen           := dataArb1.io.arbWen
+  io.sram1.wmask         := stage3.io.sram1_wmask
+  io.sram1.wdata         := stage3.io.sram1_wdata
+  io.sram2.addr          := dataArb2.io.arbAddr
+  io.sram2.cen           := dataArb2.io.arbCen
+  io.sram2.wen           := dataArb2.io.arbWen
+  io.sram2.wmask         := stage3.io.sram2_wmask
+  io.sram2.wdata         := stage3.io.sram2_wdata
+  io.sram3.addr          := dataArb3.io.arbAddr
+  io.sram3.cen           := dataArb3.io.arbCen
+  io.sram3.wen           := dataArb3.io.arbWen
+  io.sram3.wmask         := stage3.io.sram3_wmask
+  io.sram3.wdata         := stage3.io.sram3_wdata
 
   io.axiRaddrIO         <> stage3.io.axiRaddrIO
   io.axiRdataIO         <> stage3.io.axiRdataIO

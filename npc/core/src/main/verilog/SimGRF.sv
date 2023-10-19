@@ -1,4 +1,4 @@
-module RF (
+module SimGRF (
     input clock,
     input reset,
 

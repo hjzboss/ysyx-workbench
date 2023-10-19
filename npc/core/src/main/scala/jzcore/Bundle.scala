@@ -10,9 +10,49 @@ class DebugIO extends Bundle {
   val inst      = Output(UInt(32.W))
 }
 
+class AxiMaster extends Bundle {
+  val awready = Input(Bool())
+  val awvalid = Output(Bool())
+  val awid    = Output(UInt(4.W))
+  val awaddr  = Output(UInt(32.W))
+  val awlen   = Output(UInt(8.W))
+  val awsize  = Output(UInt(3.W))
+  val awburst = Output(UInt(2.W))
+  val wready  = Input(Bool())
+  val wvalid  = Output(Bool())
+  val wdata   = Output(UInt(64.W))
+  val wstrb   = Output(UInt(8.W))
+  val wlast   = Output(Bool())
+  val bready  = Output(Bool())
+  val bvalid  = Input(Bool())
+  val bid     = Input(UInt(4.W))
+  val bresp   = Input(UInt(2.W))
+  val arready = Input(Bool())
+  val arvalid = Output(Bool())
+  val arid    = Output(UInt(4.W))
+  val araddr  = Output(UInt(32.W))
+  val arlen   = Output(UInt(8.W))
+  val arsize  = Output(UInt(3.W))
+  val arburst = Output(UInt(2.W))
+  val rready  = Output(Bool())
+  val rvalid  = Input(Bool())
+  val rid     = Input(UInt(4.W))
+  val rdata   = Input(UInt(64.W))
+  val rresp   = Input(UInt(2.W))
+  val rlast   = Input(Bool())
+}
+
+class RamIO extends Bundle {
+  val rdata     = Input(UInt(128.W))
+  val cen       = Output(Bool())
+  val wen       = Output(Bool())
+  val wmask     = Output(UInt(128.W))
+  val addr      = Output(UInt(6.W))
+  val wdata     = Output(UInt(128.W)) 
+}
+
 // icache pipline
 class Stage1IO extends Bundle {
-  //val valid     = Output(Bool()) // 是否读icache
   val addr      = Output(UInt(32.W))
   val cacheable = Output(Bool())
 }
@@ -114,7 +154,9 @@ class CtrlFlow extends Bundle {
   val exception     = Output(Bool()) // 系统指令的类型
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
-  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+  if(Settings.get("sim")) {
+    val ebreak      = Output(Bool()) // ebreak指令，用于停止仿真
+  }
   val sysInsType    = Output(UInt(2.W))
   val coherence     = Output(Bool())
   // 用于送给旁路单元
@@ -145,9 +187,10 @@ class ExuOut extends Bundle {
   val csrValue      = Output(UInt(64.W))
   val coherence     = Output(Bool())
   val int           = Output(Bool())
-
-  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-  //val haltRet       = Output(UInt(64.W))
+  if(Settings.get("sim")) {
+    val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+    val haltRet       = Output(UInt(64.W))
+  }
 }
 
 class LsuOut extends Bundle {
@@ -163,9 +206,10 @@ class LsuOut extends Bundle {
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
   val int           = Output(Bool())
-
-  //val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
-  //val haltRet       = Output(UInt(64.W))
+  if(Settings.get("sim")) {
+    val ebreak        = Output(Bool()) // ebreak指令，用于停止仿真
+    val haltRet       = Output(UInt(64.W))
+  }
 }
 
 class InstrFetch extends Bundle {

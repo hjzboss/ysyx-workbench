@@ -32,34 +32,40 @@ class DCache extends Module {
     val rdataIO         = Decoupled(new CacheReadIO)
     val coherence       = Flipped(new CoherenceIO)
 
+    val sram4           = new RamIO
+    val sram5           = new RamIO
+    val sram6           = new RamIO
+    val sram7           = new RamIO
+
+    /*
     // ram, dataArray
-    val sram4_rdata     = Input(UInt(128.W))
-    val sram4_cen       = Output(Bool())
-    val sram4_wen       = Output(Bool())
-    val sram4_wmask     = Output(UInt(128.W))
-    val sram4_addr      = Output(UInt(6.W))
-    val sram4_wdata     = Output(UInt(128.W)) 
+    val sram4.rdata     = Input(UInt(128.W))
+    val sram4.cen       = Output(Bool())
+    val sram4.wen       = Output(Bool())
+    val sram4.wmask     = Output(UInt(128.W))
+    val sram4.addr      = Output(UInt(6.W))
+    val sram4.wdata     = Output(UInt(128.W)) 
 
-    val sram5_rdata     = Input(UInt(128.W))
-    val sram5_cen       = Output(Bool())
-    val sram5_wen       = Output(Bool())
-    val sram5_wmask     = Output(UInt(128.W))
-    val sram5_addr      = Output(UInt(6.W))
-    val sram5_wdata     = Output(UInt(128.W)) 
+    val sram5.rdata     = Input(UInt(128.W))
+    val sram5.cen       = Output(Bool())
+    val sram5.wen       = Output(Bool())
+    val sram5.wmask     = Output(UInt(128.W))
+    val sram5.addr      = Output(UInt(6.W))
+    val sram5.wdata     = Output(UInt(128.W)) 
 
-    val sram6_rdata     = Input(UInt(128.W))
-    val sram6_cen       = Output(Bool())
-    val sram6_wen       = Output(Bool())
-    val sram6_wmask     = Output(UInt(128.W))
-    val sram6_addr      = Output(UInt(6.W))
-    val sram6_wdata     = Output(UInt(128.W)) 
+    val sram6.rdata     = Input(UInt(128.W))
+    val sram6.cen       = Output(Bool())
+    val sram6.wen       = Output(Bool())
+    val sram6.wmask     = Output(UInt(128.W))
+    val sram6.addr      = Output(UInt(6.W))
+    val sram6.wdata     = Output(UInt(128.W)) 
 
-    val sram7_rdata     = Input(UInt(128.W))
-    val sram7_cen       = Output(Bool())
-    val sram7_wen       = Output(Bool())
-    val sram7_wmask     = Output(UInt(128.W))
-    val sram7_addr      = Output(UInt(6.W))
-    val sram7_wdata     = Output(UInt(128.W)) 
+    val sram7.rdata     = Input(UInt(128.W))
+    val sram7.cen       = Output(Bool())
+    val sram7.wen       = Output(Bool())
+    val sram7.wmask     = Output(UInt(128.W))
+    val sram7.addr      = Output(UInt(6.W))
+    val sram7.wdata     = Output(UInt(128.W))*/
 
     // axi
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -262,27 +268,27 @@ class DCache extends Module {
   when(state === tagCompare) {
     when(hit) {
       dataBlock := LookupTree(hitList.asUInt, List(
-                    "b0001".U   -> io.sram4_rdata,
-                    "b0010".U   -> io.sram5_rdata,
-                    "b0100".U   -> io.sram6_rdata,
-                    "b1000".U   -> io.sram7_rdata,
+                    "b0001".U   -> io.sram4.rdata,
+                    "b0010".U   -> io.sram5.rdata,
+                    "b0100".U   -> io.sram6.rdata,
+                    "b1000".U   -> io.sram7.rdata,
                   ))
     }.otherwise {
       // random choose
       dataBlock := LookupTree(randCount, List(
-                    0.U   -> io.sram4_rdata,
-                    1.U   -> io.sram5_rdata,
-                    2.U   -> io.sram6_rdata,
-                    3.U   -> io.sram7_rdata,
+                    0.U   -> io.sram4.rdata,
+                    1.U   -> io.sram5.rdata,
+                    2.U   -> io.sram6.rdata,
+                    3.U   -> io.sram7.rdata,
                   ))
     }
   }.elsewhen(state === coherence2) {
     dataBlock := LookupTree(ramCen.asUInt, List(
                     0.U   -> dataBlock,
-                    1.U   -> io.sram4_rdata,
-                    2.U   -> io.sram5_rdata,
-                    4.U   -> io.sram6_rdata,
-                    8.U   -> io.sram7_rdata,
+                    1.U   -> io.sram4.rdata,
+                    2.U   -> io.sram5.rdata,
+                    4.U   -> io.sram6.rdata,
+                    8.U   -> io.sram7.rdata,
                   ))
   }.otherwise {
     dataBlock := dataBlock
@@ -387,46 +393,46 @@ class DCache extends Module {
   val rdata1       = Mux(align, Cat(0.U(64.W), io.axiRdataIO.bits.rdata), Cat(io.axiRdataIO.bits.rdata, 0.U(64.W)))
 
   // dataArray control
-  io.sram4_addr   := index
-  io.sram4_wen    := true.B
-  io.sram5_addr   := index
-  io.sram5_wen    := true.B
-  io.sram6_addr   := index
-  io.sram6_wen    := true.B
-  io.sram7_addr   := index
-  io.sram7_wen    := true.B
-  io.sram4_cen    := true.B
-  io.sram5_cen    := true.B
-  io.sram6_cen    := true.B
-  io.sram7_cen    := true.B
-  io.sram4_wdata  := 0.U
-  io.sram4_wmask  := ~0.U(128.W)
-  io.sram5_wdata  := 0.U
-  io.sram5_wmask  := ~0.U(128.W)
-  io.sram6_wdata  := 0.U
-  io.sram6_wmask  := ~0.U(128.W)
-  io.sram7_wdata  := 0.U
-  io.sram7_wmask  := ~0.U(128.W)
+  io.sram4.addr   := index
+  io.sram4.wen    := true.B
+  io.sram5.addr   := index
+  io.sram5.wen    := true.B
+  io.sram6.addr   := index
+  io.sram6.wen    := true.B
+  io.sram7.addr   := index
+  io.sram7.wen    := true.B
+  io.sram4.cen    := true.B
+  io.sram5.cen    := true.B
+  io.sram6.cen    := true.B
+  io.sram7.cen    := true.B
+  io.sram4.wdata  := 0.U
+  io.sram4.wmask  := ~0.U(128.W)
+  io.sram5.wdata  := 0.U
+  io.sram5.wmask  := ~0.U(128.W)
+  io.sram6.wdata  := 0.U
+  io.sram6.wmask  := ~0.U(128.W)
+  io.sram7.wdata  := 0.U
+  io.sram7.wmask  := ~0.U(128.W)
   when(state === coherence1) {
     // coherence
-    io.sram4_addr := arb4.io.out.bits.index
-    io.sram4_cen  := !ramCen(0)
-    io.sram5_addr := arb4.io.out.bits.index
-    io.sram5_cen  := !ramCen(1)
-    io.sram6_addr := arb4.io.out.bits.index
-    io.sram6_cen  := !ramCen(2)
-    io.sram7_addr := arb4.io.out.bits.index
-    io.sram7_cen  := !ramCen(3)
+    io.sram4.addr := arb4.io.out.bits.index
+    io.sram4.cen  := !ramCen(0)
+    io.sram5.addr := arb4.io.out.bits.index
+    io.sram5.cen  := !ramCen(1)
+    io.sram6.addr := arb4.io.out.bits.index
+    io.sram6.cen  := !ramCen(2)
+    io.sram7.addr := arb4.io.out.bits.index
+    io.sram7.cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire && io.ctrlIO.bits.cacheable) {
     // read data
-    io.sram4_addr := io.ctrlIO.bits.addr(9, 4)
-    io.sram4_cen  := false.B
-    io.sram5_addr := io.ctrlIO.bits.addr(9, 4)
-    io.sram5_cen  := false.B
-    io.sram6_addr := io.ctrlIO.bits.addr(9, 4)
-    io.sram6_cen  := false.B
-    io.sram7_addr := io.ctrlIO.bits.addr(9, 4)
-    io.sram7_cen  := false.B
+    io.sram4.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram4.cen  := false.B
+    io.sram5.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram5.cen  := false.B
+    io.sram6.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram6.cen  := false.B
+    io.sram7.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram7.cen  := false.B
   }.elsewhen(state === allocate2 && rdataFire) {
     // allocate metaArray
     val metaAlloc = Wire(new MetaData)
@@ -437,31 +443,31 @@ class DCache extends Module {
     switch(victimWay) {
       is(0.U) {
         metaArray(0)(index) := metaAlloc
-        io.sram4_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram4_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
-        io.sram4_cen    := false.B
-        io.sram4_wen    := false.B
+        io.sram4.wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
+        io.sram4.wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram4.cen    := false.B
+        io.sram4.wen    := false.B
       }
       is(1.U) {
         metaArray(1)(index) := metaAlloc
-        io.sram5_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram5_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
-        io.sram5_cen    := false.B
-        io.sram5_wen    := false.B
+        io.sram5.wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
+        io.sram5.wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram5.cen    := false.B
+        io.sram5.wen    := false.B
       }
       is(2.U) {
         metaArray(2)(index) := metaAlloc
-        io.sram6_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram6_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
-        io.sram6_cen    := false.B
-        io.sram6_wen    := false.B
+        io.sram6.wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
+        io.sram6.wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram6.cen    := false.B
+        io.sram6.wen    := false.B
       }
       is(3.U) {
         metaArray(3)(index) := metaAlloc
-        io.sram7_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram7_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
-        io.sram7_cen    := false.B
-        io.sram7_wen    := false.B
+        io.sram7.wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
+        io.sram7.wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram7.cen    := false.B
+        io.sram7.wen    := false.B
       }
     }
   }.elsewhen(state === data && cwdataFire && wen) {
@@ -474,62 +480,62 @@ class DCache extends Module {
       switch(victimWay) {
         is(0.U) {
           metaArray(0)(index).dirty := true.B
-          io.sram4_wen    := false.B
-          io.sram4_cen    := false.B
-          io.sram4_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram4_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram4.wen    := false.B
+          io.sram4.cen    := false.B
+          io.sram4.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram4.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is(1.U) {
           metaArray(1)(index).dirty := true.B
-          io.sram5_wen    := false.B
-          io.sram5_cen    := false.B
-          io.sram5_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram5_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram5.wen    := false.B
+          io.sram5.cen    := false.B
+          io.sram5.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram5.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is(2.U) {
           metaArray(2)(index).dirty := true.B
-          io.sram6_wen    := false.B
-          io.sram6_cen    := false.B
-          io.sram6_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram6_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram6.wen    := false.B
+          io.sram6.cen    := false.B
+          io.sram6.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram6.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is(3.U) {
           metaArray(3)(index).dirty := true.B
-          io.sram7_wen    := false.B
-          io.sram7_cen    := false.B
-          io.sram7_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram7_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram7.wen    := false.B
+          io.sram7.cen    := false.B
+          io.sram7.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram7.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
       }
     }.otherwise {
       switch(hitListReg.asUInt) {
         is("b0001".U) {
           metaArray(0)(index).dirty := true.B
-          io.sram4_cen    := false.B
-          io.sram4_wen    := false.B
-          io.sram4_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram4_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram4.cen    := false.B
+          io.sram4.wen    := false.B
+          io.sram4.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram4.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is("b0010".U) {
           metaArray(1)(index).dirty := true.B
-          io.sram5_cen    := false.B
-          io.sram5_wen    := false.B
-          io.sram5_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram5_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram5.cen    := false.B
+          io.sram5.wen    := false.B
+          io.sram5.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram5.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is("b0100".U) {
           metaArray(2)(index).dirty := true.B
-          io.sram6_cen    := false.B
-          io.sram6_wen    := false.B
-          io.sram6_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram6_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram6.cen    := false.B
+          io.sram6.wen    := false.B
+          io.sram6.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram6.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
         is("b1000".U) {
           metaArray(3)(index).dirty := true.B
-          io.sram7_cen    := false.B
-          io.sram7_wen    := false.B
-          io.sram7_wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
-          io.sram7_wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
+          io.sram7.cen    := false.B
+          io.sram7.wen    := false.B
+          io.sram7.wmask  := Mux(align, Cat(wmask64.asUInt, "hffffffffffffffff".U(64.W)), Cat("hffffffffffffffff".U(64.W), wmask64.asUInt))
+          io.sram7.wdata  := Mux(align, Cat(io.wdataIO.bits.wdata, 0.U(64.W)), Cat(0.U(64.W), io.wdataIO.bits.wdata))
         }
       }
     }

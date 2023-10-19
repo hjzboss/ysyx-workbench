@@ -42,7 +42,9 @@ class LSU extends Module {
     val axiReady    = Output(Bool())
     */
 
-    //val lsFlag      = Output(Bool())
+    if(Settings.get("sim")) {
+      val lsFlag      = Output(Bool())
+    }
   })
 
   /*
@@ -181,7 +183,6 @@ class LSU extends Module {
   pc                    := io.in.pc
 
   io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, lsuOut)
-  //io.out.lsuOut         := rdata
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
@@ -191,8 +192,6 @@ class LSU extends Module {
   io.out.exception      := io.in.exception
   io.out.csrWaddr       := io.in.csrWaddr
   io.out.csrWen         := Mux(io.flushCsr, false.B, io.in.csrWen)
-  //io.out.ebreak         := io.in.ebreak
-  //io.out.haltRet        := io.in.haltRet
   io.out.csrValue       := io.in.csrValue
   io.out.int            := io.in.int
 
@@ -202,6 +201,11 @@ class LSU extends Module {
   //io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
   //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
 
-  // 传给仿真环境，用于外设访问的判定
-  //io.lsFlag             := io.in.lsuRen || io.in.lsuWen
+  if(Settings.get("sim")) {
+    // 传给仿真环境，用于外设访问的判定
+    io.lsFlag           := io.in.lsuRen || io.in.lsuWen
+
+    io.out.ebreak       := io.in.ebreak
+    io.out.haltRet      := io.in.haltRet
+  }
 }

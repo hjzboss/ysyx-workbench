@@ -37,9 +37,10 @@ class EXU extends Module {
     val flush       = Input(Bool())
     val ready       = Output(Bool())
 
-    // debug
-    //val debugIn     = Flipped(new DebugIO)
-    //val debugOut    = new DebugIO
+    if(Settings.get("sim")) {
+      val debugIn     = Flipped(new DebugIO)
+      val debugOut    = new DebugIO
+    }
   })
 
   val alu   = Module(new Alu)
@@ -112,13 +113,13 @@ class EXU extends Module {
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
   io.out.int           := io.ctrl.int
-/*
-  // debug
-  io.out.ebreak        := io.ctrl.ebreak
-  io.out.haltRet       := opAPre // todo: forward
 
-  // debug
-  io.debugOut.inst     := io.debugIn.inst
-  io.debugOut.pc       := io.debugIn.pc
-  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)*/
+  if(Settings.get("sim")) {
+    io.out.ebreak      := io.ctrl.ebreak
+    io.out.haltRet     := opAPre // todo: forward
+    io.debugOut.inst   := io.debugIn.inst
+    io.debugOut.pc     := io.debugIn.pc
+    io.debugOut.nextPc := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)
+    io.debugOut.valid  := Mux(io.ready, io.debugIn, false.B)
+  }
 }

@@ -17,12 +17,11 @@ class EX_REG extends Module with HasResetVector {
     val datasrcOut  = new DataSrcIO
     val aluCtrlOut  = new AluIO
     val ctrlOut     = new CtrlFlow
-
-    // just for debug
-    //val validIn = Input(Bool())
-    //val validOut = Output(Bool())
-    //val debugIn = Flipped(new DebugIO)
-    //val debugOut = new DebugIO
+    
+    if(Settings.get("sim")) {
+      val debugIn = Flipped(new DebugIO)
+      val debugOut = new DebugIO
+    }
   })
 
   // 复位值
@@ -52,12 +51,14 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.csrWaddr      := CsrId.nul
   ctrlReset.memWen        := false.B
   ctrlReset.memRen        := false.B
-  //ctrlReset.ebreak        := false.B
   ctrlReset.sysInsType    := System.nop
   ctrlReset.rs1           := 0.U(5.W)
   ctrlReset.rs2           := 0.U(5.W)
   ctrlReset.coherence     := false.B
   ctrlReset.int           := false.B
+  if(Settings.get("sim")) {
+    ctrlReset.ebreak      := false.B
+  }
 
   val datasrcReg           = RegInit(datasrcReset)
   datasrcReg              := Mux(io.stall, datasrcReg, Mux(io.flush, datasrcReset, io.datasrcIn))
@@ -68,22 +69,20 @@ class EX_REG extends Module with HasResetVector {
   val ctrlReg              = RegInit(ctrlReset)
   ctrlReg                 := Mux(io.stall, ctrlReg, Mux(io.flush, ctrlReset, io.ctrlIn))
 
-  //val validReg             = RegInit(false.B)
-  //validReg                := Mux(io.stall, validReg, Mux(io.flush, false.B, io.validIn))
-  //io.validOut             := validReg
-
   io.datasrcOut           := datasrcReg
   io.aluCtrlOut           := aluCtrlReg
   io.ctrlOut              := ctrlReg
 
-  /*
-  val debugReset = Wire(new DebugIO)
-  debugReset.pc := 0.U(32.W)
-  debugReset.nextPc := 0.U(32.W)
-  debugReset.inst := Instruction.NOP
+  if(Settings.get("sim")) {
+    val debugReset = Wire(new DebugIO)
+    debugReset.pc := 0.U(32.W)
+    debugReset.nextPc := 0.U(32.W)
+    debugReset.inst := Instruction.NOP
+    debugReset.valid := false.B
 
-  val debugReg = RegInit(debugReset)
-  debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn))
+    val debugReg = RegInit(debugReset)
+    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn))
 
-  io.debugOut := debugReg*/
+    io.debugOut := debugReg
+  }
 }

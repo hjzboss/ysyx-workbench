@@ -20,17 +20,6 @@ class IDU extends Module with HasInstrType{
     val regWrite  = Flipped(new RFWriteIO)
     val csrWrite  = Flipped(new CSRWriteIO)
 
-/*
-    // 旁路控制信号
-    val forwardA    = Input(UInt(2.W))
-    val forwardB    = Input(UInt(2.W))
-
-    // 旁路数据
-    val exuForward  = Input(UInt(64.W))
-    val lsuForward  = Input(UInt(64.W))
-    val csrForward  = Input(UInt(64.W))
-*/
-
     // 送给exu的控制信号
     val datasrc   = new DataSrcIO
     val aluCtrl   = new AluIO
@@ -41,16 +30,15 @@ class IDU extends Module with HasInstrType{
     val mret      = Output(Bool())
   })
 
-  val rf        = Module(new RF)
-  val csrReg    = Module(new CsrReg)
-  //val brAlu     = Module(new BrAlu)
+  val grf       = if(Settings.get("sim")) Module(new SimGRF) else Module(new GRF)
+  val csr       = Module(new CSR)
 
   val inst      = io.in.inst
   val op        = inst(6, 0)
   val rs1       = inst(19, 15)
   val rs2       = inst(24, 20)
   val rd        = inst(11, 7)
-  val csr       = inst(31, 20)
+  val csrReg    = inst(31, 20)
 
   // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
@@ -74,74 +62,37 @@ class IDU extends Module with HasInstrType{
                     InstrU    -> SignExt(Cat(inst(31, 12), 0.U(12.W)), 64),
                     InstrJ    -> SignExt(Cat(inst(31), inst(19, 12), inst(20), inst(30, 21), 0.U(1.W)), 64)
                   ))
-  /*
-  val csrRaddrPre = LookupTree(csr, List(
-    CsrId.mstatus -> CsrAddr.mstatus,
-    CsrId.mtvec   -> CsrAddr.mtvec,
-    CsrId.mepc    -> CsrAddr.mepc,
-    CsrId.mcause  -> CsrAddr.mcause,
-    CsrId.mie     -> CsrAddr.mie,
-    CsrId.mip     -> CsrAddr.mip
-  ))*/
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
-/*
-  // 分支计算
-  // forward
-  val opAPre = MuxLookup(io.forwardA, io.datasrc.src1, List(
-    Forward.lsuData -> io.lsuForward,
-    Forward.wbuData -> io.wbuForward,
-    Forward.csrData -> io.csrForward,
-    Forward.normal  -> io.datasrc.src1
-  ))
-  val opBPre = MuxLookup(io.forwardB, io.datasrc.src2, List(
-    Forward.lsuData -> io.lsuForward,
-    Forward.wbuData -> io.wbuForward,
-    Forward.csrData -> io.csrForward,
-    Forward.normal  -> io.datasrc.src2
-  ))
-  brAlu.io.opA         := opAPre
-  brAlu.io.opB         := opBpre
-  brAlu.io.brType      := aluOp
-  val brMark           := brAlu.io.brMark
-  val brInstr           = instrtype === InstrIJ || instrtype === InstrJ || instrtype === InstrB
-  // todo: branch addr
-  val brAddrOpA         = Mux(instrtype === InstrIJ, opAPre, io.in.pc)
-  val brAddr            = brAddrOpA + imm
-
-  io.redirect.brAddr   := Mux(systemCtrl === System.ecall, opAPre, Mux(systemCtrl === System.mret, aluOut, brAddr))
-  io.redirect.valid    := Mux((brInstr && brMark) || systemCtrl === System.ecall || systemCtrl === System.mret, true.B, false.B)
-*/
-
   // registerfile
-  rf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
-  rf.io.rs2           := rs2
-  rf.io.wen           := io.regWrite.wen
-  rf.io.waddr         := io.regWrite.rd
-  rf.io.wdata         := io.regWrite.value
-  //rf.io.clock         := clock
-  //rf.io.reset         := reset
+  grf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
+  grf.io.rs2           := rs2
+  grf.io.wen           := io.regWrite.wen
+  grf.io.waddr         := io.regWrite.rd
+  grf.io.wdata         := io.regWrite.value
+  if(Settings.get("sim")) {
+    grf.io.clock         := clock
+    grf.io.reset         := reset
+  }
   
   val csrRaddr         = Wire(UInt(12.W))
-  csrRaddr            := Mux(systemCtrl === System.ecall || csrReg.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csr))
-  csrReg.io.raddr     := csrRaddr
-  csrReg.io.waddr     := io.csrWrite.waddr
-  csrReg.io.wen       := io.csrWrite.wen
-  csrReg.io.wdata     := io.csrWrite.wdata
-  csrReg.io.mret      := systemCtrl === System.mret
-  //csrReg.io.clock     := clock
-  //csrReg.io.reset     := reset
+  csrRaddr            := Mux(systemCtrl === System.ecall || csr.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csrReg))
+  csr.io.raddr        := csrRaddr
+  csr.io.waddr        := io.csrWrite.waddr
+  csr.io.wen          := io.csrWrite.wen
+  csr.io.wdata        := io.csrWrite.wdata
+  csr.io.mret         := systemCtrl === System.mret
   // exception
-  csrReg.io.exception := io.csrWrite.exception
-  csrReg.io.epc       := io.csrWrite.epc(31, 0)
-  csrReg.io.no        := io.csrWrite.no
-  csrReg.io.timerInt  := io.timerInt
-  csrReg.io.intResp   := io.validIn && !io.flush && !io.stall
-  csrReg.io.ecall     := systemCtrl === System.ecall
+  csr.io.exception    := io.csrWrite.exception
+  csr.io.epc          := io.csrWrite.epc(31, 0)
+  csr.io.no           := io.csrWrite.no
+  csr.io.timerInt     := io.timerInt
+  csr.io.intResp      := io.validIn && !io.flush && !io.stall
+  csr.io.ecall        := systemCtrl === System.ecall
 
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csrReg.io.int || instrtype === InstrE || csrType, csrReg.io.rdata, rf.io.src1)
-  io.datasrc.src2     := Mux(csrType, rf.io.src1, rf.io.src2)
+  io.datasrc.src1     := Mux(csr.io.int || instrtype === InstrE || csrType, csr.io.rdata, grf.io.src1)
+  io.datasrc.src2     := Mux(csrType, grf.io.src1, grf.io.src2)
   io.datasrc.imm      := imm
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
@@ -156,20 +107,23 @@ class IDU extends Module with HasInstrType{
   io.ctrl.csrRen      := csrType || instrtype === InstrE || io.ctrl.int // just for csr forwarding
   io.ctrl.csrWaddr    := csrRaddr
   // ecall优先级大于clint
-  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csrReg.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
+  io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csr.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
   io.ctrl.exception   := systemCtrl === System.ecall | io.ctrl.int // type of exception
   io.ctrl.memWen      := memEn === MemEn.store & !io.ctrl.int
   io.ctrl.memRen      := memEn === MemEn.load & !io.ctrl.int
-  //io.ctrl.ebreak      := instrtype === InstrD // ebreak
   io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := Mux(csrType || io.ctrl.int, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(csrType, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF & !io.ctrl.int
-  io.ctrl.int         := csrReg.io.int && io.validIn
+  io.ctrl.int         := csr.io.int && io.validIn
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := Mux(!io.ctrl.int, aluOp, AluOp.nop)
 
   io.mret             := systemCtrl === System.mret
+
+  if(Settings.get("sim")) {
+    io.ctrl.ebreak    := instrtype === InstrD // ebreak
+  }
 }
