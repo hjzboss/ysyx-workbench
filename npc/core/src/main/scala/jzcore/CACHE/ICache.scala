@@ -3,9 +3,9 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 // 问题原因：取指出错，取出了cacheline中错误位置的指令
-
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
     //val redirect   = Input(Bool())

@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 class DebugIO extends Bundle {
   val pc        = Output(UInt(32.W))
