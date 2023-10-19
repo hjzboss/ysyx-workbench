@@ -38,8 +38,8 @@ class LS_REG extends Module with HasResetVector {
 
   if(Settings.get("sim")) {
     // debug
-    exuOutReset.ebreak    := false.B
-    exuOutReset.haltRet   := 0.U(64.W)
+    exuOutReset.ebreak.get    := false.B
+    exuOutReset.haltRet.get   := 0.U(64.W)
 
     val debugReset = Wire(new DebugIO)
     debugReset.pc := 0.U(32.W)
@@ -48,8 +48,8 @@ class LS_REG extends Module with HasResetVector {
     debugReset.valid := false.B
 
     val debugReg = RegInit(debugReset)
-    debugReg := Mux(io.stall, debugReg, io.debugIn)
-    io.debugOut := debugReg
+    debugReg := Mux(io.stall, debugReg, io.debugIn.get)
+    io.debugOut.get := debugReg
   }
 
   val memCtrlReg           = RegInit(exuOutReset)

@@ -56,7 +56,7 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.coherence     := false.B
   ctrlReset.int           := false.B
   if(Settings.get("sim")) {
-    ctrlReset.ebreak      := false.B
+    ctrlReset.ebreak.get  := false.B
   }
 
   val datasrcReg           = RegInit(datasrcReset)
@@ -80,8 +80,8 @@ class EX_REG extends Module with HasResetVector {
     debugReset.valid := false.B
 
     val debugReg = RegInit(debugReset)
-    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn))
+    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn.get))
 
-    io.debugOut := debugReg
+    io.debugOut.get := debugReg
   }
 }

@@ -45,7 +45,7 @@ class ID_REG extends Module with HasResetVector {
     debugReset.valid := false.B
 
     val debugReg = RegInit(debugReset)
-    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn))
-    io.debugOut := debugReg
+    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn.get))
+    io.debugOut.get := debugReg
   }
 }

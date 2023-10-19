@@ -75,10 +75,10 @@ class IFU extends Module with HasResetVector {
   io.valid        := valid
 
   if(Settings.get("sim")) {
-    io.debug.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
-    io.debug.pc     := pc
-    io.debug.inst   := Instruction.NOP
-    io.debug.valid  := valid
+    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+    io.debug.get.pc     := pc
+    io.debug.get.inst   := Instruction.NOP
+    io.debug.get.valid  := valid
   }
 
   /*

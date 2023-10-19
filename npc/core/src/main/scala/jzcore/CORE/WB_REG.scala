@@ -33,8 +33,8 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.int        := false.B
 
   if(Settings.get("sim")) {
-    lsuReset.ebreak     := false.B
-    lsuReset.haltRet    := 0.U(64.W)
+    lsuReset.ebreak.get     := false.B
+    lsuReset.haltRet.get    := 0.U(64.W)
 
     val debugReset = Wire(new DebugIO)
     debugReset.pc := 0.U(32.W)
@@ -43,12 +43,12 @@ class WB_REG extends Module with HasResetVector {
     debugReset.valid := false.B
 
     val debugReg = RegInit(debugReset)
-    debugReg := Mux(io.stall, debugReg, io.debugIn)
-    io.debugOut := debugReg
+    debugReg := Mux(io.stall, debugReg, io.debugIn.get)
+    io.debugOut.get := debugReg
 
     val lsFlagReg = RegInit(false.B)
-    lsFlagReg := Mux(io.stall, lsFlagReg, io.lsFlagIn)
-    io.lsFlagOut := lsFlagReg
+    lsFlagReg := Mux(io.stall, lsFlagReg, io.lsFlagIn.get)
+    io.lsFlagOut.get := lsFlagReg
   }
 
   val lsuReg           = RegInit(lsuReset)

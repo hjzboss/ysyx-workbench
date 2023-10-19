@@ -202,9 +202,9 @@ class LSU extends Module {
 
   if(Settings.get("sim")) {
     // 传给仿真环境，用于外设访问的判定
-    io.lsFlag           := io.in.lsuRen || io.in.lsuWen
+    io.lsFlag.get           := io.in.lsuRen || io.in.lsuWen
 
-    io.out.ebreak       := io.in.ebreak
-    io.out.haltRet      := io.in.haltRet
+    io.out.ebreak.get       := io.in.ebreak.get
+    io.out.haltRet.get      := io.in.haltRet.get
   }
 }

@@ -124,6 +124,6 @@ class IDU extends Module with HasInstrType{
   io.mret             := systemCtrl === System.mret
 
   if(Settings.get("sim")) {
-    io.ctrl.ebreak    := instrtype === InstrD // ebreak
+    io.ctrl.ebreak.get    := instrtype === InstrD // ebreak
   }
 }

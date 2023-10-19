@@ -34,7 +34,7 @@ class WBU extends Module {
   if(Settings.get("sim")) {
     val stop              = Module(new Stop)
     // ebreak
-    stop.io.valid        := io.in.ebreak
-    stop.io.haltRet      := io.in.haltRet
+    stop.io.valid        := io.in.ebreak.get
+    stop.io.haltRet      := io.in.haltRet.get
   }
 }

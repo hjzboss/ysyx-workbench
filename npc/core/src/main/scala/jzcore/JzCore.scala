@@ -540,15 +540,15 @@ class JzCore extends Module {
   wbu.io.in         <> wbReg.io.out
   
   if(Settings.get("sim")) {
-    wbReg.io.lsFlagIn <> lsu.io.lsFlag
-    io.lsFlag         <> wbReg.io.lsFlagOut // 仿真环境
+    wbReg.io.lsFlagIn.get <> lsu.io.lsFlag.get
+    io.lsFlag.get         <> wbReg.io.lsFlagOut.get
 
-    ifu.io.debug      <> icache.io.debugIn
-    idReg.io.debugIn  <> icache.io.debugOut
-    exReg.io.debugIn  <> idReg.io.debugOut
-    exu.io.debugIn    <> exReg.io.debugOut
-    lsReg.io.debugIn  <> exu.io.debugOut
-    wbReg.io.debugIn  <> lsReg.io.debugOut
-    io.debug          <> wbReg.io.debugOut
+    ifu.io.debug.get      <> icache.io.debugIn.get
+    idReg.io.debugIn.get  <> icache.io.debugOut.get
+    exReg.io.debugIn.get  <> idReg.io.debugOut.get
+    exu.io.debugIn.get    <> exReg.io.debugOut.get
+    lsReg.io.debugIn.get  <> exu.io.debugOut.get
+    wbReg.io.debugIn.get  <> lsReg.io.debugOut.get
+    io.debug.get          <> wbReg.io.debugOut.get
   }
 }
