@@ -19,9 +19,9 @@ class AxiArbiter extends Module {
     val lsuReady  = Input(Bool())
     val grantLsu  = Output(Bool())
 
-    val master0   = new AxiArbiter
-    val master1   = new AxiArbiter
-    val master    = new AxiArbiter
+    val master0   = new AxiMaster
+    val master1   = new AxiMaster
+    val master    = new AxiMaster
   })
 
   val req = io.ifuReq || io.lsuReq
