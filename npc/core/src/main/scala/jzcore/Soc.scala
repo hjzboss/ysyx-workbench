@@ -1,3 +1,4 @@
+/*
 package jzcore
 
 import chisel3._
@@ -98,4 +99,4 @@ class Soc extends Module {
   // 仿真环境
   io.debug        := core.io.debug.get
   io.lsFlag       := core.io.lsFlag.get
-}
+}*/
