@@ -82,9 +82,11 @@ class AxiArbiter extends Module {
   when(io.grantLsu) {
     io.master <> io.master1
     io.master0 <> defaultSlave
+    defaultMaster <> defaultSlave
   }.elsewhen(io.grantIfu) {
     io.master <> io.master0
     io.master1 <> defaultSlave
+    defaultMaster <> defaultSlave
   }.otherwise {
     io.master <> defaultMaster
     io.master0 <> defaultSlave
