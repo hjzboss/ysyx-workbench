@@ -48,6 +48,17 @@ class AxiArbiter extends Module {
   io.grantIfu := (state === grant && ifuReqReg) || (state === idle && ifuReq)
   io.grantLsu := (state === grant && lsuReqReg) || (state === idle && lsuReq)
 
+  val defaultSlave  = Wire(Flipped(new AxiMaster))
+  defaultSlave.rready   := false.B
+  defaultSlave.rvalid   := false.B
+  defaultSlave.rdata    := 0.U
+  defaultSlave.rresp    := 0.U
+  defaultSlave.rlast    := true.B
+  defaultSlave.wready   := false.B
+  defaultSlave.wready   := false.B
+  defaultSlave.bvalid   := false.B
+  defaultSlave.bresp    := 0.U
+
   val defaultMaster = Wire(new AxiMaster)
   defaultMaster.awid := 0.U
   defaultMaster.awvalid := false.B
@@ -70,9 +81,13 @@ class AxiArbiter extends Module {
 
   when(io.grantLsu) {
     io.master <> io.master1
+    io.master0 <> defaultSlave
   }.elsewhen(io.grantIfu) {
     io.master <> io.master0
+    io.master1 <> defaultSlave
   }.otherwise {
     io.master <> defaultMaster
+    io.master0 <> defaultSlave
+    io.master1 <> defaultSlave
   }
 }
