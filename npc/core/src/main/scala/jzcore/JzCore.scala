@@ -23,65 +23,6 @@ class JzCore extends Module {
     val sram6           = new RamIO
     val sram7           = new RamIO
 
-    /*
-    val sram0.rdata     = Input(UInt(128.W))
-    val sram0_cen       = Output(Bool())
-    val sram0_wen       = Output(Bool())
-    val sram0_wmask     = Output(UInt(128.W))
-    val sram0_addr      = Output(UInt(6.W))
-    val sram0_wdata     = Output(UInt(128.W)) 
-
-    val sram1_rdata     = Input(UInt(128.W))
-    val sram1_cen       = Output(Bool())
-    val sram1_wen       = Output(Bool())
-    val sram1_wmask     = Output(UInt(128.W))
-    val sram1_addr      = Output(UInt(6.W))
-    val sram1_wdata     = Output(UInt(128.W)) 
-
-    val sram2_rdata     = Input(UInt(128.W))
-    val sram2_cen       = Output(Bool())
-    val sram2_wen       = Output(Bool())
-    val sram2_wmask     = Output(UInt(128.W))
-    val sram2_addr      = Output(UInt(6.W))
-    val sram2_wdata     = Output(UInt(128.W)) 
-
-    val sram3_rdata     = Input(UInt(128.W))
-    val sram3_cen       = Output(Bool())
-    val sram3_wen       = Output(Bool())
-    val sram3_wmask     = Output(UInt(128.W))
-    val sram3_addr      = Output(UInt(6.W))
-    val sram3_wdata     = Output(UInt(128.W)) 
-
-    // dcache data array
-    val sram4_rdata     = Input(UInt(128.W))
-    val sram4_cen       = Output(Bool())
-    val sram4_wen       = Output(Bool())
-    val sram4_wmask     = Output(UInt(128.W))
-    val sram4_addr      = Output(UInt(6.W))
-    val sram4_wdata     = Output(UInt(128.W)) 
-
-    val sram5_rdata     = Input(UInt(128.W))
-    val sram5_cen       = Output(Bool())
-    val sram5_wen       = Output(Bool())
-    val sram5_wmask     = Output(UInt(128.W))
-    val sram5_addr      = Output(UInt(6.W))
-    val sram5_wdata     = Output(UInt(128.W)) 
-
-    val sram6_rdata     = Input(UInt(128.W))
-    val sram6_cen       = Output(Bool())
-    val sram6_wen       = Output(Bool())
-    val sram6_wmask     = Output(UInt(128.W))
-    val sram6_addr      = Output(UInt(6.W))
-    val sram6_wdata     = Output(UInt(128.W)) 
-
-    val sram7_rdata     = Input(UInt(128.W))
-    val sram7_cen       = Output(Bool())
-    val sram7_wen       = Output(Bool())
-    val sram7_wmask     = Output(UInt(128.W))
-    val sram7_addr      = Output(UInt(6.W))
-    val sram7_wdata     = Output(UInt(128.W)) 
-    */
-
     // axi访存接口
     /*
     val axiRaddrIO  = Decoupled(new RaddrIO)
@@ -92,69 +33,6 @@ class JzCore extends Module {
     val interrupt      = Input(Bool())
     val master         = new AxiMaster
     val slave          = Flipped(new AxiMaster)
-
-    /*
-    val master_awready = Input(Bool())
-    val master_awvalid = Output(Bool())
-    val master_awid    = Output(UInt(4.W))
-    val master_awaddr  = Output(UInt(32.W))
-    val master_awlen   = Output(UInt(8.W))
-    val master_awsize  = Output(UInt(3.W))
-    val master_awburst = Output(UInt(2.W))
-    val master_wready  = Input(Bool())
-    val master_wvalid  = Output(Bool())
-    val master_wdata   = Output(UInt(64.W))
-    val master_wstrb   = Output(UInt(8.W))
-    val master_wlast   = Output(Bool())
-    val master_bready  = Output(Bool())
-    val master_bvalid  = Input(Bool())
-    val master_bid     = Input(UInt(4.W))
-    val master_bresp   = Input(UInt(2.W))
-    val master_arready = Input(Bool())
-    val master_arvalid = Output(Bool())
-    val master_arid    = Output(UInt(4.W))
-    val master_araddr  = Output(UInt(32.W))
-    val master_arlen   = Output(UInt(8.W))
-    val master_arsize  = Output(UInt(3.W))
-    val master_arburst = Output(UInt(2.W))
-    val master_rready  = Output(Bool())
-    val master_rvalid  = Input(Bool())
-    val master_rid     = Input(UInt(4.W))
-    val master_rdata   = Input(UInt(64.W))
-    val master_rresp   = Input(UInt(2.W))
-    val master_rlast   = Input(Bool())
-
-    // useless
-    val slave_awready  = Input(Bool())
-    val slave_awvalid  = Output(Bool())
-    val slave_awid     = Output(UInt(4.W))
-    val slave_awaddr   = Output(UInt(32.W))
-    val slave_awlen    = Output(UInt(8.W))
-    val slave_awsize   = Output(UInt(3.W))
-    val slave_awburst  = Output(UInt(2.W))
-    val slave_wready   = Input(Bool())
-    val slave_wvalid   = Output(Bool())
-    val slave_wdata    = Output(UInt(64.W))
-    val slave_wstrb    = Output(UInt(8.W))
-    val slave_wlast    = Output(Bool())
-    val slave_bready   = Output(Bool())
-    val slave_bvalid   = Input(Bool())
-    val slave_bid      = Input(UInt(4.W))
-    val slave_bresp    = Input(UInt(2.W))
-    val slave_arready  = Input(Bool())
-    val slave_arvalid  = Output(Bool())
-    val slave_arid     = Output(UInt(4.W))
-    val slave_araddr   = Output(UInt(32.W))
-    val slave_arlen    = Output(UInt(8.W))
-    val slave_arsize   = Output(UInt(3.W))
-    val slave_arburst  = Output(UInt(2.W))
-    val slave_rready   = Output(Bool())
-    val slave_rvalid   = Input(Bool())
-    val slave_rid      = Input(UInt(4.W))
-    val slave_rdata    = Input(UInt(64.W))
-    val slave_rresp    = Input(UInt(2.W))
-    val slave_rlast    = Input(Bool())    
-    */
   })
 
   val ifu     = Module(new IFU)
@@ -185,6 +63,10 @@ class JzCore extends Module {
   arbiter.io.lsuReq   <> dcache.io.axiReq
   arbiter.io.grantLsu <> dcache.io.axiGrant
   arbiter.io.lsuReady <> dcache.io.axiReady
+  arbiter.io.master0  <> icache.io.master
+  arbiter.io.master1  <> dcache.io.master
+  io.master           <> arbiter.io.master
+
   //arbiter.io.lsuReq   <> lsu.io.axiReq
   //arbiter.io.grantLsu <> lsu.io.axiGrant
   //arbiter.io.lsuReady <> lsu.io.axiReady
@@ -202,6 +84,8 @@ class JzCore extends Module {
   io.slave.rdata  := 0.U
   io.slave.rresp  := 0.U
   io.slave.rlast  := false.B
+
+  /*
   val grant = Cat(arbiter.io.grantIfu, arbiter.io.grantLsu)
   when(grant === 2.U) {
     /*
@@ -381,76 +265,19 @@ class JzCore extends Module {
     lsu.io.axiBrespIO.valid   := false.B
     lsu.io.axiBrespIO.bits.bresp   := 0.U
     */
-  }
+  }*/
   
   // ram, dataArray
   icache.io.sram0       <> io.sram0
   icache.io.sram1       <> io.sram1
   icache.io.sram2       <> io.sram2
   icache.io.sram3       <> io.sram3
-  /*
-  icache.io.sram0.rdata <> io.sram0.rdata
-  icache.io.sram0.cen   <> io.sram0.cen
-  icache.io.sram0.wen   <> io.sram0.wen
-  icache.io.sram0.wmask <> io.sram0.wmask
-  icache.io.sram0.addr  <> io.sram0.addr
-  icache.io.sram0.wdata <> io.sram0.wdata
-
-  icache.io.sram1.rdata <> io.sram1.rdata
-  icache.io.sram1.cen   <> io.sram1.cen
-  icache.io.sram1.wen   <> io.sram1.wen
-  icache.io.sram1.wmask <> io.sram1.wmask
-  icache.io.sram1.addr  <> io.sram1.addr
-  icache.io.sram1.wdata <> io.sram1.wdata
-
-  icache.io.sram2.rdata <> io.sram2.rdata
-  icache.io.sram2.cen   <> io.sram2.cen
-  icache.io.sram2.wen   <> io.sram2.wen
-  icache.io.sram2.wmask <> io.sram2.wmask
-  icache.io.sram2.addr  <> io.sram2.addr
-  icache.io.sram2.wdata <> io.sram2.wdata
-
-  icache.io.sram3.rdata <> io.sram3.rdata
-  icache.io.sram3.cen   <> io.sram3.cen  
-  icache.io.sram3.wen   <> io.sram3.wen
-  icache.io.sram3.wmask <> io.sram3.wmask
-  icache.io.sram3.addr  <> io.sram3.addr
-  icache.io.sram3.wdata <> io.sram3.wdata*/
 
   // dcache
   dcache.io.sram4       <> io.sram4
   dcache.io.sram5       <> io.sram5
   dcache.io.sram6       <> io.sram6
   dcache.io.sram7       <> io.sram7
-
-  /*
-  dcache.io.sram4.rdata <> io.sram4.rdata
-  dcache.io.sram4.cen   <> io.sram4.cen
-  dcache.io.sram4.wen   <> io.sram4.wen
-  dcache.io.sram4.wmask <> io.sram4.wmask
-  dcache.io.sram4.addr  <> io.sram4.addr
-  dcache.io.sram4.wdata <> io.sram4.wdata
-
-  dcache.io.sram5.rdata <> io.sram5.rdata
-  dcache.io.sram5.cen   <> io.sram5.cen
-  dcache.io.sram5.wen   <> io.sram5.wen
-  dcache.io.sram5.wmask <> io.sram5.wmask
-  dcache.io.sram5.addr  <> io.sram5.addr
-  dcache.io.sram5.wdata <> io.sram5.wdata
-
-  dcache.io.sram6.rdata <> io.sram6.rdata
-  dcache.io.sram6.cen   <> io.sram6.cen
-  dcache.io.sram6.wen   <> io.sram6.wen
-  dcache.io.sram6.wmask <> io.sram6.wmask
-  dcache.io.sram6.addr  <> io.sram6.addr
-  dcache.io.sram6.wdata <> io.sram6.wdata
-
-  dcache.io.sram7.rdata <> io.sram7.rdata
-  dcache.io.sram7.cen   <> io.sram7.cen
-  dcache.io.sram7.wen   <> io.sram7.wen
-  dcache.io.sram7.wmask <> io.sram7.wmask
-  dcache.io.sram7.addr  <> io.sram7.addr
-  dcache.io.sram7.wdata <> io.sram7.wdata*/
 
   ifu.io.out          <> icache.io.cpu2cache
   icache.io.cache2cpu <> idReg.io.in

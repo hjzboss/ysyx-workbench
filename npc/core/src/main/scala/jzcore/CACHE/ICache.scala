@@ -8,9 +8,7 @@ import top.Settings
 // 问题原因：取指出错，取出了cacheline中错误位置的指令
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
-    //val redirect   = Input(Bool())
     val stage3Addr = Input(UInt(6.W))
-    //val stage2Addr = Input(UInt(6.W))
     val stage1Addr = Input(UInt(6.W))
     val stage3Cen  = Input(Bool())
     val stage1Cen  = Input(Bool())
@@ -22,9 +20,6 @@ sealed class IcArbiter extends Module {
     val arbWen     = Output(Bool())
   })
 
-  //io.arbAddr     := Mux(io.redirect, io.stage2Addr, Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr))
-  //io.arbCen      := Mux(io.redirect, false.B, Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen))
-  //io.arbWen      := Mux(io.redirect, true.B, Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen))
   io.arbAddr     := Mux(io.stage3Cen, io.stage1Addr, io.stage3Addr)
   io.arbCen      := Mux(io.stage3Cen, io.stage1Cen, io.stage3Cen)
   io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
@@ -134,11 +129,6 @@ sealed class CacheStage2 extends Module with HasResetVector {
     io.debugOut.get       := debugReg
   }
 
-  //io.sram0_addr         := stage2Reg.index
-  //io.sram1_addr         := stage2Reg.index
-  //io.sram2_addr         := stage2Reg.index
-  //io.sram3_addr         := stage2Reg.index
-
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
@@ -247,13 +237,16 @@ sealed class CacheStage3 extends Module with HasResetVector {
 
     val metaAlloc       = new MetaAllocIO
 
-    // axi
+    // axi， TODO
+    /*
     val axiRaddrIO      = Decoupled(new RaddrIO)
     val axiRdataIO      = Flipped(Decoupled(new RdataIO))
     // useless
     val axiWaddrIO      = Decoupled(new WaddrIO)
     val axiWdataIO      = Decoupled(new WdataIO)
-    val axiBrespIO      = Flipped(Decoupled(new BrespIO))    
+    val axiBrespIO      = Flipped(Decoupled(new BrespIO))*/
+
+    val master         = new AxiMaster
 
     // arbiter
     val axiReq          = Output(Bool())
@@ -294,8 +287,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val align             = stage3Reg.align
 
   // axi fire
-  val raddrFire         = io.axiRaddrIO.valid && io.axiRaddrIO.ready
-  val rdataFire         = io.axiRdataIO.valid && io.axiRdataIO.ready
+  val raddrFire         = io.master.arvalid && io.master.arready
+  val rdataFire         = io.master.rvalid && io.master.rready
 
   // 分配和flash取指状态机
   val idle :: addr :: data :: flush :: stall :: Nil = Enum(5)
@@ -304,36 +297,38 @@ sealed class CacheStage3 extends Module with HasResetVector {
   state := MuxLookup(state, idle, List(
     idle  -> Mux(io.flushIn || io.stallIn, idle, Mux(!stage3Reg.hit || !stage3Reg.cacheable, addr, idle)),
     addr  -> Mux(io.flushIn, Mux(io.axiGrant && raddrFire, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
-    data  -> Mux(rdataFire && io.axiRdataIO.bits.rlast && (io.axiRdataIO.bits.rresp === okay || io.axiRdataIO.bits.rresp === exokay), Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
+    data  -> Mux(rdataFire && io.master.rlast && (io.master.rresp === okay || io.master.rresp === exokay), Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
     stall -> Mux(io.stallIn, stall, idle),
-    flush -> Mux(rdataFire && io.axiRdataIO.bits.rlast, Mux(io.stallIn, stall, idle), flush) // todo: 此处有问题
+    flush -> Mux(rdataFire && io.master.rlast, Mux(io.stallIn, stall, idle), flush) // todo: 此处有问题
   ))
 
   // todo
-  flushReg                := (state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
+  flushReg                := (state === data && rdataFire && io.master.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
   io.flushOut             := flushReg
 
   val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall || state === flush
   io.stallOut             := stallOut && !flushReg 
 
   io.axiReq               := state === addr
-  io.axiReady             := (state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast
+  io.axiReady             := (state === data || state === flush) && rdataFire && io.master.rlast
 
   // allocate axi, burst read
-  io.axiRaddrIO.valid     := state === addr
-  io.axiRaddrIO.bits.addr := stage3Reg.allocAddr
-  io.axiRaddrIO.bits.len  := Mux(stage3Reg.cacheable, 1.U(8.W), 0.U(8.W))
-  io.axiRaddrIO.bits.size := Mux(stage3Reg.cacheable, 3.U(3.W), 2.U(3.W))
-  io.axiRaddrIO.bits.burst:= Mux(stage3Reg.cacheable, 2.U(2.W), 0.U(2.W))
-  io.axiRdataIO.ready     := state === data || state === flush
+  io.master.arid          := 0.U
+  io.master.arvalid      := state === addr
+  io.master.araddr       := stage3Reg.allocAddr
+  io.master.arlen        := Mux(stage3Reg.cacheable, 1.U(8.W), 0.U(8.W))
+  io.master.arsize       := Mux(stage3Reg.cacheable, 3.U(3.W), 2.U(3.W))
+  io.master.arburst      := Mux(stage3Reg.cacheable, 2.U(2.W), 0.U(2.W))
+  io.master.rready       := state === data || state === flush
 
   val rblockBuffer         = RegInit(0.U(64.W))
   rblockBuffer            := MuxLookup(state, rblockBuffer, List(
                               addr -> 0.U(64.W),
-                              data -> Mux(io.flushIn, 0.U(64.W), Mux(rdataFire && !io.axiRdataIO.bits.rlast, io.axiRdataIO.bits.rdata, rblockBuffer)),
+                              data -> Mux(io.flushIn, 0.U(64.W), Mux(rdataFire && !io.master.rlast, io.master.rdata, rblockBuffer)),
                             ))
 
   // todo
+  /*
   io.axiWaddrIO.valid     := false.B
   io.axiWaddrIO.bits.addr := 0.U(32.W) 
   io.axiWaddrIO.bits.len  := 0.U
@@ -343,12 +338,25 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.axiWdataIO.bits.wlast:= true.B
   io.axiWdataIO.bits.wdata:= 0.U(64.W)
   io.axiWdataIO.bits.wstrb:= 0.U(8.W)
-  io.axiBrespIO.ready     := true.B
+  io.axiBrespIO.ready     := true.B*/
+
+  // axi write
+  io.master.awid := 0.U
+  io.master.awvalid := false.B
+  io.master.awaddr := 0.U
+  io.master.awlen := 0.U
+  io.master.awsize := 0.U
+  io.master.awburst := 0.U
+  io.master.wvalid := false.B
+  io.master.wdata := 0.U
+  io.master.wstrb := 0.U
+  io.master.wlast := false.B
+  io.master.bready := false.B
 
   val alignMask0   = Mux(align(1), "hffffffffffffffff".U(128.W), ~"hffffffffffffffff".U(128.W))
   val alignMask1   = Mux(align(1), ~"hffffffffffffffff".U(128.W), "hffffffffffffffff".U(128.W))
-  val rdata0       = Mux(align(1), Cat(io.axiRdataIO.bits.rdata, 0.U(64.W)), Cat(0.U(64.W), io.axiRdataIO.bits.rdata))
-  val rdata1       = Mux(align(1), Cat(0.U(64.W), io.axiRdataIO.bits.rdata), Cat(io.axiRdataIO.bits.rdata, 0.U(64.W)))
+  val rdata0       = Mux(align(1), Cat(io.master.rdata, 0.U(64.W)), Cat(0.U(64.W), io.master.rdata))
+  val rdata1       = Mux(align(1), Cat(0.U(64.W), io.master.rdata), Cat(io.master.rdata, 0.U(64.W)))
 
   // dataArray control, todo: 此时发生冲刷仍会写入cache
   io.sram0_addr   := stage3Reg.index
@@ -375,26 +383,26 @@ sealed class CacheStage3 extends Module with HasResetVector {
     // allocate dataArray
     switch(stage3Reg.victim) {
       is(0.U) {
-        io.sram0_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram0_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram0_wdata  := Mux(io.master.rlast, rdata1, rdata0)
+        io.sram0_wmask  := Mux(io.master.rlast, alignMask1, alignMask0)
         io.sram0_cen    := false.B
         io.sram0_wen    := false.B
       }
       is(1.U) {
-        io.sram1_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram1_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram1_wdata  := Mux(io.master.rlast, rdata1, rdata0)
+        io.sram1_wmask  := Mux(io.master.rlast, alignMask1, alignMask0)
         io.sram1_cen    := false.B
         io.sram1_wen    := false.B
       }
       is(2.U) {
-        io.sram2_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram2_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram2_wdata  := Mux(io.master.rlast, rdata1, rdata0)
+        io.sram2_wmask  := Mux(io.master.rlast, alignMask1, alignMask0)
         io.sram2_cen    := false.B
         io.sram2_wen    := false.B
       }
       is(3.U) {
-        io.sram3_wdata  := Mux(io.axiRdataIO.bits.rlast, rdata1, rdata0)
-        io.sram3_wmask  := Mux(io.axiRdataIO.bits.rlast, alignMask1, alignMask0)
+        io.sram3_wdata  := Mux(io.master.rlast, rdata1, rdata0)
+        io.sram3_wmask  := Mux(io.master.rlast, alignMask1, alignMask0)
         io.sram3_cen    := false.B
         io.sram3_wen    := false.B
       }
@@ -405,7 +413,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.metaAlloc.tag    := stage3Reg.tag
   io.metaAlloc.index  := stage3Reg.index
   io.metaAlloc.victim := stage3Reg.victim
-  io.metaAlloc.valid  := state === data && rdataFire && io.axiRdataIO.bits.rlast && stage3Reg.cacheable
+  io.metaAlloc.valid  := state === data && rdataFire && io.master.rlast && stage3Reg.cacheable
 
   val inst             = WireDefault(Instruction.NOP)
   // -----------------------data aligner-------------------------------
@@ -415,11 +423,11 @@ sealed class CacheStage3 extends Module with HasResetVector {
     }.otherwise {
       inst := Mux(stage3Reg.align(0), stage3Reg.cacheline(63, 32), stage3Reg.cacheline(31, 0))
     }
-  }.elsewhen((state === data && rdataFire && io.axiRdataIO.bits.rlast && !io.flushIn) || state === stall) {
+  }.elsewhen((state === data && rdataFire && io.master.rlast && !io.flushIn) || state === stall) {
     when(stage3Reg.cacheable) {
       inst := Mux(stage3Reg.align(0), rblockBuffer(63, 32), rblockBuffer(31, 0))
     }.otherwise {
-      inst := io.axiRdataIO.bits.rdata(31, 0)
+      inst := io.master.rdata(31, 0)
     }
   }.otherwise {
     inst := Instruction.NOP
@@ -429,7 +437,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
 
   val validReg      = RegInit(false.B)
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    
-  io.validOut      := validReg && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || (state === data && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
+  io.validOut      := validReg && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || (state === data && rdataFire && io.master.rlast) || state === stall)
   // for npc verilator simulation env
   //io.validOut      := validReg && !io.flushIn && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
   //io.debugOut.inst := inst
@@ -455,42 +463,16 @@ class ICache extends Module {
     val sram2           = new RamIO
     val sram3           = new RamIO
 
-    /*
-    val sram0_rdata     = Input(UInt(128.W))
-    val sram0_cen       = Output(Bool())
-    val sram0_wen       = Output(Bool())
-    val sram0_wmask     = Output(UInt(128.W))
-    val sram0_addr      = Output(UInt(6.W))
-    val sram0_wdata     = Output(UInt(128.W)) 
-
-    val sram1_rdata     = Input(UInt(128.W))
-    val sram1_cen       = Output(Bool())
-    val sram1_wen       = Output(Bool())
-    val sram1_wmask     = Output(UInt(128.W))
-    val sram1_addr      = Output(UInt(6.W))
-    val sram1_wdata     = Output(UInt(128.W)) 
-
-    val sram2_rdata     = Input(UInt(128.W))
-    val sram2_cen       = Output(Bool())
-    val sram2_wen       = Output(Bool())
-    val sram2_wmask     = Output(UInt(128.W))
-    val sram2_addr      = Output(UInt(6.W))
-    val sram2_wdata     = Output(UInt(128.W)) 
-
-    val sram3_rdata     = Input(UInt(128.W))
-    val sram3_cen       = Output(Bool())
-    val sram3_wen       = Output(Bool())
-    val sram3_wmask     = Output(UInt(128.W))
-    val sram3_addr      = Output(UInt(6.W))
-    val sram3_wdata     = Output(UInt(128.W))*/
-
     // axi
+    /*
     val axiRaddrIO      = Decoupled(new RaddrIO)
     val axiRdataIO      = Flipped(Decoupled(new RdataIO))
     // useless
     val axiWaddrIO      = Decoupled(new WaddrIO)
     val axiWdataIO      = Decoupled(new WdataIO)
-    val axiBrespIO      = Flipped(Decoupled(new BrespIO))    
+    val axiBrespIO      = Flipped(Decoupled(new BrespIO))*/
+
+    val master         = new AxiMaster
 
     // arbiter
     val axiReq          = Output(Bool())
@@ -592,11 +574,13 @@ class ICache extends Module {
   io.sram3.wmask         := stage3.io.sram3_wmask
   io.sram3.wdata         := stage3.io.sram3_wdata
 
+  io.master             <> stage3.io.master
+  /*
   io.axiRaddrIO         <> stage3.io.axiRaddrIO
   io.axiRdataIO         <> stage3.io.axiRdataIO
   io.axiWaddrIO         <> stage3.io.axiWaddrIO
   io.axiWdataIO         <> stage3.io.axiWdataIO
-  io.axiBrespIO         <> stage3.io.axiBrespIO
+  io.axiBrespIO         <> stage3.io.axiBrespIO*/
 
   io.axiReq             <> stage3.io.axiReq
   io.axiGrant           <> stage3.io.axiGrant

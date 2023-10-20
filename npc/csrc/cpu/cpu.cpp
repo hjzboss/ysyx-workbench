@@ -177,28 +177,17 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       }
       wmask = wmask >> 1;
     }
-    // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
-    /*
-    uint64_t tmp = wmask_64;
-    int shift_cnt = 0;
-    for(int i = 64; i > 0; i--) {
-      if(tmp & 0x01 == 0x01) break;
-      shift_cnt++;
-      tmp = tmp >> 1;
-    }*/
 
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
       rdata = vga_read(waddr & ~0x7ull, 8);
       rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
-      //rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       vga_write(waddr & ~0x7ull, 8, rdata);
     }
     else {
       // 物理内存
       rdata = paddr_read(waddr & ~0x7ull, 8);
-      //uint64_t rdata1 = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
       paddr_write(waddr & ~0x7ull, 8, rdata);      
     }
@@ -287,11 +276,14 @@ void delete_cpu() {
 
 static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *inst) {
   int cnt = 0;
-  while (!top->io_finish) {
+  while (!top->io_debug_valid) {
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 100) break; // 防止跑飞
+    if (cnt == 100) {
+      printf("兄弟跑飞了\n");
+      break; // 防止跑飞
+    }
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;

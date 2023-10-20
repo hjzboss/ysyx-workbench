@@ -18,6 +18,10 @@ class AxiArbiter extends Module {
     val lsuReq    = Input(Bool())
     val lsuReady  = Input(Bool())
     val grantLsu  = Output(Bool())
+
+    val master0   = new AxiArbiter
+    val master1   = new AxiArbiter
+    val master    = new AxiArbiter
   })
 
   val req = io.ifuReq || io.lsuReq
@@ -43,4 +47,32 @@ class AxiArbiter extends Module {
   // 仲裁
   io.grantIfu := (state === grant && ifuReqReg) || (state === idle && ifuReq)
   io.grantLsu := (state === grant && lsuReqReg) || (state === idle && lsuReq)
+
+  val defaultMaster = Wire(new AxiArbiter)
+  defaultMaster.awid := 0.U
+  defaultMaster.awvalid := false.B
+  defaultMaster.awaddr := 0.U
+  defaultMaster.awlen := 0.U
+  defaultMaster.awsize := 0.U
+  defaultMaster.awburst := 0.U
+  defaultMaster.wvalid := false.B
+  defaultMaster.wdata := 0.U
+  defaultMaster.wstrb := 0.U
+  defaultMaster.wlast := false.B
+  defaultMaster.bready := false.B
+  defaultMaster.arid := 0.U
+  defaultMaster.araddr := 0.U
+  defaultMaster.arvalid := false.B
+  defaultMaster.arlen := 0.U
+  defaultMaster.arsize := 0.U
+  defaultMaster.arburst := 0.U
+  defaultMaster.rready := false.B
+
+  when(io.grantLsu) {
+    io.master <> io.master1
+  }.elsewhen(io.grantIfu) {
+    io.master <> io.master0
+  }.otherwise {
+    io.master <> defaultMaster
+  }
 }

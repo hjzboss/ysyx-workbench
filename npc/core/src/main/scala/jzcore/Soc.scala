@@ -1,4 +1,3 @@
-/*
 package jzcore
 
 import chisel3._
@@ -9,7 +8,6 @@ class Soc extends Module {
   val io = IO(new Bundle {
     // 传给仿真环境
     val debug      = new DebugIO
-    val finish     = Output(Bool())
     val lsFlag     = Output(Bool())
   })
 
@@ -98,6 +96,6 @@ class Soc extends Module {
   core.io.sram7.wdata <> ram7.io.D
 
   // 仿真环境
-  io.debug        := core.io.debug
-  io.lsFlag       := core.io.lsFlag
-}*/
+  io.debug        := core.io.debug.get
+  io.lsFlag       := core.io.lsFlag.get
+}
