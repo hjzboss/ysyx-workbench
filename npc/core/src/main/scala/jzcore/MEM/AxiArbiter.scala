@@ -48,7 +48,7 @@ class AxiArbiter extends Module {
   io.grantIfu := (state === grant && ifuReqReg) || (state === idle && ifuReq)
   io.grantLsu := (state === grant && lsuReqReg) || (state === idle && lsuReq)
 
-  val defaultMaster = Wire(new AxiArbiter)
+  val defaultMaster = Wire(new AxiMaster)
   defaultMaster.awid := 0.U
   defaultMaster.awvalid := false.B
   defaultMaster.awaddr := 0.U
