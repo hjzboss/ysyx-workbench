@@ -48,48 +48,72 @@ class AxiArbiter extends Module {
   io.grantIfu := (state === grant && ifuReqReg) || (state === idle && ifuReq)
   io.grantLsu := (state === grant && lsuReqReg) || (state === idle && lsuReq)
 
-  val defaultSlave  = Wire(Flipped(new AxiMaster))
-  defaultSlave.rready   := false.B
-  defaultSlave.rvalid   := false.B
-  defaultSlave.rdata    := 0.U
-  defaultSlave.rresp    := 0.U
-  defaultSlave.rlast    := true.B
-  defaultSlave.wready   := false.B
-  defaultSlave.wready   := false.B
-  defaultSlave.bvalid   := false.B
-  defaultSlave.bresp    := 0.U
-
-  val defaultMaster = Wire(new AxiMaster)
-  defaultMaster.awid := 0.U
-  defaultMaster.awvalid := false.B
-  defaultMaster.awaddr := 0.U
-  defaultMaster.awlen := 0.U
-  defaultMaster.awsize := 0.U
-  defaultMaster.awburst := 0.U
-  defaultMaster.wvalid := false.B
-  defaultMaster.wdata := 0.U
-  defaultMaster.wstrb := 0.U
-  defaultMaster.wlast := false.B
-  defaultMaster.bready := false.B
-  defaultMaster.arid := 0.U
-  defaultMaster.araddr := 0.U
-  defaultMaster.arvalid := false.B
-  defaultMaster.arlen := 0.U
-  defaultMaster.arsize := 0.U
-  defaultMaster.arburst := 0.U
-  defaultMaster.rready := false.B
-
-  when(io.grantLsu) {
+  when(io.grantLsu) {    
     io.master <> io.master1
-    io.master0 <> defaultSlave
-    defaultMaster <> defaultSlave
+    io.master0.rvalid := false.B
+    io.master0.rdata := 0.U
+    io.master0.rlast := true.B
+    io.master0.rresp := 0.U
+    io.master0.awready := false.B
+    io.master0.wready := false.B
+    io.master0.bvalid := false.B
+    io.master0.bresp := 0.U
+    io.master0.bid := 0.U
+    io.master0.arready := false.B
+    io.master0.rid := 0.U
   }.elsewhen(io.grantIfu) {
     io.master <> io.master0
-    io.master1 <> defaultSlave
-    defaultMaster <> defaultSlave
+    io.master1.rvalid := false.B
+    io.master1.rdata := 0.U
+    io.master1.rlast := true.B
+    io.master1.rresp := 0.U
+    io.master1.awready := false.B
+    io.master1.wready := false.B
+    io.master1.bvalid := false.B
+    io.master1.bresp := 0.U
+    io.master1.bid := 0.U
+    io.master1.arready := false.B
+    io.master1.rid := 0.U
   }.otherwise {
-    io.master <> defaultMaster
-    io.master0 <> defaultSlave
-    io.master1 <> defaultSlave
+    io.master0.rvalid := false.B
+    io.master0.rdata := 0.U
+    io.master0.rlast := true.B
+    io.master0.rresp := 0.U
+    io.master0.awready := false.B
+    io.master0.wready := false.B
+    io.master0.bvalid := false.B
+    io.master0.bresp := 0.U
+    io.master0.bid := 0.U
+    io.master0.arready := false.B
+    io.master0.rid := 0.U
+    io.master1.rvalid := false.B
+    io.master1.rdata := 0.U
+    io.master1.rlast := true.B
+    io.master1.rresp := 0.U
+    io.master1.awready := false.B
+    io.master1.wready := false.B
+    io.master1.bvalid := false.B
+    io.master1.bresp := 0.U
+    io.master1.bid := 0.U
+    io.master1.arready := false.B
+    io.master1.rid := 0.U
+    io.master.awid := 0.U
+    io.master.awvalid := false.B
+    io.master.awaddr := 0.U
+    io.master.awlen := 0.U
+    io.master.awsize := 0.U
+    io.master.awburst := 0.U
+    io.master.wvalid := false.B
+    io.master.wdata := 0.U
+    io.master.wstrb := 0.U
+    io.master.wlast := false.B
+    io.master.bready := false.B
+    io.master.arid := 0.U
+    io.master.araddr := 0.U
+    io.master.arvalid := false.B
+    io.master.arlen := 0.U
+    io.master.arsize := 0.U
+    io.master.arburst := 0.U
+    io.master.rready := false.B
   }
 }
