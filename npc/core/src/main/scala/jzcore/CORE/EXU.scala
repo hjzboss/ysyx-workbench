@@ -119,6 +119,6 @@ class EXU extends Module {
     io.debugOut.get.inst   := io.debugIn.get.inst
     io.debugOut.get.pc     := io.debugIn.get.pc
     io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddrPre, io.debugIn.get.nextPc)
-    io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get, false.B)
+    io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get.valid, false.B)
   }
 }
