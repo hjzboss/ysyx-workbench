@@ -87,12 +87,8 @@ class LSU extends Module {
     coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
-  var cacheable                = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
-  var flash                    = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
-  if(Settings.get("sim")) {
-    cacheable                 = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
-    flash                     = false.B
-  }
+  val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
+  var flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
 
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
@@ -169,11 +165,7 @@ class LSU extends Module {
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
   val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
-  if(Settings.get("sim")) {
-    val rdata            = io.dcacheRead.bits.rdata >> align64
-  } else {
-    val rdata            = Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32)
-  }
+  val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
                             LsType.lw   -> SignExt(rdata(31, 0), 64),
