@@ -87,12 +87,11 @@ class LSU extends Module {
     coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
+  var cacheable                = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
+  var flash                    = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
   if(Settings.get("sim")) {
-    val cacheable                = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
-    val flash                    = false.B
-  } else {
-    val cacheable                = addr <= "hffff_ffff".U && addr >= "h8000_0000".U
-    val flash                    = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
+    cacheable                 = addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U)
+    flash                     = false.B
   }
 
   io.dcacheCtrl.valid           := state === ctrl
