@@ -1,4 +1,4 @@
-module SimGRF (
+module DpiGrf (
     input [63:0] reg0 ,
     input [63:0] reg1 ,
     input [63:0] reg2 ,

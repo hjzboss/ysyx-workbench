@@ -1,4 +1,3 @@
-/*
 package jzcore
 
 import chisel3._
@@ -23,11 +22,13 @@ class Soc extends Module {
   val ram7 = Module(new Ram)
   val core = Module(new JzCore)
 
+  core.io.master     <> sram.io.slave
+  /*
   core.io.axiRaddrIO <> sram.io.raddrIO
   core.io.axiRdataIO <> sram.io.rdataIO
   core.io.axiWaddrIO <> sram.io.waddrIO
   core.io.axiWdataIO <> sram.io.wdataIO
-  core.io.axiBrespIO <> sram.io.brespIO
+  core.io.axiBrespIO <> sram.io.brespIO*/
 
   ram0.io.CLK := clock
   ram1.io.CLK := clock
@@ -67,7 +68,6 @@ class Soc extends Module {
   core.io.sram3.addr <> ram3.io.A
   core.io.sram3.wdata <> ram3.io.D
 
-
   core.io.sram4.rdata <> ram4.io.Q
   core.io.sram4.cen <> ram4.io.CEN
   core.io.sram4.wen <> ram4.io.WEN
@@ -96,7 +96,9 @@ class Soc extends Module {
   core.io.sram7.addr <> ram7.io.A
   core.io.sram7.wdata <> ram7.io.D
 
+  core.io.interrupt := false.B
+
   // 仿真环境
   io.debug        := core.io.debug.get
   io.lsFlag       := core.io.lsFlag.get
-}*/
+}

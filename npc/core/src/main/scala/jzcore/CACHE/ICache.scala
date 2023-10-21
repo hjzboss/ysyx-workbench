@@ -237,15 +237,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
 
     val metaAlloc       = new MetaAllocIO
 
-    // axi， TODO
-    /*
-    val axiRaddrIO      = Decoupled(new RaddrIO)
-    val axiRdataIO      = Flipped(Decoupled(new RdataIO))
-    // useless
-    val axiWaddrIO      = Decoupled(new WaddrIO)
-    val axiWdataIO      = Decoupled(new WdataIO)
-    val axiBrespIO      = Flipped(Decoupled(new BrespIO))*/
-
+    // axi master
     val master         = new AxiMaster
 
     // arbiter
@@ -270,14 +262,14 @@ sealed class CacheStage3 extends Module with HasResetVector {
   stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
   if(Settings.get("sim")) {
-    val debugReset        = Wire(new DebugIO)
-    debugReset.pc        := 0.U(32.W)
-    debugReset.nextPc    := 0.U(32.W)
-    debugReset.inst      := Instruction.NOP
-    debugReset.valid     := false.B
+    val debugReset            = Wire(new DebugIO)
+    debugReset.pc            := 0.U(32.W)
+    debugReset.nextPc        := 0.U(32.W)
+    debugReset.inst          := Instruction.NOP
+    debugReset.valid         := false.B
 
-    val debugReg          = RegInit(debugReset)
-    debugReg             := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn.get)))
+    val debugReg              = RegInit(debugReset)
+    debugReg                 := Mux(io.stallIn, debugReg, Mux(io.flushIn || flushReg, debugReset, Mux(io.stallOut, debugReg, io.debugIn.get)))
     io.debugOut.get.pc       := io.out.pc
     io.debugOut.get.nextPc   := debugReg.nextPc
     io.debugOut.get.valid    := io.validOut
@@ -326,19 +318,6 @@ sealed class CacheStage3 extends Module with HasResetVector {
                               addr -> 0.U(64.W),
                               data -> Mux(io.flushIn, 0.U(64.W), Mux(rdataFire && !io.master.rlast, io.master.rdata, rblockBuffer)),
                             ))
-
-  // todo
-  /*
-  io.axiWaddrIO.valid     := false.B
-  io.axiWaddrIO.bits.addr := 0.U(32.W) 
-  io.axiWaddrIO.bits.len  := 0.U
-  io.axiWaddrIO.bits.size := 0.U
-  io.axiWaddrIO.bits.burst:= 0.U
-  io.axiWdataIO.valid     := false.B
-  io.axiWdataIO.bits.wlast:= true.B
-  io.axiWdataIO.bits.wdata:= 0.U(64.W)
-  io.axiWdataIO.bits.wstrb:= 0.U(8.W)
-  io.axiBrespIO.ready     := true.B*/
 
   // axi write
   io.master.awid := 0.U
@@ -463,15 +442,7 @@ class ICache extends Module {
     val sram2           = new RamIO
     val sram3           = new RamIO
 
-    // axi
-    /*
-    val axiRaddrIO      = Decoupled(new RaddrIO)
-    val axiRdataIO      = Flipped(Decoupled(new RdataIO))
-    // useless
-    val axiWaddrIO      = Decoupled(new WaddrIO)
-    val axiWdataIO      = Decoupled(new WdataIO)
-    val axiBrespIO      = Flipped(Decoupled(new BrespIO))*/
-
+    // axi master
     val master         = new AxiMaster
 
     // arbiter
@@ -575,13 +546,6 @@ class ICache extends Module {
   io.sram3.wdata         := stage3.io.sram3_wdata
 
   io.master             <> stage3.io.master
-  /*
-  io.axiRaddrIO         <> stage3.io.axiRaddrIO
-  io.axiRdataIO         <> stage3.io.axiRdataIO
-  io.axiWaddrIO         <> stage3.io.axiWaddrIO
-  io.axiWdataIO         <> stage3.io.axiWdataIO
-  io.axiBrespIO         <> stage3.io.axiBrespIO*/
-
   io.axiReq             <> stage3.io.axiReq
   io.axiGrant           <> stage3.io.axiGrant
   io.axiReady           <> stage3.io.axiReady

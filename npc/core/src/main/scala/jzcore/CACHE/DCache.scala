@@ -39,14 +39,7 @@ class DCache extends Module {
     val sram6           = new RamIO
     val sram7           = new RamIO
 
-    // axi, TODO
-    /*
-    val axiRaddrIO  = Decoupled(new RaddrIO)
-    val axiRdataIO  = Flipped(Decoupled(new RdataIO))
-    val axiWaddrIO  = Decoupled(new WaddrIO)
-    val axiWdataIO  = Decoupled(new WdataIO)
-    val axiBrespIO  = Flipped(Decoupled(new BrespIO))*/
-
+    // axi master
     val master     = new AxiMaster
 
     // arbiter
@@ -280,17 +273,18 @@ class DCache extends Module {
   val burstAddr            = addr & "hfffffff8".U
 
   // allocate axi, burst read
-  io.master.arvalid      := state === allocate1 || rState === addr_trans
-  //io.axiRaddrIO.bits.addr := burstAddr
-  io.master.araddr       := Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)
-  //io.axiRaddrIO.bits.len  := 1.U(8.W) // 2
-  io.master.arlen        := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
-  //io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), 2.U(3.W)) // todo: 根据lbu这些类型来决定，当访问外设的时候
-  //io.axiRaddrIO.bits.size := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
-  io.master.arsize       := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
-  //io.axiRaddrIO.bits.burst:= 2.U(2.W) // wrap
-  io.master.arburst      := Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
-  io.master.rready       := state === allocate2 || rState === data_trans
+  io.master.arvalid       := state === allocate1 || rState === addr_trans
+  io.master.araddr        := Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)
+  io.master.arlen         := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
+
+  if(Settings.get("sim")) {
+    io.master.arsize      := 3.U(3.W) // just for fast sram
+  } else {
+    io.master.arsize      := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
+  }
+
+  io.master.arburst       := Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
+  io.master.rready        := state === allocate2 || rState === data_trans
 
   // 锁存axi读取的值
   val axiDataReg           = RegInit(0.U(64.W))
@@ -313,20 +307,19 @@ class DCache extends Module {
   }
 
   io.master.awvalid      := state === writeback1 || wState === addr_trans
-  //io.axiWaddrIO.bits.addr := burstAddr
-  //io.axiWaddrIO.bits.addr := Mux(state === writeback1 || state === writeback2, Cat(wtag, burstAddr(9, 0)), burstAddr)
   io.master.awaddr       := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr))
-  //io.axiWaddrIO.bits.len  := 1.U(8.W) // 2
   io.master.awlen        := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 1.U(8.W), 0.U(8.W))
-  //io.axiWaddrIO.bits.size := 3.U(3.W) // 8B, todo， 外设不能超过4字节的请求
-  io.master.awsize       := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 3.U, io.ctrlIO.bits.size)
-  //io.axiWaddrIO.bits.burst:= 2.U(2.W) // wrap, todo, 不能向外设发送burst
+
+  if(Settings.get("sim")) {
+    io.master.awsize     := 3.U(3.W) // just for fast sram
+  } else {
+    io.master.awsize     := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 3.U, io.ctrlIO.bits.size)
+  }
+
   io.master.awburst      := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 2.U, 0.U)
   io.master.wvalid       := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
   io.master.wlast        := (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
-  //io.axiWdataIO.bits.wstrb:= "b11111111".U
   io.master.wstrb        := Mux(wState === addr_trans || wState === data_trans, io.wdataIO.bits.wmask, "b11111111".U)
-
   io.master.bready       := (state === writeback2 && wburst === 2.U(2.W)) || wState === wait_resp
   
   // burst write

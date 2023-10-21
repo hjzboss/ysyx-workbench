@@ -1,8 +1,8 @@
 module CsrReg (
-    input[63:0] mstatus,
-    input[63:0] mtvec,
-    input[63:0] mepc,
-    input[63:0] mcause
+  input[63:0] mstatus,
+  input[63:0] mtvec,
+  input[63:0] mepc,
+  input[63:0] mcause
 );
 
 wire [63:0] csr [0:3];

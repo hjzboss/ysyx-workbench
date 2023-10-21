@@ -67,8 +67,11 @@ class IFU extends Module with HasResetVector {
   pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
   
   io.out.addr     := pc 
-  //io.out.cacheable:= true.B // todo: 接入soc时需要更改
-  io.out.cacheable:= pc <= "hffff_ffff".U && pc >= "h8000_0000".U
+  if(Settings.get("sim")) {
+    io.out.cacheable:= true.B
+  } else {
+    io.out.cacheable:= pc <= "hffff_ffff".U && pc >= "h8000_0000".U
+  }
 
   val valid        = dontTouch(WireDefault(false.B))
   valid           := !io.stall && !io.exuRedirect.valid && !io.icRedirect.valid
