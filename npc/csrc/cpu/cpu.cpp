@@ -281,7 +281,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
     eval_wave();
     cnt += 1;
     if (cnt == 100) {
-      printf("兄弟跑飞了\n");
+      printf("跑飞了\n");
       break; // 防止跑飞
     }
   }
@@ -355,6 +355,7 @@ static void statistic() {
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
+    Log("CPU frequency: %ld\n", cycle / g_timer / 1000000);
     Log("IPC = %lf\n", g_nr_guest_inst / 1.0 / cycle);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
