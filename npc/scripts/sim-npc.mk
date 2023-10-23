@@ -2,6 +2,8 @@ BUILD_DIR = ${NPC_HOME}/build
 
 BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
+USER_ID = ysyx_22050853
+
 TOPNAME = Soc
 
 VSRC = ${BUILD_DIR}/${TOPNAME}.v
@@ -22,7 +24,7 @@ VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/inclu
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
-VERILATOR_SIMFLAG += --top-module $(TOPNAME)
+VERILATOR_SIMFLAG += --top-module ${USER}_$(TOPNAME)
 
 IMAGE_OBJ ?= 
 
