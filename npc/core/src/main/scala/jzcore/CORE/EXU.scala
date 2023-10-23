@@ -11,7 +11,7 @@ class EXU extends Module {
     val datasrc     = Flipped(new DataSrcIO)
     val aluCtrl     = Flipped(new AluIO)
     val ctrl        = Flipped(new CtrlFlow)
-    val flushCsr    = Input(Bool())
+    //val flushCsr    = Input(Bool())
     
     // 传给Lsu
     val out         = new ExuOut
@@ -85,9 +85,9 @@ class EXU extends Module {
   brAddr               := Mux(io.ctrl.isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm(31, 0)
 
   // ecall mret
-  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, opAPre(31, 0), brAddr(31, 0))
+  val brAddrPre         = Mux(io.ctrl.exception || io.ctrl.mret, opAPre(31, 0), brAddr(31, 0))
   io.redirect.brAddr   := brAddrPre
-  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, true.B, false.B)
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)
 
   // to lsu opa
   io.out.lsType        := io.ctrl.lsType
@@ -108,10 +108,12 @@ class EXU extends Module {
   io.out.excepNo       := io.ctrl.excepNo
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
-  io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
+  //io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
+  io.out.csrWen        := io.ctrl.csrWen
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
-  io.out.int           := io.ctrl.int
+  io.out.mret          := io.ctrl.mret
+  //io.out.int           := io.ctrl.int
 
   if(Settings.get("sim")) {
     io.out.ebreak.get      := io.ctrl.ebreak.get

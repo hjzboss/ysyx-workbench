@@ -12,7 +12,7 @@ class LSU extends Module {
     // exu传入
     val in          = Flipped(new ExuOut)
 
-    val flushCsr    = Input(Bool())
+    //val flushCsr    = Input(Bool())
 
     // 传给wbu
     val out         = new LsuOut
@@ -193,9 +193,10 @@ class LSU extends Module {
   io.out.excepNo        := io.in.excepNo
   io.out.exception      := io.in.exception
   io.out.csrWaddr       := io.in.csrWaddr
-  io.out.csrWen         := Mux(io.flushCsr, false.B, io.in.csrWen)
+  //io.out.csrWen         := Mux(io.flushCsr, false.B, io.in.csrWen)
+  io.out.csrWen         := io.in.csrWen
   io.out.csrValue       := io.in.csrValue
-  io.out.int            := io.in.int
+  //io.out.int            := io.in.int
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
   io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel

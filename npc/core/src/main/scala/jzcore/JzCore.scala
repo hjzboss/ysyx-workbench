@@ -140,10 +140,10 @@ class JzCore extends Module {
   forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
   forward.io.csrRen   := exReg.io.ctrlOut.csrRen
   forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
-  forward.io.mret     <> idu.io.mret
-  forward.io.flushExuCsr <> exu.io.flushCsr
-  forward.io.flushLsuCsr <> lsu.io.flushCsr
-  forward.io.flushWbuCsr <> wbu.io.flushCsr
+  //forward.io.mret     <> idu.io.mret
+  //forward.io.flushExuCsr <> exu.io.flushCsr
+  //forward.io.flushLsuCsr <> lsu.io.flushCsr
+  //forward.io.flushWbuCsr <> wbu.io.flushCsr
   forward.io.lsuException := lsReg.io.out.exception
   forward.io.wbuException := wbReg.io.out.exception
 

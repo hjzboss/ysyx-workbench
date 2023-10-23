@@ -14,7 +14,7 @@ class WBU extends Module {
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
 
-    val flushCsr  = Input(Bool())
+    //val flushCsr  = Input(Bool())
   })
 
   // 寄存器文件写回
@@ -25,11 +25,13 @@ class WBU extends Module {
   // csr文件写回
   io.csrWrite.waddr    := io.in.csrWaddr
   io.csrWrite.wdata    := io.in.exuOut
-  io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
+  //io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
+  io.csrWrite.wen      := io.in.csrWen
   // exception
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.excepNo
+  io.csrWrite.mret     := io.in.mret
 
   if(Settings.get("sim")) {
     val stop              = Module(new Stop)

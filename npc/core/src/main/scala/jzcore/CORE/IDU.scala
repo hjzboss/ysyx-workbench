@@ -40,6 +40,8 @@ class IDU extends Module with HasInstrType{
   val rd        = inst(11, 7)
   val csrReg    = inst(31, 20)
 
+  val int       = csr.io.int && io.validIn
+
   // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
   val lsctrl    = ListLookup(inst, Instruction.LsDefault, RV64IM.lsTypeTable)
@@ -77,14 +79,15 @@ class IDU extends Module with HasInstrType{
   csr.io.waddr        := io.csrWrite.waddr
   csr.io.wen          := io.csrWrite.wen
   csr.io.wdata        := io.csrWrite.wdata
-  csr.io.mret         := systemCtrl === System.mret && io.validIn && !io.flush && !io.stall
+  //csr.io.mret         := systemCtrl === System.mret && io.validIn && !io.flush && !io.stall
+  csr.io.mret         := io.csrWrite.mret
   // exception
   csr.io.exception    := io.csrWrite.exception
   csr.io.epc          := io.csrWrite.epc(31, 0)
   csr.io.no           := io.csrWrite.no
   csr.io.timerInt     := io.timerInt
-  csr.io.intResp      := io.validIn && !io.flush && !io.stall
-  csr.io.ecall        := systemCtrl === System.ecall && io.validIn && !io.flush && !io.stall
+  //csr.io.intResp      := io.validIn && !io.flush && !io.stall
+  //csr.io.ecall        := systemCtrl === System.ecall && io.validIn && !io.flush && !io.stall
 
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(csr.io.int || instrtype === InstrE || csrType, csr.io.rdata, grf.io.src1)
@@ -93,31 +96,32 @@ class IDU extends Module with HasInstrType{
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int
-  io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
+  io.ctrl.br          := isBr(instrtype) | !int
+  io.ctrl.regWen      := regWen(instrtype) && !int
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
-  io.ctrl.csrWen      := csrType & !io.ctrl.int
-  io.ctrl.csrRen      := csrType || instrtype === InstrE || io.ctrl.int // just for csr forwarding
-  io.ctrl.csrWaddr    := csrRaddr
+  io.ctrl.csrWen      := csrType & !int
+  io.ctrl.csrRen      := csrType || instrtype === InstrE || int // just for csr forwarding
+  io.ctrl.csrWaddr    := Mux(systemCtrl === System.ecall || systemCtrl === System.mret, CsrId.mstatus, csrRaddr) // TODO: ecall mepc的旁路问题
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csr.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
-  io.ctrl.exception   := systemCtrl === System.ecall | io.ctrl.int // type of exception
-  io.ctrl.memWen      := memEn === MemEn.store & !io.ctrl.int
-  io.ctrl.memRen      := memEn === MemEn.load & !io.ctrl.int
-  io.ctrl.sysInsType  := systemCtrl
-  io.ctrl.rs1         := Mux(csrType || io.ctrl.int, 0.U(5.W), rs1)
+  io.ctrl.exception   := systemCtrl === System.ecall | int // type of exception
+  io.ctrl.mret        := systemCtrl === System.mret // change mstatus
+  io.ctrl.memWen      := memEn === MemEn.store & !int
+  io.ctrl.memRen      := memEn === MemEn.load & !int
+  //io.ctrl.sysInsType  := systemCtrl
+  io.ctrl.rs1         := Mux(csrType || int, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(csrType, rs1, rs2)
-  io.ctrl.coherence   := instrtype === InstrF & !io.ctrl.int
-  io.ctrl.int         := csr.io.int && io.validIn
+  io.ctrl.coherence   := instrtype === InstrF & !int
+  //io.ctrl.int         := csr.io.int && io.validIn
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
-  io.aluCtrl.aluOp    := Mux(!io.ctrl.int, aluOp, AluOp.nop)
+  io.aluCtrl.aluOp    := Mux(!int, aluOp, AluOp.nop)
 
-  io.mret             := systemCtrl === System.mret
+  //io.mret             := systemCtrl === System.mret
 
   if(Settings.get("sim")) {
     io.ctrl.ebreak.get    := instrtype === InstrD // ebreak

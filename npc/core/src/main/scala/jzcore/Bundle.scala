@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 import top.Settings
+import javax.xml.transform.OutputKeys
 
 class DebugIO extends Bundle {
   val pc        = Output(UInt(32.W))
@@ -127,6 +128,7 @@ class CSRWriteIO extends Bundle {
   val exception = Output(Bool())
   val epc       = Output(UInt(32.W))
   val no        = Output(UInt(64.W))
+  val mret      = Output(Bool())
 }
 
 class DataSrcIO extends Bundle {
@@ -157,13 +159,14 @@ class CtrlFlow extends Bundle {
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
   val ebreak        = if(Settings.get("sim")) Some(Output(Bool())) else None
-  val sysInsType    = Output(UInt(2.W))
+  //val sysInsType    = Output(UInt(2.W))
   val coherence     = Output(Bool())
   // 用于送给旁路单元
   val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
   val rs1           = Output(UInt(5.W))
   val rs2           = Output(UInt(5.W))
-  val int           = Output(Bool())
+  //val int           = Output(Bool())
+  val mret          = Output(Bool())
 }
 
 class ExuOut extends Bundle {
@@ -186,7 +189,7 @@ class ExuOut extends Bundle {
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
   val coherence     = Output(Bool())
-  val int           = Output(Bool())
+  val mret          = Output(Bool())
   val ebreak        = if(Settings.get("sim")) Some(Output(Bool())) else None
   val haltRet       = if(Settings.get("sim")) Some(Output(UInt(64.W))) else None
 }
@@ -203,7 +206,7 @@ class LsuOut extends Bundle {
   val csrWaddr      = Output(UInt(12.W))
   val csrWen        = Output(Bool())
   val csrValue      = Output(UInt(64.W))
-  val int           = Output(Bool())
+  val mret          = Output(Bool())
   val ebreak        = if(Settings.get("sim")) Some(Output(Bool())) else None
   val haltRet       = if(Settings.get("sim")) Some(Output(UInt(64.W))) else None
 }

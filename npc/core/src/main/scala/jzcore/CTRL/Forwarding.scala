@@ -31,10 +31,10 @@ class Forwarding extends Module {
     val wbuException = Input(Bool())
 
     // idu阶段的mret指令会更新mstatus，之前未写回指令的csr写使能无效
-    val mret       = Input(Bool())
-    val flushExuCsr= Output(Bool())
-    val flushLsuCsr= Output(Bool())
-    val flushWbuCsr= Output(Bool())
+    //val mret       = Input(Bool())
+    //val flushExuCsr= Output(Bool())
+    //val flushLsuCsr= Output(Bool())
+    //val flushWbuCsr= Output(Bool())
 
     // 旁路控制信号，用于控制alu的两个源操作数
     val forwardA = Output(UInt(4.W))
@@ -54,7 +54,7 @@ class Forwarding extends Module {
   io.forwardA := Mux(forwardALsu, Forward.lsuData, Mux(forwardAWbu, Forward.wbuData, Mux(forwardACsrWbu, Mux(io.wbuException, Mux(io.csrRaddr === CsrId.mepc, Forward.wbuMepc, Forward.wbuNo), Forward.csrWbuData), Mux(forwardACsrLsu, Mux(io.lsuException, Mux(io.csrRaddr === CsrId.mepc, Forward.lsuMepc, Forward.lsuNo), Forward.csrLsuData), Forward.normal))))
   io.forwardB := Mux(forwardBLsu, Forward.lsuData, Mux(forwardBWbu, Forward.wbuData, Forward.normal))
 
-  io.flushExuCsr := io.mret && io.csrRaddr === CsrId.mstatus
-  io.flushLsuCsr := io.mret && io.lsuCsrAddr === CsrId.mstatus
-  io.flushWbuCsr := io.mret && io.wbuCsrAddr === CsrId.mstatus
+  //io.flushExuCsr := io.mret && io.csrRaddr === CsrId.mstatus
+  //io.flushLsuCsr := io.mret && io.lsuCsrAddr === CsrId.mstatus
+  //io.flushWbuCsr := io.mret && io.wbuCsrAddr === CsrId.mstatus
 }

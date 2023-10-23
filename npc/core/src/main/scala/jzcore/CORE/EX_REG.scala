@@ -50,11 +50,12 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.csrWaddr      := CsrId.nul
   ctrlReset.memWen        := false.B
   ctrlReset.memRen        := false.B
-  ctrlReset.sysInsType    := System.nop
+  //ctrlReset.sysInsType    := System.nop
   ctrlReset.rs1           := 0.U(5.W)
   ctrlReset.rs2           := 0.U(5.W)
   ctrlReset.coherence     := false.B
-  ctrlReset.int           := false.B
+  //ctrlReset.int           := false.B
+  ctrlReset.mret          := false.B
   if(Settings.get("sim")) {
     ctrlReset.ebreak.get  := false.B
   }
