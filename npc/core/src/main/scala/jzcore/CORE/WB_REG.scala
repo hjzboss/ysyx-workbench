@@ -44,7 +44,11 @@ class WB_REG extends Module with HasResetVector {
 
     val debugReg = RegInit(debugReset)
     debugReg := Mux(io.stall, debugReg, io.debugIn.get)
-    io.debugOut.get := debugReg
+    //io.debugOut.get := debugReg
+    io.debugOut.get.pc := debugReg.pc
+    io.debugOut.get.nextPc := debugReg.nextPc
+    io.debugOut.get.inst := debugReg.inst
+    io.debugOut.get.valid := debugReg.valid & !io.stall
 
     val lsFlagReg = RegInit(false.B)
     lsFlagReg := Mux(io.stall, lsFlagReg, io.lsFlagIn.get)
