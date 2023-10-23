@@ -24,7 +24,7 @@ VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/inclu
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
-VERILATOR_SIMFLAG += --top-module ${USER}_$(TOPNAME)
+VERILATOR_SIMFLAG += --top-module ${USER_ID}_$(TOPNAME)
 
 IMAGE_OBJ ?= 
 
