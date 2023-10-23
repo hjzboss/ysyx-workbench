@@ -8,7 +8,7 @@
 vluint64_t main_time = 0;
 
 static uint64_t cycle = 0; // 统计时钟周期
-static VSoc* top;
+static Vysyx_22050853_Soc* top;
 static VerilatedContext* contextp = NULL;
 static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
