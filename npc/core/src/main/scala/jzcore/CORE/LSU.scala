@@ -197,6 +197,7 @@ class LSU extends Module {
   io.out.csrWen         := io.in.csrWen
   io.out.csrValue       := io.in.csrValue
   //io.out.int            := io.in.int
+  io.out.mret           := io.in.mret
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
   io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel

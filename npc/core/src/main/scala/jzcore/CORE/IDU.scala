@@ -27,7 +27,7 @@ class IDU extends Module with HasInstrType{
 
     val timerInt  = Input(Bool()) // clint int
     
-    val mret      = Output(Bool())
+    //val mret      = Output(Bool())
   })
 
   val grf       = Module(new GRF)

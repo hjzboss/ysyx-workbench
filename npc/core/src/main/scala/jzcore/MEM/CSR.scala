@@ -40,10 +40,10 @@ class CSR extends Module {
     val int       = Output(Bool())
 
     // timer int response
-    val intResp   = Input(Bool())
+    //val intResp   = Input(Bool())
 
     // ecall
-    val ecall     = Input(Bool())
+    //val ecall     = Input(Bool())
   })
 
   val MSTATUS_INIT = if(Settings.get("sim")) "ha00001800".U(64.W) else 0.U(64.W)
