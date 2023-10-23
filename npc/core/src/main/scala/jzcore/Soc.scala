@@ -97,6 +97,24 @@ class Soc extends Module {
   core.io.sram7.wdata <> ram7.io.D
 
   core.io.interrupt := false.B
+  core.io.slave.araddr := 0.U
+  core.io.slave.wvalid := false.B 
+  core.io.slave.awvalid := false.B
+  core.io.slave.arburst := 0.U
+  core.io.slave.awlen := 0.U
+  core.io.slave.awsize := 0.U
+  core.io.slave.wdata := 0.U
+  core.io.slave.wlast := true.B
+  core.io.slave.wstrb := 0.U
+  core.io.slave.awid := 0.U
+  core.io.slave.awaddr := 0.U
+  core.io.slave.arlen := 0.U
+  core.io.slave.arvalid := 0.U
+  core.io.slave.rready := 0.U
+  core.io.slave.arid := 0.U
+  core.io.slave.bready := true.B
+  core.io.slave.arsize := 0.U
+  core.io.slave.awburst := 0.U
 
   // 仿真环境
   io.debug        := core.io.debug.get
