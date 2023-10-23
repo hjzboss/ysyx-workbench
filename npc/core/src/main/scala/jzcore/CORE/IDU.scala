@@ -77,14 +77,14 @@ class IDU extends Module with HasInstrType{
   csr.io.waddr        := io.csrWrite.waddr
   csr.io.wen          := io.csrWrite.wen
   csr.io.wdata        := io.csrWrite.wdata
-  csr.io.mret         := systemCtrl === System.mret
+  csr.io.mret         := systemCtrl === System.mret && io.validIn && !io.flush && !io.stall
   // exception
   csr.io.exception    := io.csrWrite.exception
   csr.io.epc          := io.csrWrite.epc(31, 0)
   csr.io.no           := io.csrWrite.no
   csr.io.timerInt     := io.timerInt
   csr.io.intResp      := io.validIn && !io.flush && !io.stall
-  csr.io.ecall        := systemCtrl === System.ecall
+  csr.io.ecall        := systemCtrl === System.ecall && io.validIn && !io.flush && !io.stall
 
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(csr.io.int || instrtype === InstrE || csrType, csr.io.rdata, grf.io.src1)
@@ -93,7 +93,7 @@ class IDU extends Module with HasInstrType{
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int // ?
+  io.ctrl.br          := isBr(instrtype) | !io.ctrl.int
   io.ctrl.regWen      := regWen(instrtype) && !io.ctrl.int
   io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType

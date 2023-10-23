@@ -395,7 +395,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.metaAlloc.valid  := state === data && rdataFire && io.master.rlast && stage3Reg.cacheable
 
   val inst             = WireDefault(Instruction.NOP)
-  // -----------------------data aligner-------------------------------
+  // -----------------------data select-------------------------------
   when(state === idle && stage3Reg.hit && stage3Reg.cacheable) {
     when(align(1)) {
       inst := Mux(stage3Reg.align(0), stage3Reg.cacheline(127, 96), stage3Reg.cacheline(95, 64))
@@ -417,9 +417,6 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val validReg      = RegInit(false.B)
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    
   io.validOut      := validReg && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || (state === data && rdataFire && io.master.rlast) || state === stall)
-  // for npc verilator simulation env
-  //io.validOut      := validReg && !io.flushIn && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || ((state === data || state === flush) && rdataFire && io.axiRdataIO.bits.rlast) || state === stall)
-  //io.debugOut.inst := inst
 }
 
 class ICache extends Module {
