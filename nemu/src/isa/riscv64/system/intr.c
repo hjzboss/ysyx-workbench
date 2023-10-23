@@ -27,6 +27,7 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   cpu.csr[0] = mstatus;
   cpu.csr[3] = 0xb; // mcause syscall
   cpu.csr[2] = epc;  // mepc
+  printf("nemu: ecall, mstatus=%lx\n", mstatus);
   return cpu.csr[1]; // mtvec
 }
 
@@ -38,6 +39,7 @@ word_t isa_mret() {
   mstatus &= ~0x088; // clear mpie and mie
   mstatus |= (mie | 0x080); // set mpie=1 and mie=mpie
   cpu.csr[0] = mstatus;
+  printf("nemu: mret, mstatus=%lx\n", mstatus);
   return cpu.csr[2];
 }
 
