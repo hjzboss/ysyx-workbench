@@ -4,7 +4,8 @@ BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
 TOPNAME = Soc
 
-VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
+VSRC = ${BUILD_DIR}/${TOPNAME}.v
+#VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
 SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*.cpp")
