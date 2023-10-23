@@ -89,7 +89,7 @@ class EXU extends Module {
   io.redirect.brAddr   := brAddrPre
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, true.B, false.B)
 
-  // to lsuopa
+  // to lsu opa
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
   io.out.lsuWen        := io.ctrl.memWen

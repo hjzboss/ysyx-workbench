@@ -6,7 +6,7 @@ import chisel3.util._
 
 
 trait HasResetVector {
-  val resetVector = Settings.getLong("SocResetVector")
+  val resetVector = if(Setting.get("sim")) Settings.getLong("ResetVector") else Settings.getLong("SocResetVector")
 }
 
 class IFU extends Module with HasResetVector {
