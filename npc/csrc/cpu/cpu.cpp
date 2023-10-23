@@ -155,7 +155,6 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0 || waddr < 0x80000000ull) return;
   if (waddr == CONFIG_SERIAL_MMIO) {
-    //printf("wdata=%x\n", wdata);
     // uart
     putchar(wdata);
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
@@ -346,7 +345,6 @@ void execute(uint64_t n) {
   }
 }
 
-// todo
 static void statistic() {
   IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
@@ -355,7 +353,7 @@ static void statistic() {
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
-    Log("CPU frequency: %ld\n", cycle / g_timer / 1000000);
+    Log("CPU frequency: %ld\n", cycle / (g_timer / 1000000));
     Log("IPC = %lf\n", g_nr_guest_inst / 1.0 / cycle);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");

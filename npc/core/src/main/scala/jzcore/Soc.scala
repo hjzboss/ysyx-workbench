@@ -23,12 +23,6 @@ class Soc extends Module {
   val core = Module(new JzCore)
 
   core.io.master     <> sram.io.slave
-  /*
-  core.io.axiRaddrIO <> sram.io.raddrIO
-  core.io.axiRdataIO <> sram.io.rdataIO
-  core.io.axiWaddrIO <> sram.io.waddrIO
-  core.io.axiWdataIO <> sram.io.wdataIO
-  core.io.axiBrespIO <> sram.io.brespIO*/
 
   ram0.io.CLK := clock
   ram1.io.CLK := clock
@@ -117,6 +111,6 @@ class Soc extends Module {
   core.io.slave.awburst := 0.U
 
   // 仿真环境
-  io.debug        := core.io.debug.get
-  io.lsFlag       := core.io.lsFlag.get
+  io.debug        <> core.io.debug.get
+  io.lsFlag       <> core.io.lsFlag.get
 }
