@@ -279,7 +279,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 100) {
+    if (cnt == 10000) {
       printf("跑飞了\n");
       break; // 防止跑飞
     }

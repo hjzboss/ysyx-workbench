@@ -44,8 +44,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   }
 
   fs_close(fd);
-  Log("load %s end", filename);
   asm volatile("fence.i");
+  Log("load %s end", filename);
   return elf_head.e_entry;
 }
 
