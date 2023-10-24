@@ -59,7 +59,7 @@ class WB_REG extends Module with HasResetVector {
   lsuReg              := Mux(io.stall, lsuReg, io.in)
   io.out              := lsuReg
 
-  when((io.debugOut.get.pc === 0x80001118L.U) && (io.debugOut.valid === true.B)) {
+  when((io.debugOut.get.pc === 0x80001118L.U) && (io.debugOut.get.valid === true.B)) {
     printf("\n\nint detected!\n\n");
   }
 }
