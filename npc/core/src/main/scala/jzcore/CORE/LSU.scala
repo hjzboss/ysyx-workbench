@@ -211,4 +211,8 @@ class LSU extends Module {
     io.out.ebreak.get       := io.in.ebreak.get
     io.out.haltRet.get      := io.in.haltRet.get
   }
+
+  when((io.out.rd === 9.U) && io.out.regWen && io.lsFlag.get) {
+    printf("lsu s1: pc=%x, addr=%x\n", io.out.pc, addr)
+  }
 }
