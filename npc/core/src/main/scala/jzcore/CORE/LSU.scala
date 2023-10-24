@@ -193,6 +193,10 @@ class LSU extends Module {
     io.out.haltRet.get      := io.in.haltRet.get
   }
 
+  when(addr === 0x81ca5d88.U && io.in.lsuWen) {
+    printf("fuck shit: pc=%x, addr=%x, wdata=%x, wmask=%x\n", io.out.pc, addr, io.dcacheWrite.bits.wdata, io.dcacheWrite.bits.wmask)
+  }
+
   when((io.out.rd === 9.U) && io.out.regWen && io.lsFlag.get) {
     printf("lsu s1: pc=%x, addr=%x\n", io.out.pc, addr)
   }
