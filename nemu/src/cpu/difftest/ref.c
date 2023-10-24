@@ -37,7 +37,7 @@ void difftest_regcpy(void *dut, bool direction) {
     memcpy(&tmp, dut, REG_SIZE);
     for (int i = 0; i < 32; i++) {
       if(cpu.gpr[i] != tmp.gpr[i]) {
-        printf("%s diff: dut=%lx, ref=%lx\n", regs[i], tmp.gpr[i], cpu.gpr[i]);
+        printf("%d diff: dut=%lx, ref=%lx\n", i, tmp.gpr[i], cpu.gpr[i]);
       }
     }
     for (int i = 0; i < CSR_NUM; i++) {
