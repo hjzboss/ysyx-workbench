@@ -58,8 +58,4 @@ class WB_REG extends Module with HasResetVector {
   val lsuReg           = RegInit(lsuReset)
   lsuReg              := Mux(io.stall, lsuReg, io.in)
   io.out              := lsuReg
-
-  when((io.out.rd === 9.U) && io.out.regWen && io.debugOut.get.valid) {
-    printf("wbu s1 write: pc=%x, inst=%x, wdata=%x\n", io.debugOut.get.pc, io.debugOut.get.inst, Mux(io.out.csrWen, io.out.csrValue, Mux(io.out.loadMem, io.out.lsuOut, io.out.exuOut)))
-  }
 }
