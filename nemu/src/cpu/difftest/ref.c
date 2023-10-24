@@ -31,6 +31,7 @@ void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
 
 void difftest_regcpy(void *dut, bool direction) {
   if(direction == DIFFTEST_TO_REF) {
+    /*
     CPU_state tmp;
     memcpy(&tmp, dut, REG_SIZE);
     for (int i = 0; i < 32; i++) {
@@ -42,7 +43,7 @@ void difftest_regcpy(void *dut, bool direction) {
       if(cpu.csr[i] != tmp.csr[i]) {
         printf("csr[%d] diff: dut=%lx, ref=%lx, pc=%lx\n", i, tmp.csr[i], cpu.csr[i], tmp.pc);
       }
-    }
+    }*/
     memcpy(&cpu, dut, REG_SIZE);
   }
   else {
