@@ -193,7 +193,7 @@ class LSU extends Module {
     io.out.haltRet.get      := io.in.haltRet.get
   }
 
-  when(!cacheable && io.lsFlag.get) {
-    printf("device: pc=%x, addr=%x, wmask=%x, size=%x, wdata=%x\n", io.in.pc, addr, io.dcacheWrite.bits.wmask, size, io.dcacheWrite.bits.wdata)
+  when((io.out.rd === 9.U) && io.out.regWen && io.lsFlag.get) {
+    printf("lsu s1: pc=%x, addr=%x\n", io.out.pc, addr)
   }
 }
