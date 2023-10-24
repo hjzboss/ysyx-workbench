@@ -33,15 +33,16 @@ void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
 
 void difftest_regcpy(void *dut, bool direction) {
   if(direction == DIFFTEST_TO_REF) {
-    CPU_state *tmp = (CPU_state *)dut;
+    CPU_state tmp;
+    memcpy(&tmp, dut, REG_SIZE);
     for (int i = 0; i < 32; i++) {
-      if(cpu.gpr[i] != tmp->gpr[i]) {
-        printf("%s diff: dut=%lx, ref=%lx\n", regs[i], tmp->gpr[i], cpu.gpr[i]);
+      if(cpu.gpr[i] != tmp.gpr[i]) {
+        printf("%s diff: dut=%lx, ref=%lx\n", regs[i], tmp.gpr[i], cpu.gpr[i]);
       }
     }
     for (int i = 0; i < CSR_NUM; i++) {
-      if(cpu.csr[i] != tmp->csr[i]) {
-        printf("csr[%d] diff: dut=%lx, ref=%lx\n", i, tmp->csr[i], cpu.csr[i]);
+      if(cpu.csr[i] != tmp.csr[i]) {
+        printf("csr[%d] diff: dut=%lx, ref=%lx\n", i, tmp.csr[i], cpu.csr[i]);
       }
     }
     memcpy(&cpu, dut, REG_SIZE);
