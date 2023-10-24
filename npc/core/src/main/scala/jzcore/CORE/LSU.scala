@@ -46,25 +46,6 @@ class LSU extends Module {
     val lsFlag        = if(Settings.get("sim")) Some(Output(Bool())) else None
   })
 
-  /*
-  val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // resp
-
-  val raddrFire          = io.axiRaddrIO.valid && io.axiRaddrIO.ready
-  val rdataFire          = io.axiRdataIO.valid && io.axiRdataIO.ready
-  val waddrFire          = io.axiWaddrIO.valid && io.axiWaddrIO.ready
-  val wdataFire          = io.axiWdataIO.valid && io.axiWdataIO.ready
-  val brespFire          = io.axiBrespIO.valid && io.axiBrespIO.ready
-
-  // todo
-  io.axiRaddrIO.bits.len := 0.U
-  io.axiRaddrIO.bits.size:= 3.U
-  io.axiRaddrIO.bits.burst := 2.U(2.W)
-  io.axiWaddrIO.bits.len := 0.U
-  io.axiWaddrIO.bits.size:= 3.U
-  io.axiWaddrIO.bits.burst := 2.U(2.W)
-  io.axiWdataIO.bits.wlast := true.B
-  */
-
   val addr        = io.in.lsuAddr
   val readTrans   = io.in.lsuRen
   val writeTrans  = io.in.lsuWen
@@ -212,7 +193,7 @@ class LSU extends Module {
     io.out.haltRet.get      := io.in.haltRet.get
   }
 
-  when((io.out.rd === 9.U) && io.out.regWen && io.lsFlag.get) {
-    printf("lsu s1: pc=%x, addr=%x\n", io.out.pc, addr)
+  when(!cacheable && io.lsFlag.get) {
+    printf("device: pc=%x, addr=%x, wmask=%x, size=%x, wdata=%x\n", io.in.pc, addr, io.dcacheWrite.bits.wmask, size, io.dcacheWrite.bits.wdata)
   }
 }
