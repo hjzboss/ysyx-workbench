@@ -144,13 +144,10 @@ class LSU extends Module {
   io.clintIO.wmask      := io.in.wmask
 
   // 数据对齐
-  val lsType             = dontTouch(Wire(LsType()))
-  lsType                := io.in.lsType
   val align64            = Cat(addr(2, 0), 0.U(3.W))
   val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
-  //val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
-  val rdata              = io.dcacheRead.bits.rdata >> align64
-  val lsuOut             = LookupTree(lsType, Seq(
+  val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
+  val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
                             LsType.lw   -> SignExt(rdata(31, 0), 64),
                             LsType.lh   -> SignExt(rdata(15, 0), 64),
@@ -168,8 +165,7 @@ class LSU extends Module {
   val pc                 = dontTouch(Wire(UInt(32.W)))
   pc                    := io.in.pc
 
-  //io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, lsuOut)
-  io.out.lsuOut         := lsuOut
+  io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, lsuOut)
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
