@@ -197,7 +197,7 @@ class LSU extends Module {
   //  printf("fuck shit: pc=%x, addr=%x, wdata=%x, wmask=%x\n", io.out.pc, addr, io.dcacheWrite.bits.wdata, io.dcacheWrite.bits.wmask)
   //}
 
-  when((io.out.rd === 9.U) && io.out.regWen && io.lsFlag.get && !cacheable) {
-    printf("lsu s1: pc=%x, addr=%x, rdata=%x\n", io.out.pc, addr, lsuOut)
-  }
+  //when((io.out.rd === 9.U) && io.out.regWen && io.lsFlag.get && !cacheable) {
+    //printf("lsu s1: pc=%x, addr=%x, rdata=%x\n", io.out.pc, addr, lsuOut)
+  //}
 }
