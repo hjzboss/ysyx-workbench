@@ -125,10 +125,6 @@ class LSU extends Module {
   // coherence
   io.dcacheCoh.valid            := io.in.coherence
 
-  when(!cacheable && (io.out.rd === 9.U) && io.out.regWen) {
-    printf("s1 detected: pc=%x, addr=%x, rdata=%x\n", io.in.pc, addr, io.dcacheRead.bits.rdata)
-  }
-
   /*
   // load状态机
   val idle :: wait_data :: wait_resp ::Nil = Enum(3)
