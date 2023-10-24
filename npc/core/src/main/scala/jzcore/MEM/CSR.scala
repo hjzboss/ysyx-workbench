@@ -80,10 +80,7 @@ class CSR extends Module {
       is(CsrId.mtvec)   { mtvec   := io.wdata(31, 0) }
       is(CsrId.mepc)    { mepc    := io.wdata(31, 0) }
       is(CsrId.mcause)  { mcause  := io.wdata }
-      is(CsrId.mie)     { 
-        mie     := io.wdata(15, 0) 
-        printf("mie write: mie=%x\n", mie);
-      }
+      is(CsrId.mie)     { mie     := io.wdata(15, 0) }
     }
   }
 
@@ -99,6 +96,9 @@ class CSR extends Module {
 
   // interrupt, just for timer int now
   io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
+  when(io.int) {
+    printf("\n\nint detected: mie=%x, mstatus=%x\n\n", mie, mstatus);
+  }
 
   // interrupt
   when(io.mret) {
