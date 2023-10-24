@@ -40,7 +40,6 @@ bool ioe_init() {
 }
 
 void ioe_read (int reg, void *buf) {
-  printf("reg=%d\n", reg);
   ((handler_t)lut[reg])(buf); 
 }
 
