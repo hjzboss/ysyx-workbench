@@ -96,9 +96,6 @@ class CSR extends Module {
 
   // interrupt, just for timer int now
   io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
-  when(io.int) {
-    printf("\n\nint detected: mie=%x, mstatus=%x\n\n", mie, mstatus);
-  }
 
   // interrupt
   when(io.mret) {
