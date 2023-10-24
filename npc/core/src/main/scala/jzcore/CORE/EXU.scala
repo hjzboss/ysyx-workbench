@@ -90,7 +90,7 @@ class EXU extends Module {
   io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)
 
   when(io.redirect.valid && (brAddrPre === 0x80001118L.U)) {
-    printf("branch: pc=%x, inst=%x, braddr=%x\n", io.debugIn.pc, io.debugIn.inst, io.redirect.braddr)
+    printf("branch: pc=%x, inst=%x, braddr=%x\n", io.debugIn.get.pc, io.debugIn.get.inst, io.redirect.braddr)
   }
 
   // to lsu opa
