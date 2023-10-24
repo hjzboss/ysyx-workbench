@@ -87,9 +87,8 @@ class LSU extends Module {
     coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
-  //val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
-  val cacheable = false.B
-  val flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
+  val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
+  var flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
 
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
@@ -125,6 +124,10 @@ class LSU extends Module {
 
   // coherence
   io.dcacheCoh.valid            := io.in.coherence
+
+  when(!cacheable && (io.out.rd === 9.U) && io.out.regWen) {
+    printf("s1 detected: pc=%x, addr=%x, rdata=%x\n", io.in.pc, addr, io.dcacheRead.bits.rdata)
+  }
 
   /*
   // load状态机
