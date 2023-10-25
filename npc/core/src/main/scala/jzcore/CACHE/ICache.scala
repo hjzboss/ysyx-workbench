@@ -291,7 +291,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
     addr  -> Mux(io.flushIn, Mux(io.axiGrant && raddrFire, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
     data  -> Mux(rdataFire && io.master.rlast && (io.master.rresp === okay || io.master.rresp === exokay), Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
     stall -> Mux(io.stallIn, stall, idle),
-    flush -> Mux(rdataFire && io.master.rlast, Mux(io.stallIn, stall, idle), flush) // todo: 此处有问题
+    flush -> Mux(rdataFire && io.master.rlast, idle, flush) // todo: 此处有问题
   ))
 
   // todo
