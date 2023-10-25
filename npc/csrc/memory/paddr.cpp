@@ -98,13 +98,7 @@ uint64_t paddr_read(uint64_t addr, int len) {
     IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, ret));
     return ret;
   }
-  else {
-    addr += CONFIG_MBASE;
-    uint64_t ret = host_read(guest_to_host(addr), len);
-    IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, ret));
-    return ret;
-  }
-  //out_of_bound(addr);
+  out_of_bound(addr);
 }
 
 
@@ -114,12 +108,7 @@ void paddr_write(uint64_t addr, int len, uint64_t data) {
     host_write(guest_to_host(addr), len, data);
     return;
   }
-  else {
-    addr += CONFIG_MBASE;
-    host_write(guest_to_host(addr), len, data);
-    return;
-  }
-  //out_of_bound(addr);
+  out_of_bound(addr);
 }
 
 
