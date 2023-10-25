@@ -311,13 +311,36 @@ _fseeko_r (struct _reent *ptr,
 #endif
 
 dumb:
+/*
+fp->_seek: 
+
+_fpos_t
+__sseek (struct _reent *ptr,
+       void *cookie,
+       _fpos_t offset,
+       int whence)
+{
+  register FILE *fp = (FILE *) cookie;
+  register _off_t ret;
+
+  ret = _lseek_r (ptr, fp->_file, (_off_t) offset, whence);
+  if (ret == -1L)
+    fp->_flags &= ~__SOFF;
+  else
+    {
+      fp->_flags |= __SOFF;
+      fp->_offset = ret;
+    }
+  return ret;
+}
+*/
+  printf("cookie=%d\n", ((FILE *)fp->_cookie)->_file);
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _newlib_flockfile_exit (fp);
       return EOF;
     }
-    printf("seek offset=%ld\n", fp->_offset);
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB (fp))
     FREEUB (ptr, fp);
