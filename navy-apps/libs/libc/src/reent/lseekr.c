@@ -49,6 +49,7 @@ _lseek_r (struct _reent *ptr,
   ret = _lseek (fd, pos, whence);
   asm volatile(
     "mv s0, %[ret]\n"
+    "ebreak\n"
     :
     : [ret] "r" (ret)
     : "s0"
