@@ -49,8 +49,8 @@ class CTRL extends Module {
   //val int         = io.iduInt | io.exuInt | io.lsuInt
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
+  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
   //io.stallPc     := !io.lsuReady | (loadUse & !io.branch)
   io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
   io.stallExuReg := !io.lsuReady | !io.exuReady
