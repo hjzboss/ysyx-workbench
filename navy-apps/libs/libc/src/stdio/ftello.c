@@ -87,8 +87,7 @@ _ftello_r (struct _reent * ptr,
        register FILE * fp)
 {
   _fpos_t pos;
-  pos = fp->_offset;
-  printf("pos0=%ld\n", pos);
+
   /* Ensure stdio is set up.  */
 
   CHECK_INIT (ptr, fp);
@@ -114,10 +113,8 @@ _ftello_r (struct _reent * ptr,
           return (_off_t) -1;
 	}
     }
-  else if (fp->_flags & __SOFF) {
+  else if (fp->_flags & __SOFF)
     pos = fp->_offset;
-    printf("pos=%ld\n", pos);
-  }
   else
     {
       pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);

@@ -89,7 +89,6 @@ _ftell_r (struct _reent *ptr,
   _fpos_t pos;
 
   pos = _ftello_r (ptr, fp);
-  printf("return value1=%ld\n", pos);
   if ((long)pos != pos)
     {
       pos = -1;
@@ -103,7 +102,7 @@ _ftell_r (struct _reent *ptr,
 long
 ftell (register FILE * fp)
 {
-  return  _ftell_r (_REENT, fp);;
+  return _ftell_r (_REENT, fp);
 }
 
 #endif /* !_REENT_ONLY */
