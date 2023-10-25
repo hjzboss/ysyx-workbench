@@ -86,6 +86,7 @@ _off_t
 _ftello_r (struct _reent * ptr,
        register FILE * fp)
 {
+        printf("shit2\n");
   _fpos_t pos;
 
   /* Ensure stdio is set up.  */
