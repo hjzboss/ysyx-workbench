@@ -130,8 +130,8 @@ class JzCore extends Module {
   idReg.io.flush      <> ctrl.io.flushIduReg
   exReg.io.flush      := ctrl.io.flushExuReg
   exu.io.flush        := ctrl.io.flushExuReg
-  lsReg.io.flush      := ctrl.io.flushLsuReg
-  wbReg.io.flush      := ctrl.io.flushWbuReg
+  //lsReg.io.flush      := ctrl.io.flushLsuReg
+  //wbReg.io.flush      := ctrl.io.flushWbuReg
 
   forward.io.lsuRd  := lsReg.io.out.rd
   forward.io.wbuRd  := wbReg.io.out.rd

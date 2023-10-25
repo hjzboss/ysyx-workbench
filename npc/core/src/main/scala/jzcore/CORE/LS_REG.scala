@@ -51,11 +51,11 @@ class LS_REG extends Module with HasResetVector {
     debugReset.valid := false.B
 
     val debugReg = RegInit(debugReset)
-    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn.get))
+    debugReg := Mux(io.stall, debugReg, io.debugIn.get)
     io.debugOut.get := debugReg
   }
 
   val memCtrlReg           = RegInit(exuOutReset)
-  memCtrlReg              := Mux(io.stall, memCtrlReg, Mux(io.flush, exuOutReset, io.in))
+  memCtrlReg              := Mux(io.stall, memCtrlReg, io.in)
   io.out                  := memCtrlReg
 }
