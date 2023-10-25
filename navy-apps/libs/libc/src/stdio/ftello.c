@@ -117,6 +117,7 @@ _ftello_r (struct _reent * ptr,
     pos = fp->_offset;
   else
     {
+      printf("shit\n");
       pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
       if (pos == (_fpos_t) -1)
         {
@@ -142,6 +143,7 @@ _ftello_r (struct _reent * ptr,
        * position to be greater than that in the
        * underlying object.
        */
+      printf("fuck\n");
       pos += fp->_p - fp->_bf._base;
     }
 
