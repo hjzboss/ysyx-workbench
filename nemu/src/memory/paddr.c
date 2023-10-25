@@ -125,6 +125,7 @@ word_t paddr_read(paddr_t addr, int len) {
   }
   IFDEF(CONFIG_DEVICE, result = mmio_read(addr, len);
       IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, result)); return result);
+  printf("read error!\n");
   out_of_bound(addr);
   return 0;
 }
@@ -135,5 +136,6 @@ void paddr_write(paddr_t addr, int len, word_t data) {
     IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data));
     return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); IFDEF(CONFIG_MTRACE, insert_mtrace(false, addr, len, data)); return);
+  printf("write error!\n");
   out_of_bound(addr);
 }
