@@ -102,7 +102,9 @@ _ftell_r (struct _reent *ptr,
 long
 ftell (register FILE * fp)
 {
-  return _ftell_r (_REENT, fp);
+  long tmp = _ftell_r (_REENT, fp);
+  return tmp;
+  printf("return value1: %ld\n", tmp);
 }
 
 #endif /* !_REENT_ONLY */
