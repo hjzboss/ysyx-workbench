@@ -8,6 +8,7 @@ import top.Settings
 class LS_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     val stall = Input(Bool())
+    val flush = Input(Bool())
 
     val in = Flipped(new ExuOut)
     val out = new ExuOut
@@ -36,6 +37,7 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.coherence   := false.B
   //exuOutReset.int         := false.B
   exuOutReset.mret        := false.B
+  exuOutReset.csrChange   := false.B
 
   if(Settings.get("sim")) {
     // debug
@@ -49,11 +51,11 @@ class LS_REG extends Module with HasResetVector {
     debugReset.valid := false.B
 
     val debugReg = RegInit(debugReset)
-    debugReg := Mux(io.stall, debugReg, io.debugIn.get)
+    debugReg := Mux(io.stall, debugReg, Mux(io.flush, debugReset, io.debugIn.get))
     io.debugOut.get := debugReg
   }
 
   val memCtrlReg           = RegInit(exuOutReset)
-  memCtrlReg              := Mux(io.stall, memCtrlReg, io.in)
+  memCtrlReg              := Mux(io.stall, memCtrlReg, Mux(io.flush, exuOutReset, io.in))
   io.out                  := memCtrlReg
 }

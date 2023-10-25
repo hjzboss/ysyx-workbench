@@ -103,16 +103,18 @@ class IDU extends Module with HasInstrType{
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.csrWen      := csrType & !int
-  io.ctrl.csrRen      := csrType || instrtype === InstrE || int // just for csr forwarding
-  io.ctrl.csrWaddr    := Mux(systemCtrl === System.ecall || systemCtrl === System.mret, CsrId.mstatus, csrRaddr) // TODO: ecall mepc的旁路问题
+  //io.ctrl.csrRen      := csrType || instrtype === InstrE || int // just for csr forwarding
+  io.ctrl.csrWaddr    := csrRaddr
+  //io.ctrl.csrWaddr    := Mux(systemCtrl === System.ecall || systemCtrl === System.mret, CsrId.mstatus, csrRaddr) // TODO: ecall mepc的旁路问题
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csr.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
   io.ctrl.exception   := systemCtrl === System.ecall | int // type of exception
+  io.ctrl.csrChange   := io.ctrl.exception | io.ctrl.csrWen // change csr status
   io.ctrl.mret        := systemCtrl === System.mret // change mstatus
   io.ctrl.memWen      := memEn === MemEn.store & !int
   io.ctrl.memRen      := memEn === MemEn.load & !int
   //io.ctrl.sysInsType  := systemCtrl
-  io.ctrl.rs1         := Mux(csrType || int, 0.U(5.W), rs1)
+  io.ctrl.rs1         := Mux(csrType | int, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(csrType, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF & !int
   //io.ctrl.int         := csr.io.int && io.validIn

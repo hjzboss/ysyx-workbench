@@ -113,6 +113,7 @@ class EXU extends Module {
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
   io.out.mret          := io.ctrl.mret
+  io.out.csrChange     := io.ctrl.csrChange
   //io.out.int           := io.ctrl.int
 
   if(Settings.get("sim")) {

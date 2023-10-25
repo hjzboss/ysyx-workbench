@@ -105,6 +105,9 @@ class JzCore extends Module {
 
   // 控制模块
   //ctrl.io.ifuReady  <> ifu.io.ready
+  ctrl.io.exuCsr      := exReg.io.ctrlOut.csrChange
+  ctrl.io.lsuCsr      := lsReg.io.out.csrChange
+  ctrl.io.wbuCsr      := wbReg.io.out.csrChange
   ctrl.io.memRen      := exReg.io.ctrlOut.memRen
   ctrl.io.exRd        := exReg.io.ctrlOut.rd
   ctrl.io.rs1         := idu.io.ctrl.rs1
@@ -127,6 +130,9 @@ class JzCore extends Module {
   idReg.io.flush      <> ctrl.io.flushIduReg
   exReg.io.flush      := ctrl.io.flushExuReg
   exu.io.flush        := ctrl.io.flushExuReg
+  lsu.io.flush        := ctrl.io.flushLsuReg
+  lsReg.io.flush      := ctrl.io.flushLsuReg
+  wbReg.io.flush      := ctrl.io.flushWbuReg
 
   forward.io.lsuRd  := lsReg.io.out.rd
   forward.io.wbuRd  := wbReg.io.out.rd
@@ -134,18 +140,18 @@ class JzCore extends Module {
   forward.io.wbuRegWen := wbReg.io.out.regWen
   forward.io.rs1    := exReg.io.ctrlOut.rs1
   forward.io.rs2    := exReg.io.ctrlOut.rs2
-  forward.io.wbuCsrWen := wbReg.io.out.csrWen
-  forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
-  forward.io.lsuCsrWen := lsReg.io.out.csrWen
-  forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
-  forward.io.csrRen   := exReg.io.ctrlOut.csrRen
-  forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
+  //forward.io.wbuCsrWen := wbReg.io.out.csrWen
+  //forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
+  //forward.io.lsuCsrWen := lsReg.io.out.csrWen
+  //forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
+  //forward.io.csrRen   := exReg.io.ctrlOut.csrRen
+  //forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
   //forward.io.mret     <> idu.io.mret
   //forward.io.flushExuCsr <> exu.io.flushCsr
   //forward.io.flushLsuCsr <> lsu.io.flushCsr
   //forward.io.flushWbuCsr <> wbu.io.flushCsr
-  forward.io.lsuException := lsReg.io.out.exception
-  forward.io.wbuException := wbReg.io.out.exception
+  //forward.io.lsuException := lsReg.io.out.exception
+  //forward.io.wbuException := wbReg.io.out.exception
 
   idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite
