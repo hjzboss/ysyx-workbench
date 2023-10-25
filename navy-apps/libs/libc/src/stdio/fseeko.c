@@ -311,14 +311,13 @@ _fseeko_r (struct _reent *ptr,
 #endif
 
 dumb:
-  printf("shit\n");
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _newlib_flockfile_exit (fp);
       return EOF;
     }
-    printf("shit1\n");
+    printf("seek offset=%ld\n", fp->_offset);
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB (fp))
     FREEUB (ptr, fp);
