@@ -46,10 +46,18 @@ _lseek_r (struct _reent *ptr,
   _off_t ret;
 
   errno = 0;
+  ret = _lseek (fd, pos, whence);
+  asm volatile(
+    "mv s0, %[ret]\n"
+    "ebreak\n"
+    :
+    : [ret] "r" (ret)
+    : "s0"
+  );
   if ((ret = _lseek (fd, pos, whence)) == (_off_t) -1 && errno != 0)
     ptr->_errno = errno;
-  asm volatile("ebreak");
-  printf("ret1=%ld\n", ret);
+  //asm volatile("ebreak");
+  printf("ret1=%lx\n", ret);
   return ret;
 }
 
