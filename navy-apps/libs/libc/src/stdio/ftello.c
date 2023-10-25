@@ -87,7 +87,8 @@ _ftello_r (struct _reent * ptr,
        register FILE * fp)
 {
   _fpos_t pos;
-
+  pos = fp->_offset;
+  printf("pos0=%ld\n", pos);
   /* Ensure stdio is set up.  */
 
   CHECK_INIT (ptr, fp);
@@ -115,7 +116,7 @@ _ftello_r (struct _reent * ptr,
     }
   else if (fp->_flags & __SOFF) {
     pos = fp->_offset;
-    printf("pos=%d\n", pos);
+    printf("pos=%ld\n", pos);
   }
   else
     {
@@ -148,7 +149,6 @@ _ftello_r (struct _reent * ptr,
     }
 
   _newlib_flockfile_end (fp);
-  printf("pos1=%d\n", pos);
   return (_off_t) pos;
 }
 
