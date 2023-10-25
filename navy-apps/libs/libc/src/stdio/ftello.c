@@ -114,8 +114,8 @@ _ftello_r (struct _reent * ptr,
 	}
     }
   else if (fp->_flags & __SOFF) {
-    printf("shit\n");
     pos = fp->_offset;
+    printf("pos=%d\n", pos);
   }
   else
     {
@@ -133,7 +133,6 @@ _ftello_r (struct _reent * ptr,
        * those from ungetc) cause the position to be
        * smaller than that in the underlying object.
        */
-      printf("shit1\n");
       pos -= fp->_r;
       if (HASUB (fp))
 	pos -= fp->_ur;
@@ -145,11 +144,11 @@ _ftello_r (struct _reent * ptr,
        * position to be greater than that in the
        * underlying object.
        */
-      printf("shit2\n");
       pos += fp->_p - fp->_bf._base;
     }
 
   _newlib_flockfile_end (fp);
+  printf("pos1=%d\n", pos);
   return (_off_t) pos;
 }
 
