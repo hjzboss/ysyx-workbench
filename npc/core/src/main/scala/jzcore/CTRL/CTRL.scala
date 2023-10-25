@@ -52,7 +52,7 @@ class CTRL extends Module {
   io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
   io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
   //io.stallPc     := !io.lsuReady | (loadUse & !io.branch)
-  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
   io.stallExuReg := !io.lsuReady | !io.exuReady
   io.stallLsuReg := !io.lsuReady | !io.exuReady
   io.stallWbuReg := !io.lsuReady | !io.exuReady
