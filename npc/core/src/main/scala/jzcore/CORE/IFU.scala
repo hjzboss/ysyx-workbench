@@ -68,7 +68,7 @@ class IFU extends Module with HasResetVector {
   
   io.out.addr     := pc 
   if(Settings.get("sim")) {
-    io.out.cacheable := false.B
+    io.out.cacheable := true.B
   } else {
     io.out.cacheable := pc <= "hffff_ffff".U && pc >= "h8000_0000".U
   }

@@ -54,7 +54,7 @@ class Sram extends Module {
 
   // wrap burst
   when(rState === fetch) {
-    pmem.io.raddr       := Mux(rcnt === 0.U(2.W), raddrReg, Cat(raddrReg(31, 4),  Cat(~raddrReg(3), raddrReg(2, 0))))
+    pmem.io.raddr       := Mux(rcnt === 0.U(2.W), raddrReg, Cat(raddrReg(31, 4), Cat(~raddrReg(3), raddrReg(2, 0))))
   }
   pmem.io.rvalid        := rState === fetch
   io.slave.rdata        := pmem.io.rdata

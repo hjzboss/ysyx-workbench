@@ -91,6 +91,7 @@ void syscall_lseek(Context *c, uintptr_t *a) {
   int fd = a[1];
   size_t offset = a[2];
   int whence = a[3];
+  printf("shit\n");
   c->GPRx = fs_lseek(fd, offset, whence);
 #ifdef CONFIG_STRACE
   insert_strace("SYS_lseek", a, c->GPRx, fd);
