@@ -93,12 +93,10 @@ off_t _lseek(int fd, off_t offset, int whence) {
   off_t ret = _syscall_(SYS_lseek, fd, offset, whence);
   
   asm volatile(
-    "mv t1, %[ret]\n"
     "mv t2, %[ret]\n"
-    "mv t3, %[ret]\n"
     :
     : [ret] "r" (ret)
-    : "t1", "t2", "t3"
+    : "t2"
   );
   return ret;
 }
