@@ -334,7 +334,6 @@ __sseek (struct _reent *ptr,
   return ret;
 }
 */
-  printf("cookie=%d\n", ((FILE *)fp->_cookie)->_file);
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
