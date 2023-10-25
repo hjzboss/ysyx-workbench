@@ -156,6 +156,7 @@ _fseeko_r (struct _reent *ptr,
     case SEEK_SET:
     case SEEK_END:
       havepos = 0;
+      printf("here!\n");
       break;
 
     default:
