@@ -120,6 +120,7 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 }
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
+  printf("fuck it: offset=%d\n", offset);
   switch (whence) {
     case SEEK_SET: file_table[fd].open_offset = offset; return offset;
     case SEEK_CUR: file_table[fd].open_offset = file_table[fd].open_offset + offset; return file_table[fd].open_offset;
