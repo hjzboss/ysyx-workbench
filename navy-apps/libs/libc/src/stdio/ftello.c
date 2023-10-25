@@ -114,9 +114,10 @@ _ftello_r (struct _reent * ptr,
           return (_off_t) -1;
 	}
     }
-  else if (fp->_flags & __SOFF)
+  else if (fp->_flags & __SOFF) {
     printf("shit\n");
     pos = fp->_offset;
+  }
   else
     {
       pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
