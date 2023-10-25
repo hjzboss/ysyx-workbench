@@ -98,6 +98,7 @@ off_t _lseek(int fd, off_t offset, int whence) {
     : [ret] "r" (ret)
     : "s0"
   );
+  printf("shit\n");
   return ret;
 }
 
