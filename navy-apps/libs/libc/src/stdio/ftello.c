@@ -106,7 +106,6 @@ _ftello_r (struct _reent * ptr,
       fp->_p != NULL && fp->_p - fp->_bf._base > 0 &&
       (fp->_flags & __SAPP))
     {
-      printf("shit1\n");
       pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_END);
       if (pos == (_fpos_t) -1)
 	{
@@ -134,8 +133,8 @@ _ftello_r (struct _reent * ptr,
        * those from ungetc) cause the position to be
        * smaller than that in the underlying object.
        */
+      printf("shit1\n");
       pos -= fp->_r;
-      printf("fuck\n");
       if (HASUB (fp))
 	pos -= fp->_ur;
     }
@@ -146,6 +145,7 @@ _ftello_r (struct _reent * ptr,
        * position to be greater than that in the
        * underlying object.
        */
+      printf("shit2\n");
       pos += fp->_p - fp->_bf._base;
     }
 
