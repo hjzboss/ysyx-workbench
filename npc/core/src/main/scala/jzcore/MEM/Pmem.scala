@@ -10,6 +10,7 @@ class Pmem extends BlackBox {
     val rdata   = Output(UInt(64.W))
     val rvalid  = Input(Bool())
 
+    val pmem    = Input(Bool())
     val waddr   = Input(UInt(64.W))
     val wdata   = Input(UInt(64.W))
     val mask    = Input(UInt(8.W))

@@ -3,6 +3,7 @@ module Pmem (
   output reg[63:0] rdata,
   input rvalid,
 
+  input wvalid,
   input[63:0] waddr,
   input[63:0] wdata,
   input[7:0] mask
@@ -21,7 +22,8 @@ always @(*) begin
 end
 
 always @(*) begin
-  pmem_write(waddr, wdata, mask);
+  if(wvalid)
+    pmem_write(waddr, wdata, mask);
 end
 
 endmodule
