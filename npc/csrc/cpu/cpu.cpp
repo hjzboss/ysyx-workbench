@@ -175,7 +175,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
         printf("fuck%d\n", i);
         *index = 0xff;
       }
-      wmask = wmask >> 1;
+      tmp = tmp >> 1;
     }
 
     printf("wmask0=%x, wmask=%x, wmask64=%016x\n", tmp, wmask, wmask_64);
