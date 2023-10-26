@@ -249,6 +249,7 @@ long init_cpu(char *dir) {
 
   top->clock = 0;
   reset(4);
+  cycle += 2;
 
   npc_cpu.pc = RESET_ADDR;
   npc_cpu.npc = RESET_ADDR + 4;
@@ -349,6 +350,7 @@ void execute(uint64_t n) {
   while (n--) {
     cpu_exec_once();
     g_nr_guest_inst ++;
+    printf("inst=%d, cycle=%d\n", g_nr_guest_inst, cycle);
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
