@@ -167,6 +167,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   else {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
+    /*
     uint64_t align = waddr & 0x07ull;
     uint64_t wmask_u = ((uint64_t)wmask & 0xff) >> align;
     switch(wmask_u) {
@@ -175,8 +176,8 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       case 0x00f: wmask_64 = 0xffffffff; break;
       case 0x0ff: wmask_64 = 0xffffffffffffffff; break;
       default: exit(-1);
-    }
-    /*
+    }*/
+    
     uint8_t *index = (uint8_t*)&wmask_64;
     uint8_t tmp = wmask;
     // 将8位的掩码转换为64位的掩码
@@ -186,9 +187,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
         *index = 0xff;
       }
       tmp = tmp >> 1;
-    }*/
+    }
 
-    //printf("wmask=%d, wmask64=%lx\n", wmask_u, wmask_64);
+    printf("wmask=%d, wmask64=%lx\n", wmask_u, wmask_64);
     wmask_64 <<= align << 3;
     if (check_vmem_bound(waddr)) {
       // vga显存
