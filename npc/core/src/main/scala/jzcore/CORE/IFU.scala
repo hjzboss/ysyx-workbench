@@ -14,7 +14,7 @@ class IFU extends Module with HasResetVector {
     // 用于仿真环境
     val debug         = if(Settings.get("sim")) Some(new DebugIO) else None
     
-    //val valid         = Output(Bool()) // 是否是一条有效指令
+    val valid         = Output(Bool()) // 是否是一条有效指令
 
     // from exu
     val exuRedirect   = Flipped(new RedirectIO)
