@@ -13,7 +13,7 @@ static VerilatedContext* contextp = NULL;
 static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
-uint64_t g_nr_guest_inst = 0;
+uint64_t total_inst = 0;
 extern uint64_t* gpr;
 static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
@@ -349,8 +349,8 @@ static void cpu_exec_once() {
 void execute(uint64_t n) {
   while (n--) {
     cpu_exec_once();
-    g_nr_guest_inst ++;
-    printf("inst=%d, cycle=%d\n", g_nr_guest_inst, cycle);
+    total_inst ++;
+    printf("inst=%d, cycle=%d\n", total_inst, cycle);
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
@@ -362,11 +362,11 @@ static void statistic() {
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
-  Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
+  Log("total guest instructions = " NUMBERIC_FMT, total_inst);
   if (g_timer > 0) {
-    Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
+    Log("simulation frequency = " NUMBERIC_FMT " inst/s", total_inst * 1000000 / g_timer);
     if(g_timer >= 1000000) Log("CPU frequency: %ld HZ\n", cycle / (g_timer / 1000000));
-    Log("IPC = %lf\n", (g_nr_guest_inst / 1.0) / cycle);
+    Log("IPC = %lf\n", (total_inst / 1.0) / cycle);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }
