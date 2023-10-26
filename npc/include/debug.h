@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <macro.h>
 #include <assert.h>
-#include <cpu.h>
+#include <cpu/cpu.h>
 //#include <utils.h>
 
 #define Log(format, ...) \
