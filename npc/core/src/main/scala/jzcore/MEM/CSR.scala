@@ -37,7 +37,7 @@ class CSR extends Module {
     val timerInt  = Input(Bool())
 
     // interrupt
-    //val int       = Output(Bool())
+    val int       = Output(Bool())
 
     // timer int response
     //val intResp   = Input(Bool())
