@@ -11,7 +11,7 @@ static void timer_test() {
   uptime = io_read(AM_TIMER_UPTIME);
   t0 = uptime.us / 1000;
 
-  for (int volatile i = 0; i < 1000; i ++) ;
+  for (int volatile i = 0; i < 100000; i ++) ;
 
   uptime = io_read(AM_TIMER_UPTIME);
   t1 = uptime.us / 1000;
