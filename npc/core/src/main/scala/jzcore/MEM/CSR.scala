@@ -96,7 +96,7 @@ class CSR extends Module {
 
   // interrupt, just for timer int now
   //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
-
+  io.int := false.B
   // interrupt
   /*
   when(io.mret) {
