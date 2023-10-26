@@ -167,12 +167,12 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   else {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
-    switch (wmask) {
-      case 0x1: wmask_64 = 0x0ff; break;
-      case 0x3: wmask_64 = 0x0ffff; break;
-      case 0xf: wmask_64 = 0xffffffff; break;
-      case 0xff: wmask_64 = 0xffffffffffffffff; break;
-      default: printf("wmask=%x\n", wmask); break;
+    switch ((unsigned)wmask) {
+      case 0x01: wmask_64 = 0x0ff; break;
+      case 0x03: wmask_64 = 0x0ffff; break;
+      case 0x0f: wmask_64 = 0xffffffff; break;
+      case 0x0ff: wmask_64 = 0xffffffffffffffff; break;
+      default: exit(-1); break;
     }
 
     printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
