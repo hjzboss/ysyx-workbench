@@ -11,21 +11,22 @@ class JzCore extends Module {
     val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
     val lsFlag          = if(Settings.get("sim")) Some(Output(Bool())) else None
 
+    /*
     // icache data array
-    //val sram0           = new RamIO
-    //val sram1           = new RamIO
-    //val sram2           = new RamIO
-    //val sram3           = new RamIO
+    val sram0           = new RamIO
+    val sram1           = new RamIO
+    val sram2           = new RamIO
+    val sram3           = new RamIO
 
     // dcache data array
     val sram4           = new RamIO
     val sram5           = new RamIO
     val sram6           = new RamIO
-    val sram7           = new RamIO
+    val sram7           = new RamIO*/
 
     val interrupt      = Input(Bool())
-    val master         = new AxiMaster
-    val slave          = Flipped(new AxiMaster)
+    //val master         = new AxiMaster
+    //val slave          = Flipped(new AxiMaster)
   })
 
   val ifu     = Module(new IFU)
@@ -34,9 +35,9 @@ class JzCore extends Module {
   val lsu     = Module(new LSU)
   val wbu     = Module(new WBU)
   val ctrl    = Module(new CTRL)
-  val arbiter = Module(new AxiArbiter) // todo:仲裁器
+  //val arbiter = Module(new AxiArbiter) // todo:仲裁器
   //val icache  = Module(new ICache)
-  val dcache  = Module(new DCache)
+  //val dcache  = Module(new DCache)
   val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
@@ -49,14 +50,15 @@ class JzCore extends Module {
   clint.io.int        <> idu.io.timerInt
 
   //io.csrAddr  := idu.io.csrAddr
+  /*
   // 仲裁
-  //arbiter.io.ifuReq   <> icache.io.axiReq
-  //arbiter.io.grantIfu <> icache.io.axiGrant
-  //arbiter.io.ifuReady <> icache.io.axiReady
+  arbiter.io.ifuReq   <> icache.io.axiReq
+  arbiter.io.grantIfu <> icache.io.axiGrant
+  arbiter.io.ifuReady <> icache.io.axiReady
   arbiter.io.lsuReq   <> dcache.io.axiReq
   arbiter.io.grantLsu <> dcache.io.axiGrant
   arbiter.io.lsuReady <> dcache.io.axiReady
-  //arbiter.io.master0  <> icache.io.master
+  arbiter.io.master0  <> icache.io.master
   arbiter.io.master1  <> dcache.io.master
   io.master           <> arbiter.io.master
 
@@ -79,16 +81,16 @@ class JzCore extends Module {
   io.slave.rlast  := false.B
 
   // ram, dataArray
-  //icache.io.sram0       <> io.sram0
-  //icache.io.sram1       <> io.sram1
-  //icache.io.sram2       <> io.sram2
-  //icache.io.sram3       <> io.sram3
+  icache.io.sram0       <> io.sram0
+  icache.io.sram1       <> io.sram1
+  icache.io.sram2       <> io.sram2
+  icache.io.sram3       <> io.sram3
 
   // dcache
   dcache.io.sram4       <> io.sram4
   dcache.io.sram5       <> io.sram5
   dcache.io.sram6       <> io.sram6
-  dcache.io.sram7       <> io.sram7
+  dcache.io.sram7       <> io.sram7*/
 
   //ifu.io.out          <> icache.io.cpu2cache
   //icache.io.cache2cpu <> idReg.io.in
@@ -174,13 +176,13 @@ class JzCore extends Module {
   exu.io.lsuNo      := lsReg.io.out.excepNo
   exu.io.wbuNo      := wbReg.io.out.excepNo
 
-  lsu.io.dcacheCtrl <> dcache.io.ctrlIO
-  lsu.io.dcacheRead <> dcache.io.rdataIO
-  lsu.io.dcacheWrite<> dcache.io.wdataIO
-  lsu.io.dcacheCoh  <> dcache.io.coherence
+  //lsu.io.dcacheCtrl <> dcache.io.ctrlIO
+  //lsu.io.dcacheRead <> dcache.io.rdataIO
+  //lsu.io.dcacheWrite<> dcache.io.wdataIO
+  //lsu.io.dcacheCoh  <> dcache.io.coherence
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
-
+  lsu.io.stall      := ctrl.io.stallLsuReg
   wbu.io.in         <> wbReg.io.out
   
   if(Settings.get("sim")) {

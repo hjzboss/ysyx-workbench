@@ -11,6 +11,7 @@ class LSU extends Module {
   val io = IO(new Bundle {
     // exu传入
     val in          = Flipped(new ExuOut)
+    val stall       = Input(Bool())
 
     //val flushCsr    = Input(Bool())
 
@@ -21,10 +22,10 @@ class LSU extends Module {
     val ready       = Output(Bool())
     
     // dcache访问接口
-    val dcacheCtrl  = Decoupled(new CacheCtrlIO)
-    val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
-    val dcacheWrite = Decoupled(new CacheWriteIO)
-    val dcacheCoh   = new CoherenceIO
+    //val dcacheCtrl  = Decoupled(new CacheCtrlIO)
+    //val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
+    //val dcacheWrite = Decoupled(new CacheWriteIO)
+    //val dcacheCoh   = new CoherenceIO
 
     // clint接口
     val clintIO     = Flipped(new ClintIO)
@@ -51,14 +52,17 @@ class LSU extends Module {
   val writeTrans  = io.in.lsuWen
   val hasTrans    = readTrans || writeTrans
 
+  val pmem        = Module(new Pmem)
+  /*
   val ctrlFire    = io.dcacheCtrl.valid && io.dcacheCtrl.ready
   val readFire    = io.dcacheRead.valid && io.dcacheRead.ready
   val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
   val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
-
+*/
   val clintSel                   = dontTouch(WireDefault(false.B))
   clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint select
 
+  /*
   val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
@@ -68,8 +72,7 @@ class LSU extends Module {
     coherence -> Mux(coherenceFire, idle, coherence)
   ))
 
-  //val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
-  val cacheable = false.B
+  val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
   var flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
 
   io.dcacheCtrl.valid           := state === ctrl
@@ -106,6 +109,7 @@ class LSU extends Module {
 
   // coherence
   io.dcacheCoh.valid            := io.in.coherence
+  */
 
   /*
   // load状态机
@@ -144,10 +148,17 @@ class LSU extends Module {
   io.clintIO.wdata      := io.in.lsuWdata
   io.clintIO.wmask      := io.in.wmask
 
+  pmem.io.raddr         := addr
+  pmem.io.rvalid        := readTrans & !io.stall
+  pmem.io.waddr         := addr
+  pmem.io.wdata         := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
+  pmem.io.wmask         := io.in.wmask << addr(2, 0)
+
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
   val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
-  val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
+  //val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
+  val rdata              = pmem.io.rdata >> align64
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
                             LsType.lw   -> SignExt(rdata(31, 0), 64),
@@ -183,7 +194,8 @@ class LSU extends Module {
   io.out.csrChange      := io.in.csrChange
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
-  io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
+  //io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
+  io.ready              := true.B
   // 仲裁信号
   //io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
   //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
