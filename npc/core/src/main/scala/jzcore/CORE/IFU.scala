@@ -13,10 +13,12 @@ class IFU extends Module with HasResetVector {
   val io = IO(new Bundle {
     // 用于仿真环境
     val debug         = if(Settings.get("sim")) Some(new DebugIO) else None
-    val valid         = Output(Bool()) // 是否是一条有效指令
+    
+    //val valid         = Output(Bool()) // 是否是一条有效指令
 
     // from exu
     val exuRedirect   = Flipped(new RedirectIO)
+    /*
     val icRedirect    = Flipped(new RedirectIO)
     //val wbuRedirect   = Flipped(new RedirectIO)
 
@@ -27,11 +29,13 @@ class IFU extends Module with HasResetVector {
     // icache
     //val icacheCtrl  = Decoupled(new CacheCtrlIO)
     //val icacheRead  = Flipped(Decoupled(new CacheReadIO))
-    //val icacheWrite = Decoupled(new CacheWriteIO)
+    //val icacheWrite = Decoupled(new CacheWriteIO)*/
  
     // ctrl
     //val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
     val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
+
+    val out         = new InstrFetch
   })
 
   /*
@@ -59,28 +63,36 @@ class IFU extends Module with HasResetVector {
   val dnpc         = io.exuRedirect.brAddr
   // 非流水icache end
   */
+  val valid        = dontTouch(WireDefault(false.B))
+  valid           := !io.stall && !io.exuRedirect.valid
+  io.valid        := valid
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
 
-  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
-  
+  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, snpc))
+  //pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+  val imem         = Module(new IMEM)
+  imem.io.pc      := pc
+  io.out.pc       := pc
+  io.out.inst     := Mux(valid, imem.io.inst, Instruction.NOP)
+
+  /*
   io.out.addr     := pc 
   if(Settings.get("sim")) {
     io.out.cacheable := true.B
   } else {
     io.out.cacheable := pc <= "hffff_ffff".U && pc >= "h8000_0000".U
   }
-
-  val valid        = dontTouch(WireDefault(false.B))
-  valid           := !io.stall && !io.exuRedirect.valid && !io.icRedirect.valid
-  io.valid        := valid
+  */
 
   if(Settings.get("sim")) {
-    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+    //io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, snpc))
     io.debug.get.pc     := pc
-    io.debug.get.inst   := Instruction.NOP
+    //io.debug.get.inst   := Instruction.NOP
+    io.debug.get.inst   := io.out.inst
     io.debug.get.valid  := valid
   }
 

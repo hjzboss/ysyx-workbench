@@ -50,13 +50,13 @@ class JzCore extends Module {
 
   //io.csrAddr  := idu.io.csrAddr
   // 仲裁
-  arbiter.io.ifuReq   <> icache.io.axiReq
-  arbiter.io.grantIfu <> icache.io.axiGrant
-  arbiter.io.ifuReady <> icache.io.axiReady
+  //arbiter.io.ifuReq   <> icache.io.axiReq
+  //arbiter.io.grantIfu <> icache.io.axiGrant
+  //arbiter.io.ifuReady <> icache.io.axiReady
   arbiter.io.lsuReq   <> dcache.io.axiReq
   arbiter.io.grantLsu <> dcache.io.axiGrant
   arbiter.io.lsuReady <> dcache.io.axiReady
-  arbiter.io.master0  <> icache.io.master
+  //arbiter.io.master0  <> icache.io.master
   arbiter.io.master1  <> dcache.io.master
   io.master           <> arbiter.io.master
 
@@ -90,9 +90,9 @@ class JzCore extends Module {
   dcache.io.sram6       <> io.sram6
   dcache.io.sram7       <> io.sram7
 
-  ifu.io.out          <> icache.io.cpu2cache
-  icache.io.cache2cpu <> idReg.io.in
-  //ifu.io.out          <> idReg.io.in
+  //ifu.io.out          <> icache.io.cpu2cache
+  //icache.io.cache2cpu <> idReg.io.in
+  ifu.io.out          <> idReg.io.in
   ifu.io.exuRedirect  <> exu.io.redirect
   ifu.io.icRedirect   <> icache.io.redirect
 
@@ -112,11 +112,11 @@ class JzCore extends Module {
   ctrl.io.exRd        := exReg.io.ctrlOut.rd
   ctrl.io.rs1         := idu.io.ctrl.rs1
   ctrl.io.rs2         := idu.io.ctrl.rs2
-  ctrl.io.icStall     <> icache.io.stallOut
+  //ctrl.io.icStall     <> icache.io.stallOut
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.exuReady    <> exu.io.ready
   ctrl.io.branch      := exu.io.redirect.valid
-  ctrl.io.stallICache <> icache.io.stallIn
+  //ctrl.io.stallICache <> icache.io.stallIn
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg
   ctrl.io.stallExuReg <> exReg.io.stall
@@ -124,7 +124,7 @@ class JzCore extends Module {
   ctrl.io.stallWbuReg <> wbReg.io.stall
   ctrl.io.stallExu    <> exu.io.stall
   ctrl.io.stallPc     <> ifu.io.stall
-  ctrl.io.flushICache <> icache.io.flush
+  //ctrl.io.flushICache <> icache.io.flush
   idReg.io.flush      := ctrl.io.flushIduReg
   idu.io.flush        := ctrl.io.flushIduReg
   idReg.io.flush      <> ctrl.io.flushIduReg
@@ -187,8 +187,9 @@ class JzCore extends Module {
     wbReg.io.lsFlagIn.get <> lsu.io.lsFlag.get
     io.lsFlag.get         <> wbReg.io.lsFlagOut.get
 
-    ifu.io.debug.get      <> icache.io.debugIn.get
-    idReg.io.debugIn.get  <> icache.io.debugOut.get
+    //ifu.io.debug.get      <> icache.io.debugIn.get
+    //idReg.io.debugIn.get  <> icache.io.debugOut.get
+    ifu.io.debug.get      <> idReg.io.debugIn.get
     exReg.io.debugIn.get  <> idReg.io.debugOut.get
     exu.io.debugIn.get    <> exReg.io.debugOut.get
     lsReg.io.debugIn.get  <> exu.io.debugOut.get

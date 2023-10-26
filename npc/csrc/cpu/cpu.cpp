@@ -194,6 +194,17 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
 }
 
 
+extern "C" void imem_read(int pc, int *inst) {
+  // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
+  if (pc < 0x80000000ull) {
+    *inst = 0;
+    return;
+  }
+  else {
+    *inst = (int)paddr_read(pc, 4);
+  }
+}
+
 static void reset(int time) {
   visit_device = true;
   top->reset = 1;
