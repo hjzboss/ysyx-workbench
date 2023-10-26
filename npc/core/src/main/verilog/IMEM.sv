@@ -7,7 +7,7 @@ import "DPI-C" function void imem_read(
   input int raddr, output int rdata);
 
 always @(*) begin
-  pmem_read(pc, inst);
+  imem_read(pc, inst);
 end
 
 endmodule
