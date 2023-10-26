@@ -167,15 +167,15 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   else {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
-    uint8_t *index = (uint8_t*)&wmask_64;
+    uint16_t *index = (uint16_t*)&wmask_64;
     // 将8位的掩码转换为64位的掩码
     for(int i = 0; i < 8; i++, index++) {
       if(wmask & 0x01 == 0x01) {
-        *index = 0xff;
+        *index = 0xffff;
       }
       wmask = wmask >> 1;
     }
-    printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
+
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
