@@ -174,7 +174,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       case 0xff: wmask_64 = 0xffffffffffffffff; break;
       default: exit(0);
     }
+
     printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
+
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
