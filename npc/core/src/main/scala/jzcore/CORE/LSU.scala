@@ -152,11 +152,11 @@ class LSU extends Module {
   pmem.io.rvalid        := readTrans & !io.stall
   pmem.io.waddr         := addr
   pmem.io.wdata         := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
-  pmem.io.wmask         := io.in.wmask << addr(2, 0)
+  pmem.io.mask         := io.in.wmask << addr(2, 0)
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
-  val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
+  //val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
   //val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
   val rdata              = pmem.io.rdata >> align64
   val lsuOut             = LookupTree(io.in.lsType, Seq(
