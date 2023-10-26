@@ -35,8 +35,6 @@
       extern void assert_fail_msg(); \
       assert_fail_msg(); \
       npc_state.state = NPC_ABORT; \
-      //assert(cond); 
-      \
     } \
   } while (0)
 
