@@ -37,7 +37,7 @@ class CSR extends Module {
     val timerInt  = Input(Bool())
 
     // interrupt
-    val int       = Output(Bool())
+    //val int       = Output(Bool())
 
     // timer int response
     //val intResp   = Input(Bool())
@@ -95,9 +95,10 @@ class CSR extends Module {
   mip       := mipVec.asUInt
 
   // interrupt, just for timer int now
-  io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
+  //io.int    := io.timerInt & mie(MIP_CLINT) & mstatus(MSTATUS_MIE)
 
   // interrupt
+  /*
   when(io.mret) {
     // mret指令会导致mie更新为mpie,mpie更新为1
     val mpie = mstatus(MSTATUS_MPIE)
@@ -106,7 +107,7 @@ class CSR extends Module {
     // 将mstatus的mie字段保存到mpie，mie字段设置为0
     val mstatusMie = mstatus(MSTATUS_MIE)
     mstatus := mstatus(63, MSTATUS_MPIE+1) ## mstatusMie ## mstatus(MSTATUS_MPIE-1, MSTATUS_MIE+1) ## false.B ## mstatus(MSTATUS_MIE-1, 0)
-  }
+  }*/
 
   if(Settings.get("sim")) {
     val csrReg = Module(new CsrReg)
