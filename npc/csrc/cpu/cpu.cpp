@@ -167,13 +167,12 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   else {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
-    uint16_t *index = (uint16_t*)&wmask_64;
-    // 将8位的掩码转换为64位的掩码
-    for(int i = 0; i < 8; i++, index++) {
-      if(wmask & 0x01 == 0x01) {
-        *index = 0xff;
-      }
-      wmask = wmask >> 1;
+    switch (wmask) {
+      case 0x1: wmask_64 = 0x0ff; break;
+      case 0x3: wmask_64 = 0x0ffff; break;
+      case 0xf: wmask_64 = 0xffffffff; break;
+      case 0xff: wmask_64 = 0xffffffffffffffff; break;
+      default: exit(0);
     }
     printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
     if (check_vmem_bound(waddr)) {
