@@ -63,12 +63,24 @@ uint32_t get_vga_config() {
 
 uint64_t vga_read(uint64_t addr, int len) {
   uint64_t offset = addr - CONFIG_FB_ADDR;
-  return *(uint64_t *)(vmem + offset);
+  switch (len) {
+    case 1: return *(uint8_t  *)(vmem + offset);
+    case 2: return *(uint16_t *)(vmem + offset);
+    case 4: return *(uint32_t *)(vmem + offset);
+    case 8: return *(uint64_t *)(vmem + offset);
+    default: return 0;
+  }
 }
 
 void vga_write(uint64_t addr, int len, uint64_t data) {
   uint64_t offset = addr - CONFIG_FB_ADDR;
-  *(uint64_t *)(vmem + offset) = data;
+  switch (len) {
+    case 1: *(uint8_t *)(vmem + offset) = data; return;
+    case 2: *(uint16_t *)(vmem + offset) = data; return;
+    case 4: *(uint32_t *)(vmem + offset) = data; return;
+    case 8: *(uint64_t *)(vmem + offset) = data; return;
+    default: assert(0);
+  }
 }
 
 void syn_update() {
