@@ -167,6 +167,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   else {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
+    printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
     switch ((unsigned)wmask) {
       case 0x01: wmask_64 = 0x0ff; break;
       case 0x03: wmask_64 = 0x0ffff; break;
@@ -175,7 +176,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
       default: exit(-1); break;
     }
 
-    printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
+    //printf("wmask=%x, wmask64=%016x\n", wmask, wmask_64);
 
     if (check_vmem_bound(waddr)) {
       // vga显存
