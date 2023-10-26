@@ -189,7 +189,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   }
 }
 
-
+// just for fast no-cache simulation
 extern "C" void imem_read(int pc, int *inst) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
   if (pc < 0x80000000ull) {
