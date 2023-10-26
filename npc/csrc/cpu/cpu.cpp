@@ -201,7 +201,7 @@ extern "C" void imem_read(int pc, int *inst) {
     return;
   }
   else {
-    *inst = (int)paddr_read(pc, 4);
+    *inst = (int)paddr_read((uint32_t)pc, 4);
   }
 }
 
