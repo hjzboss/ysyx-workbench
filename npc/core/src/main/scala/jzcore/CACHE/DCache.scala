@@ -76,6 +76,9 @@ class DCache extends Module {
   val crdataFire         = io.rdataIO.valid && io.rdataIO.ready
   val coherenceFire      = io.coherence.valid && io.coherence.ready
 
+  io.master.awid := 0.U
+  io.master.arid := 0.U
+
   // cache state machine，cacheable access
   val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: addr_trans :: data_trans :: wait_resp :: ok :: coherence1 :: coherence2 :: Nil = Enum(13)
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
@@ -270,19 +273,13 @@ class DCache extends Module {
   io.axiReq := state === writeback1 || state === allocate1 || rState === addr_trans || wState === addr_trans // todo: 可以提前申请总线请求
   io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.master.rlast) || (wState === wait_resp && brespFire) || (state === coherence1 && coherenceFire)
 
-  val burstAddr            = addr & "hfffffff8".U
+  val burstAddr            = addr & ~0x7L.U
 
   // allocate axi, burst read
   io.master.arvalid       := state === allocate1 || rState === addr_trans
   io.master.araddr        := Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)
   io.master.arlen         := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
-
-  if(Settings.get("sim")) {
-    io.master.arsize      := 3.U(3.W) // just for fast sram
-  } else {
-    io.master.arsize      := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
-  }
-
+  io.master.arsize        := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
   io.master.arburst       := Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
   io.master.rready        := state === allocate2 || rState === data_trans
 
@@ -487,7 +484,7 @@ class DCache extends Module {
     }
   }
 
-  // -----------------------data aligner-------------------------------
+  // -----------------------data select-------------------------------
   val alignData = WireDefault(0.U(64.W))
   when(state === data) {
     when(allocTag) {
@@ -496,9 +493,6 @@ class DCache extends Module {
       alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
     }
   }
-
-  io.master.awid := 0.U
-  io.master.arid := 0.U
 
   // todo: 要等待cpu和cache握手完毕，而不是和axi总线
   io.wdataIO.ready         := state === data || (wState === wait_resp && brespFire) || wState === ok
