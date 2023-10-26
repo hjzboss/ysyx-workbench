@@ -12,10 +12,10 @@ class Soc extends Module {
   })
 
   val sram = Module(new Sram)
-  val ram0 = Module(new Ram)
-  val ram1 = Module(new Ram)
-  val ram2 = Module(new Ram)
-  val ram3 = Module(new Ram)
+  //val ram0 = Module(new Ram)
+  //val ram1 = Module(new Ram)
+  //val ram2 = Module(new Ram)
+  //val ram3 = Module(new Ram)
   val ram4 = Module(new Ram)
   val ram5 = Module(new Ram)
   val ram6 = Module(new Ram)
@@ -24,16 +24,17 @@ class Soc extends Module {
 
   core.io.master     <> sram.io.slave
 
-  ram0.io.CLK := clock
-  ram1.io.CLK := clock
-  ram2.io.CLK := clock
-  ram3.io.CLK := clock
+  //ram0.io.CLK := clock
+  //ram1.io.CLK := clock
+  //ram2.io.CLK := clock
+  //ram3.io.CLK := clock
   ram4.io.CLK := clock
   ram5.io.CLK := clock
   ram6.io.CLK := clock
   ram7.io.CLK := clock
 
   // ram, dataArray
+  /*
   core.io.sram0.rdata <> ram0.io.Q
   core.io.sram0.cen <> ram0.io.CEN
   core.io.sram0.wen <> ram0.io.WEN
@@ -60,7 +61,7 @@ class Soc extends Module {
   core.io.sram3.wen <> ram3.io.WEN
   core.io.sram3.wmask <> ram3.io.BWEN
   core.io.sram3.addr <> ram3.io.A
-  core.io.sram3.wdata <> ram3.io.D
+  core.io.sram3.wdata <> ram3.io.D*/
 
   core.io.sram4.rdata <> ram4.io.Q
   core.io.sram4.cen <> ram4.io.CEN

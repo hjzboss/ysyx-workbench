@@ -12,10 +12,10 @@ class JzCore extends Module {
     val lsFlag          = if(Settings.get("sim")) Some(Output(Bool())) else None
 
     // icache data array
-    val sram0           = new RamIO
-    val sram1           = new RamIO
-    val sram2           = new RamIO
-    val sram3           = new RamIO
+    //val sram0           = new RamIO
+    //val sram1           = new RamIO
+    //val sram2           = new RamIO
+    //val sram3           = new RamIO
 
     // dcache data array
     val sram4           = new RamIO
@@ -35,7 +35,7 @@ class JzCore extends Module {
   val wbu     = Module(new WBU)
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
-  val icache  = Module(new ICache)
+  //val icache  = Module(new ICache)
   val dcache  = Module(new DCache)
   val clint   = Module(new Clint)
 
@@ -79,10 +79,10 @@ class JzCore extends Module {
   io.slave.rlast  := false.B
 
   // ram, dataArray
-  icache.io.sram0       <> io.sram0
-  icache.io.sram1       <> io.sram1
-  icache.io.sram2       <> io.sram2
-  icache.io.sram3       <> io.sram3
+  //icache.io.sram0       <> io.sram0
+  //icache.io.sram1       <> io.sram1
+  //icache.io.sram2       <> io.sram2
+  //icache.io.sram3       <> io.sram3
 
   // dcache
   dcache.io.sram4       <> io.sram4
