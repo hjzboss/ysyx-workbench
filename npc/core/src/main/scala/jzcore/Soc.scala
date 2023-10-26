@@ -21,8 +21,9 @@ class Soc extends Module {
   val ram5 = Module(new Ram)
   val ram6 = Module(new Ram)
   val ram7 = Module(new Ram)
+  */
   val core = Module(new JzCore)
-
+  /*
   core.io.master     <> sram.io.slave
 
   ram0.io.CLK := clock
