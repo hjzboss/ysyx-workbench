@@ -47,6 +47,7 @@ static void video_test() {
 }
 
 static void storage_test() {
+  /*
   #define nbytes 512
   static char buf[nbytes];
   AM_DISK_CONFIG_T info = io_read(AM_DISK_CONFIG);
@@ -55,7 +56,8 @@ static void storage_test() {
   for (uint32_t i = 0; i < nbytes; i += 2) {
     printf("%02x%02x ", buf[i] & 0xff, buf[i+1] & 0xff);
     if ((i+2) % 32 == 0) printf("\n");
-  }
+  }*/
+  printf("storage device test skipped.\n");
 }
 
 void devscan() {
