@@ -151,7 +151,6 @@ class LSU extends Module {
   pmem.io.waddr         := addr
   pmem.io.wdata         := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   pmem.io.mask          := io.in.wmask << addr(2, 0)
-  pmem.io.wvalid        := writeTrans & !io.stall
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
