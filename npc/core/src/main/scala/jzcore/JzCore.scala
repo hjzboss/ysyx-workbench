@@ -96,7 +96,7 @@ class JzCore extends Module {
   ifu.io.exuRedirect  <> exu.io.redirect
   //ifu.io.icRedirect   <> icache.io.redirect
 
-  ifu.io.valid        <> icache.io.validIn
+  ifu.io.valid        <> idReg.io.validIn
   //icache.io.validOut  <> idReg.io.validIn
   idReg.io.validOut   <> idu.io.validIn
   //ifu.io.icacheCtrl <> icache.io.ctrlIO
