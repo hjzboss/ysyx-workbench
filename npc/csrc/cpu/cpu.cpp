@@ -249,7 +249,6 @@ long init_cpu(char *dir) {
 
   top->clock = 0;
   reset(4);
-  cycle += 2;
 
   npc_cpu.pc = RESET_ADDR;
   npc_cpu.npc = RESET_ADDR + 4;
@@ -307,7 +306,6 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
   bool lsFlag = false; // 访存信号
-  //npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once(&pc, &npc_cpu.pc, &lsFlag, &npc_cpu.inst);
 #ifdef CONFIG_DIFFTEST
   // 由于访存会在lsu阶段产生，会提前设置visit_device信号，因此要用个lsflag信号
@@ -316,9 +314,6 @@ static void cpu_exec_once() {
     visit_device = false;
   }
 #endif
-  //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
-  //npc_cpu.pc = top->io_debug_nextPc; // next pc
-  //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
@@ -399,7 +394,7 @@ void cpu_exec(uint64_t n) {
 
   // todo
   switch (npc_state.state) {
-    case NPC_RUNNING: /*npc_state.state = NPC_STOP;*/ break;
+    case NPC_RUNNING: break;
 
     case NPC_END: case NPC_ABORT:
       printf("npc: %s at pc = " FMT_WORD,
