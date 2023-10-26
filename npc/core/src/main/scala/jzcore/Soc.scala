@@ -23,6 +23,7 @@ class Soc extends Module {
   val ram7 = Module(new Ram)
   */
   val core = Module(new JzCore)
+  core.io.interrupt := false.B
   /*
   core.io.master     <> sram.io.slave
 
