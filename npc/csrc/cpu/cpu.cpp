@@ -168,7 +168,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
     uint64_t align = waddr & 0x07ull;
-    uint64_t wmask_u = (uint64_t)wmask >> align;
+    uint64_t wmask_u = ((uint64_t)wmask & 0xff) >> align;
     switch(wmask_u) {
       case 0x001: wmask_64 = 0xff; break;
       case 0x003: wmask_64 = 0xffff; break;
