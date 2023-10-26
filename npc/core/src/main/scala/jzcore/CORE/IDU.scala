@@ -79,7 +79,7 @@ class IDU extends Module with HasInstrType{
   csr.io.waddr        := io.csrWrite.waddr
   csr.io.wen          := io.csrWrite.wen
   csr.io.wdata        := io.csrWrite.wdata
-  //csr.io.mret         := systemCtrl === System.mret && io.validIn && !io.flush && !io.stall
+  csr.io.mret         := systemCtrl === System.mret && io.validIn && !io.flush && !io.stall
   csr.io.mret         := io.csrWrite.mret
   // exception
   csr.io.exception    := io.csrWrite.exception
