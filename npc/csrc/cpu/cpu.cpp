@@ -171,7 +171,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     uint8_t tmp = wmask;
     // 将8位的掩码转换为64位的掩码
     for(int i = 0; i < 8; i++, index++) {
-      if(wmask & 0x01 == 0x01) {
+      if(tmp & 0x01 == 0x01) {
         printf("fuck%d\n", i);
         *index = 0xff;
       }
