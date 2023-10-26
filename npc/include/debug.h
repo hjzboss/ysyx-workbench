@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <macro.h>
 #include <assert.h>
-#include <cpu/cpu.h>
 //#include <utils.h>
 
 #define Log(format, ...) \
@@ -34,7 +33,7 @@
       IFNDEF(CONFIG_TARGET_AM, extern FILE* log_fp; fflush(log_fp)); \
       extern void assert_fail_msg(); \
       assert_fail_msg(); \
-      npc_state.state = NPC_ABORT; \
+      assert(cond); \
     } \
   } while (0)
 

@@ -103,6 +103,7 @@ static void trace_and_difftest() {
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
 
+
 // for ebreak instruction
 extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
@@ -189,6 +190,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   }
 }
 
+
 // just for fast no-cache simulation
 extern "C" void imem_read(int pc, int *inst) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
@@ -200,6 +202,7 @@ extern "C" void imem_read(int pc, int *inst) {
     *inst = (int)paddr_read((uint32_t)pc, 4);
   }
 }
+
 
 static void reset(int time) {
   visit_device = true;
