@@ -345,7 +345,6 @@ void execute(uint64_t n) {
   while (n--) {
     cpu_exec_once();
     total_inst ++;
-    printf("inst=%d, cycle=%d\n", total_inst, cycle);
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
