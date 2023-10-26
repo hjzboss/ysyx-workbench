@@ -151,7 +151,8 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0) return;
-  if (waddr == CONFIG_SERIAL_MMIO) {
+  if (waddr < 0x80000000ull) return rand();
+  else if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
