@@ -43,7 +43,9 @@ static void video_test() {
   };
 
   io_write(AM_GPU_MEMCPY, 0, vmem, sizeof(vmem));
+  printf("shit\n");
   io_write(AM_GPU_RENDER, 0);
+  printf("fuck\n");
 }
 
 static void storage_test() {
