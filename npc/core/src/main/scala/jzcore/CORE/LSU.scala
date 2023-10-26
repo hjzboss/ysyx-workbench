@@ -5,8 +5,6 @@ import chisel3.util._
 import utils._
 import top.Settings
 
-// todo: flush信号的处理，现在的想法：在idu阶段检测中断，在wbu阶段进行异常号等等的写回和异常地址的跳转
-// todo：wbu阶段跳转的优先级高于exu阶段
 class LSU extends Module {
   val io = IO(new Bundle {
     // exu传入
@@ -152,7 +150,7 @@ class LSU extends Module {
   pmem.io.rvalid        := readTrans & !io.stall
   pmem.io.waddr         := addr
   pmem.io.wdata         := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
-  pmem.io.mask         := io.in.wmask << addr(2, 0)
+  pmem.io.mask          := io.in.wmask << addr(2, 0)
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
@@ -189,11 +187,11 @@ class LSU extends Module {
   //io.out.csrWen         := Mux(io.flushCsr, false.B, io.in.csrWen)
   io.out.csrWen         := io.in.csrWen
   io.out.csrValue       := io.in.csrValue
-  //io.out.int            := io.in.int
   io.out.mret           := io.in.mret
   io.out.csrChange      := io.in.csrChange
 
   //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
+  
   //io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
   io.ready              := true.B
   // 仲裁信号
