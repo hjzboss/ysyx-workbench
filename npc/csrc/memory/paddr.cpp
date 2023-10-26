@@ -98,7 +98,6 @@ uint64_t paddr_read(uint64_t addr, int len) {
     IFDEF(CONFIG_MTRACE, insert_mtrace(true, addr, len, ret));
     return ret;
   }
-  printf("read error!\n");
   out_of_bound(addr);
 }
 
@@ -109,7 +108,6 @@ void paddr_write(uint64_t addr, int len, uint64_t data) {
     host_write(guest_to_host(addr), len, data);
     return;
   }
-  printf("write error!\n");
   out_of_bound(addr);
 }
 

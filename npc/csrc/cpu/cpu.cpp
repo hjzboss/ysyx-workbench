@@ -113,12 +113,7 @@ extern "C" void c_break(long long halt_ret) {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
-  if (raddr < 0x80000000ull) {
-    printf("motherfucker\n");
-    *rdata = 0x00000000;
-    return;
-  }
-  else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
+  if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
