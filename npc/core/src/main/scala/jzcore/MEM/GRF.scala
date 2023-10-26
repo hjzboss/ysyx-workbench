@@ -19,8 +19,8 @@ class GRF extends Module {
 
   val rf = RegInit(VecInit(List.fill(32)(0.U(64.W))))
 
-  io.src1 := Mux(io.wen && io.waddr === io.rs1, io.wdata, rf(io.rs1))
-  io.src2 := Mux(io.wen && io.waddr === io.rs2, io.wdata, rf(io.rs2))
+  io.src1 := Mux(io.wen && io.waddr === io.rs1 && io.rs1 =/= 0.U, io.wdata, rf(io.rs1))
+  io.src2 := Mux(io.wen && io.waddr === io.rs2 && io.rs2 =/= 0.U, io.wdata, rf(io.rs2))
 
   when(io.wen && io.waddr =/= 0.U(5.W)) {
     rf(io.waddr) := io.wdata
