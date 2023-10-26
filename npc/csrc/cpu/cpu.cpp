@@ -172,10 +172,12 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     // 将8位的掩码转换为64位的掩码
     for(int i = 0; i < 8; i++, index++) {
       if(wmask & 0x01 == 0x01) {
+        printf("fuck\n");
         *index = 0xff;
       }
       wmask = wmask >> 1;
     }
+
     printf("wmask=%x, wmask64=%016x\n", tmp, wmask_64);
     if (check_vmem_bound(waddr)) {
       // vga显存
