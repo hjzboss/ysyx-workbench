@@ -57,7 +57,7 @@ _gettimeofday_r (struct _reent *ptr,
      void *ptimezone)
 {
   int ret;
-  printf("fuck\n");
+
   errno = 0;
   if ((ret = _gettimeofday (ptimeval, ptimezone)) == -1 && errno != 0)
     ptr->_errno = errno;
