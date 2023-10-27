@@ -117,6 +117,7 @@ _fopen_r (struct _reent *ptr,
        const char *__restrict file,
        const char *__restrict mode)
 {
+  printf("fuck\n");
   register FILE *fp;
   register int f;
   int flags, oflags;
