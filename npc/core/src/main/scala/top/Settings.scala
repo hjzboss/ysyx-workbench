@@ -9,6 +9,7 @@ object DefaultSettings {
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
     "lowpower"    -> true,
+    "fast"        -> true, // no-cache, no-axi, fast simulation mode
     "sim"         -> true // verilator mode
   )
 }
