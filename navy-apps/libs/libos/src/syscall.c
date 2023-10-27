@@ -94,7 +94,7 @@ int _close(int fd) {
 
 off_t _lseek(int fd, off_t offset, int whence) {
   off_t ret = _syscall_(SYS_lseek, fd, offset, whence);
-  asm volatile("ebreak");
+  asm volatile("ebreak\n" "ebreak\n" "ebreak\n");
   return ret;
 }
 
