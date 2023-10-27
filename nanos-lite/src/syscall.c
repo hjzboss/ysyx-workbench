@@ -119,8 +119,11 @@ void syscall_gettimeofday(Context *c, uintptr_t *a) {
   // 此处返回的是系统启动的时间，todo，时钟不精确
   printf("fuck\n");
   uint64_t us = io_read(AM_TIMER_UPTIME).us;
+  printf("fuck1\n");
   ((struct timeval *)a[1])->tv_usec = us;
+  printf("fuck2\n");
   ((struct timeval *)a[1])->tv_sec = us / 1000000;
+  printf("fuck3\n");
 #ifdef CONFIG_STRACE
   insert_strace("SYS_gettimeofday", a, c->GPRx, -1);
 #endif
