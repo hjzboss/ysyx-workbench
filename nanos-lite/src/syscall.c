@@ -2,7 +2,6 @@
 #include "syscall.h"
 #include <sys/time.h>
 #include <proc.h>
-#include <stdio.h>
 
 #ifdef CONFIG_STRACE
 void insert_strace(char *name, uint64_t *args, uint64_t ret, int fd);
@@ -92,9 +91,7 @@ void syscall_lseek(Context *c, uintptr_t *a) {
   int fd = a[1];
   size_t offset = a[2];
   int whence = a[3];
-  //printf("fuck\n");
   c->GPRx = fs_lseek(fd, offset, whence);
-  printf("gprx=%ld\n", c->GPRx);
 #ifdef CONFIG_STRACE
   insert_strace("SYS_lseek", a, c->GPRx, fd);
 #endif
@@ -138,6 +135,7 @@ void do_syscall(Context *c) {
   a[2] = c->GPR3;
   a[3] = c->GPR4;
 
+  printf("shit\n");
   switch (a[0]) {
     case SYS_yield: syscall_yield(c, a); break;
     case SYS_exit: syscall_exit(c, a); break;
@@ -149,6 +147,6 @@ void do_syscall(Context *c) {
     case SYS_close: syscall_close(c, a); break;
     case SYS_gettimeofday: syscall_gettimeofday(c, a); break;
     case SYS_execve: syscall_execve(c, a); break;
-    //default: panic("Unhandled syscall ID = %d", a[0]);
+    default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
