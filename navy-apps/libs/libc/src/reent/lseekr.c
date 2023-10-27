@@ -46,9 +46,9 @@ _lseek_r (struct _reent *ptr,
   _off_t ret;
 
   errno = 0;
+  printf("shit\n");
   if ((ret = _lseek (fd, pos, whence)) == (_off_t) -1 && errno != 0)
     ptr->_errno = errno;
-  printf("shit\n");
   return ret;
 }
 
