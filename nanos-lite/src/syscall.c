@@ -92,6 +92,7 @@ void syscall_lseek(Context *c, uintptr_t *a) {
   size_t offset = a[2];
   int whence = a[3];
   c->GPRx = fs_lseek(fd, offset, whence);
+  asm volatile("ebreak");
 #ifdef CONFIG_STRACE
   insert_strace("SYS_lseek", a, c->GPRx, fd);
 #endif
