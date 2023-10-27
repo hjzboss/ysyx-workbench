@@ -17,7 +17,7 @@ always @(*) begin
   if (rvalid)
     pmem_read(raddr, rdata);
   else
-    rdata = 64'd0;
+    rdata = {2{$random}};
 end
 
 always @(*) begin

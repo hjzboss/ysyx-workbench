@@ -2,7 +2,7 @@ import jzcore._
 import circt.stage._
 
 object Elaborate extends App {
-  def top       = new JzCore()
+  def top       = new Soc()
   val useMFC    = false // use MLIR-based firrtl compiler
   val generator = Seq(chisel3.stage.ChiselGeneratorAnnotation(() => top))
   if (useMFC) {
@@ -10,7 +10,7 @@ object Elaborate extends App {
   } else {
     //(new chisel3.stage.ChiselStage).execute(args, generator)
     (new chisel3.stage.ChiselStage).execute(args, Seq(
-      chisel3.stage.ChiselGeneratorAnnotation(() => new JzCore()),
+      chisel3.stage.ChiselGeneratorAnnotation(() => new Soc()),
       firrtl.stage.RunFirrtlTransformAnnotation(new AddModulePrefix()),
       ModulePrefixAnnotation("ysyx_22050853_")
     ))

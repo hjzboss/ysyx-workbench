@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 class WBU extends Module {
   val io = IO(new Bundle {
@@ -13,11 +14,8 @@ class WBU extends Module {
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
 
-    val flushCsr  = Input(Bool())
-    //val redirect  = new RedirectIO
+    //val flushCsr  = Input(Bool())
   })
-
-  //val stop              = Module(new Stop)
 
   // 寄存器文件写回
   io.regWrite.rd       := io.in.rd
@@ -27,16 +25,18 @@ class WBU extends Module {
   // csr文件写回
   io.csrWrite.waddr    := io.in.csrWaddr
   io.csrWrite.wdata    := io.in.exuOut
-  io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
+  //io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
+  io.csrWrite.wen      := io.in.csrWen
   // exception
   io.csrWrite.exception:= io.in.exception
   io.csrWrite.epc      := io.in.pc
   io.csrWrite.no       := io.in.excepNo
+  io.csrWrite.mret     := io.in.mret
 
-  //io.redirect.valid    := io.in.int
-  //io.redirect.brAddr   := io.in.csrValue
-
-  // ebreak
-  //stop.io.valid        := io.in.ebreak
-  //stop.io.haltRet      := io.in.haltRet
+  if(Settings.get("sim")) {
+    val stop              = Module(new Stop)
+    // ebreak
+    stop.io.valid        := io.in.ebreak.get
+    stop.io.haltRet      := io.in.haltRet.get
+  }
 }

@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 class EXU extends Module {
   val io = IO(new Bundle {
@@ -10,7 +11,7 @@ class EXU extends Module {
     val datasrc     = Flipped(new DataSrcIO)
     val aluCtrl     = Flipped(new AluIO)
     val ctrl        = Flipped(new CtrlFlow)
-    val flushCsr    = Input(Bool())
+    //val flushCsr    = Input(Bool())
     
     // 传给Lsu
     val out         = new ExuOut
@@ -37,9 +38,8 @@ class EXU extends Module {
     val flush       = Input(Bool())
     val ready       = Output(Bool())
 
-    // debug
-    //val debugIn     = Flipped(new DebugIO)
-    //val debugOut    = new DebugIO
+    val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut    = if(Settings.get("sim")) Some(new DebugIO) else None
   })
 
   val alu   = Module(new Alu)
@@ -85,11 +85,11 @@ class EXU extends Module {
   brAddr               := Mux(io.ctrl.isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm(31, 0)
 
   // ecall mret
-  val brAddrPre         = Mux(io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, opAPre(31, 0), brAddr(31, 0))
+  val brAddrPre         = Mux(io.ctrl.exception || io.ctrl.mret, opAPre(31, 0), brAddr(31, 0))
   io.redirect.brAddr   := brAddrPre
-  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.sysInsType === System.ecall || io.ctrl.sysInsType === System.mret || io.ctrl.int, true.B, false.B)
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)
 
-  // to lsuopa
+  // to lsu opa
   io.out.lsType        := io.ctrl.lsType
   io.out.wmask         := io.ctrl.wmask
   io.out.lsuWen        := io.ctrl.memWen
@@ -108,17 +108,20 @@ class EXU extends Module {
   io.out.excepNo       := io.ctrl.excepNo
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
-  io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
+  //io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
+  io.out.csrWen        := io.ctrl.csrWen
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
-  io.out.int           := io.ctrl.int
-/*
-  // debug
-  io.out.ebreak        := io.ctrl.ebreak
-  io.out.haltRet       := opAPre // todo: forward
+  io.out.mret          := io.ctrl.mret
+  io.out.csrChange     := io.ctrl.csrChange
+  //io.out.int           := io.ctrl.int
 
-  // debug
-  io.debugOut.inst     := io.debugIn.inst
-  io.debugOut.pc       := io.debugIn.pc
-  io.debugOut.nextPc   := Mux(io.redirect.valid, brAddrPre, io.debugIn.nextPc)*/
+  if(Settings.get("sim")) {
+    io.out.ebreak.get      := io.ctrl.ebreak.get
+    io.out.haltRet.get     := opAPre // todo: forward
+    io.debugOut.get.inst   := io.debugIn.get.inst
+    io.debugOut.get.pc     := io.debugIn.get.pc
+    io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddrPre, io.debugIn.get.nextPc)
+    io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get.valid, false.B)
+  }
 }

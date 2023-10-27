@@ -4,7 +4,7 @@
 #include <verilated.h>
 
 // Include model header, generated from Verilating "jzcore.v"
-#include "VSoc.h"
+#include "Vysyx_22050853_Soc.h"
 
 // If "verilator --trace" is used, include the tracing class
 #include <verilated_vcd_c.h>

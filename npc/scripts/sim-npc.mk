@@ -2,9 +2,12 @@ BUILD_DIR = ${NPC_HOME}/build
 
 BLACKBOX_DIR = ${NPC_HOME}/core/src/main/verilog
 
+USER_ID = ysyx_22050853
+
 TOPNAME = Soc
 
-VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
+VSRC = ${BUILD_DIR}/${TOPNAME}.v
+#VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
 SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*.cpp")
@@ -21,7 +24,7 @@ VERILATOR_SIMFLAG += -CFLAGS "-I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/inclu
 # open trace
 VERILATOR_SIMFLAG += --trace --Mdir $(SIM_OBJ_DIR)
 # top module
-VERILATOR_SIMFLAG += --top-module $(TOPNAME)
+VERILATOR_SIMFLAG += --top-module ${USER_ID}_$(TOPNAME)
 
 IMAGE_OBJ ?= 
 
@@ -43,6 +46,6 @@ sim: $(SIM_CSRC) $(VSRC)
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
-	$(SIM_OBJ_DIR)/V$(TOPNAME) $(NPC_FLAG)
+	$(SIM_OBJ_DIR)/V${USER_ID}_$(TOPNAME) $(NPC_FLAG)
 	@echo "wave"
 	gtkwave $(SIM_OBJ_DIR)/$(WAVE)

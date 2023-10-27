@@ -8,12 +8,12 @@
 vluint64_t main_time = 0;
 
 static uint64_t cycle = 0; // 统计时钟周期
-static VSoc* top;
+static Vysyx_22050853_Soc* top;
 static VerilatedContext* contextp = NULL;
 static VerilatedVcdC* tfp = NULL;
 static bool g_print_step = false;
 static uint64_t g_timer = 0; // unit: us
-uint64_t g_nr_guest_inst = 0;
+uint64_t total_inst = 0;
 extern uint64_t* gpr;
 static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
@@ -103,6 +103,7 @@ static void trace_and_difftest() {
 	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
 
+
 // for ebreak instruction
 extern "C" void c_break(long long halt_ret) {
   npc_state.state = NPC_END;
@@ -113,11 +114,8 @@ extern "C" void c_break(long long halt_ret) {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
-  if (raddr < 0x80000000ull) {
-    *rdata = 0x00000000;
-    return;
-  }
-  else if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
+  if (raddr < 0x80000000ull) { *rdata = rand(); return; }
+  if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
@@ -153,9 +151,9 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // 总是往地址为`waddr & ~0x7ull`的8字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
-  if (wmask == 0 || waddr < 0x80000000ull) return;
-  if (waddr == CONFIG_SERIAL_MMIO) {
-    //printf("wdata=%x\n", wdata);
+  if (wmask == 0) return;
+  if (waddr < 0x80000000ull) { printf("addr=%016llx out of bound\n", waddr); c_break(1); return; }
+  else if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
@@ -170,38 +168,42 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     uint64_t rdata; 
     uint64_t wmask_64 = 0;
     uint8_t *index = (uint8_t*)&wmask_64;
+    uint8_t tmp = wmask;
     // 将8位的掩码转换为64位的掩码
     for(int i = 0; i < 8; i++, index++) {
-      if(wmask & 0x01 == 0x01) {
+      if(tmp & 0x01 == 0x01) {
         *index = 0xff;
       }
-      wmask = wmask >> 1;
-    }
-    // 需要将要写入的数据进行移位，移位到掩码为1的部分，跳过右侧的0
-    /*
-    uint64_t tmp = wmask_64;
-    int shift_cnt = 0;
-    for(int i = 64; i > 0; i--) {
-      if(tmp & 0x01 == 0x01) break;
-      shift_cnt++;
       tmp = tmp >> 1;
-    }*/
+    }
 
+    //printf("wmask=%d, wmask64=%lx\n", wmask, wmask_64);
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
       rdata = vga_read(waddr & ~0x7ull, 8);
       rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
-      //rdata = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       vga_write(waddr & ~0x7ull, 8, rdata);
     }
     else {
       // 物理内存
       rdata = paddr_read(waddr & ~0x7ull, 8);
-      //uint64_t rdata1 = (rdata & ~wmask_64) + ((wdata << shift_cnt) & wmask_64);
       rdata = (rdata & ~wmask_64) | (wdata & wmask_64);
       paddr_write(waddr & ~0x7ull, 8, rdata);      
     }
+  }
+}
+
+
+// just for fast no-cache simulation
+extern "C" void imem_read(int pc, int *inst) {
+  // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
+  if (pc < 0x80000000ull) {
+    *inst = 0;
+    return;
+  }
+  else {
+    *inst = (int)paddr_read((uint32_t)pc, 4);
   }
 }
 
@@ -242,7 +244,7 @@ static void init_wave() {
 
 long init_cpu(char *dir) {
   // Construct the Verilated model, from VSoc.h generated from Verilating "Soc.v"
-  top = new VSoc; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
+  top = new Vysyx_22050853_Soc; // Or use a const unique_ptr, or the VL_UNIQUE_PTR wrapper
 
   IFDEF(CONFIG_WAVE, init_wave());
 
@@ -287,11 +289,14 @@ void delete_cpu() {
 
 static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *inst) {
   int cnt = 0;
-  while (!top->io_finish) {
+  while (!top->io_debug_valid) {
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 100) break; // 防止跑飞
+    if (cnt == 1000) {
+      printf("跑飞了\n");
+      break; // 防止跑飞
+    }
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
@@ -305,7 +310,6 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
 static void cpu_exec_once() {
   uint64_t pc = top->io_debug_pc; // 当前pc
   bool lsFlag = false; // 访存信号
-  //npc_cpu.inst = paddr_read(npc_cpu.pc, 4);
   isa_exec_once(&pc, &npc_cpu.pc, &lsFlag, &npc_cpu.inst);
 #ifdef CONFIG_DIFFTEST
   // 由于访存会在lsu阶段产生，会提前设置visit_device信号，因此要用个lsflag信号
@@ -314,9 +318,6 @@ static void cpu_exec_once() {
     visit_device = false;
   }
 #endif
-  //npc_cpu.pc = top->io_debug_pc; // 执行后的pc
-  //npc_cpu.pc = top->io_debug_nextPc; // next pc
-  //npc_cpu.npc = top->io_debug_nextPc;
 #ifdef CONFIG_ITRACE
   char *p = npc_cpu.logbuf;
   p += snprintf(p, sizeof(npc_cpu.logbuf), FMT_WORD ":", pc);
@@ -347,23 +348,23 @@ static void cpu_exec_once() {
 void execute(uint64_t n) {
   while (n--) {
     cpu_exec_once();
-    g_nr_guest_inst ++;
+    total_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
 
-// todo
 static void statistic() {
   IFDEF(CONFIG_FTRACE, print_ftrace(true));
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
-  Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
+  Log("total guest instructions = " NUMBERIC_FMT, total_inst);
   if (g_timer > 0) {
-    Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
-    Log("IPC = %lf\n", g_nr_guest_inst / 1.0 / cycle);
+    Log("simulation frequency = " NUMBERIC_FMT " inst/s", total_inst * 1000000 / g_timer);
+    if(g_timer >= 1000000) Log("CPU frequency: %ld HZ\n", cycle / (g_timer / 1000000));
+    Log("IPC = %lf\n", (total_inst / 1.0) / cycle);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }
@@ -396,7 +397,7 @@ void cpu_exec(uint64_t n) {
 
   // todo
   switch (npc_state.state) {
-    case NPC_RUNNING: /*npc_state.state = NPC_STOP;*/ break;
+    case NPC_RUNNING: break;
 
     case NPC_END: case NPC_ABORT:
       printf("npc: %s at pc = " FMT_WORD,

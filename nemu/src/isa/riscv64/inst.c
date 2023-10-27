@@ -148,10 +148,10 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci , Z, R(dest) = cpu.csr[csr]; cpu.csr[csr] = cpu.csr[csr] & ~imm);
 
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , N, s->dnpc = isa_raise_intr(0, s->pc));
-  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , N, s->dnpc = cpu.csr[2]); // mepc
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , N, s->dnpc = isa_mret()); // mepc
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
+  INSTPAT("??????? ????? ????? 001 ????? 00011 11", fence_i, N, ); // do nothing, no cache
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
-  // todo: fence.i
   INSTPAT_END();
 
   R(0) = 0; // reset $zero to 0

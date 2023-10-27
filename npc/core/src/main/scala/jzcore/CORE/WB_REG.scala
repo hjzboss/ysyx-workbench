@@ -3,24 +3,19 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 class WB_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
-    //val flush = Input(Bool())
     val stall = Input(Bool())
   
     val in = Flipped(new LsuOut)
     val out = new LsuOut
-    //val flush = Input(Bool())
 
-    /*
-    val validIn = Input(Bool())
-    val validOut = Output(Bool())
-    val debugIn = Flipped(new DebugIO)
-    val debugOut = new DebugIO
-
-    val lsFlagIn = Input(Bool())
-    val lsFlagOut = Output(Bool())*/
+    val debugIn  = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut = if(Settings.get("sim")) Some(new DebugIO) else None
+    val lsFlagIn  = if(Settings.get("sim")) Some(Input(Bool())) else None
+    val lsFlagOut = if(Settings.get("sim")) Some(Output(Bool())) else None
   })
 
   val lsuReset = Wire(new LsuOut)
@@ -35,29 +30,33 @@ class WB_REG extends Module with HasResetVector {
   lsuReset.csrWaddr   := CsrId.nul
   lsuReset.csrWen     := false.B
   lsuReset.csrValue   := 0.U(64.W)
-  lsuReset.int        := false.B
-  //lsuReset.ebreak     := false.B
-  //lsuReset.haltRet    := 0.U(64.W)
+  //lsuReset.int        := false.B
+  lsuReset.mret       := false.B
+  lsuReset.csrChange  := false.B
+
+  if(Settings.get("sim")) {
+    lsuReset.ebreak.get     := false.B
+    lsuReset.haltRet.get    := 0.U(64.W)
+
+    val debugReset = Wire(new DebugIO)
+    debugReset.pc := 0.U(32.W)
+    debugReset.nextPc := 0.U(32.W)
+    debugReset.inst := Instruction.NOP
+    debugReset.valid := false.B
+
+    val debugReg = RegInit(debugReset)
+    debugReg := Mux(io.stall, debugReg, io.debugIn.get)
+    io.debugOut.get.pc := debugReg.pc
+    io.debugOut.get.nextPc := debugReg.nextPc
+    io.debugOut.get.inst := debugReg.inst
+    io.debugOut.get.valid := debugReg.valid & !io.stall
+
+    val lsFlagReg = RegInit(false.B)
+    lsFlagReg := Mux(io.stall, lsFlagReg, io.lsFlagIn.get)
+    io.lsFlagOut.get := lsFlagReg
+  }
 
   val lsuReg           = RegInit(lsuReset)
   lsuReg              := Mux(io.stall, lsuReg, io.in)
   io.out              := lsuReg
-
-  /*
-  val validReg         = RegInit(false.B)
-  validReg            := Mux(io.stall, false.B, io.validIn) // todo
-  io.validOut         := validReg
-
-  val debugReset = Wire(new DebugIO)
-  debugReset.pc := 0.U(32.W)
-  debugReset.nextPc := 0.U(32.W)
-  debugReset.inst := Instruction.NOP
-
-  val debugReg = RegInit(debugReset)
-  debugReg := Mux(io.stall, debugReg, io.debugIn)
-  io.debugOut := debugReg
-
-  val lsFlagReg = RegInit(false.B)
-  lsFlagReg := Mux(io.stall, lsFlagReg, io.lsFlagIn)
-  io.lsFlagOut := lsFlagReg*/
 }
