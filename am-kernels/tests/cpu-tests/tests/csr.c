@@ -2,8 +2,16 @@
 #include <stdio.h>
 
 void fuck() {
+  asm volatile(
+    "csrrci t0, mepc, 0\n"
+    "addi t0, t0, 4\n"
+    "csrrw t0, mepc, t0\n"
+    :
+    :
+    : "t0"
+  );
   printf("syscall\n");
-  //asm volatile("mret");
+  asm volatile("mret");
 }
 
 int main() {
