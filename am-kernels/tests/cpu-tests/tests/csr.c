@@ -15,11 +15,12 @@ void fuck() {
 }
 
 int main() {
-  uint8_t a = 0;
+  uint64_t a = 0;
   //void (*tmp)() = fuck;
   asm volatile(
     "csrrw t0, mtvec, %[fuck]\n"
-    "csrrw t1, mepc, t0\n"
+    "csrrc t0, mtvec, %[a]\n"
+    "csrrw t0, mepc, t0\n"
     "ecall\n"
     "csrrc t0, mepc, %[a]\n"
     "ebreak\n"
