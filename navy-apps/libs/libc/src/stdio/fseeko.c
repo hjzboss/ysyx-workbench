@@ -356,7 +356,6 @@ __sseek (struct _reent *ptr,
   fp->_flags &= ~__SNPT;
   memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
   _newlib_flockfile_end (fp);
-  printf("shit\n");
   return 0;
 }
 

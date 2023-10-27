@@ -111,6 +111,7 @@ __sseek (struct _reent *ptr,
   register _off_t ret;
 
   ret = _lseek_r (ptr, fp->_file, (_off_t) offset, whence);
+  printf("shit\n");
   if (ret == -1L)
     fp->_flags &= ~__SOFF;
   else
