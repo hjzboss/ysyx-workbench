@@ -93,6 +93,7 @@ _fdopen_r (struct _reent *ptr,
     _fcntl_r (ptr, fd, F_SETFL, fdflags | O_APPEND);
 #endif
   fp->_file = fd;
+  printf("fd=%d\n", fd);
   fp->_cookie = (void *) fp;
 
 #undef _read
