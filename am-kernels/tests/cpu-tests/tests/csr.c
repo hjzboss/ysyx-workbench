@@ -3,7 +3,7 @@
 
 void fuck() {
   printf("syscall\n");
-  asm volatile("mret");
+  //asm volatile("mret");
 }
 
 int main() {
