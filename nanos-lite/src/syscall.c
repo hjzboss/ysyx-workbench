@@ -143,7 +143,7 @@ void do_syscall(Context *c) {
     case SYS_write: syscall_write(c, a); break;
     case SYS_brk: syscall_brk(c, a); break;
     case SYS_read: syscall_read(c, a); break;
-    case SYS_lseek: syscall_lseek(c, a); asm volatile("ebreak"); break;
+    case SYS_lseek: syscall_lseek(c, a); break;
     case SYS_open: syscall_open(c, a); break;
     case SYS_close: syscall_close(c, a); break;
     case SYS_gettimeofday: syscall_gettimeofday(c, a); break;
