@@ -117,15 +117,14 @@ _fopen_r (struct _reent *ptr,
        const char *__restrict file,
        const char *__restrict mode)
 {
-  
   register FILE *fp;
   register int f;
   int flags, oflags;
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     return NULL;
-  //if ((fp = __sfp (ptr)) == NULL)
-  //  return NULL;
+  if ((fp = __sfp (ptr)) == NULL)
+    return NULL;
 
   if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
     {

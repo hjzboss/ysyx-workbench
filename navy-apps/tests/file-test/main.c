@@ -4,7 +4,7 @@
 int main() {
   printf("open begin\n");
   FILE *fp = fopen("/share/files/num", "r+");
-  printf("open end\n");
+  printf("open end, fd=%d\n", fp->_file);
   assert(fp);
   printf("seek begin\n");
   fseek(fp, 0, SEEK_END);
