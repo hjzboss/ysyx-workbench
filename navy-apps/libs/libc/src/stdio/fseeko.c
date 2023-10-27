@@ -334,6 +334,7 @@ __sseek (struct _reent *ptr,
   return ret;
 }
 */
+  printf("shit\n");
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
