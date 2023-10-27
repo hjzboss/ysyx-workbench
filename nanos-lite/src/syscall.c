@@ -117,6 +117,7 @@ void syscall_close(Context *c, uintptr_t *a) {
 
 void syscall_gettimeofday(Context *c, uintptr_t *a) {
   // 此处返回的是系统启动的时间，todo，时钟不精确
+  printf("fuck\n");
   uint64_t us = io_read(AM_TIMER_UPTIME).us;
   ((struct timeval *)a[1])->tv_usec = us;
   ((struct timeval *)a[1])->tv_sec = us / 1000000;
