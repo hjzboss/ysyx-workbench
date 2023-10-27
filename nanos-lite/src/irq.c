@@ -10,7 +10,6 @@ static Context* do_event(Event e, Context* c) {
       Log("event_type: yield"); break;
     case EVENT_SYSCALL:
       c->mepc += 4;
-      printf("fuck shit\n");
       do_syscall(c);
       break;
     default: panic("Unhandled event ID = %d", e.event);
