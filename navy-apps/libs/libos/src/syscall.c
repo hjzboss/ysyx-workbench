@@ -79,7 +79,7 @@ void *_sbrk(intptr_t increment) {
   intptr_t old_brk_tmp = old_brk;
   // 更新program break，返回旧的program break
   old_brk = new_brk;
-  printf("old=%ld, new=%ld\n", old_brk_tmp, old_brk);
+  //printf("old=%ld, new=%ld\n", old_brk_tmp, old_brk);
   return (void *)old_brk_tmp;
 }
 
