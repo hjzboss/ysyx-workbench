@@ -124,10 +124,8 @@ _fopen_r (struct _reent *ptr,
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     return NULL;
-  if ((fp = __sfp (ptr)) == NULL) {
-    printf("fuck\n");
-    return NULL;
-  }
+  //if ((fp = __sfp (ptr)) == NULL)
+  //  return NULL;
 
   if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
     {
