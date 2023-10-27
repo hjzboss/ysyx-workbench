@@ -135,7 +135,7 @@ void do_syscall(Context *c) {
   a[2] = c->GPR3;
   a[3] = c->GPR4;
 
-  printf("shit\n");
+  printf("a[0]=%d\n", a[0]);
   switch (a[0]) {
     case SYS_yield: syscall_yield(c, a); break;
     case SYS_exit: syscall_exit(c, a); break;
