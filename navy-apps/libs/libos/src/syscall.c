@@ -70,6 +70,7 @@ int _write(int fd, void *buf, size_t count) {
 }
 
 void *_sbrk(intptr_t increment) {
+  printf("fuck\n");
   if (old_brk == -1) {
     old_brk = (intptr_t)&_end;
   }
@@ -78,7 +79,7 @@ void *_sbrk(intptr_t increment) {
   intptr_t old_brk_tmp = old_brk;
   // 更新program break，返回旧的program break
   old_brk = new_brk;
-  printf("old=%p, new=%p\n", old_brk_tmp, old_brk);
+  printf("old=%ld, new=%ld\n", old_brk_tmp, old_brk);
   return (void *)old_brk_tmp;
 }
 
