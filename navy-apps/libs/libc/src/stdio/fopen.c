@@ -117,7 +117,7 @@ _fopen_r (struct _reent *ptr,
        const char *__restrict file,
        const char *__restrict mode)
 {
-  printf("fuck\n");
+  
   register FILE *fp;
   register int f;
   int flags, oflags;
@@ -126,7 +126,7 @@ _fopen_r (struct _reent *ptr,
     return NULL;
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
-
+  printf("fuck\n");
   if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
     {
       _newlib_sfp_lock_start (); 
