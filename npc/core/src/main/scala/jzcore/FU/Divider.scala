@@ -158,19 +158,19 @@ sealed class FastDivider extends Module {
 
   when(io.in.divw) {
     when(io.in.divSigned) {
-      io.out.bits.quotient := SignExt((dividend(31, 0).asSInt / divisor(31, 0).asSInt)(31, 0), 64)
-      io.out.bits.remainder := SignExt((dividend(31, 0).asSInt % divisor(31, 0).asSInt)(31, 0), 64)
+      io.out.bits.quotient := (SignExt((dividend(31, 0).asSInt / divisor(31, 0).asSInt)(31, 0), 64)).asUInt
+      io.out.bits.remainder := (SignExt((dividend(31, 0).asSInt % divisor(31, 0).asSInt)(31, 0), 64)).asUInt
     }.otherwise {
-      io.out.bits.quotient := SignExt((dividend(31, 0) / divisor(31, 0))(31, 0), 64)
-      io.out.bits.remainder := SignExt((dividend(31, 0) % divisor(31, 0))(31, 0), 64)
+      io.out.bits.quotient := (SignExt((dividend(31, 0) / divisor(31, 0))(31, 0), 64)).asUInt
+      io.out.bits.remainder := (SignExt((dividend(31, 0) % divisor(31, 0))(31, 0), 64)).asUInt
     }
   }.otherwise {
     when(io.in.divSigned) {
-      io.out.bits.quotient := dividend.asSInt / divisor.asSInt
-      io.out.bits.remainder := dividend.asSInt % divisor.asSInt
+      io.out.bits.quotient := (dividend.asSInt / divisor.asSInt).asUInt
+      io.out.bits.remainder := (dividend.asSInt % divisor.asSInt).asUInt
     }.otherwise {
-      io.out.bits.quotient := dividend / divisor
-      io.out.bits.remainder := dividend % divisor
+      io.out.bits.quotient := (dividend / divisor).asUInt
+      io.out.bits.remainder := (dividend % divisor).asUInt
     }
   }
 
