@@ -157,13 +157,17 @@ sealed class FastDivider extends Module {
   val dividend = io.in.dividend
 
   when(io.in.divw) {
+    val quotientw = WireDefault(0.U(32.W))
+    val remainderw = WireDefault(0.U(32.W))
     when(io.in.divSigned) {
-      io.out.bits.quotient := (SignExt((dividend(31, 0).asSInt / divisor(31, 0).asSInt).asUInt, 64)).asUInt
-      io.out.bits.remainder := (SignExt((dividend(31, 0).asSInt % divisor(31, 0).asSInt).asUInt, 64)).asUInt
+      quotientw := (dividend(31, 0).asSInt / divisor(31, 0).asSInt).asUInt
+      remainderw := (dividend(31, 0).asSInt % divisor(31, 0).asSInt).asUInt
     }.otherwise {
-      io.out.bits.quotient := (SignExt((dividend(31, 0) / divisor(31, 0)).asUInt, 64)).asUInt
-      io.out.bits.remainder := (SignExt((dividend(31, 0) % divisor(31, 0)).asUInt, 64)).asUInt
+      quotientw := dividend(31, 0).asUInt / divisor(31, 0).asUInt
+      remainderw := dividend(31, 0).asUInt % divisor(31, 0).asUInt
     }
+    io.out.bits.quotient := SignExt(quotientw, 64)
+    io.out.bits.remainder := SignExt(remainderw, 64)
   }.otherwise {
     when(io.in.divSigned) {
       io.out.bits.quotient := (dividend.asSInt / divisor.asSInt).asUInt
