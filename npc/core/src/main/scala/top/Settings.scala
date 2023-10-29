@@ -16,7 +16,7 @@ object DefaultSettings {
 }
 
 object Settings {
-  var settings: Map[String, AnyVal] = DefaultSettings()
+  var settings = DefaultSettings()
   def get(field: String) = {
     settings(field).asInstanceOf[Boolean]
   }
