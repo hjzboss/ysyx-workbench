@@ -49,7 +49,7 @@ class IDU extends Module with HasInstrType{
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = Wire(UInt(4.W)) // 防止信号被优化
+  //val lsType    = Wire(UInt(4.W)) // 防止信号被优化
   //lsType       := lsctrl(0)
   val lsType    = lsctrl(0)
   val loadMem   = lsctrl(2)

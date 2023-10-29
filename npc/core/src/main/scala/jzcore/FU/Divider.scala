@@ -12,7 +12,7 @@ class Divider extends Module{
     val out     = Decoupled(new DivOutput)
   })
 
-  val div = if(Setting.getString("div") == "fast") Module(new FastDivider) else Module(new RestDivider(64))
+  val div = if(Settings.getString("div") == "fast") Module(new FastDivider) else Module(new RestDivider(64))
   div.flush <> io.flush
   div.in <> io.in
   div.out <> io.out
