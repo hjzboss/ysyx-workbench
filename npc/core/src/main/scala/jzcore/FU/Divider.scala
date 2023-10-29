@@ -158,11 +158,11 @@ sealed class FastDivider extends Module {
 
   when(io.in.divw) {
     when(io.in.divSigned) {
-      io.out.bits.quotient := (SignExt((dividend(31, 0).asSInt / divisor(31, 0).asSInt)(31, 0).asUInt, 64)).asUInt
-      io.out.bits.remainder := (SignExt((dividend(31, 0).asSInt % divisor(31, 0).asSInt)(31, 0).asUInt, 64)).asUInt
+      io.out.bits.quotient := (SignExt((dividend(31, 0).asSInt / divisor(31, 0).asSInt).asUInt, 64)).asUInt
+      io.out.bits.remainder := (SignExt((dividend(31, 0).asSInt % divisor(31, 0).asSInt).asUInt, 64)).asUInt
     }.otherwise {
-      io.out.bits.quotient := (SignExt((dividend(31, 0) / divisor(31, 0))(31, 0).asUInt, 64)).asUInt
-      io.out.bits.remainder := (SignExt((dividend(31, 0) % divisor(31, 0))(31, 0).asUInt, 64)).asUInt
+      io.out.bits.quotient := (SignExt((dividend(31, 0) / divisor(31, 0)).asUInt, 64)).asUInt
+      io.out.bits.remainder := (SignExt((dividend(31, 0) % divisor(31, 0)).asUInt, 64)).asUInt
     }
   }.otherwise {
     when(io.in.divSigned) {
