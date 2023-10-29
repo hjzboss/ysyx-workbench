@@ -7,16 +7,6 @@ import utils._
 // just transfer with cache, for verilator simulation, dpi-c sram
 class Sram extends Module {
   val io = IO(new Bundle {
-    /*
-    // read channel
-    val raddrIO   = Flipped(Decoupled(new RaddrIO))
-    val rdataIO   = Decoupled(new RdataIO)
-    // write channel
-    val waddrIO   = Flipped(Decoupled(new WaddrIO))
-    val wdataIO   = Flipped(Decoupled(new WdataIO))
-    // write response channel
-    val brespIO   = Decoupled(new BrespIO)*/
-
     val slave     = Flipped(new AxiMaster)
   })
 

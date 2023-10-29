@@ -497,11 +497,8 @@ class DCache extends Module {
   // todo: 要等待cpu和cache握手完毕，而不是和axi总线
   io.wdataIO.ready         := state === data || (wState === wait_resp && brespFire) || wState === ok
 
-  //io.rdataIO.bits.rdata    := Mux(state === data, alignData, 0.U(64.W))
-  //io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.axiRdataIO.bits,rdata, 0.U(64.W)))
   io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
   io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
 
-  //io.ctrlIO.ready          := state === idle // todo
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
 }

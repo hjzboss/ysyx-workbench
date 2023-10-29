@@ -70,8 +70,6 @@ int _write(int fd, void *buf, size_t count) {
 }
 
 void *_sbrk(intptr_t increment) {
-  //return -1;
-  
   if (old_brk == -1) {
     old_brk = (intptr_t)&_end;
   }
@@ -80,7 +78,6 @@ void *_sbrk(intptr_t increment) {
   intptr_t old_brk_tmp = old_brk;
   // 更新program break，返回旧的program break
   old_brk = new_brk;
-  //printf("old=%ld, new=%ld\n", old_brk_tmp, old_brk);
   return (void *)old_brk_tmp;
 }
 
@@ -93,13 +90,10 @@ int _close(int fd) {
 }
 
 off_t _lseek(int fd, off_t offset, int whence) {
-  off_t ret = _syscall_(SYS_lseek, fd, offset, whence);
-  //asm volatile("li x0, 0": : :);
-  return ret;
+  return _syscall_(SYS_lseek, fd, offset, whence);
 }
 
 int _gettimeofday(struct timeval *tv, struct timezone *tz) {
-  //printf("tv=%d, tz=%d\n", tv, tz);
   return _syscall_(SYS_gettimeofday, (__uint64_t)tv, (__uint64_t)tz, 0);
 }
 

@@ -33,8 +33,6 @@ class CTRL extends Module {
     //val flushICache = Output(Bool())
     val flushIduReg = Output(Bool())
     val flushExuReg = Output(Bool()) // todo: 是否需要这个信号
-    //val flushLsuReg = Output(Bool())
-    //val flushWbuReg = Output(Bool())
 
     // todo: load-use停顿处理
     val memRen      = Input(Bool()) // 来自exu
@@ -64,6 +62,4 @@ class CTRL extends Module {
   io.flushIduReg := io.branch
   //io.flushIduReg := !io.ifuReady || io.branch
   io.flushExuReg := io.branch | loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr
-  //io.flushLsuReg := io.lsuCsr | io.wbuCsr
-  //io.flushWbuReg := io.wbuCsr
 }

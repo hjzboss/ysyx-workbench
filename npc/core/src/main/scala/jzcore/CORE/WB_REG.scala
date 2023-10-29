@@ -8,7 +8,6 @@ import top.Settings
 class WB_REG extends Module with HasResetVector {
   val io = IO(new Bundle {
     val stall = Input(Bool())
-    //val flush = Input(Bool())
   
     val in = Flipped(new LsuOut)
     val out = new LsuOut

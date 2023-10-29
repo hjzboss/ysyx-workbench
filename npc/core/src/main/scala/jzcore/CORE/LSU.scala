@@ -11,8 +11,6 @@ class LSU extends Module {
     val in          = Flipped(new ExuOut)
     val stall       = Input(Bool())
 
-    //val flushCsr    = Input(Bool())
-
     // 传给wbu
     val out         = new LsuOut
 
@@ -28,20 +26,6 @@ class LSU extends Module {
     // clint接口
     val clintIO     = Flipped(new ClintIO)
 
-    /*
-    // axi总线访存接口，用于外设的访问
-    val axiRaddrIO  = Decoupled(new RaddrIO)
-    val axiRdataIO  = Flipped(Decoupled(new RdataIO))
-    val axiWaddrIO  = Decoupled(new WaddrIO)
-    val axiWdataIO  = Decoupled(new WdataIO)
-    val axiBrespIO  = Flipped(Decoupled(new BrespIO))
-
-    // 仲裁信号
-    val axiReq      = Output(Bool())
-    val axiGrant    = Input(Bool())
-    val axiReady    = Output(Bool())
-    */
-
     val lsFlag        = if(Settings.get("sim")) Some(Output(Bool())) else None
   })
 
@@ -50,7 +34,7 @@ class LSU extends Module {
   val writeTrans  = io.in.lsuWen
   val hasTrans    = readTrans || writeTrans
 
-  val pmem        = Module(new Pmem)
+  val pmem        = Module(new Pmem) // debug
   /*
   val ctrlFire    = io.dcacheCtrl.valid && io.dcacheCtrl.ready
   val readFire    = io.dcacheRead.valid && io.dcacheRead.ready
@@ -109,51 +93,22 @@ class LSU extends Module {
   io.dcacheCoh.valid            := io.in.coherence
   */
 
-  /*
-  // load状态机
-  val idle :: wait_data :: wait_resp ::Nil = Enum(3)
-  val rState = RegInit(idle)
-  rState := MuxLookup(rState, idle, List(
-    idle        -> Mux(raddrFire && io.axiGrant, wait_data, idle),
-    wait_data   -> Mux(rdataFire, idle, wait_data)
-  ))
-
-  val rresp              = io.axiRdataIO.bits.rresp // todo
-  val bresp              = io.axiBrespIO.bits.bresp
-
-  io.axiRaddrIO.valid      := rState === idle && io.in.lsuRen
-  io.axiRaddrIO.bits.addr  := addr
-  io.axiRdataIO.ready      := rState === wait_data
-
-  // store状态机
-  val wState = RegInit(idle)
-  wState := MuxLookup(wState, idle, List(
-    idle        -> Mux(waddrFire && wdataFire && io.axiGrant, wait_resp, idle),
-    wait_resp   -> Mux(brespFire, idle, wait_resp)
-  ))
-
-  io.axiWaddrIO.valid      := wState === idle && io.in.lsuWen
-  io.axiWaddrIO.bits.addr  := addr
-  io.axiWdataIO.valid      := wState === idle && io.in.lsuWen
-  io.axiWdataIO.bits.wdata := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
-  io.axiWdataIO.bits.wstrb := io.in.wmask << addr(2, 0) // todo
-  io.axiBrespIO.ready      := wState === wait_resp
-  */
-
   // clint访问
   io.clintIO.addr       := addr
   io.clintIO.wen        := writeTrans && clintSel
   io.clintIO.wdata      := io.in.lsuWdata
   io.clintIO.wmask      := io.in.wmask
 
+  // debug
   pmem.io.raddr         := addr
   pmem.io.rvalid        := readTrans & !io.stall
   pmem.io.waddr         := addr
   pmem.io.wdata         := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
   pmem.io.mask          := io.in.wmask << addr(2, 0)
+  //
 
   // 数据对齐
-  val align64            = Cat(addr(2, 0), 0.U(3.W))
+  val align64            = Cat(addr(2, 0), 0.U(3.W)) // debug
   //val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
   //val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
   val rdata              = pmem.io.rdata >> align64
@@ -184,19 +139,13 @@ class LSU extends Module {
   io.out.excepNo        := io.in.excepNo
   io.out.exception      := io.in.exception
   io.out.csrWaddr       := io.in.csrWaddr
-  //io.out.csrWen         := Mux(io.flushCsr, false.B, io.in.csrWen)
   io.out.csrWen         := io.in.csrWen
   io.out.csrValue       := io.in.csrValue
   io.out.mret           := io.in.mret
   io.out.csrChange      := io.in.csrChange
 
-  //io.ready              := !(readTrans || writeTrans) || ((rState === wait_data && rdataFire) || (wState === wait_resp && brespFire)) && (rresp === okay || bresp === okay)
-  
   //io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
-  io.ready              := true.B
-  // 仲裁信号
-  //io.axiReq             := (rState === idle && io.in.lsuRen) || (wState === idle && io.in.lsuWen)
-  //io.axiReady           := (rState === wait_data && rdataFire) || (brespFire && wState === wait_resp)
+  io.ready              := true.B // debug
 
   if(Settings.get("sim")) {
     // 传给仿真环境，用于外设访问的判定
@@ -204,12 +153,4 @@ class LSU extends Module {
     io.out.ebreak.get       := io.in.ebreak.get
     io.out.haltRet.get      := io.in.haltRet.get
   }
-
-  //when(addr === 0x81ca5d88L.U && io.in.lsuWen) {
-  //  printf("fuck shit: pc=%x, addr=%x, wdata=%x, wmask=%x\n", io.out.pc, addr, io.dcacheWrite.bits.wdata, io.dcacheWrite.bits.wmask)
-  //}
-
-  //when(io.lsFlag.get && !cacheable) {
-  //  printf("lsu s1: pc=%x, addr=%x, rdata=%x\n", io.out.pc, addr, lsuOut)
-  //}
 }

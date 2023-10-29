@@ -49,7 +49,6 @@ class JzCore extends Module {
   clint.io.clintIO    <> lsu.io.clintIO
   clint.io.int        <> idu.io.timerInt
 
-  //io.csrAddr  := idu.io.csrAddr
   /*
   // 仲裁
   arbiter.io.ifuReq   <> icache.io.axiReq
@@ -61,10 +60,6 @@ class JzCore extends Module {
   arbiter.io.master0  <> icache.io.master
   arbiter.io.master1  <> dcache.io.master
   io.master           <> arbiter.io.master
-
-  //arbiter.io.lsuReq   <> lsu.io.axiReq
-  //arbiter.io.grantLsu <> lsu.io.axiGrant
-  //arbiter.io.lsuReady <> lsu.io.axiReady
 
   // todo: axi总线替换，axi中burst的判断（外设无法burst），外设无法超过4字节请求
   // axi访问接口
@@ -94,16 +89,13 @@ class JzCore extends Module {
 
   //ifu.io.out          <> icache.io.cpu2cache
   //icache.io.cache2cpu <> idReg.io.in
-  ifu.io.out          <> idReg.io.in
+  ifu.io.out          <> idReg.io.in // debug
   ifu.io.exuRedirect  <> exu.io.redirect
   //ifu.io.icRedirect   <> icache.io.redirect
 
-  ifu.io.valid        <> idReg.io.validIn
+  ifu.io.valid        <> idReg.io.validIn // debug
   //icache.io.validOut  <> idReg.io.validIn
   idReg.io.validOut   <> idu.io.validIn
-  //ifu.io.icacheCtrl <> icache.io.ctrlIO
-  //ifu.io.icacheRead <> icache.io.rdataIO
-  //ifu.io.icacheWrite<> icache.io.wdataIO
 
   // 控制模块
   //ctrl.io.ifuReady  <> ifu.io.ready
@@ -132,8 +124,6 @@ class JzCore extends Module {
   idReg.io.flush      <> ctrl.io.flushIduReg
   exReg.io.flush      := ctrl.io.flushExuReg
   exu.io.flush        := ctrl.io.flushExuReg
-  //lsReg.io.flush      := ctrl.io.flushLsuReg
-  //wbReg.io.flush      := ctrl.io.flushWbuReg
 
   forward.io.lsuRd  := lsReg.io.out.rd
   forward.io.wbuRd  := wbReg.io.out.rd
@@ -141,18 +131,6 @@ class JzCore extends Module {
   forward.io.wbuRegWen := wbReg.io.out.regWen
   forward.io.rs1    := exReg.io.ctrlOut.rs1
   forward.io.rs2    := exReg.io.ctrlOut.rs2
-  //forward.io.wbuCsrWen := wbReg.io.out.csrWen
-  //forward.io.wbuCsrAddr := wbReg.io.out.csrWaddr
-  //forward.io.lsuCsrWen := lsReg.io.out.csrWen
-  //forward.io.lsuCsrAddr:= lsReg.io.out.csrWaddr
-  //forward.io.csrRen   := exReg.io.ctrlOut.csrRen
-  //forward.io.csrRaddr := exReg.io.ctrlOut.csrWaddr
-  //forward.io.mret     <> idu.io.mret
-  //forward.io.flushExuCsr <> exu.io.flushCsr
-  //forward.io.flushLsuCsr <> lsu.io.flushCsr
-  //forward.io.flushWbuCsr <> wbu.io.flushCsr
-  //forward.io.lsuException := lsReg.io.out.exception
-  //forward.io.wbuException := wbReg.io.out.exception
 
   idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite
