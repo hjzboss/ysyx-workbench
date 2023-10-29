@@ -44,7 +44,7 @@ sealed class FastMul extends Module {
   val multiplier = io.in.multiplier
 
   when(io.in.mulw) {
-    val resultw = Wire(UInt(64.W))
+    val resultw = WireDefault(0.U(64.W))
     switch(io.in.mulSigned) {
       is(MulType.uu) {
         resultw := (multiplicand(31, 0).asUInt * multiplier(31, 0).asUInt).asUInt
@@ -59,7 +59,7 @@ sealed class FastMul extends Module {
     io.out.bits.resultLo := SignExt(resultw(31, 0), 64).asUInt
     io.out.bits.resultHi := SignExt(resultw(63, 32), 64).asUInt
   }.otherwise {
-    val result = Wire(UInt(128.W))
+    val result = WireDefault(0.U(128.W))
     switch(io.in.mulSigned) {
       is(MulType.uu) {
         result := (multiplicand.asUInt * multiplier.asUInt).asUInt
