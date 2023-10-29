@@ -14,10 +14,17 @@ class Divider extends Module{
 
   //val div = if(Settings.getString("div") == "fast") Module(new FastDivider) else Module(new RestDivider(64))
   //val div = Module(if(Settings.getString("div") == "fast") new FastDivider else new RestDivider(64))
-  val div = Module(new FastDivider)
-  div.io.flush <> io.flush
-  div.io.in <> io.in
-  div.io.out <> io.out
+  if(Settings.getString("div") == "fast") {
+    val fastDiv = Module(new FastDivider)
+    fastDiv.io.flush <> io.flush
+    fastDiv.io.in <> io.in
+    fastDiv.io.out <> io.out
+  } else {
+    val restDiv = Module(new FastDivider)
+    restDiv.io.flush <> io.flush
+    restDiv.io.in <> io.in
+    restDiv.io.out <> io.out
+  }
 }
 
 // 恢复余数法
