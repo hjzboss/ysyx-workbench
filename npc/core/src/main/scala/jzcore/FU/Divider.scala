@@ -5,7 +5,7 @@ import chisel3.util._
 import utils._
 import top._
 
-class Divider extends Moudle{
+class Divider extends Module{
   val io = IO(new Bundle {
     val flush   = Input(Bool())
     val in      = Flipped(new DivInput)
