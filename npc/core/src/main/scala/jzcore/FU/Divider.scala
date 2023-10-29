@@ -13,9 +13,9 @@ class Divider extends Module{
   })
 
   val div = if(Settings.getString("div") == "fast") Module(new FastDivider) else Module(new RestDivider(64))
-  div.flush <> io.flush
-  div.in <> io.in
-  div.out <> io.out
+  div.io.flush <> io.flush
+  div.io.in <> io.in
+  div.io.out <> io.out
 }
 
 // 恢复余数法
