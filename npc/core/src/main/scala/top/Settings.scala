@@ -8,7 +8,8 @@ object DefaultSettings {
     "ResetVector" -> 0x80000000L,
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
-    "lowpower"    -> true,
+    "mul"         -> "fast",
+    "div"         -> "fast",
     "fast"        -> true, // no-cache, no-axi, fast simulation mode
     "sim"         -> true // verilator mode
   )
@@ -24,5 +25,8 @@ object Settings {
   }
   def getInt(field: String) = {
     settings(field).asInstanceOf[Int]
+  }
+  def getString(field: String) = {
+    settings(field).asInstanceOf[String]
   }
 }

@@ -21,7 +21,7 @@ class Alu extends Module {
   })
 
   val mul = Module(new Mul)
-  val div = Module(new Divider(64))
+  val div = Module(new Divider)
  
   val aluOp = io.aluOp
   val isWop = AluOp.isWordOp(aluOp)

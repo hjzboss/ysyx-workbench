@@ -3,9 +3,23 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top._
+
+class Divider extends Moudle{
+  val io = IO(new Bundle {
+    val flush   = Input(Bool())
+    val in      = Flipped(new DivInput)
+    val out     = Decoupled(new DivOutput)
+  })
+
+  val div = if(Setting.getString("div") == "fast") Module(new FastDivider) else Module(new RestDivider(64))
+  div.flush <> io.flush
+  div.in <> io.in
+  div.out <> io.out
+}
 
 // 恢复余数法
-class Divider(len: Int) extends Module {
+sealed class RestDivider(len: Int) extends Module {
   val io = IO(new Bundle {
     val flush   = Input(Bool())
     val in      = Flipped(new DivInput)
@@ -122,4 +136,36 @@ class Divider(len: Int) extends Module {
     io.out.bits.quotient  := quotient
     io.out.bits.remainder := remainder
   }
+}
+
+// fast divider, one cycle
+sealed class FastDivider extends Module {
+  val io = IO(new Bundle{
+    val flush   = Input(Bool())
+    val in      = Flipped(new DivInput)
+    val out     = Decoupled(new DivOutput)
+  })
+
+  val divisor = io.in.divisor
+  val dividend = io.in.dividend
+
+  when(io.in.divw) {
+    when(io.in.divSigned) {
+      io.out.bits.quotient := SignExt((dividend(31, 0).asSInt / divisor(31, 0).asSInt)(31, 0), 64)
+      io.out.bits.remainder := SignExt((dividend(31, 0).asSInt % divisor(31, 0).asSInt)(31, 0), 64)
+    }.otherwise {
+      io.out.bits.quotient := SignExt((dividend(31, 0) / divisor(31, 0))(31, 0), 64)
+      io.out.bits.remainder := SignExt((dividend(31, 0) % divisor(31, 0))(31, 0), 64)
+    }
+  }.otherwise {
+    when(io.in.divSigned) {
+      io.out.bits.quotient := dividend.asSInt / divisor.asSInt
+      io.out.bits.remainder := dividend.asSInt % divisor.asSInt
+    }.otherwise {
+      io.out.bits.quotient := dividend / divisor
+      io.out.bits.remainder := dividend % divisor
+    }
+  }
+
+  io.out.valid := true.B
 }
