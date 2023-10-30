@@ -165,7 +165,6 @@ class JzCore extends Module {
 
     ifu.io.debug.get      <> icache.io.debugIn.get
     idReg.io.debugIn.get  <> icache.io.debugOut.get
-    ifu.io.debug.get      <> idReg.io.debugIn.get
     exReg.io.debugIn.get  <> idReg.io.debugOut.get
     exu.io.debugIn.get    <> exReg.io.debugOut.get
     lsReg.io.debugIn.get  <> exu.io.debugOut.get
