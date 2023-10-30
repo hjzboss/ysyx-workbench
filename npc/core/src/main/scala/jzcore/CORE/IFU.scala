@@ -32,7 +32,7 @@ class IFU extends Module with HasResetVector {
   })
 
   val valid        = dontTouch(WireDefault(false.B))
-  valid           := !io.stall && !io.exuRedirect.valid
+  valid           := !io.stall & !io.exuRedirect.valid
   io.valid        := valid
 
   // pc
@@ -44,7 +44,7 @@ class IFU extends Module with HasResetVector {
   val imem         = Module(new IMEM)
   imem.io.pc      := pc
   io.out.pc       := pc
-  io.out.inst     := Mux(valid, imem.io.inst, Instruction.NOP)
+  io.out.inst     := imem.io.inst
 
   /*
   io.out.addr     := pc 
