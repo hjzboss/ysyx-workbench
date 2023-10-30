@@ -7,7 +7,7 @@
 
 #define CSR_NUM 4
 
-#define SINGLE_CYCLE 1 // 单周期cpu仿真
+//#define SINGLE_CYCLE 1 // 单周期cpu仿真
 #define RESET_ADDR 0x80000000
 #define CONFIG_MBASE 0x80000000
 #define CONFIG_MSIZE 0x8000000
@@ -15,7 +15,7 @@
 #define CONFIG_ITRACE 1
 //#define CONFIG_FTRACE 1
 #define CONFIG_DIFFTEST 1
-//#define CONFIG_MTRACE 1
+#define CONFIG_MTRACE 1
 
 #define CONFIG_DEVICE 1
 #define CONFIG_VGA_SIZE_400x300 1
