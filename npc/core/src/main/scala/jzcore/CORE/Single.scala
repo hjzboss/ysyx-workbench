@@ -85,9 +85,9 @@ class Single extends Module with HasResetVector with HasInstrType {
   alu.io.opB           := opB
   alu.io.aluOp         := aluOp
   // branch addrint
-  val brAddr           = Mux(isJalr, opA(31, 0), pc) + imm(31, 0)
+  val brAddr           = Mux(isJalr, src1(31, 0), pc) + imm(31, 0)
   // ecall mret
-  brAddrPre            := Mux(systemCtrl === System.ecall | systemCtrl === System.mret, opA(31, 0), brAddr)
+  brAddrPre            := Mux(systemCtrl === System.ecall | systemCtrl === System.mret, src1(31, 0), brAddr)
   redirectValid        := (br && alu.io.brMark) || systemCtrl === System.ecall || systemCtrl === System.mret
 
 
