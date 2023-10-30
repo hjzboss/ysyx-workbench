@@ -8,10 +8,11 @@ object DefaultSettings {
     "ResetVector" -> 0x80000000L,
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
-    "mul"         -> "fast",
-    "div"         -> "fast",
-    "fast"        -> true, // no-cache, no-axi, fast simulation mode
-    "sim"         -> true // verilator mode
+    "mul"         -> "fast", // fast, booth, wallance
+    "div"         -> "fast", // fast, rest
+    //"fast"        -> true, // no-cache, no-axi, fast simulation mode
+    "sim"         -> true, // verilator mode
+    "singlecycle" -> true
   )
 }
 
