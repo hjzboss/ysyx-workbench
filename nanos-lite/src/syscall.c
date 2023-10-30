@@ -95,7 +95,6 @@ void syscall_lseek(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
   insert_strace("SYS_lseek", a, c->GPRx, fd);
 #endif
-  printf("fuck shit\n");
 }
 
 void syscall_open(Context *c, uintptr_t *a) {
@@ -136,7 +135,7 @@ void do_syscall(Context *c) {
   a[2] = c->GPR3;
   a[3] = c->GPR4;
 
-  //printf("a[0]=%d\n", a[0]);
+  printf("a[0]=%d\n", a[0]);
   switch (a[0]) {
     case SYS_yield: syscall_yield(c, a); break;
     case SYS_exit: syscall_exit(c, a); break;
