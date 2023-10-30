@@ -21,7 +21,7 @@ class GRF extends Module {
 
 
 
-  if(Settings.get("singlecycle")) {
+  if(Settings.get("core") == "single") {
     io.src1 := rf(io.rs1)
     io.src2 := rf(io.rs2)
   } else {
