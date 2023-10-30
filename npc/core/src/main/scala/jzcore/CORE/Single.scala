@@ -101,7 +101,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   pmem.io.raddr         := addr
   pmem.io.rvalid        := readTrans
   pmem.io.waddr         := addr
-  pmem.io.wdata         := opB << (ZeroExt(addr(2, 0), 6) << 3.U)
+  pmem.io.wdata         := opB << Cat(addr(2, 0), 0.U(3.W))
   pmem.io.mask          := wmask << addr(2, 0)
   val align64            = Cat(addr(2, 0), 0.U(3.W)) // debug
   val rdata              = pmem.io.rdata >> align64
@@ -135,9 +135,9 @@ class Single extends Module with HasResetVector with HasInstrType {
 
   // ebreak
   if(Settings.get("sim")) {
-    val stop              = Module(new Stop)
-    stop.io.valid        := instrtype === InstrD // ebreak
-    stop.io.haltRet      := opA
+    val stop             = Module(new Stop)
+    stop.io.valid       := instrtype === InstrD // ebreak
+    stop.io.haltRet     := opA
 
     io.debug.get.nextPc := Mux(redirectValid, brAddrPre, snpc)
     io.debug.get.pc     := pc
