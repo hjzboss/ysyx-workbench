@@ -12,13 +12,18 @@ class Soc extends Module {
     val lsFlag     = Output(Bool())
   })
 
-  if(Settings.get("singlecycle")) {
+  if(Settings.getString("core") == "single") {
     val core = Module(new Single)
     // 仿真环境
     io.debug        <> core.io.debug.get
     io.lsFlag       <> core.io.lsFlag.get
+  } else if(Settings.getString("fast")) {
+    val core = Module(new FastCore)
+    core.io.interrupt := false.B
+    // 仿真环境
+    io.debug        <> core.io.debug.get
+    io.lsFlag       <> core.io.lsFlag.get
   } else {
-    /*
     val sram = Module(new Sram)
     val ram0 = Module(new Ram)
     val ram1 = Module(new Ram)
@@ -28,10 +33,10 @@ class Soc extends Module {
     val ram5 = Module(new Ram)
     val ram6 = Module(new Ram)
     val ram7 = Module(new Ram)
-    */
+
     val core = Module(new JzCore)
     core.io.interrupt := false.B
-    /*
+
     core.io.master     <> sram.io.slave
 
     ram0.io.CLK := clock
@@ -44,7 +49,6 @@ class Soc extends Module {
     ram7.io.CLK := clock
 
     // ram, dataArray
-    
     core.io.sram0.rdata <> ram0.io.Q
     core.io.sram0.cen <> ram0.io.CEN
     core.io.sram0.wen <> ram0.io.WEN
@@ -119,7 +123,7 @@ class Soc extends Module {
     core.io.slave.arid := 0.U
     core.io.slave.bready := true.B
     core.io.slave.arsize := 0.U
-    core.io.slave.awburst := 0.U*/
+    core.io.slave.awburst := 0.U
 
     // 仿真环境
     io.debug        <> core.io.debug.get

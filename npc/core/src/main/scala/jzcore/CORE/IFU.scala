@@ -18,55 +18,36 @@ class IFU extends Module with HasResetVector {
 
     // from exu
     val exuRedirect   = Flipped(new RedirectIO)
-    /*
     val icRedirect    = Flipped(new RedirectIO)
 
     // to idu
-    val out           = new Stage1IO*/
+    val out           = new Stage1IO
  
     // ctrl
-    //val ready       = Output(Bool()) // 取指完成，主要用于唤醒流水线寄存器
     val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
-
-    val out         = new InstrFetch
   })
-
-  val valid        = dontTouch(WireDefault(false.B))
-  valid           := !io.stall & !io.exuRedirect.valid
-  io.valid        := valid
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
+  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
 
-  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, snpc))
-  //pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
-  val imem         = Module(new IMEM)
-  imem.io.pc      := pc
-  io.out.pc       := pc
-  io.out.inst     := imem.io.inst
-
-  /*
-  io.out.addr     := pc 
   if(Settings.get("sim")) {
     io.out.cacheable := true.B
   } else {
     io.out.cacheable := pc <= "hffff_ffff".U && pc >= "h8000_0000".U
   }
-  */
+
+  io.out.addr     := pc
 
   if(Settings.get("sim")) {
-    //io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
-    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, snpc))
+    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
     io.debug.get.pc     := pc
-    //io.debug.get.inst   := Instruction.NOP
-    io.debug.get.inst   := io.out.inst
+    io.debug.get.inst   := Instruction.NOP
     io.debug.get.valid  := valid
   }
 
-  /*
   val valid        = dontTouch(WireDefault(false.B))
   valid           := !io.stall && !io.exuRedirect.valid && !io.icRedirect.valid
   io.valid        := valid
-  */
 }

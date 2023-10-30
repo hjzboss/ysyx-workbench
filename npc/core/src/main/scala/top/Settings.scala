@@ -12,7 +12,7 @@ object DefaultSettings {
     "div"         -> "rest", // fast, rest
     //"fast"        -> true, // no-cache, no-axi, fast simulation mode
     "sim"         -> true, // verilator mode
-    "singlecycle" -> false
+    "core"        -> "fast"
   )
 }
 
