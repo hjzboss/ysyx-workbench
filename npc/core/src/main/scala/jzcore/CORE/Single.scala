@@ -1,8 +1,9 @@
 package jzcore
 
 import chisel3._
-import top.Settings
 import chisel3.util._
+import utils._
+import top.Settings
 
 // single cycle cpu, just for debug
 class Single extends Module with HasResetVector with HasInstrType {
@@ -84,9 +85,9 @@ class Single extends Module with HasResetVector with HasInstrType {
   alu.io.opB           := opB
   alu.io.aluOp         := aluOp
   // branch addrint
-  val brAddr           = Mux(isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm(31, 0)
+  val brAddr           = Mux(isJalr, opA(31, 0), pc) + imm(31, 0)
   // ecall mret
-  brAddrPre            := Mux(exception | mret, opA(31, 0), brAddr(31, 0))
+  brAddrPre            := Mux(exception | mret, opA(31, 0), brAddr)
   redirectValid        := (br && alu.io.brMark) || exception || mret
 
 
