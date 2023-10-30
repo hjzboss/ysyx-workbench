@@ -87,8 +87,8 @@ class Single extends Module with HasResetVector with HasInstrType {
   // branch addrint
   val brAddr           = Mux(isJalr, opA(31, 0), pc) + imm(31, 0)
   // ecall mret
-  brAddrPre            := Mux(exception | mret, opA(31, 0), brAddr)
-  redirectValid        := (br && alu.io.brMark) || exception || mret
+  brAddrPre            := Mux(systemCtrl === System.ecall | systemCtrl === System.mret, opA(31, 0), brAddr)
+  redirectValid        := (br && alu.io.brMark) || systemCtrl === System.ecall || systemCtrl === System.mret
 
 
   // LSU
@@ -122,9 +122,9 @@ class Single extends Module with HasResetVector with HasInstrType {
 
 
   // WBU
-  grf.io.wen           := regWen(instrtype)
-  grf.io.waddr         := rd
-  grf.io.wdata         := Mux(csrWen, opA, Mux(loadMem, lsuOut, aluOut))
+  grf.io.wen          := regWen(instrtype)
+  grf.io.waddr        := rd
+  grf.io.wdata        := Mux(csrType, opA, Mux(loadMem, lsuOut, aluOut))
   csr.io.waddr        := csrRaddr
   csr.io.wen          := csrType
   csr.io.wdata        := aluOut
@@ -144,6 +144,6 @@ class Single extends Module with HasResetVector with HasInstrType {
     io.debug.get.inst   := inst
     io.debug.get.valid  := true.B
 
-    io.lsFlag.get        = hasTrans
+    io.lsFlag.get       := hasTrans
   }
 }
