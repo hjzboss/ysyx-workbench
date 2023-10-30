@@ -95,6 +95,7 @@ void syscall_lseek(Context *c, uintptr_t *a) {
 #ifdef CONFIG_STRACE
   insert_strace("SYS_lseek", a, c->GPRx, fd);
 #endif
+  printf("fuck shit\n");
 }
 
 void syscall_open(Context *c, uintptr_t *a) {
