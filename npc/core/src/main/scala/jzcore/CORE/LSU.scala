@@ -9,7 +9,6 @@ class LSU extends Module {
   val io = IO(new Bundle {
     // exu传入
     val in          = Flipped(new ExuOut)
-    val stall       = Input(Bool())
 
     // 传给wbu
     val out         = new LsuOut
@@ -96,7 +95,7 @@ class LSU extends Module {
   io.clintIO.wmask      := io.in.wmask
 
   // 数据对齐
-  val align64            = Cat(addr(2, 0), 0.U(3.W)) // debug
+  val align64            = Cat(addr(2, 0), 0.U(3.W))
   val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
   val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
   val lsuOut             = LookupTree(io.in.lsType, Seq(

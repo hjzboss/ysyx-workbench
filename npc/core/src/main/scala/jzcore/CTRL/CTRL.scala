@@ -45,7 +45,6 @@ class CTRL extends Module {
   // 当取指未完成时停顿之前所有阶段，当前面指令有csr操作是时候停顿后面阶段的指令
   io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
   io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
   io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
   io.stallExuReg := !io.lsuReady | !io.exuReady
   io.stallLsuReg := !io.lsuReady | !io.exuReady
