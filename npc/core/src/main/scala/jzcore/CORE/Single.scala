@@ -5,7 +5,7 @@ import top.Settings
 import chisel3.util._
 
 // single cycle cpu, just for debug
-class Single extends Module with HasResetVector {
+class Single extends Module with HasResetVector with HasInstrType {
   val io = IO(new Bundle {
     val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
     val lsFlag          = if(Settings.get("sim")) Some(Output(Bool())) else None
@@ -73,8 +73,6 @@ class Single extends Module with HasResetVector {
 
   // EXU
   val alu   = Module(new Alu)
-  val aluSrc1 = io.aluCtrl.aluSrc1
-  val aluSrc2 = io.aluCtrl.aluSrc2
   // 操作数选择
   val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), src1))
   val opB = Mux(aluSrc2 === SrcType.reg, src2, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), imm))
