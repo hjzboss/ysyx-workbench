@@ -3,6 +3,7 @@ package top
 import chisel3._
 import chisel3.util._
 
+// 提供了三种仿真模式： 单周期、快速（没有cache和axi）和常规仿真，单周期仿真只能使用fast版本的乘除法器
 object DefaultSettings {
   def apply() = Map(
     "ResetVector" -> 0x80000000L,
