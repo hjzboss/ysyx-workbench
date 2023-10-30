@@ -13,16 +13,16 @@ class Soc extends Module {
   })
 
   if(Settings.getString("core") == "single") {
-    val core = Module(new Single)
+    val single = Module(new Single)
     // 仿真环境
-    io.debug        <> core.io.debug.get
-    io.lsFlag       <> core.io.lsFlag.get
+    io.debug        <> single.io.debug.get
+    io.lsFlag       <> single.io.lsFlag.get
   } else if(Settings.getString("core") == "fast") {
-    val core = Module(new FastCore)
-    core.io.interrupt := false.B
+    val fast = Module(new FastCore)
+    fast.io.interrupt := false.B
     // 仿真环境
-    io.debug        <> core.io.debug.get
-    io.lsFlag       <> core.io.lsFlag.get
+    io.debug        <> fast.io.debug.get
+    io.lsFlag       <> fast.io.lsFlag.get
   } else {
     val sram = Module(new Sram)
     val ram0 = Module(new Ram)
