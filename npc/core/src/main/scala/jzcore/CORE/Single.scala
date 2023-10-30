@@ -124,7 +124,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   // WBU
   grf.io.wen          := regWen(instrtype)
   grf.io.waddr        := rd
-  grf.io.wdata        := Mux(csrType, opA, Mux(loadMem, lsuOut, aluOut))
+  grf.io.wdata        := Mux(csrType, opA, Mux(loadMem.asBool, lsuOut, aluOut))
   csr.io.waddr        := csrRaddr
   csr.io.wen          := csrType
   csr.io.wdata        := aluOut
