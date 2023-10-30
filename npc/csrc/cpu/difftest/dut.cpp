@@ -30,7 +30,7 @@ static void checkregs(NEMUCPUState *ref) {
     npc_log_write("ref pc: 0x%016lx\n", ref->pc);
     npc_log_write("dut pc: 0x%016lx\n", npc_cpu.pc);
     same = false;
-    err_list[33] = true;
+    err_list[32] = true;
   }
 
   // check reg

@@ -3,9 +3,30 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top._
+
+class Divider extends Module{
+  val io = IO(new Bundle {
+    val flush   = Input(Bool())
+    val in      = Flipped(new DivInput)
+    val out     = Decoupled(new DivOutput)
+  })
+
+  if(Settings.getString("div") == "fast") {
+    val fastDiv = Module(new FastDivider)
+    fastDiv.io.flush <> io.flush
+    fastDiv.io.in <> io.in
+    fastDiv.io.out <> io.out
+  } else {
+    val restDiv = Module(new RestDivider(64))
+    restDiv.io.flush <> io.flush
+    restDiv.io.in <> io.in
+    restDiv.io.out <> io.out
+  }
+}
 
 // 恢复余数法
-class Divider(len: Int) extends Module {
+sealed class RestDivider(len: Int) extends Module {
   val io = IO(new Bundle {
     val flush   = Input(Bool())
     val in      = Flipped(new DivInput)
@@ -122,4 +143,40 @@ class Divider(len: Int) extends Module {
     io.out.bits.quotient  := quotient
     io.out.bits.remainder := remainder
   }
+}
+
+// fast divider, one cycle
+sealed class FastDivider extends Module {
+  val io = IO(new Bundle{
+    val flush   = Input(Bool())
+    val in      = Flipped(new DivInput)
+    val out     = Decoupled(new DivOutput)
+  })
+
+  val divisor = io.in.divisor
+  val dividend = io.in.dividend
+
+  when(io.in.divw) {
+    val quotientw = WireDefault(0.U(32.W))
+    val remainderw = WireDefault(0.U(32.W))
+    when(io.in.divSigned) {
+      quotientw := (dividend(31, 0).asSInt / divisor(31, 0).asSInt).asUInt
+      remainderw := (dividend(31, 0).asSInt % divisor(31, 0).asSInt).asUInt
+    }.otherwise {
+      quotientw := dividend(31, 0).asUInt / divisor(31, 0).asUInt
+      remainderw := dividend(31, 0).asUInt % divisor(31, 0).asUInt
+    }
+    io.out.bits.quotient := SignExt(quotientw, 64)
+    io.out.bits.remainder := SignExt(remainderw, 64)
+  }.otherwise {
+    when(io.in.divSigned) {
+      io.out.bits.quotient := (dividend.asSInt / divisor.asSInt).asUInt
+      io.out.bits.remainder := (dividend.asSInt % divisor.asSInt).asUInt
+    }.otherwise {
+      io.out.bits.quotient := (dividend / divisor).asUInt
+      io.out.bits.remainder := (dividend % divisor).asUInt
+    }
+  }
+
+  io.out.valid := true.B
 }

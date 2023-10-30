@@ -19,8 +19,16 @@ class GRF extends Module {
 
   val rf = RegInit(VecInit(List.fill(32)(0.U(64.W))))
 
-  io.src1 := Mux(io.wen && io.waddr === io.rs1 && io.rs1 =/= 0.U, io.wdata, rf(io.rs1))
-  io.src2 := Mux(io.wen && io.waddr === io.rs2 && io.rs2 =/= 0.U, io.wdata, rf(io.rs2))
+
+
+  if(Settings.getString("core") == "single") {
+    // 单周期无需旁路
+    io.src1 := rf(io.rs1)
+    io.src2 := rf(io.rs2)
+  } else {
+    io.src1 := Mux(io.wen && io.waddr === io.rs1 && io.rs1 =/= 0.U, io.wdata, rf(io.rs1))
+    io.src2 := Mux(io.wen && io.waddr === io.rs2 && io.rs2 =/= 0.U, io.wdata, rf(io.rs2))
+  }
 
   when(io.wen && io.waddr =/= 0.U(5.W)) {
     rf(io.waddr) := io.wdata
@@ -62,20 +70,3 @@ class GRF extends Module {
     dpigrf.io.reg31 := rf(31)
   }
 }
-
-/*
-class SimGRF extends BlackBox {
-  val io = IO(new Bundle {
-    val clock = Input(Clock())
-    val reset = Input(Bool())
-
-    val rs1   = Input(UInt(5.W))
-    val rs2   = Input(UInt(5.W))
-    val src1  = Output(UInt(64.W))
-    val src2  = Output(UInt(64.W))
-
-    val waddr = Input(UInt(5.W))
-    val wen   = Input(Bool())
-    val wdata = Input(UInt(64.W))
-  })
-}*/

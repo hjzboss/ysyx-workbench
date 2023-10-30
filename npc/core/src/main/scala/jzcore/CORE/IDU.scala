@@ -26,8 +26,6 @@ class IDU extends Module with HasInstrType{
     val ctrl      = new CtrlFlow
 
     val timerInt  = Input(Bool()) // clint int
-    
-    //val mret      = Output(Bool())
   })
 
   val grf       = Module(new GRF)
@@ -49,8 +47,6 @@ class IDU extends Module with HasInstrType{
   val aluOp     = ctrlList(3)
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
-  val lsType    = Wire(UInt(4.W)) // 防止信号被优化
-  //lsType       := lsctrl(0)
   val lsType    = lsctrl(0)
   val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
@@ -80,15 +76,12 @@ class IDU extends Module with HasInstrType{
   csr.io.waddr        := io.csrWrite.waddr
   csr.io.wen          := io.csrWrite.wen
   csr.io.wdata        := io.csrWrite.wdata
-  //csr.io.mret         := systemCtrl === System.mret && io.validIn && !io.flush && !io.stall
   csr.io.mret         := io.csrWrite.mret
   // exception
   csr.io.exception    := io.csrWrite.exception
   csr.io.epc          := io.csrWrite.epc(31, 0)
   csr.io.no           := io.csrWrite.no
   csr.io.timerInt     := io.timerInt
-  //csr.io.intResp      := io.validIn && !io.flush && !io.stall
-  //csr.io.ecall        := systemCtrl === System.ecall && io.validIn && !io.flush && !io.stall
 
   io.datasrc.pc       := io.in.pc(31, 0)
   io.datasrc.src1     := Mux(csr.io.int || instrtype === InstrE || csrType, csr.io.rdata, grf.io.src1)
@@ -104,9 +97,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.csrWen      := csrType & !int
-  //io.ctrl.csrRen      := csrType || instrtype === InstrE || int // just for csr forwarding
   io.ctrl.csrWaddr    := csrRaddr
-  //io.ctrl.csrWaddr    := Mux(systemCtrl === System.ecall || systemCtrl === System.mret, CsrId.mstatus, csrRaddr) // TODO: ecall mepc的旁路问题
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csr.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
   io.ctrl.exception   := systemCtrl === System.ecall | int // type of exception
@@ -114,17 +105,13 @@ class IDU extends Module with HasInstrType{
   io.ctrl.mret        := systemCtrl === System.mret // change mstatus
   io.ctrl.memWen      := memEn === MemEn.store & !int
   io.ctrl.memRen      := memEn === MemEn.load & !int
-  //io.ctrl.sysInsType  := systemCtrl
   io.ctrl.rs1         := Mux(csrType | int, 0.U(5.W), rs1)
   io.ctrl.rs2         := Mux(csrType, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF & !int
-  //io.ctrl.int         := csr.io.int && io.validIn
 
   io.aluCtrl.aluSrc1  := aluSrc1
   io.aluCtrl.aluSrc2  := aluSrc2
   io.aluCtrl.aluOp    := Mux(!int, aluOp, AluOp.nop)
-
-  //io.mret             := systemCtrl === System.mret
 
   if(Settings.get("sim")) {
     io.ctrl.ebreak.get    := instrtype === InstrD // ebreak

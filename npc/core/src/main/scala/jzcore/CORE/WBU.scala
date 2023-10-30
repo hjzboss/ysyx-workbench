@@ -25,7 +25,6 @@ class WBU extends Module {
   // csr文件写回
   io.csrWrite.waddr    := io.in.csrWaddr
   io.csrWrite.wdata    := io.in.exuOut
-  //io.csrWrite.wen      := Mux(io.flushCsr, false.B, io.in.csrWen)
   io.csrWrite.wen      := io.in.csrWen
   // exception
   io.csrWrite.exception:= io.in.exception

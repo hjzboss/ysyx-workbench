@@ -119,6 +119,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // timer
     if (raddr == CONFIG_TIMER_MMIO + 8) {
+      // initial boot time
       gettimeofday(&boot_time, NULL);
     }
     else if (raddr == CONFIG_TIMER_MMIO) {

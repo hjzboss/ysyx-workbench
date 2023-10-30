@@ -11,7 +11,6 @@ class EXU extends Module {
     val datasrc     = Flipped(new DataSrcIO)
     val aluCtrl     = Flipped(new AluIO)
     val ctrl        = Flipped(new CtrlFlow)
-    //val flushCsr    = Input(Bool())
     
     // 传给Lsu
     val out         = new ExuOut
@@ -108,13 +107,11 @@ class EXU extends Module {
   io.out.excepNo       := io.ctrl.excepNo
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
-  //io.out.csrWen        := Mux(io.flushCsr, false.B, io.ctrl.csrWen)
   io.out.csrWen        := io.ctrl.csrWen
   io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
   io.out.mret          := io.ctrl.mret
   io.out.csrChange     := io.ctrl.csrChange
-  //io.out.int           := io.ctrl.int
 
   if(Settings.get("sim")) {
     io.out.ebreak.get      := io.ctrl.ebreak.get
