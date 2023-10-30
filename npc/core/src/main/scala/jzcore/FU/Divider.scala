@@ -18,7 +18,7 @@ class Divider extends Module{
     fastDiv.io.in <> io.in
     fastDiv.io.out <> io.out
   } else {
-    val restDiv = Module(new FastDivider)
+    val restDiv = Module(new RestDivider(64))
     restDiv.io.flush <> io.flush
     restDiv.io.in <> io.in
     restDiv.io.out <> io.out
