@@ -10,9 +10,8 @@ object DefaultSettings {
     "SocResetVector" -> 0x30000000L,
     "mul"         -> "booth", // fast, booth, wallance
     "div"         -> "rest", // fast, rest
-    //"fast"        -> true, // no-cache, no-axi, fast simulation mode
-    "sim"         -> true, // verilator mode
-    "core"        -> "fast"
+    "sim"         -> true, // verilator mode， false is soc mode， no debug
+    "core"        -> "single" // single, fast, normal
   )
 }
 
