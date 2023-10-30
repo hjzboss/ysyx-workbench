@@ -143,7 +143,7 @@ object RV64IM extends HasInstrType {
     LUI     -> List(InstrU, SrcType.nul, SrcType.imm, AluOp.add),
 
     JAL     -> List(InstrJ, SrcType.pc, SrcType.plus4, AluOp.jump),
-    JALR    -> List(InstrIJ, SrcType.pc, SrcType.plus4, AluOp.jump),
+    JALR    -> List(InstrIJ, SrcType.reg, SrcType.plus4, AluOp.jump),
 
     BEQ     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.beq),
     BNE     -> List(InstrB, SrcType.reg, SrcType.reg, AluOp.bne),
