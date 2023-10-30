@@ -91,6 +91,7 @@ int _close(int fd) {
 
 off_t _lseek(int fd, off_t offset, int whence) {
   off_t ret = _syscall_(SYS_lseek, fd, offset, whence);
+  // TODO: 神秘bug？？？？？？？？？不加下面两行代码编译出的代码会少一大截，导致程序出现莫名奇妙的错误
   off_t fuck = 0;
   asm volatile("mv %[fuck], %[ret]" :[fuck] "=r" (fuck) :[ret] "r" (ret));
   return ret;

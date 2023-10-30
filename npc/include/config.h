@@ -7,7 +7,6 @@
 
 #define CSR_NUM 4
 
-//#define SINGLE_CYCLE 1 // 单周期cpu仿真
 #define RESET_ADDR 0x80000000
 #define CONFIG_MBASE 0x80000000
 #define CONFIG_MSIZE 0x8000000
