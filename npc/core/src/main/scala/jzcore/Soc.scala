@@ -3,6 +3,7 @@ package jzcore
 import chisel3._
 import chisel3.util._
 import utils._
+import top.Settings
 
 class Soc extends Module {
   val io = IO(new Bundle {
@@ -17,8 +18,6 @@ class Soc extends Module {
     io.debug        <> core.io.debug.get
     io.lsFlag       <> core.io.lsFlag.get
   } else {
-    val core = Module(new JzCore)
-
     /*
     val sram = Module(new Sram)
     val ram0 = Module(new Ram)
