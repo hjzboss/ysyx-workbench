@@ -86,7 +86,7 @@ class LSU extends Module {
   }
 
   // coherence
-  io.dcacheCoh.valid            := io.in.coherence
+  io.dcacheCoh.valid    := io.in.coherence
 
   // clint访问
   io.clintIO.addr       := addr
