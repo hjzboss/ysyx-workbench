@@ -21,7 +21,8 @@ class GRF extends Module {
 
 
 
-  if(Settings.get("core") == "single") {
+  if(Settings.getString("core") == "single") {
+    // 单周期无需旁路
     io.src1 := rf(io.rs1)
     io.src2 := rf(io.rs2)
   } else {
