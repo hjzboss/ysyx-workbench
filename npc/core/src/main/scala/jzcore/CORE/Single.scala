@@ -101,7 +101,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   pmem.io.raddr         := addr
   pmem.io.rvalid        := readTrans
   pmem.io.waddr         := addr
-  pmem.io.wdata         := opB << Cat(addr(2, 0), 0.U(3.W))
+  pmem.io.wdata         := src2 << Cat(addr(2, 0), 0.U(3.W))
   pmem.io.mask          := wmask << addr(2, 0)
   val align64            = Cat(addr(2, 0), 0.U(3.W)) // debug
   val rdata              = pmem.io.rdata >> align64
