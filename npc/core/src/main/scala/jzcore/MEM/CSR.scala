@@ -54,7 +54,8 @@ class CSR extends Module {
   val MSTATUS_MPIE    = 7
   val MIP_CLINT       = 7
 
-  if(Settings.get("singlecycle")) {
+  if(Settings.getString("core") == "single") {
+    // 单周期无需旁路
     io.rdata := LookupTreeDefault(io.raddr, 0.U, List(
       CsrId.mstatus -> mstatus,
       CsrId.mtvec   -> ZeroExt(mtvec, 64),
