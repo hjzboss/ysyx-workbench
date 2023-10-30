@@ -54,10 +54,7 @@ class CSR extends Module {
   val MSTATUS_MPIE    = 7
   val MIP_CLINT       = 7
 
-  when(io.wen && io.waddr === io.raddr) {
-    // forward
-    io.rdata := io.wdata
-  }.otherwise {
+  if(Settings.get("singlecycle")) {
     io.rdata := LookupTreeDefault(io.raddr, 0.U, List(
       CsrId.mstatus -> mstatus,
       CsrId.mtvec   -> ZeroExt(mtvec, 64),
@@ -66,6 +63,20 @@ class CSR extends Module {
       CsrId.mie     -> ZeroExt(mie, 64),
       CsrId.mip     -> ZeroExt(mip, 64)
     ))
+  } else {
+    when(io.wen && io.waddr === io.raddr) {
+      // forward
+      io.rdata := io.wdata
+    }.otherwise {
+      io.rdata := LookupTreeDefault(io.raddr, 0.U, List(
+        CsrId.mstatus -> mstatus,
+        CsrId.mtvec   -> ZeroExt(mtvec, 64),
+        CsrId.mepc    -> ZeroExt(mepc, 64),
+        CsrId.mcause  -> mcause,
+        CsrId.mie     -> ZeroExt(mie, 64),
+        CsrId.mip     -> ZeroExt(mip, 64)
+      ))
+    }
   }
 
   when(io.wen) {
