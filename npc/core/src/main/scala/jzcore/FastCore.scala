@@ -91,7 +91,6 @@ class FastCore extends Module {
 
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
-  lsu.io.stall      := ctrl.io.stallLsuReg
   wbu.io.in         <> wbReg.io.out
   
   if(Settings.get("sim")) {
