@@ -17,7 +17,7 @@ class Soc extends Module {
     // 仿真环境
     io.debug        <> core.io.debug.get
     io.lsFlag       <> core.io.lsFlag.get
-  } else if(Settings.getString("fast")) {
+  } else if(Settings.getString("core") == "fast") {
     val core = Module(new FastCore)
     core.io.interrupt := false.B
     // 仿真环境

@@ -21,7 +21,7 @@ class JzCore extends Module {
     val sram4           = new RamIO
     val sram5           = new RamIO
     val sram6           = new RamIO
-    val sram7           = new RamIO*/
+    val sram7           = new RamIO
 
     val interrupt      = Input(Bool())
     val master         = new AxiMaster
@@ -83,7 +83,7 @@ class JzCore extends Module {
   dcache.io.sram4       <> io.sram4
   dcache.io.sram5       <> io.sram5
   dcache.io.sram6       <> io.sram6
-  dcache.io.sram7       <> io.sram7*/
+  dcache.io.sram7       <> io.sram7
 
   ifu.io.out          <> icache.io.cpu2cache
   icache.io.cache2cpu <> idReg.io.in
