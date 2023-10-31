@@ -99,7 +99,8 @@ class FastCore extends Module {
     wbReg.io.lsFlagIn.get <> lsu.io.lsFlag.get
     io.lsFlag.get         <> wbReg.io.lsFlagOut.get
     ifu.io.debug.get      <> idReg.io.debugIn.get
-    exReg.io.debugIn.get  <> idReg.io.debugOut.get
+    idu.io.debugIn.get    <> idReg.io.debugOut.get
+    exReg.io.debugIn.get  <> idu.io.debugOut.get
     exu.io.debugIn.get    <> exReg.io.debugOut.get
     lsReg.io.debugIn.get  <> exu.io.debugOut.get
     wbReg.io.debugIn.get  <> lsReg.io.debugOut.get
