@@ -54,7 +54,7 @@ class Alu extends Module {
   aluOut    := LookupTree(io.aluOp, List(
     AluOp.add       -> (opA + opB),
     AluOp.addw      -> (opA + opB),
-    //AluOp.jump      -> (opA + opB),
+    AluOp.jump      -> (opA + opB),
     AluOp.sub       -> (opA - opB),
     AluOp.subw      -> (opA - opB),
     //AluOp.beq       -> Mux(opA === opB, 1.U(64.W), 0.U(64.W)),
