@@ -145,17 +145,12 @@ object MemEn {
 }
 
 object Forward {
-  def normal      = "b0000".U
-  def lsuData     = "b0001".U
-  def wbuData     = "b0010".U
-  def csrWbuData  = "b0011".U
-  def csrLsuData  = "b0100".U
-  def wbuMepc     = "b0101".U
-  def wbuNo       = "b0110".U
-  def lsuMepc     = "b0111".U
-  def lsuNo       = "b1000".U
+  def normal      = "b00".U
+  def lsuData     = "b01".U
+  def wbuData     = "b10".U
+  def exuData     = "b11".U
 
-  def apply() = UInt(4.W)
+  def apply() = UInt(2.W)
 }
 
 trait HasInstrType {

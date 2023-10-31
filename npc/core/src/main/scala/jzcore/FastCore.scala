@@ -80,15 +80,9 @@ class FastCore extends Module {
   exu.io.ctrl       <> exReg.io.ctrlOut
   exu.io.lsuForward := lsReg.io.out.exuOut
   exu.io.wbuForward := wbu.io.regWrite.value
-  exu.io.csrWbuForward := wbReg.io.out.csrValue
-  exu.io.csrLsuForward := lsReg.io.out.csrValue
   exu.io.out        <> lsReg.io.in
   exu.io.forwardA   <> forward.io.forwardA
   exu.io.forwardB   <> forward.io.forwardB
-  exu.io.wbuMepc    := wbReg.io.out.pc
-  exu.io.lsuMepc    := lsReg.io.out.pc
-  exu.io.lsuNo      := lsReg.io.out.excepNo
-  exu.io.wbuNo      := wbReg.io.out.excepNo
 
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
