@@ -9,6 +9,7 @@ class FastLSU extends Module {
   val io = IO(new Bundle {
     // exu传入
     val in          = Flipped(new ExuOut)
+    val stall       = Input(Bool())
 
     // 传给wbu
     val out         = new LsuOut

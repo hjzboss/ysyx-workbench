@@ -50,7 +50,8 @@ class FastCore extends Module {
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg
   ctrl.io.stallExuReg <> exReg.io.stall
-  ctrl.io.stallLsuReg <> lsReg.io.stall
+  lsReg.io.stall      := ctrl.io.stallLsuReg
+  lsu.io.stall        := ctrl.io.stallLsuReg
   ctrl.io.stallWbuReg <> wbReg.io.stall
   ctrl.io.stallExu    <> exu.io.stall
   ctrl.io.stallPc     <> ifu.io.stall
