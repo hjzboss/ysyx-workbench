@@ -103,7 +103,7 @@ class EXU extends Module {
 
   if(Settings.get("sim")) {
     io.out.ebreak.get      := io.ctrl.ebreak.get
-    io.out.haltRet.get     := opAPre // todo: forward
+    io.out.haltRet.get     := io.ctrl.haltRet.get // todo: forward
     io.debugOut.get.inst   := io.debugIn.get.inst
     io.debugOut.get.pc     := io.debugIn.get.pc
     io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddrPre, io.debugIn.get.nextPc)

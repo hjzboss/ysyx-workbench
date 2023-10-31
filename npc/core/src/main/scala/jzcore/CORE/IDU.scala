@@ -84,6 +84,9 @@ class IDU extends Module with HasInstrType{
   grf.io.waddr         := io.regWrite.rd
   grf.io.wdata         := io.regWrite.value
 
+  io.rs1              := Mux(instrtype === InstrD, 10.U(5.W), rs1)
+  io.rs2              := rs2
+
   val csrRaddr         = Wire(UInt(12.W))
   csrRaddr            := Mux(systemCtrl === System.ecall || csr.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csrReg))
   csr.io.raddr        := csrRaddr
@@ -125,14 +128,14 @@ class IDU extends Module with HasInstrType{
   ))
   val brAddrPre         = Wire(UInt(32.W))
   brAddrPre            := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
-  val brAddr            = Mux(excepInsr | int, csr.io.rdata(31, 0), brAddr(31, 0))
+  val brAddr            = Mux(excepInsr | int, csr.io.rdata(31, 0), brAddrPre(31, 0))
   io.redirect.brAddr   := brAddr
   io.redirect.valid    := (isBr(instrtype) & brMark) | excepInsr | int
 
   // data output
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csr.io.int || excepInsr || csrType, csr.io.rdata, grf.io.src1)
-  io.datasrc.src2     := Mux(csrType, grf.io.src1, grf.io.src2)
+  io.datasrc.src1     := Mux(csr.io.int || excepInsr || csrType, csr.io.rdata, opA)
+  io.datasrc.src2     := Mux(csrType, opA, opB)
   io.datasrc.imm      := imm
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
@@ -162,5 +165,6 @@ class IDU extends Module with HasInstrType{
 
   if(Settings.get("sim")) {
     io.ctrl.ebreak.get    := instrtype === InstrD // ebreak
+    io.ctrl.haltRet.get   := opA
   }
 }
