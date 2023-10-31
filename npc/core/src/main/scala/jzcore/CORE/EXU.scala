@@ -106,7 +106,7 @@ class EXU extends Module {
     io.out.haltRet.get     := io.ctrl.haltRet.get // todo: forward
     io.debugOut.get.inst   := io.debugIn.get.inst
     io.debugOut.get.pc     := io.debugIn.get.pc
-    io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddrPre, io.debugIn.get.nextPc)
+    io.debugOut.get.nextPc := io.debugIn.get.nextPc
     io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get.valid, false.B)
   }
 }
