@@ -9,14 +9,9 @@ void init_i8042();
 void send_key(uint8_t, bool);
 void vga_update_screen();
 
-static uint64_t last = 0;
+static uint64_t key_last = 0;
 
 void device_update() {
-  last++;
-  if(last < UPDATE_FREQ) {
-    return;
-  }
-  last = 0;
   vga_update_screen();
 
   SDL_Event event;
@@ -28,6 +23,9 @@ void device_update() {
       // If a key was pressed
       case SDL_KEYDOWN:
       case SDL_KEYUP: {
+        key_last++;
+        if(key_last < KEY_UPDATE_FREQ) return;
+        key_last = 0;
         uint8_t k = event.key.keysym.scancode;
         bool is_keydown = (event.key.type == SDL_KEYDOWN);
         send_key(k, is_keydown);
