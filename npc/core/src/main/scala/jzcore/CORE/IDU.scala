@@ -32,7 +32,6 @@ class IDU extends Module with HasInstrType{
     val rs2       = Output(UInt(5.W))
     
     // 旁路数据
-    val exuForward  = Input(UInt(64.W))
     val lsuForward  = Input(UInt(64.W))
     val wbuForward  = Input(UInt(64.W))
 
