@@ -71,7 +71,8 @@ class Single extends Module with HasResetVector with HasInstrType {
   val memWen           = memEn === MemEn.store
   val memRen           = memEn === MemEn.load
 
-  val brMark = LookupTreeDefault(aluOp, false.B, List(
+  val brMark = Wire(Bool())
+  brMark := LookupTreeDefault(aluOp, false.B, List(
     AluOp.jump      -> true.B,
     AluOp.beq       -> (src1 === src2),
     AluOp.bne       -> (src1 =/= src2),
