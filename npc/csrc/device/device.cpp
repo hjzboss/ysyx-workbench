@@ -6,11 +6,17 @@ void init_vga();
 void vga_update_screen();
 void init_i8042();
 
-
 void send_key(uint8_t, bool);
 void vga_update_screen();
 
+static uint64_t last = 0;
+
 void device_update() {
+  last++;
+  if(last < UPDATE_FREQ) {
+    return;
+  }
+  last = 0;
   vga_update_screen();
 
   SDL_Event event;

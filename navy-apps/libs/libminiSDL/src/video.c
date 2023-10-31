@@ -10,7 +10,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
 
-  int src_w, src_h, src_x, src_y;
+  int src_w, src_h, src_x, src_y; // 矩形位置参数
   int dst_w, dst_h, dst_x, dst_y;
 
   if (srcrect == NULL) {
@@ -37,6 +37,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     dst_y = dstrect->y;
   }
 
+  int src_w_margin = src->w - src_w; // 画布和矩形的差值
+  int dst_w_margin = dst->w - src_w;
   if (dst->format->BytesPerPixel == 1) {
     uint8_t *src_pixel = src->pixels + src_y * src->w + src_x;
     uint8_t *dst_pixel = dst->pixels + dst_y * dst->w + dst_x;
@@ -46,8 +48,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
       for (int j = 0; j < src_w; j++) {
         *dst_pixel++ = *src_pixel++;
       }
-      src_pixel += src->w - src_w;
-      dst_pixel += dst->w - src_w;
+      src_pixel += src_w_margin;
+      dst_pixel += dst_w_margin;
     }
   }
   else {
@@ -61,8 +63,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
       for(int j = 0; j < src_w; j++) {
         *dst_pixels++ = *src_pixels++;
       }
-      src_pixels += src->w - src_w;
-      dst_pixels += dst->w - src_w; // 注意此处是src_w，不是dst_w，因为画了的宽度是src_w
+      src_pixels += src_w_margin;
+      dst_pixels += dst_w_margin; // 注意此处是src_w，不是dst_w，因为画了的宽度是src_w
     }
   }
 
@@ -89,7 +91,8 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     x = dstrect->x;
     y = dstrect->y;
   }
-
+  
+  int margin = dst->w - w; // 画布和矩形的差值
   if (dst->format->BytesPerPixel == 1) {
     assert(dst->pixels);
     uint8_t *palette_data = dst->pixels + y * dst->w + x;
@@ -97,7 +100,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
       for (int j = 0; j < w; j++) {
         *palette_data++ = color;
       }
-      palette_data += dst->w - w;
+      palette_data += margin;
     }
   }
   else {
@@ -107,7 +110,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
       for (int j = 0; j < w; j++) {
         *pixels++ = color;
       }
-      pixels += dst->w - w;
+      pixels += margin;
     }
   }
 }
