@@ -9,19 +9,12 @@ class FastLSU extends Module {
   val io = IO(new Bundle {
     // exu传入
     val in          = Flipped(new ExuOut)
-    val stall       = Input(Bool())
 
     // 传给wbu
     val out         = new LsuOut
 
     // 送给ctrl模块，用于停顿
     val ready       = Output(Bool())
-    
-    // dcache访问接口
-    //val dcacheCtrl  = Decoupled(new CacheCtrlIO)
-    //val dcacheRead  = Flipped(Decoupled(new CacheReadIO))
-    //val dcacheWrite = Decoupled(new CacheWriteIO)
-    //val dcacheCoh   = new CoherenceIO
 
     // clint接口
     val clintIO     = Flipped(new ClintIO)
@@ -35,63 +28,9 @@ class FastLSU extends Module {
   val hasTrans    = readTrans || writeTrans
 
   val pmem        = Module(new Pmem) // debug
-  /*
-  val ctrlFire    = io.dcacheCtrl.valid && io.dcacheCtrl.ready
-  val readFire    = io.dcacheRead.valid && io.dcacheRead.ready
-  val writeFire   = io.dcacheWrite.valid && io.dcacheWrite.ready
-  val coherenceFire = io.dcacheCoh.valid && io.dcacheCoh.ready
-*/
   val clintSel                   = dontTouch(WireDefault(false.B))
   clintSel                      := (addr <= 0x0200ffff.U) && (addr >= 0x02000000.U) // clint select
 
-  /*
-  val idle :: ctrl :: data :: coherence :: Nil = Enum(4)
-  val state = RegInit(idle)
-  state := MuxLookup(state, idle, List(
-    idle -> Mux(hasTrans && !clintSel, ctrl, Mux(io.in.coherence, coherence, idle)),
-    ctrl -> Mux(ctrlFire, data, ctrl),
-    data -> Mux(readFire || writeFire, idle, data), // todo
-    coherence -> Mux(coherenceFire, idle, coherence)
-  ))
-
-  val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
-  var flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
-
-  io.dcacheCtrl.valid           := state === ctrl
-  io.dcacheCtrl.bits.wen        := writeTrans
-  io.dcacheCtrl.bits.addr       := addr
-  io.dcacheCtrl.bits.cacheable  := cacheable
-  // 指定cache访问axi的size
-  val size                      = LookupTree(io.in.lsType, Seq(
-                                      LsType.ld   -> AxiWidth.double,
-                                      LsType.lw   -> AxiWidth.word,
-                                      LsType.lh   -> AxiWidth.half,
-                                      LsType.lb   -> AxiWidth.byte,
-                                      LsType.lbu  -> AxiWidth.byte,
-                                      LsType.lhu  -> AxiWidth.half,
-                                      LsType.lwu  -> AxiWidth.word,
-                                      LsType.sd   -> AxiWidth.double,
-                                      LsType.sw   -> AxiWidth.word,
-                                      LsType.sh   -> AxiWidth.half,
-                                      LsType.sb   -> AxiWidth.byte,
-                                      LsType.nop  -> AxiWidth.double
-                                    ))
-  io.dcacheCtrl.bits.size       := Mux(cacheable, AxiWidth.double, size)
-
-  io.dcacheRead.ready           := state === data
-  io.dcacheWrite.valid          := state === data
-
-  if(Settings.get("sim")) {
-    io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
-    io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
-  } else {
-    io.dcacheWrite.bits.wdata     := Mux(cacheable, io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U), io.in.lsuWdata << (ZeroExt(addr(1, 0), 4) << 3.U))
-    io.dcacheWrite.bits.wmask     := Mux(cacheable, io.in.wmask << addr(2, 0), io.in.wmask << addr(1, 0))
-  }
-
-  // coherence
-  io.dcacheCoh.valid            := io.in.coherence
-  */
 
   // clint访问
   io.clintIO.addr       := addr
@@ -109,8 +48,6 @@ class FastLSU extends Module {
 
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W)) // debug
-  //val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
-  //val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
   val rdata              = pmem.io.rdata >> align64
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
