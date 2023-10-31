@@ -40,8 +40,8 @@ class FastCTRL extends Module {
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
-  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
+  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
   io.stallExuReg := !io.lsuReady | !io.exuReady
   io.stallLsuReg := !io.lsuReady | !io.exuReady
   io.stallWbuReg := !io.lsuReady | !io.exuReady
@@ -49,6 +49,6 @@ class FastCTRL extends Module {
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushIduReg := io.branch
-  io.flushExuReg := io.branch | loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr
 }
 
