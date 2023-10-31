@@ -105,7 +105,7 @@ class JzCore extends Module {
   ctrl.io.icStall     <> icache.io.stallOut
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.exuReady    <> exu.io.ready
-  ctrl.io.branch      := exu.io.redirect.valid
+  ctrl.io.branch      := idu.io.redirect.valid
   ctrl.io.stallICache <> icache.io.stallIn
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg

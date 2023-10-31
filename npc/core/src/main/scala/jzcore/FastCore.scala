@@ -46,7 +46,7 @@ class FastCore extends Module {
   ctrl.io.rs2         := idu.io.ctrl.rs2
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.exuReady    <> exu.io.ready
-  ctrl.io.branch      := exu.io.redirect.valid
+  ctrl.io.branch      := idu.io.redirect.valid
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg
   ctrl.io.stallExuReg <> exReg.io.stall
