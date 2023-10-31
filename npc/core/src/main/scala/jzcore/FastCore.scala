@@ -42,8 +42,8 @@ class FastCore extends Module {
   ctrl.io.wbuCsr      := wbReg.io.out.csrChange
   ctrl.io.memRen      := exReg.io.ctrlOut.memRen
   ctrl.io.exRd        := exReg.io.ctrlOut.rd
-  ctrl.io.rs1         := idu.io.ctrl.rs1
-  ctrl.io.rs2         := idu.io.ctrl.rs2
+  ctrl.io.rs1         := idu.io.rs1
+  ctrl.io.rs2         := idu.io.rs2
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.exuReady    <> exu.io.ready
   ctrl.io.branch      := idu.io.redirect.valid

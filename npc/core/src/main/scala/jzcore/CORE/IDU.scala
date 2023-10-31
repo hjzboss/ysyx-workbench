@@ -40,6 +40,9 @@ class IDU extends Module with HasInstrType{
     val forwardB  = Input(Forward())
 
     val timerInt  = Input(Bool()) // clint int
+
+    val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut    = if(Settings.get("sim")) Some(new DebugIO) else None
   })
 
   val grf       = Module(new GRF)
@@ -166,5 +169,10 @@ class IDU extends Module with HasInstrType{
   if(Settings.get("sim")) {
     io.ctrl.ebreak.get    := instrtype === InstrD // ebreak
     io.ctrl.haltRet.get   := opA
+
+    io.debugOut.get.inst   := io.debugIn.get.inst
+    io.debugOut.get.pc     := io.debugIn.get.pc
+    io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddr, io.debugIn.get.nextPc)
+    io.debugOut.get.valid  := io.debugIn.get.valid
   }
 }
