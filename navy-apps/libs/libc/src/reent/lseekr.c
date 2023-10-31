@@ -46,8 +46,6 @@ _lseek_r (struct _reent *ptr,
   _off_t ret;
 
   errno = 0;
-  ret = _lseek (fd, pos, whence);
-  asm volatile("ebreak");
   if ((ret = _lseek (fd, pos, whence)) == (_off_t) -1 && errno != 0)
     ptr->_errno = errno;
   return ret;
