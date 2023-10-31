@@ -25,6 +25,20 @@ class IDU extends Module with HasInstrType{
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
 
+    // 写回ifu,todo:需要移动到idu阶段
+    val redirect  = new RedirectIO
+
+    val rs1       = Output(UInt(5.W))
+    val rs2       = Output(UInt(5.W))
+    
+    // 旁路数据
+    val exuForward  = Input(UInt(64.W))
+    val lsuForward  = Input(UInt(64.W))
+    val wbuForward  = Input(UInt(64.W))
+
+    val forwardA  = Input(Forward())
+    val forwardB  = Input(Forward())
+
     val timerInt  = Input(Bool()) // clint int
   })
 
@@ -82,17 +96,50 @@ class IDU extends Module with HasInstrType{
   csr.io.epc          := io.csrWrite.epc(31, 0)
   csr.io.no           := io.csrWrite.no
   csr.io.timerInt     := io.timerInt
+  val exception        = systemCtrl === System.ecall | int // type of exception
+  val excepInsr        = instrtype === InstrE // 异常指令（ecall, mret）
 
+  // branch detected
+  // forward
+  val opA = LookupTreeDefault(io.forwardA, grf.io.src1, List(
+    Forward.lsuData     -> io.lsuForward,
+    Forward.wbuData     -> io.wbuForward,
+    Forward.exuData     -> io.exuForward,
+    Forward.normal      -> grf.io.src1
+  ))
+  val opB = LookupTreeDefault(io.forwardB, grf.io.src2, List(
+    Forward.lsuData     -> io.lsuForward,
+    Forward.wbuData     -> io.wbuForward,
+    Forward.exuData     -> io.exuForward,
+    Forward.normal      -> grf.io.src2
+  ))
+  // brmark compute
+  val brMark = LookupTreeDefault(aluOp, false.B, List(
+    AluOp.jump      -> true.B,
+    AluOp.beq       -> (opA === opB),
+    AluOp.bne       -> (opA =/= opB),
+    AluOp.blt       -> (opA.asSInt() < opB.asSInt()),
+    AluOp.bge       -> (opA.asSInt() >= opB.asSInt()),
+    AluOp.bgeu      -> (opA >= opB),
+    AluOp.bltu      -> (opA < opB),
+  ))
+  val brAddrPre         = Wire(UInt(32.W))
+  brAddrPre            := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
+  val brAddr            = Mux(excepInsr | int, csr.io.rdata(31, 0), brAddr(31, 0))
+  io.redirect.brAddr   := brAddr
+  io.redirect.valid    := (isBr(instrtype) & brMark) | excepInsr | int
+
+  // data output
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csr.io.int || instrtype === InstrE || csrType, csr.io.rdata, grf.io.src1)
+  io.datasrc.src1     := Mux(csr.io.int || excepInsr || csrType, csr.io.rdata, grf.io.src1)
   io.datasrc.src2     := Mux(csrType, grf.io.src1, grf.io.src2)
   io.datasrc.imm      := imm
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  io.ctrl.br          := isBr(instrtype) | !int
+  //io.ctrl.br          := isBr(instrtype) | !int
   io.ctrl.regWen      := regWen(instrtype) & !int
-  io.ctrl.isJalr      := instrtype === InstrIJ
+  //io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
@@ -100,13 +147,13 @@ class IDU extends Module with HasInstrType{
   io.ctrl.csrWaddr    := csrRaddr
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csr.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
-  io.ctrl.exception   := systemCtrl === System.ecall | int // type of exception
-  io.ctrl.csrChange   := instrtype === InstrE | io.ctrl.csrWen // change csr status(include mret)
+  io.ctrl.exception   := exception // type of exception
+  io.ctrl.csrChange   := instrtype === InstrE | io.ctrl.csrWen | int // change csr status(include mret)
   io.ctrl.mret        := systemCtrl === System.mret // change mstatus
   io.ctrl.memWen      := memEn === MemEn.store & !int
   io.ctrl.memRen      := memEn === MemEn.load & !int
-  io.ctrl.rs1         := Mux(csrType | int, 0.U(5.W), rs1)
-  io.ctrl.rs2         := Mux(csrType, rs1, rs2)
+  //io.ctrl.rs1         := Mux(csrType | int, 0.U(5.W), rs1)
+  //io.ctrl.rs2         := Mux(csrType, rs1, rs2)
   io.ctrl.coherence   := instrtype === InstrF & !int
 
   io.aluCtrl.aluSrc1  := aluSrc1

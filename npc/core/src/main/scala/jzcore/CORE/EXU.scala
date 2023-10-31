@@ -16,15 +16,15 @@ class EXU extends Module {
     val out         = new ExuOut
 
     // 写回ifu,todo:需要移动到idu阶段
-    val redirect    = new RedirectIO
+    //val redirect    = new RedirectIO
 
     // 旁路数据
-    val lsuForward  = Input(UInt(64.W))
-    val wbuForward  = Input(UInt(64.W))
+    //val lsuForward  = Input(UInt(64.W))
+    //val wbuForward  = Input(UInt(64.W))
   
     // 旁路控制信号
-    val forwardA    = Input(Forward())
-    val forwardB    = Input(Forward())
+    //val forwardA    = Input(Forward())
+    //val forwardB    = Input(Forward())
 
     // alu
     val stall       = Input(Bool())
@@ -40,6 +40,7 @@ class EXU extends Module {
   val aluSrc1 = io.aluCtrl.aluSrc1
   val aluSrc2 = io.aluCtrl.aluSrc2
 
+  /*
   // forward
   val opAPre = LookupTreeDefault(io.forwardA, io.datasrc.src1, List(
     Forward.lsuData     -> io.lsuForward,
@@ -50,14 +51,14 @@ class EXU extends Module {
     Forward.lsuData     -> io.lsuForward,
     Forward.wbuData     -> io.wbuForward,
     Forward.normal      -> io.datasrc.src2
-  ))
+  ))*/
 
   // 操作数选择
-  val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
-  val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
+  val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), io.datasrc.src1))
+  val opB = Mux(aluSrc2 === SrcType.reg, io.datasrc.src2, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
   // alu
-  val aluOut  = alu.io.aluOut
+  val aluOut            = alu.io.aluOut
   alu.io.stall         := io.stall
   alu.io.flush         := io.flush
   alu.io.opA           := opA
@@ -65,6 +66,7 @@ class EXU extends Module {
   alu.io.aluOp         := io.aluCtrl.aluOp
   io.ready             := alu.io.ready
 
+  /*
   // todo: branch addrint
   val brAddr            = Wire(UInt(32.W))
   brAddr               := Mux(io.ctrl.isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm(31, 0)
@@ -72,7 +74,7 @@ class EXU extends Module {
   // ecall mret
   val brAddrPre         = Mux(io.ctrl.exception || io.ctrl.mret, opAPre(31, 0), brAddr(31, 0))
   io.redirect.brAddr   := brAddrPre
-  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)*/
 
   // to lsu opa
   io.out.lsType        := io.ctrl.lsType
@@ -94,7 +96,7 @@ class EXU extends Module {
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
   io.out.csrWen        := io.ctrl.csrWen
-  io.out.csrValue      := opAPre
+  io.out.csrValue      := opA
   io.out.coherence     := io.ctrl.coherence
   io.out.mret          := io.ctrl.mret
   io.out.csrChange     := io.ctrl.csrChange
