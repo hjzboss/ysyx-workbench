@@ -164,8 +164,8 @@ class CtrlFlow extends Bundle {
   val coherence     = Output(Bool())
   // 用于送给旁路单元
   //val csrRen        = Output(Bool()) // 是否读了csr寄存器的数据，用于旁路
-  //val rs1           = Output(UInt(5.W))
-  //val rs2           = Output(UInt(5.W))
+  val rs1           = Output(UInt(5.W))
+  val rs2           = Output(UInt(5.W))
   //val int           = Output(Bool())
   val mret          = Output(Bool())
   val csrChange     = Output(Bool())

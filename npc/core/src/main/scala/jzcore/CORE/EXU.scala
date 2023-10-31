@@ -19,12 +19,12 @@ class EXU extends Module {
     //val redirect    = new RedirectIO
 
     // 旁路数据
-    //val lsuForward  = Input(UInt(64.W))
-    //val wbuForward  = Input(UInt(64.W))
+    val lsuForward  = Input(UInt(64.W))
+    val wbuForward  = Input(UInt(64.W))
   
     // 旁路控制信号
-    //val forwardA    = Input(Forward())
-    //val forwardB    = Input(Forward())
+    val forwardA    = Input(Forward())
+    val forwardB    = Input(Forward())
 
     // alu
     val stall       = Input(Bool())
@@ -40,7 +40,6 @@ class EXU extends Module {
   val aluSrc1 = io.aluCtrl.aluSrc1
   val aluSrc2 = io.aluCtrl.aluSrc2
 
-  /*
   // forward
   val opAPre = LookupTreeDefault(io.forwardA, io.datasrc.src1, List(
     Forward.lsuData     -> io.lsuForward,
@@ -51,11 +50,11 @@ class EXU extends Module {
     Forward.lsuData     -> io.lsuForward,
     Forward.wbuData     -> io.wbuForward,
     Forward.normal      -> io.datasrc.src2
-  ))*/
+  ))
 
   // 操作数选择
-  val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), io.datasrc.src1))
-  val opB = Mux(aluSrc2 === SrcType.reg, io.datasrc.src2, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
+  val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
+  val opB = Mux(aluSrc2 === SrcType.reg, io.datasrc.src2, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), opBPre))
 
   // alu
   val aluOut            = alu.io.aluOut

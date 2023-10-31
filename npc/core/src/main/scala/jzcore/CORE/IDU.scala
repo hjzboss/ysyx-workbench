@@ -41,8 +41,10 @@ class IDU extends Module with HasInstrType{
 
     val timerInt  = Input(Bool()) // clint int
 
-    val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
-    val debugOut    = if(Settings.get("sim")) Some(new DebugIO) else None
+    val isBr      = Output(Bool())
+
+    val debugIn   = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
+    val debugOut  = if(Settings.get("sim")) Some(new DebugIO) else None
   })
 
   val grf       = Module(new GRF)
@@ -80,14 +82,17 @@ class IDU extends Module with HasInstrType{
                   ))
   val systemCtrl = ListLookup(inst, Instruction.SystemDefault, RV64IM.systemCtrl)(0)
 
-  // register file
-  grf.io.rs1           := Mux(instrtype === InstrD, 10.U(5.W), rs1)
-  grf.io.rs2           := rs2
-  grf.io.wen           := io.regWrite.wen
-  grf.io.waddr         := io.regWrite.rd
-  grf.io.wdata         := io.regWrite.value
+  val grfRs1 = Mux(instrtype === InstrD, 10.U(5.W), rs1)
+  val grfRs2 = rs2
 
-  io.rs1              := Mux(instrtype === InstrD, 10.U(5.W), rs1)
+  // register file
+  grf.io.rs1          := grfRs1
+  grf.io.rs2          := grfRs2
+  grf.io.wen          := io.regWrite.wen
+  grf.io.waddr        := io.regWrite.rd
+  grf.io.wdata        := io.regWrite.value
+
+  io.rs1              := rs1
   io.rs2              := rs2
 
   val csrRaddr         = Wire(UInt(12.W))
@@ -110,13 +115,11 @@ class IDU extends Module with HasInstrType{
   val opA = LookupTreeDefault(io.forwardA, grf.io.src1, List(
     Forward.lsuData     -> io.lsuForward,
     Forward.wbuData     -> io.wbuForward,
-    Forward.exuData     -> io.exuForward,
     Forward.normal      -> grf.io.src1
   ))
   val opB = LookupTreeDefault(io.forwardB, grf.io.src2, List(
     Forward.lsuData     -> io.lsuForward,
     Forward.wbuData     -> io.wbuForward,
-    Forward.exuData     -> io.exuForward,
     Forward.normal      -> grf.io.src2
   ))
   // brmark compute
@@ -137,9 +140,11 @@ class IDU extends Module with HasInstrType{
 
   // data output
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csr.io.int || excepInsr || csrType, csr.io.rdata, opA)
+  io.datasrc.src1     := Mux(csrType | int | excepInsr, csr.io.rdata, opA)
   io.datasrc.src2     := Mux(csrType, opA, opB)
   io.datasrc.imm      := imm
+
+  io.isBr             := isBr(instrtype) & !int
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
@@ -158,8 +163,8 @@ class IDU extends Module with HasInstrType{
   io.ctrl.mret        := systemCtrl === System.mret // change mstatus
   io.ctrl.memWen      := memEn === MemEn.store & !int
   io.ctrl.memRen      := memEn === MemEn.load & !int
-  //io.ctrl.rs1         := Mux(csrType | int, 0.U(5.W), rs1)
-  //io.ctrl.rs2         := Mux(csrType, rs1, rs2)
+  io.ctrl.rs1         := Mux(csrType | int | excepInsr, 0.U(5.W), grfRs1) // 如果是csr或者异常中断指令就会将rs1清零，防止exu阶段旁路转发
+  io.ctrl.rs2         := Mux(csrType, grfRs1, grfRs2)
   io.ctrl.coherence   := instrtype === InstrF & !int
 
   io.aluCtrl.aluSrc1  := aluSrc1

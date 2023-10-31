@@ -13,6 +13,8 @@ class FastCTRL extends Module {
     val lsuCsr      = Input(Bool())
     val wbuCsr      = Input(Bool())
 
+    val brUse       = Input(Bool()) // forwarding
+
     // 分支指令需要flush流水线
     val branch      = Input(Bool())
   
@@ -40,8 +42,8 @@ class FastCTRL extends Module {
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
   // 当取指未完成时停顿之前所有阶段
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
-  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.stallPc     := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
+  io.stallIduReg := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
   io.stallExuReg := !io.lsuReady | !io.exuReady
   io.stallLsuReg := !io.lsuReady | !io.exuReady
   io.stallWbuReg := !io.lsuReady | !io.exuReady
