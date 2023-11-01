@@ -42,6 +42,8 @@ class FastCTRL extends Module {
   val loadUse     = dontTouch(WireDefault(false.B))
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
+  val branch      = io.branch & ~io.brUse // 当出现brUse时说明操作数还没准备好，并不是真正的跳转有效
+
   // 当取指未完成时停顿之前所有阶段
   io.stallPc     := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
   io.stallIduReg := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
@@ -51,7 +53,7 @@ class FastCTRL extends Module {
   io.stallExu    := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
-  io.flushIduReg := io.branch
+  io.flushIduReg := branch
   io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
 }
 
