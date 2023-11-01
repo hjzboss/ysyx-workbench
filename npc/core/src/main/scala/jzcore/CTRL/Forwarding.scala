@@ -10,6 +10,7 @@ class Forwarding extends Module {
     val exuRd     = Input(UInt(5.W))
     val exuRegWen = Input(Bool())
     val brUse     = Output(Bool()) // 分支指令依赖于执行阶段的计算结果
+    val loadMem   = Input(Bool())
 
     // 目的寄存器编号
     val lsuRd     = Input(UInt(5.W))
@@ -34,9 +35,11 @@ class Forwarding extends Module {
   })
 
   // 当译码阶段分支计算的源操作数依赖于执行阶段的结果时停顿一拍，只旁路访存阶段和写回阶段的结果（利用流水线寄存器防止亚稳态）
-  val brUse1 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs1
-  val brUse2 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs2
-  io.brUse := io.isBr & (brUse1 | brUse2)
+  val exBrUse1 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs1
+  val exBrUse2 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs2
+  val lsBrUse1 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1 && io.loadMem
+  val lsBrUse2 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2 && io.loadMem
+  io.brUse := io.isBr & (exBrUse1 | exBrUse2 | lsBrUse1 | lsBrUse2)
 
   // idu阶段的旁路
   val idForwardALsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1

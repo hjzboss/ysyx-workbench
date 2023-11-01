@@ -72,6 +72,7 @@ class FastCore extends Module {
   forward.io.idRs2    := idu.io.rs2
   forward.io.exRs1    := exReg.io.ctrlOut.rs1
   forward.io.exRs2    := exReg.io.ctrlOut.rs2
+  forward.io.loadMem  := lsReg.io.out.loadMem
 
   idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite

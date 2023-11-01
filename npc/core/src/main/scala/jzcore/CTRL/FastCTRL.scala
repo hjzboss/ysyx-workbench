@@ -38,6 +38,7 @@ class FastCTRL extends Module {
     val rs2         = Input(UInt(5.W))
   })
 
+  // 当bruse和loaduse都出现时需要停顿两拍
   val loadUse     = dontTouch(WireDefault(false.B))
   loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
 
