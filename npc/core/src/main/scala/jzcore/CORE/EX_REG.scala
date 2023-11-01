@@ -36,10 +36,10 @@ class EX_REG extends Module with HasResetVector {
   aluCtrlReset.aluOp      := AluOp.nop
 
   val ctrlReset            = Wire(new CtrlFlow)
-  ctrlReset.br            := false.B
+  //ctrlReset.br            := false.B
   ctrlReset.rd            := 0.U(5.W)
   ctrlReset.regWen        := false.B
-  ctrlReset.isJalr        := false.B
+  //ctrlReset.isJalr        := false.B
   ctrlReset.lsType        := LsType.nop
   ctrlReset.loadMem       := false.B
   ctrlReset.wmask         := Wmask.nop
@@ -56,7 +56,7 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.csrChange     := false.B
   if(Settings.get("sim")) {
     ctrlReset.ebreak.get  := false.B
-    //ctrlReset.haltRet.get := 0.U
+    ctrlReset.haltRet.get := 0.U
   }
 
   val datasrcReg           = RegInit(datasrcReset)
