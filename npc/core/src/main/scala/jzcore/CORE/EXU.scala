@@ -28,7 +28,7 @@ class EXU extends Module {
 
     // alu
     val stall       = Input(Bool())
-    val flush       = Input(Bool())
+    //val flush       = Input(Bool())
     val ready       = Output(Bool())
 
     val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
@@ -59,7 +59,7 @@ class EXU extends Module {
   // alu
   val aluOut            = alu.io.aluOut
   alu.io.stall         := io.stall
-  alu.io.flush         := io.flush
+  //alu.io.flush         := io.flush
   alu.io.opA           := opA
   alu.io.opB           := opB
   alu.io.aluOp         := io.aluCtrl.aluOp
