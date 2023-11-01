@@ -12,7 +12,7 @@ class FastIFU extends Module with HasResetVector {
     val valid         = Output(Bool()) // 是否是一条有效指令
 
     // from exu
-    val iduRedirect   = Flipped(new RedirectIO)
+    val exuRedirect   = Flipped(new RedirectIO)
 
     // ctrl
     val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
@@ -21,14 +21,14 @@ class FastIFU extends Module with HasResetVector {
   })
 
   val valid        = dontTouch(WireDefault(false.B))
-  valid           := !io.stall & !io.iduRedirect.valid
+  valid           := !io.stall & !io.exuRedirect.valid
   io.valid        := valid
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
 
-  pc              := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, snpc))
+  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, snpc))
   val imem         = Module(new IMEM)
   imem.io.pc      := pc
   io.out.pc       := pc
@@ -36,7 +36,7 @@ class FastIFU extends Module with HasResetVector {
 
 
   if(Settings.get("sim")) {
-    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, snpc))
+    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, snpc))
     io.debug.get.pc     := pc
     io.debug.get.inst   := io.out.inst
     io.debug.get.valid  := valid
