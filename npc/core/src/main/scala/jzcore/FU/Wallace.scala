@@ -9,7 +9,7 @@ import utils._
 // todo: 无符号数的处理
 class Wallace extends Module {
   val io = IO(new Bundle() {
-    val flush   = Input(Bool())
+    //val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
@@ -57,7 +57,7 @@ class Wallace extends Module {
   def max(in: Iterable[Int]): Int = in.reduce((a, b) => if(a>b) a else b)
 
   // 华莱士树压缩算法
-  def addAll(cols: Array[Seq[Bool]], depth: Int, valid: Bool, flush: Bool): (UInt, UInt, Bool) = {
+  def addAll(cols: Array[Seq[Bool]], depth: Int, valid: Bool): (UInt, UInt, Bool) = {
     if(max(cols.map(_.size)) <= 2) {
       val sum = Cat(cols.map(_(0)).reverse)
       var k = 0
@@ -76,10 +76,10 @@ class Wallace extends Module {
 
       // 有效信号传递
       val toNextValid = dontTouch(RegInit(false.B))
-      toNextValid := Mux(flush, false.B, valid)
+      toNextValid := valid
 
       val toNextLayer = columns_next.map(_.map(x => RegEnable(x, regEnables(depth))))
-      addAll(toNextLayer, depth+1, toNextValid, flush)
+      addAll(toNextLayer, depth+1, toNextValid)
     }
   }
 
@@ -91,10 +91,10 @@ class Wallace extends Module {
   val idle :: start :: busy :: ok :: Nil = Enum(4)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle  -> Mux(io.in.valid && !io.flush, start, idle),
-    start -> Mux(io.flush, idle, busy),
-    busy  -> Mux(io.flush, idle, Mux(validTmp, ok, busy)),
-    ok    -> Mux(outFire || io.flush, idle, ok)
+    idle  -> Mux(io.in.valid, start, idle),
+    start -> busy,
+    busy  -> Mux(validTmp, ok, busy),
+    ok    -> Mux(outFire, idle, ok)
   ))
 
   val (a, b) = (io.in.multiplicand, io.in.multiplier)
@@ -148,13 +148,13 @@ class Wallace extends Module {
 
   val validIn = state === start
   // todo: 此处为每个时钟周期都调用addAll
-  val (sum, carry, validOut) = addAll(cols = columns, depth = 0, valid = validIn, flush=io.flush)
+  val (sum, carry, validOut) = addAll(cols = columns, depth = 0, valid = validIn)
   validTmp := validOut
   val result = sum + carry
 
   // 锁存有效信号和结果
   val resultReg = RegInit(0.U(128.W))
-  resultReg := Mux(io.flush, 0.U(128.W), Mux(state === busy && validTmp, result, resultReg))
+  resultReg := Mux(state === busy && validTmp, result, resultReg)
 
   io.out.bits.resultLo := Mux(io.in.mulw, SignExt(resultReg(31, 0), 64), resultReg(63, 0))
   io.out.bits.resultHi := resultReg(127, 64)
