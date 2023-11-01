@@ -93,9 +93,6 @@ class IDU extends Module with HasInstrType{
   grf.io.waddr        := io.regWrite.rd
   grf.io.wdata        := io.regWrite.value
 
-  io.rs1              := rs1
-  io.rs2              := rs2
-
   val csrRaddr         = Wire(UInt(12.W))
   csrRaddr            := Mux(systemCtrl === System.ecall || csr.io.int, CsrId.mtvec, Mux(systemCtrl === System.mret, CsrId.mepc, csrReg))
   csr.io.raddr        := csrRaddr
@@ -112,6 +109,8 @@ class IDU extends Module with HasInstrType{
   val excepInsr        = instrtype === InstrE // 异常指令（ecall, mret）
 
   /*
+  io.rs1              := rs1
+  io.rs2              := rs2
   // branch detected
   // forward
   val opA = LookupTreeDefault(io.forwardA, grf.io.src1, List(
