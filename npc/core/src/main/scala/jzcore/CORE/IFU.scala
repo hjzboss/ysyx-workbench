@@ -16,8 +16,8 @@ class IFU extends Module with HasResetVector {
     val valid         = Output(Bool()) // 是否是一条有效指令
 
     // from exu
-    //val exuRedirect   = Flipped(new RedirectIO)
-    val iduRedirect   = Flipped(new RedirectIO)
+    val exuRedirect   = Flipped(new RedirectIO)
+    //val iduRedirect   = Flipped(new RedirectIO)
     val icRedirect    = Flipped(new RedirectIO)
 
     // to idu
@@ -30,7 +30,7 @@ class IFU extends Module with HasResetVector {
   // pc
   val pc           = RegInit(resetVector.U(32.W))
   val snpc         = pc + 4.U(32.W)
-  pc              := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+  pc              := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
 
   if(Settings.get("sim")) {
     io.out.cacheable := true.B
@@ -41,11 +41,11 @@ class IFU extends Module with HasResetVector {
   io.out.addr     := pc
 
   val valid        = dontTouch(WireDefault(false.B))
-  valid           := !io.stall && !io.iduRedirect.valid && !io.icRedirect.valid
+  valid           := !io.stall && !io.exuRedirect.valid && !io.icRedirect.valid
   io.valid        := valid
 
   if(Settings.get("sim")) {
-    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+    io.debug.get.nextPc := Mux(io.stall, pc, Mux(io.exuRedirect.valid, io.exuRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
     io.debug.get.pc     := pc
     io.debug.get.inst   := Instruction.NOP
     io.debug.get.valid  := valid

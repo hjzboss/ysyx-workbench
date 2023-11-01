@@ -32,7 +32,7 @@ class FastCore extends Module {
   clint.io.int        <> idu.io.timerInt
 
   ifu.io.out          <> idReg.io.in
-  ifu.io.iduRedirect  <> exu.io.redirect
+  ifu.io.exuRedirect  <> exu.io.redirect
   ifu.io.valid        <> idReg.io.validIn
   idReg.io.validOut   <> idu.io.validIn
 
