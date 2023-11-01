@@ -63,6 +63,6 @@ class CTRL extends Module {
   io.flushICache := branch
   io.flushIduReg := branch
   //io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | (io.brUse & io.exuReady & io.lsuReady) // 当发现bruse且exu执行完毕才在下一阶段刷新exu阶段
-  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | branch
 }
 
