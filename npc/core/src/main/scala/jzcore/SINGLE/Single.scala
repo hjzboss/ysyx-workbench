@@ -90,7 +90,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   // alu
   val aluOut            = alu.io.aluOut
   alu.io.stall         := false.B
-  alu.io.flush         := false.B
+  //alu.io.flush         := false.B
   alu.io.opA           := opA
   alu.io.opB           := opB
   alu.io.aluOp         := aluOp
