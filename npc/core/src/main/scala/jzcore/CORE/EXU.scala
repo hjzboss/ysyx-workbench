@@ -16,19 +16,18 @@ class EXU extends Module {
     val out         = new ExuOut
 
     // 写回ifu,todo:需要移动到idu阶段
-    //val redirect    = new RedirectIO
+    val redirect    = new RedirectIO
 
     // 旁路数据
     val lsuForward  = Input(UInt(64.W))
     val wbuForward  = Input(UInt(64.W))
-  
+
     // 旁路控制信号
     val forwardA    = Input(Forward())
     val forwardB    = Input(Forward())
 
     // alu
     val stall       = Input(Bool())
-    //val flush       = Input(Bool())
     val ready       = Output(Bool())
 
     val debugIn     = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
@@ -65,7 +64,6 @@ class EXU extends Module {
   alu.io.aluOp         := io.aluCtrl.aluOp
   io.ready             := alu.io.ready
 
-  /*
   // todo: branch addrint
   val brAddr            = Wire(UInt(32.W))
   brAddr               := Mux(io.ctrl.isJalr, opAPre(31, 0), io.datasrc.pc) + io.datasrc.imm(31, 0)
@@ -73,7 +71,7 @@ class EXU extends Module {
   // ecall mret
   val brAddrPre         = Mux(io.ctrl.exception || io.ctrl.mret, opAPre(31, 0), brAddr(31, 0))
   io.redirect.brAddr   := brAddrPre
-  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)*/
+  io.redirect.valid    := Mux((io.ctrl.br && alu.io.brMark) || io.ctrl.exception || io.ctrl.mret, true.B, false.B)
 
   // to lsu opa
   io.out.lsType        := io.ctrl.lsType
@@ -95,17 +93,24 @@ class EXU extends Module {
   io.out.exception     := io.ctrl.exception
   io.out.csrWaddr      := io.ctrl.csrWaddr
   io.out.csrWen        := io.ctrl.csrWen
-  io.out.csrValue      := opA
+  io.out.csrValue      := opAPre
   io.out.coherence     := io.ctrl.coherence
   io.out.mret          := io.ctrl.mret
   io.out.csrChange     := io.ctrl.csrChange
 
   if(Settings.get("sim")) {
     io.out.ebreak.get      := io.ctrl.ebreak.get
+    io.out.haltRet.get     := opAPre // todo: forward
+    io.debugOut.get.inst   := io.debugIn.get.inst
+    io.debugOut.get.pc     := io.debugIn.get.pc
+    io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddrPre, io.debugIn.get.nextPc)
+    io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get.valid, false.B)
+    /*
+    io.out.ebreak.get      := io.ctrl.ebreak.get
     io.out.haltRet.get     := io.ctrl.haltRet.get // todo: forward
     io.debugOut.get.inst   := io.debugIn.get.inst
     io.debugOut.get.pc     := io.debugIn.get.pc
     io.debugOut.get.nextPc := io.debugIn.get.nextPc
-    io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get.valid, false.B)
+    io.debugOut.get.valid  := Mux(io.ready, io.debugIn.get.valid, false.B)*/
   }
 }

@@ -25,6 +25,7 @@ class IDU extends Module with HasInstrType{
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
 
+    /*
     // 写回ifu,todo:需要移动到idu阶段
     val redirect  = new RedirectIO
 
@@ -37,10 +38,11 @@ class IDU extends Module with HasInstrType{
 
     val forwardA  = Input(Forward())
     val forwardB  = Input(Forward())
+    
+    val isBr      = Output(Bool())
+    */
 
     val timerInt  = Input(Bool()) // clint int
-
-    val isBr      = Output(Bool())
 
     val debugIn   = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
     val debugOut  = if(Settings.get("sim")) Some(new DebugIO) else None
@@ -109,6 +111,7 @@ class IDU extends Module with HasInstrType{
   val exception        = systemCtrl === System.ecall | int // type of exception
   val excepInsr        = instrtype === InstrE // 异常指令（ecall, mret）
 
+  /*
   // branch detected
   // forward
   val opA = LookupTreeDefault(io.forwardA, grf.io.src1, List(
@@ -137,19 +140,22 @@ class IDU extends Module with HasInstrType{
   io.redirect.brAddr   := brAddr
   io.redirect.valid    := (isBr(instrtype) & brMark) | excepInsr | int
 
+  io.isBr             := isBr(instrtype) & !int
+  */
+
   // data output
   io.datasrc.pc       := io.in.pc(31, 0)
-  io.datasrc.src1     := Mux(csrType | int | excepInsr, csr.io.rdata, opA)
-  io.datasrc.src2     := Mux(csrType, opA, opB)
+  //io.datasrc.src1     := Mux(csrType | int | excepInsr, csr.io.rdata, opA)
+  //io.datasrc.src2     := Mux(csrType, opA, opB)
+  io.datasrc.src1     := Mux(csrType | int | excepInsr, csr.io.rdata, grf.io.src1)
+  io.datasrc.src2     := Mux(csrType, grf.io.src1, grf.io.src2)
   io.datasrc.imm      := imm
-
-  io.isBr             := isBr(instrtype) & !int
 
   // 当一条指令产生中断时，其向寄存器写回和访存信号都要清零
   io.ctrl.rd          := rd
-  //io.ctrl.br          := isBr(instrtype) | !int
+  io.ctrl.br          := isBr(instrtype) | !int
   io.ctrl.regWen      := regWen(instrtype) & !int
-  //io.ctrl.isJalr      := instrtype === InstrIJ
+  io.ctrl.isJalr      := instrtype === InstrIJ
   io.ctrl.lsType      := lsType
   io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
@@ -172,11 +178,12 @@ class IDU extends Module with HasInstrType{
 
   if(Settings.get("sim")) {
     io.ctrl.ebreak.get    := instrtype === InstrD // ebreak
-    io.ctrl.haltRet.get   := opA
+    //io.ctrl.haltRet.get   := opA
 
     io.debugOut.get.inst   := io.debugIn.get.inst
     io.debugOut.get.pc     := io.debugIn.get.pc
-    io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddr, io.debugIn.get.nextPc)
+    //io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddr, io.debugIn.get.nextPc)
+    io.debugOut.get.nextPc := io.debugIn.get.nextPc
     io.debugOut.get.valid  := io.debugIn.get.valid
   }
 }
