@@ -54,7 +54,7 @@ class EXU extends Module {
 
   // 操作数选择
   val opA = Mux(aluSrc1 === SrcType.pc, ZeroExt(io.datasrc.pc, 64), Mux(aluSrc1 === SrcType.nul, 0.U(64.W), opAPre))
-  val opB = Mux(aluSrc2 === SrcType.reg, io.datasrc.src2, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), opBPre))
+  val opB = Mux(aluSrc2 === SrcType.reg, opBPre, Mux(aluSrc2 === SrcType.plus4, 4.U(64.W), io.datasrc.imm))
 
   // alu
   val aluOut            = alu.io.aluOut
