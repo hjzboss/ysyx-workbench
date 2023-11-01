@@ -8,14 +8,12 @@ import utils._
 class Alu extends Module {
   val io = IO(new Bundle {
     val stall   = Input(Bool())
-    val flush   = Input(Bool())
 
     val opA     = Input(UInt(64.W))
     val opB     = Input(UInt(64.W))
     val aluOp   = Input(AluOp())
 
     val aluOut  = Output(UInt(64.W))
-    val brMark  = Output(Bool())
 
     val ready   = Output(Bool()) // alu操作是否完成，主要作用于乘除法
   })
@@ -36,7 +34,6 @@ class Alu extends Module {
                                     AluOp.mulhsu  -> MulType.su
                                   ))
   mul.io.out.ready              := !io.stall
-  mul.io.flush                  := io.flush
 
   val divOp                      = AluOp.divOp(aluOp)
   div.io.in.valid               := divOp
@@ -45,7 +42,6 @@ class Alu extends Module {
   div.io.in.divw                := isWop
   div.io.in.divSigned           := AluOp.divSigned(aluOp)
   div.io.out.ready              := !io.stall
-  div.io.flush                  := io.flush
 
   // xlen computation
   val opA = io.opA
@@ -57,17 +53,11 @@ class Alu extends Module {
     AluOp.jump      -> (opA + opB),
     AluOp.sub       -> (opA - opB),
     AluOp.subw      -> (opA - opB),
-    AluOp.beq       -> Mux(opA === opB, 1.U(64.W), 0.U(64.W)),
-    AluOp.bne       -> Mux(opA =/= opB, 1.U(64.W), 0.U(64.W)),
     AluOp.and       -> (opA & opB),
     AluOp.or        -> (opA | opB),
     AluOp.xor       -> (opA ^ opB),
     AluOp.slt       -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
-    AluOp.blt       -> Mux(opA.asSInt() < opB.asSInt(), 1.U(64.W), 0.U(64.W)),
-    AluOp.bge       -> Mux(opA.asSInt() >= opB.asSInt(), 1.U(64.W), 0.U(64.W)),
-    AluOp.bgeu      -> Mux(opA >= opB, 1.U(64.W), 0.U(64.W)),
     AluOp.sltu      -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
-    AluOp.bltu      -> Mux(opA < opB, 1.U(64.W), 0.U(64.W)),
     AluOp.sll       -> (opA << opB(5, 0))(63, 0),
     AluOp.srl       -> (opA >> opB(5, 0))(63, 0),
     AluOp.sra       -> (opA.asSInt() >> opB(5, 0))(63, 0).asUInt(),
@@ -95,8 +85,6 @@ class Alu extends Module {
   val divFire = div.io.out.valid && div.io.out.ready
 
   val aluOutw = SignExt(aluOut(31, 0), 64)
-  val isOne = aluOut.asUInt() === 1.U(64.W)
   io.aluOut := Mux(isWop, aluOutw, aluOut)
-  io.brMark := Mux(aluOp === AluOp.jump, true.B, Mux(AluOp.Bop(aluOp), isOne, false.B))
   io.ready  := Mux(mulOp, mulFire, Mux(divOp, divFire, true.B))
 }

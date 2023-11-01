@@ -115,19 +115,6 @@ object CsrId {
   def apply() = UInt(12.W)
 }
 
-/*
-object CsrAddr {
-  def mstatus = "b000".U
-  def mtvec   = "b001".U
-  def mepc    = "b010".U
-  def mcause  = "b011".U
-  def mie     = "b100".U
-  def mip     = "b101".U
-  def nul     = "b110".U
-
-  def apply() = UInt(3.W)
-}*/
-
 object System {
   def nop    = "b00".U
   def mret   = "b01".U
@@ -145,17 +132,11 @@ object MemEn {
 }
 
 object Forward {
-  def normal      = "b0000".U
-  def lsuData     = "b0001".U
-  def wbuData     = "b0010".U
-  def csrWbuData  = "b0011".U
-  def csrLsuData  = "b0100".U
-  def wbuMepc     = "b0101".U
-  def wbuNo       = "b0110".U
-  def lsuMepc     = "b0111".U
-  def lsuNo       = "b1000".U
+  def normal      = "b00".U
+  def lsuData     = "b01".U
+  def wbuData     = "b10".U
 
-  def apply() = UInt(4.W)
+  def apply() = UInt(2.W)
 }
 
 trait HasInstrType {

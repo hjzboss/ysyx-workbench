@@ -71,6 +71,16 @@ class Single extends Module with HasResetVector with HasInstrType {
   val memWen           = memEn === MemEn.store
   val memRen           = memEn === MemEn.load
 
+  val brMark = Wire(Bool())
+  brMark := LookupTreeDefault(aluOp, false.B, List(
+    AluOp.jump      -> true.B,
+    AluOp.beq       -> (src1 === src2),
+    AluOp.bne       -> (src1 =/= src2),
+    AluOp.blt       -> (src1.asSInt() < src2.asSInt()),
+    AluOp.bge       -> (src1.asSInt() >= src2.asSInt()),
+    AluOp.bgeu      -> (src1 >= src2),
+    AluOp.bltu      -> (src1 < src2),
+  ))
 
   // EXU
   val alu   = Module(new Alu)
@@ -80,7 +90,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   // alu
   val aluOut            = alu.io.aluOut
   alu.io.stall         := false.B
-  alu.io.flush         := false.B
+  //alu.io.flush         := false.B
   alu.io.opA           := opA
   alu.io.opB           := opB
   alu.io.aluOp         := aluOp
@@ -88,7 +98,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   val brAddr           = Mux(isJalr, src1(31, 0), pc) + imm(31, 0)
   // ecall mret
   brAddrPre            := Mux(systemCtrl === System.ecall | systemCtrl === System.mret, src1(31, 0), brAddr)
-  redirectValid        := (br && alu.io.brMark) || systemCtrl === System.ecall || systemCtrl === System.mret
+  redirectValid        := (br & brMark) || systemCtrl === System.ecall || systemCtrl === System.mret
 
 
   // LSU

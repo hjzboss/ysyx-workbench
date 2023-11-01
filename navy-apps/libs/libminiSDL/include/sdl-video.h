@@ -15,8 +15,8 @@
 #define DEFAULT_AMASK 0xff000000
 
 typedef struct {
-	int16_t x, y;
-	uint16_t w, h;
+	int16_t x, y; // 矩形左上角的xy坐标
+	uint16_t w, h; // 矩形的宽高
 } SDL_Rect;
 
 typedef union {

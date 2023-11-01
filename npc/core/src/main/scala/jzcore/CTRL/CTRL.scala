@@ -14,6 +14,8 @@ class CTRL extends Module {
     val lsuCsr      = Input(Bool())
     val wbuCsr      = Input(Bool())
 
+    val brUse       = Input(Bool()) // forwarding
+
     // 分支指令需要flush流水线
     val branch      = Input(Bool())
   
@@ -40,20 +42,22 @@ class CTRL extends Module {
   })
 
   val loadUse     = dontTouch(WireDefault(false.B))
-  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2) 
+  loadUse        := io.memRen && (io.exRd === io.rs1 || io.exRd === io.rs2)
 
-  // 当取指未完成时停顿之前所有阶段，当前面指令有csr操作是时候停顿后面阶段的指令
-  io.stallICache := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
-  io.stallPc     := !io.lsuReady | (loadUse & !io.branch) | (io.icStall & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
-  io.stallIduReg := !io.lsuReady | (loadUse & !io.branch) | !io.exuReady | (io.exuCsr & !io.branch) | io.lsuCsr | io.wbuCsr
+  val branch      = io.branch & ~io.brUse // 当出现brUse时说明操作数还没准备好，并不是真正的跳转有效
+
+  // 当取指未完成时停顿之前所有阶段，当前面指令有csr操作是时候停顿后面阶段pc的指令
+  io.stallICache := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
+  io.stallPc     := !io.lsuReady | loadUse | (io.icStall & !branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
+  io.stallIduReg := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
   io.stallExuReg := !io.lsuReady | !io.exuReady
   io.stallLsuReg := !io.lsuReady | !io.exuReady
   io.stallWbuReg := !io.lsuReady | !io.exuReady
   io.stallExu    := !io.lsuReady
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
-  io.flushICache := io.branch
-  io.flushIduReg := io.branch
-  io.flushExuReg := io.branch | loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr
+  io.flushICache := branch
+  io.flushIduReg := branch
+  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | (io.brUse & io.exuReady & io.lsuReady) // 当发现bruse且exu执行完毕才在下一阶段刷新exu阶段
 }
 

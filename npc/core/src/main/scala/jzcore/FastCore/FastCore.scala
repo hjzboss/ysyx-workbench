@@ -32,7 +32,7 @@ class FastCore extends Module {
   clint.io.int        <> idu.io.timerInt
 
   ifu.io.out          <> idReg.io.in
-  ifu.io.exuRedirect  <> exu.io.redirect
+  ifu.io.iduRedirect  <> idu.io.redirect
   ifu.io.valid        <> idReg.io.validIn
   idReg.io.validOut   <> idu.io.validIn
 
@@ -42,15 +42,17 @@ class FastCore extends Module {
   ctrl.io.wbuCsr      := wbReg.io.out.csrChange
   ctrl.io.memRen      := exReg.io.ctrlOut.memRen
   ctrl.io.exRd        := exReg.io.ctrlOut.rd
-  ctrl.io.rs1         := idu.io.ctrl.rs1
-  ctrl.io.rs2         := idu.io.ctrl.rs2
+  ctrl.io.rs1         := idu.io.rs1
+  ctrl.io.rs2         := idu.io.rs2
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.exuReady    <> exu.io.ready
-  ctrl.io.branch      := exu.io.redirect.valid
+  ctrl.io.branch      := idu.io.redirect.valid
+  ctrl.io.brUse       <> forward.io.brUse
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg
   ctrl.io.stallExuReg <> exReg.io.stall
-  ctrl.io.stallLsuReg <> lsReg.io.stall
+  lsReg.io.stall      := ctrl.io.stallLsuReg
+  lsu.io.stall        := ctrl.io.stallLsuReg
   ctrl.io.stallWbuReg <> wbReg.io.stall
   ctrl.io.stallExu    <> exu.io.stall
   ctrl.io.stallPc     <> ifu.io.stall
@@ -58,14 +60,18 @@ class FastCore extends Module {
   idu.io.flush        := ctrl.io.flushIduReg
   idReg.io.flush      <> ctrl.io.flushIduReg
   exReg.io.flush      := ctrl.io.flushExuReg
-  exu.io.flush        := ctrl.io.flushExuReg
 
+  forward.io.exuRd  := exReg.io.ctrlOut.rd
   forward.io.lsuRd  := lsReg.io.out.rd
   forward.io.wbuRd  := wbReg.io.out.rd
+  forward.io.exuRegWen := exReg.io.ctrlOut.regWen
   forward.io.lsuRegWen := lsReg.io.out.regWen
   forward.io.wbuRegWen := wbReg.io.out.regWen
-  forward.io.rs1    := exReg.io.ctrlOut.rs1
-  forward.io.rs2    := exReg.io.ctrlOut.rs2
+  forward.io.idRs1    := idu.io.rs1
+  forward.io.idRs2    := idu.io.rs2
+  forward.io.exRs1    := exReg.io.ctrlOut.rs1
+  forward.io.exRs2    := exReg.io.ctrlOut.rs2
+  forward.io.loadMem  := lsReg.io.out.loadMem
 
   idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite
@@ -73,21 +79,20 @@ class FastCore extends Module {
   idu.io.datasrc    <> exReg.io.datasrcIn
   idu.io.aluCtrl    <> exReg.io.aluCtrlIn
   idu.io.ctrl       <> exReg.io.ctrlIn
+  idu.io.isBr       <> forward.io.isBr
+  idu.io.forwardA   <> forward.io.idForwardA
+  idu.io.forwardB   <> forward.io.idForwardB
+  idu.io.lsuForward := lsReg.io.out.exuOut
+  idu.io.wbuForward := wbu.io.regWrite.value
 
   exu.io.datasrc    <> exReg.io.datasrcOut
   exu.io.aluCtrl    <> exReg.io.aluCtrlOut
   exu.io.ctrl       <> exReg.io.ctrlOut
   exu.io.lsuForward := lsReg.io.out.exuOut
   exu.io.wbuForward := wbu.io.regWrite.value
-  exu.io.csrWbuForward := wbReg.io.out.csrValue
-  exu.io.csrLsuForward := lsReg.io.out.csrValue
   exu.io.out        <> lsReg.io.in
-  exu.io.forwardA   <> forward.io.forwardA
-  exu.io.forwardB   <> forward.io.forwardB
-  exu.io.wbuMepc    := wbReg.io.out.pc
-  exu.io.lsuMepc    := lsReg.io.out.pc
-  exu.io.lsuNo      := lsReg.io.out.excepNo
-  exu.io.wbuNo      := wbReg.io.out.excepNo
+  exu.io.forwardA   <> forward.io.exForwardA
+  exu.io.forwardB   <> forward.io.exForwardB
 
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
@@ -97,7 +102,8 @@ class FastCore extends Module {
     wbReg.io.lsFlagIn.get <> lsu.io.lsFlag.get
     io.lsFlag.get         <> wbReg.io.lsFlagOut.get
     ifu.io.debug.get      <> idReg.io.debugIn.get
-    exReg.io.debugIn.get  <> idReg.io.debugOut.get
+    idu.io.debugIn.get    <> idReg.io.debugOut.get
+    exReg.io.debugIn.get  <> idu.io.debugOut.get
     exu.io.debugIn.get    <> exReg.io.debugOut.get
     lsReg.io.debugIn.get  <> exu.io.debugOut.get
     wbReg.io.debugIn.get  <> lsReg.io.debugOut.get

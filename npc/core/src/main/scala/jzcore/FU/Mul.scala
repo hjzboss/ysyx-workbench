@@ -8,7 +8,6 @@ import top._
 
 class Mul extends Module {
   val io = IO(new Bundle {
-    val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
@@ -17,17 +16,14 @@ class Mul extends Module {
 
   if(mulType == "booth") {
     val booth = Module(new Booth)
-    booth.io.flush <> io.flush
     booth.io.in <> io.in
     booth.io.out <> io.out
   } else if(mulType == "wallance") {
     val wallace = Module(new Wallace)
-    wallace.io.flush <> io.flush
     wallace.io.in <> io.in
     wallace.io.out <> io.out
   } else {
     val fastMul = Module(new FastMul)
-    fastMul.io.flush <> io.flush
     fastMul.io.in <> io.in
     fastMul.io.out <> io.out
   }
@@ -35,7 +31,6 @@ class Mul extends Module {
 
 sealed class FastMul extends Module {
   val io = IO(new Bundle{
-    val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
