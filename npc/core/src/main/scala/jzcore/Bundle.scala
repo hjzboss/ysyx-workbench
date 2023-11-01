@@ -145,10 +145,10 @@ class AluIO extends Bundle {
 }
 
 class CtrlFlow extends Bundle {
-  //val br            = Output(Bool()) // 分支指令信号
+  val br            = Output(Bool()) // 分支指令信号
   val rd            = Output(UInt(5.W)) // 目的寄存器
   val regWen        = Output(Bool()) // 寄存器写使能
-  //val isJalr        = Output(Bool()) // 是否三jalr指令
+  val isJalr        = Output(Bool()) // 是否三jalr指令
   val lsType        = Output(UInt(4.W)) // 访存指令类型
   val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
@@ -159,7 +159,7 @@ class CtrlFlow extends Bundle {
   val memWen        = Output(Bool()) // 存储器写使能
   val memRen        = Output(Bool()) // 存储器读使能
   val ebreak        = if(Settings.get("sim")) Some(Output(Bool())) else None
-  val haltRet       = if(Settings.get("sim")) Some(Output(UInt(64.W))) else None
+  //val haltRet       = if(Settings.get("sim")) Some(Output(UInt(64.W))) else None
   //val sysInsType    = Output(UInt(2.W))
   val coherence     = Output(Bool())
   // 用于送给旁路单元
