@@ -111,6 +111,7 @@ class IDU extends Module with HasInstrType{
   /*
   io.rs1              := rs1
   io.rs2              := rs2
+
   // branch detected
   // forward
   val opA = LookupTreeDefault(io.forwardA, grf.io.src1, List(

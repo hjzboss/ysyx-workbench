@@ -56,7 +56,7 @@ class EX_REG extends Module with HasResetVector {
   ctrlReset.csrChange     := false.B
   if(Settings.get("sim")) {
     ctrlReset.ebreak.get  := false.B
-    ctrlReset.haltRet.get := 0.U
+    //ctrlReset.haltRet.get := 0.U
   }
 
   val datasrcReg           = RegInit(datasrcReset)
