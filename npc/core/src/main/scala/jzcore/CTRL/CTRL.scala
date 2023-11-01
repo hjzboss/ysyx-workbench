@@ -58,6 +58,6 @@ class CTRL extends Module {
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushICache := branch
   io.flushIduReg := branch
-  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | (io.brUse & io.exuReady) // 当发现bruse且exu执行完毕才在下一阶段刷新exu阶段
+  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | (io.brUse & io.exuReady & io.lsuReady) // 当发现bruse且exu执行完毕才在下一阶段刷新exu阶段
 }
 

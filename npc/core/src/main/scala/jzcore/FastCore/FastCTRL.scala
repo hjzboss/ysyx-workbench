@@ -54,6 +54,6 @@ class FastCTRL extends Module {
 
   // 当取指未完成或者发现是分支指令时flush idu_reg
   io.flushIduReg := branch
-  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | (io.brUse & io.exuReady)
+  io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr | (io.brUse & io.exuReady & io.lsuReady)
 }
 
