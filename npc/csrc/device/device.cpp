@@ -6,6 +6,7 @@ void init_vga();
 void vga_update_screen();
 void init_i8042();
 
+
 void send_key(uint8_t, bool);
 void vga_update_screen();
 
