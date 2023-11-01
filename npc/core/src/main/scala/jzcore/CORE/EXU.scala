@@ -81,7 +81,7 @@ class EXU extends Module {
   io.out.lsuWen        := io.ctrl.memWen
   io.out.lsuRen        := io.ctrl.memRen
   io.out.lsuAddr       := aluOut(31, 0)
-  io.out.lsuWdata      := opBPre
+  io.out.lsuWdata      := opBPre // 写入的是寄存器的值opbpre，不是opb
   io.out.loadMem       := io.ctrl.loadMem
 
   // exu output
