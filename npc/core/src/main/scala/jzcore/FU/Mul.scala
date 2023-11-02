@@ -8,7 +8,6 @@ import top._
 
 class Mul extends Module {
   val io = IO(new Bundle {
-    val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
@@ -17,7 +16,6 @@ class Mul extends Module {
 
   if(mulType == "booth") {
     val booth = Module(new Booth)
-    booth.io.flush <> io.flush
     booth.io.in <> io.in
     booth.io.out <> io.out
   } else if(mulType == "wallance") {
