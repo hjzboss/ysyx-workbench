@@ -5,6 +5,8 @@ import chisel3.util._
 import utils._
 import top.Settings
 
+abstract class DCache extends Module
+
 class ArbiterIO extends Bundle {
   //val cen   = Output(Vec(len, Bool())) // valid & dirty
   val no    = Output(UInt(2.W))
@@ -25,7 +27,7 @@ class CohArbiter(len: Int) extends Module {
 }
 
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
-sealed class ColDCache extends Module {
+sealed class ColDCache extends DCache {
   val io = IO(new Bundle {
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
@@ -504,7 +506,7 @@ sealed class ColDCache extends Module {
 }
 
 
-class NoColDCache extends Module {
+class NoColDCache extends DCache {
   val io = IO(new Bundle {
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
