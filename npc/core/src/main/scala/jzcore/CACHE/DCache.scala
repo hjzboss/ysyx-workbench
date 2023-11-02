@@ -5,10 +5,6 @@ import chisel3.util._
 import utils._
 import top.Settings
 
-abstract class DCache extends Module {
-    val io = IO
-}
-
 class ArbiterIO extends Bundle {
   //val cen   = Output(Vec(len, Bool())) // valid & dirty
   val no    = Output(UInt(2.W))
@@ -16,21 +12,7 @@ class ArbiterIO extends Bundle {
   val tag   = Output(UInt(22.W))
 }
 
-// 一致性写回的多路选择器（仲裁）
-class CohArbiter(len: Int) extends Module {
-  val io = IO(new Bundle {
-    val in = Vec(len, Flipped(Decoupled(new ArbiterIO)))
-    val out = Decoupled(new ArbiterIO)
-  })
-
-  val arbiter = Module(new Arbiter(new ArbiterIO, len))
-  arbiter.io.in <> io.in
-  arbiter.io.out <> io.out
-}
-
-// dataArray = 4KB, 4路组相连, 64个组，一个块16B
-sealed class ColDCache extends DCache {
-  val io = IO(new Bundle {
+class DCacheIO extends Bundle {
     // cpu
     val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
     val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
@@ -50,7 +32,27 @@ sealed class ColDCache extends DCache {
     val axiReq      = Output(Bool())
     val axiGrant    = Input(Bool())
     val axiReady    = Output(Bool())
+}
+
+abstract class DCache extends Module {
+    val io = DCacheIO
+}
+
+// 一致性写回的多路选择器（仲裁）
+class CohArbiter(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val in = Vec(len, Flipped(Decoupled(new ArbiterIO)))
+    val out = Decoupled(new ArbiterIO)
   })
+
+  val arbiter = Module(new Arbiter(new ArbiterIO, len))
+  arbiter.io.in <> io.in
+  arbiter.io.out <> io.out
+}
+
+// dataArray = 4KB, 4路组相连, 64个组，一个块16B
+sealed class ColDCache extends DCache {
+  val io = DCacheIO
 
   // random replace count
   val randCount          = RegInit(0.U(2.W))
@@ -509,27 +511,7 @@ sealed class ColDCache extends DCache {
 
 
 class NoColDCache extends DCache {
-  val io = IO(new Bundle {
-    // cpu
-    val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
-    val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
-    val rdataIO         = Decoupled(new CacheReadIO)
-    val coherence       = Flipped(new CoherenceIO)
-
-    // data array io
-    val sram4           = new RamIO
-    val sram5           = new RamIO
-    val sram6           = new RamIO
-    val sram7           = new RamIO
-
-    // axi master
-    val master          = new AxiMaster
-
-    // arbiter
-    val axiReq          = Output(Bool())
-    val axiGrant        = Input(Bool())
-    val axiReady        = Output(Bool())
-  })
+  val io = DCacheIO
 
   // random replace count
   val randCount          = RegInit(0.U(2.W))
