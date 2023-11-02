@@ -12,10 +12,10 @@ object DefaultSettings {
     "ResetVector" -> 0x80000000L,
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
-    "mul"         -> "booth", // fast, booth, wallance
-    "div"         -> "rest", // fast, rest
+    "mul"         -> "fast", // fast, booth, wallance
+    "div"         -> "fast", // fast, rest
     "sim"         -> true, // verilator mode， false is soc mode， no debug
-    "core"        -> "fast" // single, fast, normal
+    "core"        -> "normal" // single, fast, normal
   )
 }
 
