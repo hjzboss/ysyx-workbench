@@ -105,9 +105,9 @@ static void trace_and_difftest() {
 
 
 // for ebreak instruction
-extern "C" void c_break(long long halt_ret) {
+extern "C" void c_break(long long halt_ret, long long pc) {
   npc_state.state = NPC_END;
-  npc_state.halt_pc = top->io_debug_pc;
+  npc_state.halt_pc = pc;
   npc_state.halt_ret = halt_ret;
 }
 
@@ -153,7 +153,7 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0) return;
-  if (waddr < 0x80000000ull) { printf("addr=%016llx out of bound\n", waddr); c_break(1); return; }
+  if (waddr < 0x80000000ull) { printf("addr=%016llx out of bound\n", waddr); c_break(1, top->io_debug_pc); return; }
   else if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
@@ -294,7 +294,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
     eval_wave();
     eval_wave();
     cnt += 1;
-    if (cnt == 1000) {
+    if (cnt == 5000) {
       printf("跑飞了\n");
       break; // 防止跑飞
     }
@@ -361,6 +361,7 @@ static void statistic() {
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
+  Log("cycle spent = " NUMBERIC_FMT " us", cycle);
   Log("total guest instructions = " NUMBERIC_FMT, total_inst);
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", total_inst * 1000000 / g_timer);

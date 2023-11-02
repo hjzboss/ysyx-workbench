@@ -7,10 +7,10 @@ int main() {
   int i;
   //char *ptr = (char *)0x81000000;
   for(i = 0; i < 65535; i++) {
-    fuck[i] = 1;
+    fuck[i] = i;
   }
   for(i = 0; i < 65535; i++) {
-    check(fuck[i] == 1);
+    check(fuck[i] == i);
   }
 
   i = 0;

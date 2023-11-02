@@ -36,7 +36,7 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
-  val dcache  = Module(new DCache)
+  val dcache  = Module(new ColDCache)
   val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
@@ -173,6 +173,7 @@ class JzCore extends Module {
     exu.io.debugIn.get    <> exReg.io.debugOut.get
     lsReg.io.debugIn.get  <> exu.io.debugOut.get
     wbReg.io.debugIn.get  <> lsReg.io.debugOut.get
-    io.debug.get          <> wbReg.io.debugOut.get
+    io.debug.get          := wbReg.io.debugOut.get
+    wbu.io.debugIn.get    := wbReg.io.debugOut.get
   }
 }

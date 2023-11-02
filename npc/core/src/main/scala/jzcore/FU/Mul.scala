@@ -70,5 +70,8 @@ sealed class FastMul extends Module {
     io.out.bits.resultHi := result(127, 64).asUInt
   }
 
-  io.out.valid := true.B
+  val fuck = RegInit(0.U(9.W))
+  fuck := fuck + 1.U
+
+  io.out.valid := fuck === 511.U
 }
