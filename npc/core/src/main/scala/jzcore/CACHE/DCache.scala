@@ -13,25 +13,25 @@ class ArbiterIO extends Bundle {
 }
 
 class DCacheIO extends Bundle {
-    // cpu
-    val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
-    val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
-    val rdataIO         = Decoupled(new CacheReadIO)
-    val coherence       = Flipped(new CoherenceIO)
+  // cpu
+  val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
+  val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
+  val rdataIO         = Decoupled(new CacheReadIO)
+  val coherence       = Flipped(new CoherenceIO)
 
-    // data array io
-    val sram4           = new RamIO
-    val sram5           = new RamIO
-    val sram6           = new RamIO
-    val sram7           = new RamIO
+  // data array io
+  val sram4           = new RamIO
+  val sram5           = new RamIO
+  val sram6           = new RamIO
+  val sram7           = new RamIO
 
-    // axi master
-    val master     = new AxiMaster
+  // axi master
+  val master     = new AxiMaster
 
-    // arbiter
-    val axiReq      = Output(Bool())
-    val axiGrant    = Input(Bool())
-    val axiReady    = Output(Bool())
+  // arbiter
+  val axiReq      = Output(Bool())
+  val axiGrant    = Input(Bool())
+  val axiReady    = Output(Bool())
 }
 
 abstract class DCache extends Module {
@@ -874,4 +874,5 @@ class NoColDCache extends DCache {
   io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
 
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
+  io.coherence.ready       := true.B
 }
