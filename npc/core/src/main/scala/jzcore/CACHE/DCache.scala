@@ -35,7 +35,7 @@ class DCacheIO extends Bundle {
 }
 
 abstract class DCache extends Module {
-    val io = new DCacheIO
+  val io = new DCacheIO
 }
 
 // 一致性写回的多路选择器（仲裁）
@@ -52,8 +52,6 @@ class CohArbiter(len: Int) extends Module {
 
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 sealed class ColDCache extends DCache {
-  val io = new DCacheIO
-
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
@@ -511,8 +509,6 @@ sealed class ColDCache extends DCache {
 
 
 class NoColDCache extends DCache {
-  val io = new DCacheIO
-
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
