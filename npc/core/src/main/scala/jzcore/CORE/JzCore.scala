@@ -113,6 +113,7 @@ class JzCore extends Module {
   ctrl.io.stallICache <> icache.io.stallIn
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg
+  lsu.io.stall        := ctrl.io.stallLsuReg
   ctrl.io.stallExuReg <> exReg.io.stall
   ctrl.io.stallLsuReg <> lsReg.io.stall
   ctrl.io.stallWbuReg <> wbReg.io.stall
