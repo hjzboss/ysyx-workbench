@@ -55,6 +55,7 @@ class EXU extends Module {
 
   // alu
   val aluOut            = alu.io.aluOut
+  alu.io.flush         := io.flush
   alu.io.stall         := io.stall
   alu.io.opA           := opA
   alu.io.opB           := opB
