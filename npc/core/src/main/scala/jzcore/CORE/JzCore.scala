@@ -18,10 +18,10 @@ class JzCore extends Module {
     val sram3           = new RamIO
 
     // dcache data array
-    val sram4           = new RamIO
-    val sram5           = new RamIO
-    val sram6           = new RamIO
-    val sram7           = new RamIO
+    //val sram4           = new RamIO
+    //val sram5           = new RamIO
+    //val sram6           = new RamIO
+    //val sram7           = new RamIO
 
     val interrupt      = Input(Bool())
     val master         = new AxiMaster
@@ -52,9 +52,9 @@ class JzCore extends Module {
   arbiter.io.ifuReq   <> icache.io.axiReq
   arbiter.io.grantIfu <> icache.io.axiGrant
   arbiter.io.ifuReady <> icache.io.axiReady
-  arbiter.io.lsuReq   <> dcache.io.axiReq
-  arbiter.io.grantLsu <> dcache.io.axiGrant
-  arbiter.io.lsuReady <> dcache.io.axiReady
+  arbiter.io.lsuReq   := false.B
+  //arbiter.io.grantLsu <> dcache.io.axiGrant
+  arbiter.io.lsuReady := true.B
   arbiter.io.master0  <> icache.io.master
   arbiter.io.master1  <> dcache.io.master
   io.master           <> arbiter.io.master
@@ -80,10 +80,10 @@ class JzCore extends Module {
   icache.io.sram3       <> io.sram3
 
   // dcache
-  dcache.io.sram4       <> io.sram4
-  dcache.io.sram5       <> io.sram5
-  dcache.io.sram6       <> io.sram6
-  dcache.io.sram7       <> io.sram7
+  //dcache.io.sram4       <> io.sram4
+  //dcache.io.sram5       <> io.sram5
+  //dcache.io.sram6       <> io.sram6
+  //dcache.io.sram7       <> io.sram7
 
   ifu.io.out          <> icache.io.cpu2cache
   icache.io.cache2cpu <> idReg.io.in
