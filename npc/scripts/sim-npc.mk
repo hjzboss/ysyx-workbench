@@ -16,7 +16,7 @@ VERILATOR = verilator
 SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 WAVE = wave.vcd
 
-VERILATOR_SIMFLAG = --prof-cfuncs
+VERILATOR_SIMFLAG = 
 # build
 VERILATOR_SIMFLAG += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
