@@ -15,7 +15,7 @@ object DefaultSettings {
     "mul"         -> "fast", // fast, booth, wallance
     "div"         -> "rest", // fast, rest
     "sim"         -> true, // verilator mode， false is soc mode， no debug
-    "core"        -> "normal" // single, fast, normal
+    "core"        -> "fast" // single, fast, normal
   )
 }
 
