@@ -34,7 +34,7 @@ class DCacheIO extends Bundle {
     val axiReady    = Output(Bool())
 }
 
-abstract class DCache extends Module {
+class DCache extends Module {
   val io = new DCacheIO
 }
 
