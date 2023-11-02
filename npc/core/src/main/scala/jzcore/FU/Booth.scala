@@ -33,6 +33,7 @@ sealed class PGenerator extends Module {
 // booth2位乘法器
 class Booth extends Module {
   val io = IO(new Bundle {
+    val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
@@ -42,8 +43,8 @@ class Booth extends Module {
   val idle :: busy :: Nil = Enum(2)
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
-    idle -> Mux(io.in.valid, busy, idle),
-    busy -> Mux(outFire, idle, busy)
+    idle -> Mux(io.in.valid && !io.flush, busy, idle),
+    busy -> Mux(outFire || io.flush, idle, busy)
   ))
 
   val result = RegInit(0.U(132.W)) // 结果寄存器
