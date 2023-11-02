@@ -36,8 +36,10 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
-  //val dcache  = Module(new DCache)
-  val dcache  = if(Settings.get("sim")) { Module(new NoColDCache) } else { Module(new ColDCache) }
+  var dcache  = Module(new ColDCache)
+  if(Settings.get("sim")) {
+    dcache  = Module(new NoColDCache)
+  }
   val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
