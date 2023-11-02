@@ -33,7 +33,6 @@ sealed class PGenerator extends Module {
 // booth2位乘法器
 class Booth extends Module {
   val io = IO(new Bundle {
-    //val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })

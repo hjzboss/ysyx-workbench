@@ -9,7 +9,6 @@ import utils._
 // todo: 无符号数的处理
 class Wallace extends Module {
   val io = IO(new Bundle() {
-    //val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })

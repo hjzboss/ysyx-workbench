@@ -7,19 +7,16 @@ import top._
 
 class Divider extends Module{
   val io = IO(new Bundle {
-    //val flush   = Input(Bool())
     val in      = Flipped(new DivInput)
     val out     = Decoupled(new DivOutput)
   })
 
   if(Settings.getString("div") == "fast") {
     val fastDiv = Module(new FastDivider)
-    //fastDiv.io.flush <> io.flush
     fastDiv.io.in <> io.in
     fastDiv.io.out <> io.out
   } else {
     val restDiv = Module(new RestDivider(64))
-    //restDiv.io.flush <> io.flush
     restDiv.io.in <> io.in
     restDiv.io.out <> io.out
   }
@@ -28,7 +25,6 @@ class Divider extends Module{
 // 恢复余数法
 sealed class RestDivider(len: Int) extends Module {
   val io = IO(new Bundle {
-    //val flush   = Input(Bool())
     val in      = Flipped(new DivInput)
     val out     = Decoupled(new DivOutput)
   })
@@ -148,7 +144,6 @@ sealed class RestDivider(len: Int) extends Module {
 // fast divider, one cycle
 sealed class FastDivider extends Module {
   val io = IO(new Bundle{
-    //val flush   = Input(Bool())
     val in      = Flipped(new DivInput)
     val out     = Decoupled(new DivOutput)
   })
