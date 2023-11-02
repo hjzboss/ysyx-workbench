@@ -49,15 +49,18 @@ class JzCore extends Module {
   clint.io.int        <> idu.io.timerInt
 
   // 仲裁
+  /*
   arbiter.io.ifuReq   <> icache.io.axiReq
   arbiter.io.grantIfu <> icache.io.axiGrant
   arbiter.io.ifuReady <> icache.io.axiReady
-  arbiter.io.lsuReq   := false.B
-  //arbiter.io.grantLsu <> dcache.io.axiGrant
-  arbiter.io.lsuReady := true.B
+  arbiter.io.lsuReq   <> dcache.io.axiReq
+  arbiter.io.grantLsu <> dcache.io.axiGrant
+  arbiter.io.lsuReady <> dcache.io.axiReady
   arbiter.io.master0  <> icache.io.master
-  //arbiter.io.master1  <> dcache.io.master
-  io.master           <> arbiter.io.master
+  arbiter.io.master1  <> dcache.io.master
+  io.master           <> arbiter.io.master*/
+  io.master <> icache.io.master
+  icache.io.axiGrant := true.B
 
   // todo: axi总线替换，axi中burst的判断（外设无法burst），外设无法超过4字节请求
   // axi访问接口
