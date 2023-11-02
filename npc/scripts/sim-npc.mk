@@ -16,7 +16,7 @@ VERILATOR = verilator
 SIM_OBJ_DIR = $(BUILD_DIR)/sim/obj_dir
 WAVE = wave.vcd
 
-VERILATOR_SIMFLAG = 
+VERILATOR_SIMFLAG = -j8
 # build
 VERILATOR_SIMFLAG += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
@@ -45,7 +45,6 @@ sim: $(SIM_CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
-	@echo $(IMAGE)
 	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V${USER_ID}_$(TOPNAME) $(NPC_FLAG)
 	@echo "wave"
