@@ -107,6 +107,7 @@ class FastCore extends Module {
     exu.io.debugIn.get    <> exReg.io.debugOut.get
     lsReg.io.debugIn.get  <> exu.io.debugOut.get
     wbReg.io.debugIn.get  <> lsReg.io.debugOut.get
-    io.debug.get          <> wbReg.io.debugOut.get
+    io.debug.get          := wbReg.io.debugOut.get
+    wbu.io.debugIn.get    := wbReg.io.debugOut.get
   }
 }

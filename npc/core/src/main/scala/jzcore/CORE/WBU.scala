@@ -14,7 +14,7 @@ class WBU extends Module {
     val regWrite  = new RFWriteIO
     val csrWrite  = new CSRWriteIO
 
-    //val flushCsr  = Input(Bool())
+    val debugIn  = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
   })
 
   // 寄存器文件写回
@@ -37,5 +37,6 @@ class WBU extends Module {
     // ebreak
     stop.io.valid        := io.in.ebreak.get
     stop.io.haltRet      := io.in.haltRet.get
+    stop.io.pc           := io.debugIn.get.pc
   }
 }
