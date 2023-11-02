@@ -34,8 +34,8 @@ class DCacheIO extends Bundle {
     val axiReady    = Output(Bool())
 }
 
-class DCache extends Module {
-  val io = new DCacheIO
+abstract class DCache extends Module {
+  val io = IO(new DCacheIO)
 }
 
 // 一致性写回的多路选择器（仲裁）
