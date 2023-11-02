@@ -36,7 +36,7 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
-  val dcache  = if(Settings.get("sim")) { Module(new NoColDCache) } else { Module(new ColDCache) }
+  //val dcache  = if(Settings.get("sim")) { Module(new NoColDCache) } else { Module(new ColDCache) }
   val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
@@ -154,10 +154,10 @@ class JzCore extends Module {
   exu.io.forwardA   <> forward.io.exForwardA
   exu.io.forwardB   <> forward.io.exForwardB
 
-  lsu.io.dcacheCtrl <> dcache.io.ctrlIO
-  lsu.io.dcacheRead <> dcache.io.rdataIO
-  lsu.io.dcacheWrite<> dcache.io.wdataIO
-  lsu.io.dcacheCoh  <> dcache.io.coherence
+  //lsu.io.dcacheCtrl <> dcache.io.ctrlIO
+  //lsu.io.dcacheRead <> dcache.io.rdataIO
+  //lsu.io.dcacheWrite<> dcache.io.wdataIO
+  //lsu.io.dcacheCoh  <> dcache.io.coherence
   lsu.io.in         <> lsReg.io.out
   lsu.io.out        <> wbReg.io.in
   wbu.io.in         <> wbReg.io.out
