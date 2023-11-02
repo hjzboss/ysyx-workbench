@@ -9,6 +9,7 @@ import utils._
 // todo: 无符号数的处理
 class Wallace extends Module {
   val io = IO(new Bundle() {
+    val flush   = Input(Bool())
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
@@ -56,7 +57,7 @@ class Wallace extends Module {
   def max(in: Iterable[Int]): Int = in.reduce((a, b) => if(a>b) a else b)
 
   // 华莱士树压缩算法
-  def addAll(cols: Array[Seq[Bool]], depth: Int, valid: Bool): (UInt, UInt, Bool) = {
+  def addAll(cols: Array[Seq[Bool]], depth: Int, valid: Bool, flush: Bool): (UInt, UInt, Bool) = {
     if(max(cols.map(_.size)) <= 2) {
       val sum = Cat(cols.map(_(0)).reverse)
       var k = 0
@@ -75,10 +76,10 @@ class Wallace extends Module {
 
       // 有效信号传递
       val toNextValid = dontTouch(RegInit(false.B))
-      toNextValid := valid
+      toNextValid := Mux(flush, false.B, valid)
 
       val toNextLayer = columns_next.map(_.map(x => RegEnable(x, regEnables(depth))))
-      addAll(toNextLayer, depth+1, toNextValid)
+      addAll(toNextLayer, depth+1, toNextValid, flush)
     }
   }
 
@@ -147,13 +148,13 @@ class Wallace extends Module {
 
   val validIn = state === start
   // todo: 此处为每个时钟周期都调用addAll
-  val (sum, carry, validOut) = addAll(cols = columns, depth = 0, valid = validIn)
+  val (sum, carry, validOut) = addAll(cols = columns, depth = 0, valid = validIn, flush=io.flush)
   validTmp := validOut
   val result = sum + carry
 
   // 锁存有效信号和结果
   val resultReg = RegInit(0.U(128.W))
-  resultReg := Mux(state === busy && validTmp, result, resultReg)
+  resultReg := Mux(io.flush, 0.U(128.W), Mux(state === busy && validTmp, result, resultReg))
 
   io.out.bits.resultLo := Mux(io.in.mulw, SignExt(resultReg(31, 0), 64), resultReg(63, 0))
   io.out.bits.resultHi := resultReg(127, 64)
