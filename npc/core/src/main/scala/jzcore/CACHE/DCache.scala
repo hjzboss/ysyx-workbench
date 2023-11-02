@@ -588,29 +588,6 @@ class NoColDCache extends DCache {
   index      := addr(9, 4)
   align      := addr(3)
 
-  // dataArray lookup
-  val dataBlock = RegInit(0.U(128.W))
-  when(state === tagCompare) {
-    when(hit) {
-      dataBlock := LookupTree(hitList.asUInt, List(
-                    "b0001".U   -> io.sram4.rdata,
-                    "b0010".U   -> io.sram5.rdata,
-                    "b0100".U   -> io.sram6.rdata,
-                    "b1000".U   -> io.sram7.rdata,
-                  ))
-    }.otherwise {
-      // random choose
-      dataBlock := LookupTree(randCount, List(
-                    0.U   -> io.sram4.rdata,
-                    1.U   -> io.sram5.rdata,
-                    2.U   -> io.sram6.rdata,
-                    3.U   -> io.sram7.rdata,
-                  ))
-    }
-  }.otherwise {
-    dataBlock := dataBlock
-  }
-
   // ---------------------lookup metaArray and dataArray-------------------------------
   // metaArray lookup
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
@@ -646,6 +623,29 @@ class NoColDCache extends DCache {
             ))
   }.otherwise {
     wtag := wtag
+  }
+
+  // dataArray lookup
+  val dataBlock = RegInit(0.U(128.W))
+  when(state === tagCompare) {
+    when(hit) {
+      dataBlock := LookupTree(hitList.asUInt, List(
+                    "b0001".U   -> io.sram4.rdata,
+                    "b0010".U   -> io.sram5.rdata,
+                    "b0100".U   -> io.sram6.rdata,
+                    "b1000".U   -> io.sram7.rdata,
+                  ))
+    }.otherwise {
+      // random choose
+      dataBlock := LookupTree(randCount, List(
+                    0.U   -> io.sram4.rdata,
+                    1.U   -> io.sram5.rdata,
+                    2.U   -> io.sram6.rdata,
+                    3.U   -> io.sram7.rdata,
+                  ))
+    }
+  }.otherwise {
+    dataBlock := dataBlock
   }
 
   // ----------------------------write back and allocate--------------------------------
