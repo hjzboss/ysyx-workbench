@@ -7,7 +7,6 @@ import utils._
 
 class Alu extends Module {
   val io = IO(new Bundle {
-    val flush   = Input(Bool())
     val stall   = Input(Bool())
 
     val opA     = Input(UInt(64.W))
@@ -35,7 +34,6 @@ class Alu extends Module {
                                     AluOp.mulhsu  -> MulType.su
                                   ))
   mul.io.out.ready              := !io.stall
-  mul.io.flush                  := io.flush
 
   val divOp                      = AluOp.divOp(aluOp)
   div.io.in.valid               := divOp
