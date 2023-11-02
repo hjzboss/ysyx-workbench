@@ -361,6 +361,7 @@ static void statistic() {
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
+  Log("cycle spent = " NUMBERIC_FMT " us", cycle);
   Log("total guest instructions = " NUMBERIC_FMT, total_inst);
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", total_inst * 1000000 / g_timer);
