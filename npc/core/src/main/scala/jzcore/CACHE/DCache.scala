@@ -6,27 +6,7 @@ import utils._
 import top.Settings
 
 abstract class DCache extends Module {
-    val io = IO(new Bundle {
-    // cpu
-    val ctrlIO          = Flipped(Decoupled(new CacheCtrlIO))
-    val wdataIO         = Flipped(Decoupled(new CacheWriteIO))
-    val rdataIO         = Decoupled(new CacheReadIO)
-    val coherence       = Flipped(new CoherenceIO)
-
-    // data array io
-    val sram4           = new RamIO
-    val sram5           = new RamIO
-    val sram6           = new RamIO
-    val sram7           = new RamIO
-
-    // axi master
-    val master          = new AxiMaster
-
-    // arbiter
-    val axiReq          = Output(Bool())
-    val axiGrant        = Input(Bool())
-    val axiReady        = Output(Bool())
-  })
+    val io = IO
 }
 
 class ArbiterIO extends Bundle {
