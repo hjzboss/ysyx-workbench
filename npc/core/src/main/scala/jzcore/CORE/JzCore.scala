@@ -59,7 +59,7 @@ class JzCore extends Module {
   //arbiter.io.master0  <> icache.io.master
   //arbiter.io.master1  <> dcache.io.master
   io.master           <> dcache.io.master
-  dcache.io.grantLsu := true.B
+  dcache.io.axiGrant := true.B
 
   // todo: axi总线替换，axi中burst的判断（外设无法burst），外设无法超过4字节请求
   // axi访问接口
@@ -92,10 +92,10 @@ class JzCore extends Module {
   //icache.io.cache2cpu <> idReg.io.in
   ifu.io.out <> idReg.io.in
   ifu.io.iduRedirect  <> idu.io.redirect
-  ifu.io.icRedirect   <> icache.io.redirect
+  //ifu.io.icRedirect   <> icache.io.redirect
 
-  ifu.io.valid        <> icache.io.validIn
-  icache.io.validOut  <> idReg.io.validIn
+  ifu.io.valid        <> idReg.io.validIn
+  //icache.io.validOut  <> idReg.io.validIn
   idReg.io.validOut   <> idu.io.validIn
 
   // 控制模块
