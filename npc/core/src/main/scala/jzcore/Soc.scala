@@ -29,10 +29,10 @@ class Soc extends Module {
     val ram1 = Module(new Ram)
     val ram2 = Module(new Ram)
     val ram3 = Module(new Ram)
-    //val ram4 = Module(new Ram)
-    //val ram5 = Module(new Ram)
-    //val ram6 = Module(new Ram)
-    //val ram7 = Module(new Ram)
+    val ram4 = Module(new Ram)
+    val ram5 = Module(new Ram)
+    val ram6 = Module(new Ram)
+    val ram7 = Module(new Ram)
 
     val core = Module(new JzCore)
     core.io.interrupt := false.B
@@ -43,10 +43,10 @@ class Soc extends Module {
     ram1.io.CLK := clock
     ram2.io.CLK := clock
     ram3.io.CLK := clock
-    //ram4.io.CLK := clock
-    //ram5.io.CLK := clock
-    //ram6.io.CLK := clock
-    //ram7.io.CLK := clock
+    ram4.io.CLK := clock
+    ram5.io.CLK := clock
+    ram6.io.CLK := clock
+    ram7.io.CLK := clock
 
     // ram, dataArray
     core.io.sram0.rdata <> ram0.io.Q
@@ -76,7 +76,7 @@ class Soc extends Module {
     core.io.sram3.wmask <> ram3.io.BWEN
     core.io.sram3.addr <> ram3.io.A
     core.io.sram3.wdata <> ram3.io.D
-    /*
+
     core.io.sram4.rdata <> ram4.io.Q
     core.io.sram4.cen <> ram4.io.CEN
     core.io.sram4.wen <> ram4.io.WEN
@@ -103,7 +103,7 @@ class Soc extends Module {
     core.io.sram7.wen <> ram7.io.WEN
     core.io.sram7.wmask <> ram7.io.BWEN
     core.io.sram7.addr <> ram7.io.A
-    core.io.sram7.wdata <> ram7.io.D*/
+    core.io.sram7.wdata <> ram7.io.D
 
     core.io.interrupt := false.B
     core.io.slave.araddr := 0.U
