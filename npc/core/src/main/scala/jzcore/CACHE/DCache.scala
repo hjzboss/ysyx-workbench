@@ -541,7 +541,7 @@ class NoColDCache extends DCache {
   io.master.arid := 0.U
 
   // cache state machine，cacheable access
-  val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(13)
+  val idle :: tagCompare :: data :: writeback1 :: writeback2 :: allocate1 :: allocate2 :: addr_trans :: data_trans :: wait_resp :: ok :: Nil = Enum(11)
   val okay :: exokay :: slverr :: decerr :: Nil = Enum(4) // rresp
   val state = RegInit(idle)
   state := MuxLookup(state, idle, List(
