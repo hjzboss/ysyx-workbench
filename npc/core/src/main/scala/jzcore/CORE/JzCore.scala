@@ -56,7 +56,7 @@ class JzCore extends Module {
   //arbiter.io.grantLsu <> dcache.io.axiGrant
   arbiter.io.lsuReady := true.B
   arbiter.io.master0  <> icache.io.master
-  arbiter.io.master1  <> dcache.io.master
+  //arbiter.io.master1  <> dcache.io.master
   io.master           <> arbiter.io.master
 
   // todo: axi总线替换，axi中burst的判断（外设无法burst），外设无法超过4字节请求
