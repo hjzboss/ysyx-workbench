@@ -120,6 +120,7 @@ class JzCore extends Module {
   idu.io.flush        := ctrl.io.flushIduReg
   idReg.io.flush      <> ctrl.io.flushIduReg
   exReg.io.flush      := ctrl.io.flushExuReg
+  exu.io.flush        := ctrl.io.flushExuReg
 
   forward.io.exuRd  := exReg.io.ctrlOut.rd
   forward.io.lsuRd  := lsReg.io.out.rd
