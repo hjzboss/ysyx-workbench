@@ -44,6 +44,7 @@ class Alu extends Module {
   div.io.in.divw                := isWop
   div.io.in.divSigned           := AluOp.divSigned(aluOp)
   div.io.out.ready              := !io.stall
+  div.io.flush                  := io.flush
 
   // xlen computation
   val opA = io.opA
