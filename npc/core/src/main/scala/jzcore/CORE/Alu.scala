@@ -25,7 +25,7 @@ class Alu extends Module {
   val mul = mulType match {
     case "fast"     => Module(new FastMul)
     case "booth"    => Module(new Booth)
-    case "wallance" => Module(new wallance)
+    case "wallace" => Module(new Wallace)
   }
   val div = divType match {
     case "rest"     => Module(new RestDivider(64))
