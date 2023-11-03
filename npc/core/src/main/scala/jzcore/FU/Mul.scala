@@ -6,13 +6,12 @@ import utils._
 import top._
 
 
-class Mul extends Module {
+abstract class Mul extends Module {
   val io = IO(new Bundle {
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
 
-  val mulType: String = Settings.getString("mul")
 
   if(mulType == "booth") {
     val booth = Module(new Booth)
@@ -29,12 +28,7 @@ class Mul extends Module {
   }
 }
 
-sealed class FastMul extends Module {
-  val io = IO(new Bundle{
-    val in      = Flipped(new MultiInput)
-    val out     = Decoupled(new MultiOutput)
-  })
-
+class FastMul extends Mul {
   val multiplicand = io.in.multiplicand
   val multiplier = io.in.multiplier
 
@@ -69,9 +63,4 @@ sealed class FastMul extends Module {
     io.out.bits.resultLo := result(63, 0).asUInt
     io.out.bits.resultHi := result(127, 64).asUInt
   }
-
-  val fuck = RegInit(0.U(9.W))
-  fuck := fuck + 1.U
-
-  io.out.valid := fuck === 511.U
 }

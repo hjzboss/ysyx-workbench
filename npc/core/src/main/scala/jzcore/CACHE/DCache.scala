@@ -51,7 +51,8 @@ class CohArbiter(len: Int) extends Module {
 }
 
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
-sealed class ColDCache extends DCache {
+// 支持一致性的dcache
+sealed class CohDCache extends DCache {
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
@@ -508,7 +509,8 @@ sealed class ColDCache extends DCache {
 }
 
 
-class NoColDCache extends DCache {
+// 不支持一致性的dcache，加快仿真
+class NoCohDCache extends DCache {
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)

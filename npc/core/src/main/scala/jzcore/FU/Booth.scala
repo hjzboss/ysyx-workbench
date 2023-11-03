@@ -31,12 +31,7 @@ sealed class PGenerator extends Module {
 } 
 
 // booth2位乘法器
-class Booth extends Module {
-  val io = IO(new Bundle {
-    val in      = Flipped(new MultiInput)
-    val out     = Decoupled(new MultiOutput)
-  })
-
+class Booth extends Mul {
   val outFire = io.out.valid & io.out.ready 
 
   val idle :: busy :: Nil = Enum(2)

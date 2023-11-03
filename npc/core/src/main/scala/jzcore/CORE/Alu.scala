@@ -18,8 +18,18 @@ class Alu extends Module {
     val ready   = Output(Bool()) // alu操作是否完成，主要作用于乘除法
   })
 
-  val mul = Module(new Mul)
-  val div = Module(new Divider)
+  val mulType: String = Settings.getString("mul")
+  val divType: String = Settings.getString("div")
+
+  val mul = mulType match {
+    case "fast"     => Module(new FastMul)
+    case "booth"    => Module(new Booth)
+    case "wallance" => Module(new wallance)
+  }
+  val div = divType match {
+    case "rest"     => Module(new RestDivider(64))
+    case "fast"     => Module(new FastDivider)
+  }
  
   val aluOp = io.aluOp
   val isWop = AluOp.isWordOp(aluOp)
