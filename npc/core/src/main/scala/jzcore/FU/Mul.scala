@@ -11,24 +11,9 @@ abstract class Mul extends Module {
     val in      = Flipped(new MultiInput)
     val out     = Decoupled(new MultiOutput)
   })
-
-
-  if(mulType == "booth") {
-    val booth = Module(new Booth)
-    booth.io.in <> io.in
-    booth.io.out <> io.out
-  } else if(mulType == "wallance") {
-    val wallace = Module(new Wallace)
-    wallace.io.in <> io.in
-    wallace.io.out <> io.out
-  } else {
-    val fastMul = Module(new FastMul)
-    fastMul.io.in <> io.in
-    fastMul.io.out <> io.out
-  }
 }
 
-class FastMul extends Mul {
+sealed class FastMul extends Mul {
   val multiplicand = io.in.multiplicand
   val multiplier = io.in.multiplier
 
