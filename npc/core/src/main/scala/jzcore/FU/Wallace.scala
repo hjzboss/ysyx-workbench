@@ -7,12 +7,7 @@ import utils._
 
 // 华莱士树，第一个参数为位宽，第二个参数为流水线寄存器的插入位置
 // todo: 无符号数的处理
-class Wallace extends Module {
-  val io = IO(new Bundle() {
-    val in      = Flipped(new MultiInput)
-    val out     = Decoupled(new MultiOutput)
-  })
-
+class Wallace extends Mul {
   // 压缩一列
   def addOneColumn(col: Seq[Bool], cin: Seq[Bool]): (Seq[Bool], Seq[Bool], Seq[Bool]) = {
     var sum = Seq[Bool]()

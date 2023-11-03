@@ -51,7 +51,8 @@ class CohArbiter(len: Int) extends Module {
 }
 
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
-sealed class ColDCache extends DCache {
+// 支持一致性的dcache
+sealed class CohDCache extends DCache {
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)
@@ -171,6 +172,7 @@ sealed class ColDCache extends DCache {
   }
 
   // -----------------------------------coherence---------------------------------------
+  // TODO: 仿真速度瓶颈之一，需要优化
   val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
   val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
   for(i <- 0 to 63; j <- 0 to 3) {
@@ -508,7 +510,8 @@ sealed class ColDCache extends DCache {
 }
 
 
-class NoColDCache extends DCache {
+// 不支持一致性的dcache，加快仿真
+class NoCohDCache extends DCache {
   // random replace count
   val randCount          = RegInit(0.U(2.W))
   randCount             := randCount + 1.U(2.W)

@@ -5,30 +5,15 @@ import chisel3.util._
 import utils._
 import top._
 
-class Divider extends Module{
+abstract class Divider extends Module{
   val io = IO(new Bundle {
     val in      = Flipped(new DivInput)
     val out     = Decoupled(new DivOutput)
   })
-
-  if(Settings.getString("div") == "fast") {
-    val fastDiv = Module(new FastDivider)
-    fastDiv.io.in <> io.in
-    fastDiv.io.out <> io.out
-  } else {
-    val restDiv = Module(new RestDivider(64))
-    restDiv.io.in <> io.in
-    restDiv.io.out <> io.out
-  }
 }
 
 // 恢复余数法
-sealed class RestDivider(len: Int) extends Module {
-  val io = IO(new Bundle {
-    val in      = Flipped(new DivInput)
-    val out     = Decoupled(new DivOutput)
-  })
-
+sealed class RestDivider(len: Int) extends Divider {
   // 取反函数
   def getN(num: UInt): UInt = ~num + 1.U
 
@@ -142,12 +127,7 @@ sealed class RestDivider(len: Int) extends Module {
 }
 
 // fast divider, one cycle
-sealed class FastDivider extends Module {
-  val io = IO(new Bundle{
-    val in      = Flipped(new DivInput)
-    val out     = Decoupled(new DivOutput)
-  })
-
+sealed class FastDivider extends Divider {
   val divisor = io.in.divisor
   val dividend = io.in.dividend
 
