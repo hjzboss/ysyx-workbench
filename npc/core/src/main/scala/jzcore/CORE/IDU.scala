@@ -13,6 +13,8 @@ class IDU extends Module with HasInstrType{
 
     val validIn   = Input(Bool())
 
+    val bpuTrain  = if(Settings.getString("core") == "normal") Some(Flipped(new BPUTrainIO)) else None
+
     // 来自ifu
     val in        = Flipped(new InstrFetch)
 
@@ -56,7 +58,7 @@ class IDU extends Module with HasInstrType{
   val rd        = inst(11, 7)
   val csrReg    = inst(31, 20)
 
-  val int       = csr.io.int && io.validIn
+  val int       = csr.io.int & io.validIn
 
   // 译码
   val ctrlList  = ListLookup(inst, Instruction.DecodeDefault, RV64IM.table)
@@ -131,11 +133,34 @@ class IDU extends Module with HasInstrType{
     AluOp.bgeu      -> (opA >= opB),
     AluOp.bltu      -> (opA < opB),
   ))
-  val brAddrPre         = Wire(UInt(32.W))
-  brAddrPre            := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
-  val brAddr            = Mux(excepInsr | int, csr.io.rdata(31, 0), brAddrPre(31, 0))
-  io.redirect.brAddr   := brAddr
-  io.redirect.valid    := (isBr(instrtype) & brMark) | excepInsr | int
+
+  if(Settings.getString("core") == "normal") {
+    val brAddrPre        = Wire(UInt(32.W))
+    brAddrPre           := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
+    val brAddr           = Mux(excepInsr | int, csr.io.rdata(31, 0), Mux(brMark, brAddrPre(31, 0), io.in.pc + 4.U))
+    io.redirect.brAddr  := brAddr
+    io.redirect.valid   := (io.validIn & (brAddr =/= io.in.npc)) | int // 分支预测错误时进行跳转
+
+    val call             = ((rd === 1.U) | (rd === 5.U)) & ((((rs1 === 1.U) | (rs1 === 5.U)) & (rd === rs1)) | ((rs1 =/= 1.U) & (rs1 =/= 5.U)))
+    val ret              = (rd =/= 1.U) & (rd =/= 5.U) & ((rs1 === 1.U) | (rs1 === 5.U))
+
+    // btb train
+    // 当是分支指令且预测错误时更新btb，当不是分支指令且预测错误时无效btb
+    // 发生定时器中断时不训练btb
+    io.bpuTrain.get.train   := ((isBr(instrtype) & brMark) | excepInsr) & (brAddr =/= io.in.npc) & !int
+    io.bpuTrain.get.pc      := io.in.pc
+    io.bpuTrain.get.target  := brAddr
+    io.bpuTrain.get.brType  := Mux(call, BrType.call, Mux(ret, BrType.ret, BrType.jump))
+    io.bpuTrain.get.invalid := !((isBr(instrtype) & brMark) | excepInsr) & (brAddr =/= io.in.npc) & !int
+  } else {
+
+    // fast core
+    val brAddrPre         = Wire(UInt(32.W))
+    brAddrPre            := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
+    val brAddr            = Mux(excepInsr | int, csr.io.rdata(31, 0), brAddrPre(31, 0))
+    io.redirect.brAddr   := brAddr
+    io.redirect.valid    := (isBr(instrtype) & brMark) | excepInsr | int
+  }
 
   // data output
   io.datasrc.pc       := io.in.pc(31, 0)
@@ -174,7 +199,7 @@ class IDU extends Module with HasInstrType{
 
     io.debugOut.get.inst   := io.debugIn.get.inst
     io.debugOut.get.pc     := io.debugIn.get.pc
-    io.debugOut.get.nextPc := Mux(io.redirect.valid, brAddr, io.debugIn.get.nextPc)
+    io.debugOut.get.nextPc := Mux(io.redirect.valid, io.redirect.brAddr, io.debugIn.get.nextPc)
     io.debugOut.get.valid  := io.debugIn.get.valid
   }
 }

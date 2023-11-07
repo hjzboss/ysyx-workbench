@@ -164,7 +164,7 @@ object MulType {
   def su  = "b10".U
   def uu  = "b00".U
 
-  def apply = UInt(2.W)
+  def apply() = UInt(2.W)
 }
 
 object AxiWidth {
@@ -173,5 +173,14 @@ object AxiWidth {
   def word = "b10".U
   def double = "b11".U
 
-  def apply = UInt(2.W)
+  def apply() = UInt(2.W)
+}
+
+object BrType {
+  def nul = "b00".U
+  def jump = "b01".U
+  def call = "b10".U
+  def ret = "b11".U
+
+  def apply() = UInt(2.W)
 }

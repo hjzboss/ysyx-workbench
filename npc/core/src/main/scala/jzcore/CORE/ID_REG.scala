@@ -25,6 +25,7 @@ class ID_REG extends Module with HasResetVector {
   // 复位值
   val regReset = Wire(new InstrFetch)
   regReset.pc := 0.U(32.W)
+  regReset.npc := 0.U(32.W)
   regReset.inst := Instruction.NOP
 
   // 流水线寄存器

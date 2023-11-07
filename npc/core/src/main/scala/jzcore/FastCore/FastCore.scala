@@ -5,7 +5,7 @@ import chisel3.util._
 import utils._
 import top.Settings
 
-
+// no cache, no axi
 class FastCore extends Module {
   val io = IO(new Bundle {
     val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
