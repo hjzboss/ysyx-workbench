@@ -48,7 +48,7 @@ sealed class BTB extends Module {
     val train = new BPUTrainIO
   })
 
-  val entryNum = 512 // btb entry number
+  val entryNum = 256 // btb entry number
   val indexNum = log2Up(entryNum)
   val tagNum = 30 - indexNum // 忽略低两位， TODO: 压缩扩展忽略最低位
 
