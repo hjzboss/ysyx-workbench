@@ -18,7 +18,7 @@ class BPU extends Module with HasResetVector {
 
   val snpc = io.pc + 4.U
 
-  btb.io.pc := pc
+  btb.io.pc := io.pc
   btb.io.train := io.bpuTrain
 
   val brType = btb.io.predict.brType
@@ -34,7 +34,7 @@ class BPU extends Module with HasResetVector {
 
 sealed class BTBEntry(tagNum: Int) extends Bundle {
   val tag     = UInt(tagNum.W)
-  val btType  = UInt(2.W)
+  val brType  = UInt(2.W)
   val target  = UInt(32.W)
 }
 
