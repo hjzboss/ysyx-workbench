@@ -16,8 +16,8 @@ object DefaultSettings {
     "div"         -> "rest", // fast, rest
     "sim"         -> true, // verilator mode， false is soc mode， no debug
     "core"        -> "normal", // single, fast, normal
-    "btb_num"     -> 64, // btb entry num
-    "ras_num"     -> 8 // ras entry num
+    "btb_num"     -> 2048, // btb entry num
+    "ras_num"     -> 512 // ras entry num
   )
 }
 
