@@ -7,7 +7,7 @@ import chisel3.util._
 // 分支预测模块：BTB+ras，采用静态分支预测
 class BPU extends Module with HasResetVector {
   val io = IO(new Bundle{
-    val pc = Input(Bool())
+    val pc = Input(UInt(32.W))
     val npc = Output(UInt(32.W))
 
     val bpuTrain = new BPUTrainIO
