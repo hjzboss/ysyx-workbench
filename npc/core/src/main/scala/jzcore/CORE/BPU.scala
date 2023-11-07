@@ -48,7 +48,7 @@ sealed class BTB extends Module {
     val train = new BPUTrainIO
   })
 
-  val entryNum = 64 // btb entry number, todo
+  val entryNum = Settings.getLong("btb_num") // btb entry number, todo
   val indexNum = log2Up(entryNum)
   val tagNum = 30 - indexNum // 忽略低两位， TODO: 压缩C扩展忽略最低位
 
@@ -102,12 +102,12 @@ sealed class RAS extends Module {
     val popVal = Output(Bool()) // 是否是一个有效的pop
   })
 
-  val rasNum = 8
+  val rasNum = settings.getLong("ras_num")
   val top = RegInit(0.U(log2Up(rasNum).W)) // 栈顶指针
   val topPlus = top + 1.U
 
   val stack = RegInit(VecInit(List.fill(rasNum)(0.U(32.W))))
-  val count = RegInit(VecInit(List.fill(rasNum)(0.U(8.W)))) // 递归调用计数器
+  val count = RegInit(VecInit(List.fill(rasNum)(0.U(5.W)))) // 递归调用计数器
 
   val full = top === (rasNum).U
   val empty = (top === 0.U) & (count(top) === 0.U)
@@ -118,7 +118,7 @@ sealed class RAS extends Module {
   when(io.push) {
     when(topData === io.pushData) {
       // 同一个call递归调用
-      count(top) := Mux(topCount === 255.U, topCount, topCount + 1.U)
+      count(top) := Mux(topCount === 31.U, topCount, topCount + 1.U)
     }.elsewhen(!full) {
       stack(topPlus) := io.pushData
       count(topPlus) := count(topPlus) + 1.U
