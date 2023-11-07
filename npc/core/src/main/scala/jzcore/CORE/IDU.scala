@@ -139,7 +139,7 @@ class IDU extends Module with HasInstrType{
     brAddrPre           := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
     val brAddr           = Mux(excepInsr | int, csr.io.rdata(31, 0), Mux(brMark, brAddrPre(31, 0), io.in.pc + 4.U))
     io.redirect.brAddr  := brAddr
-    io.redirect.valid   := ((isBr(instrtype) | excepInsr) & (brAddr =/= io.in.npc)) | int // 分支预测错误时进行跳转
+    io.redirect.valid   := (brAddr =/= io.in.npc) | int // 分支预测错误时进行跳转
 
     val call             = ((rd === 1.U) | (rd === 5.U)) & ((((rs1 === 1.U) | (rs1 === 5.U)) & (rd === rs1)) | ((rs1 =/= 1.U) & (rs1 =/= 5.U)))
     val ret              = (rd =/= 1.U) & (rd =/= 5.U) & ((rs1 === 1.U) | (rs1 === 5.U))
