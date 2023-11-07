@@ -17,7 +17,7 @@ class IFU extends Module with HasResetVector {
 
     // from idu
     val iduRedirect   = Flipped(new RedirectIO)
-    //val bpuTrain      = new BPUTrainIO
+    val bpuTrain      = new BPUTrainIO
 
     val icRedirect    = Flipped(new RedirectIO)
 
@@ -30,12 +30,12 @@ class IFU extends Module with HasResetVector {
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
-  //val bpu          = Module(new BPU)
+  val bpu          = Module(new BPU)
 
   // 分支预测
-  //bpu.io.pc       := pc
-  //bpu.io.bpuTrain := io.bpuTrain
-  val snpc         = pc + 4.U
+  bpu.io.pc       := pc
+  bpu.io.bpuTrain := io.bpuTrain
+  val snpc         = bpu.io.npc
   val dnpc         = Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
   pc              := dnpc
 
