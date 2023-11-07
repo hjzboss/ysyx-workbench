@@ -5,7 +5,6 @@ import chisel3.util._
 import utils._
 import top.Settings
 
-// 问题原因：取指出错，取出了cacheline中错误位置的指令
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
     val stage3Addr = Input(UInt(6.W))
@@ -25,6 +24,7 @@ sealed class IcArbiter extends Module {
   io.arbWen      := Mux(io.stage3Wen, io.stage1Wen, io.stage3Wen)
 }
 
+// 负责拆分pc，读取data array
 sealed class CacheStage1 extends Module {
   val io = IO(new Bundle {
     val toStage1        = Flipped(new Stage1IO)
@@ -77,6 +77,7 @@ sealed class CacheStage1 extends Module {
   io.toStage2.cacheable := io.toStage1.cacheable
 }
 
+// 负责meta命中检查，随机替换选择
 sealed class CacheStage2 extends Module with HasResetVector {
   val io = IO(new Bundle {
     val debugIn         = if(Settings.get("sim")) Some(Flipped(new DebugIO)) else None
@@ -90,14 +91,16 @@ sealed class CacheStage2 extends Module with HasResetVector {
     val toStage3        = new Stage3IO
 
     val flushIn         = Input(Bool())
-    val stallIn         = Input(Bool()) // lsu的stall，优先级最高
+    val stallIn         = Input(Bool()) // cache外的stall优先级最高
     val stage3Stall     = Input(Bool()) // cache stage3的stall，优先级最低
 
+    // data array
     val sram0_rdata     = Input(UInt(128.W))
     val sram1_rdata     = Input(UInt(128.W))
     val sram2_rdata     = Input(UInt(128.W))
     val sram3_rdata     = Input(UInt(128.W))
 
+    // stage3的meta分配
     val metaAlloc       = Flipped(new MetaAllocIO)
   })
 
@@ -113,10 +116,11 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.align         := false.B
   regInit.cacheable     := true.B
   regInit.pc            := 0.U(32.W)
+  // 优先级：外部stall > flush > 内部stall
   val stage2Reg          = RegInit(regInit)
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
 
-  // just for verilator
+  // just for verilator simulation
   if(Settings.get("sim")) {
     val debugReset         = Wire(new DebugIO)
     debugReset.pc         := 0.U(32.W)
@@ -143,9 +147,8 @@ sealed class CacheStage2 extends Module with HasResetVector {
   // metaArray lookup
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
   (0 to 3).map(i => (hitList(i) := metaArray(i)(stage2Reg.index).valid && (metaArray(i)(stage2Reg.index).tag === stage2Reg.tag)))
-  //val hit = (hitList.asUInt).orR
-  val hit = dontTouch(WireDefault(true.B))
-  hit    := (hitList.asUInt).orR
+  val hit = (hitList.asUInt).orR
+
   // metaArray alloc
   when(io.metaAlloc.valid) {
     // allocate metaArray
@@ -188,6 +191,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   io.toStage3.tag       := stage2Reg.tag
 }
 
+// 负责axi的交互和分配
 sealed class CacheStage3 extends Module with HasResetVector {
   val io = IO(new Bundle {
     // debug
@@ -257,6 +261,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   regInit.align        := 0.U(2.W)
   regInit.tag          := 0.U(22.W)
   regInit.index        := 0.U(6.W)
+  // pipline reg
   val stage3Reg         = RegInit(regInit)
   stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))
 
@@ -289,36 +294,38 @@ sealed class CacheStage3 extends Module with HasResetVector {
     idle  -> Mux(io.flushIn || io.stallIn, idle, Mux(!stage3Reg.hit || !stage3Reg.cacheable, addr, idle)),
     addr  -> Mux(io.flushIn, Mux(io.axiGrant && raddrFire, flush, idle), Mux(raddrFire && io.axiGrant, data, addr)),
     data  -> Mux(rdataFire && io.master.rlast && (io.master.rresp === okay || io.master.rresp === exokay), Mux(io.stallIn, stall, idle), Mux(io.flushIn, flush, data)),
-    stall -> Mux(io.stallIn, stall, idle),
+    stall -> Mux(io.stallIn, stall, idle), // 暂停后进入stall状态，此时axi的交互已经完毕
     flush -> Mux(rdataFire && io.master.rlast, idle, flush) // todo: 此处有问题
   ))
 
-  // todo
-  flushReg                := (state === data && rdataFire && io.master.rlast && !io.stallIn) || (state === stall && !io.stallIn) 
+  // 当axi交互完毕且外部停顿信号拉低则在下一周期刷新icache，转发此阶段的pc给ifu重新访问icache
+  flushReg                := (state === data && rdataFire && io.master.rlast && !io.stallIn) || (state === stall && !io.stallIn)
   io.flushOut             := flushReg
 
+  // 当未命中则停顿前面所有阶段，直到axi交互完成且外部停顿信号拉低
   val stallOut             = (state === idle && (!stage3Reg.hit || !stage3Reg.cacheable)) || state === addr || state === data || state === stall || state === flush
-  io.stallOut             := stallOut && !flushReg 
+  io.stallOut             := stallOut & !flushReg 
 
   io.axiReq               := state === addr
   io.axiReady             := (state === data || state === flush) && rdataFire && io.master.rlast
 
   // allocate axi, burst read
   io.master.arid          := 0.U
-  io.master.arvalid      := state === addr
-  io.master.araddr       := stage3Reg.allocAddr
-  io.master.arlen        := Mux(stage3Reg.cacheable, 1.U(8.W), 0.U(8.W))
-  io.master.arsize       := Mux(stage3Reg.cacheable, 3.U(3.W), 2.U(3.W))
-  io.master.arburst      := Mux(stage3Reg.cacheable, 2.U(2.W), 0.U(2.W))
-  io.master.rready       := state === data || state === flush
+  io.master.arvalid       := state === addr
+  io.master.araddr        := stage3Reg.allocAddr
+  io.master.arlen         := Mux(stage3Reg.cacheable, 1.U(8.W), 0.U(8.W))
+  io.master.arsize        := Mux(stage3Reg.cacheable, 3.U(3.W), 2.U(3.W)) // 访问外设是32位
+  io.master.arburst       := Mux(stage3Reg.cacheable, 2.U(2.W), 0.U(2.W))
+  io.master.rready        := state === data || state === flush
 
-  val rblockBuffer         = RegInit(0.U(64.W))
-  rblockBuffer            := MuxLookup(state, rblockBuffer, List(
+  // 保存burst传输中的第一次传输数据
+  val rburstFirstDataReg   = RegInit(0.U(64.W))
+  rburstFirstDataReg      := MuxLookup(state, rburstFirstDataReg, List(
                               addr -> 0.U(64.W),
-                              data -> Mux(io.flushIn, 0.U(64.W), Mux(rdataFire && !io.master.rlast, io.master.rdata, rblockBuffer)),
+                              data -> Mux(io.flushIn, 0.U(64.W), Mux(rdataFire & !io.master.rlast, io.master.rdata, rburstFirstDataReg)),
                             ))
 
-  // axi write
+  // axi write为空
   io.master.awid := 0.U
   io.master.awvalid := false.B
   io.master.awaddr := 0.U
@@ -403,7 +410,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
     }
   }.elsewhen((state === data && rdataFire && io.master.rlast && !io.flushIn) || state === stall) {
     when(stage3Reg.cacheable) {
-      inst := Mux(stage3Reg.align(0), rblockBuffer(63, 32), rblockBuffer(31, 0))
+      // 第一次burst的值就是目标块
+      inst := Mux(stage3Reg.align(0), rburstFirstDataReg(63, 32), rburstFirstDataReg(31, 0))
     }.otherwise {
       inst := io.master.rdata(31, 0)
     }

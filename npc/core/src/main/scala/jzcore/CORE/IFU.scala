@@ -28,6 +28,7 @@ class IFU extends Module with HasResetVector {
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
+  //val bpc          = Module(new BPU)
   val snpc         = pc + 4.U(32.W)
   pc              := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
 

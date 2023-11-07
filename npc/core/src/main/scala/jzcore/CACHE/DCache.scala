@@ -67,7 +67,7 @@ sealed class CohDCache extends DCache {
   val tag                = Wire(UInt(22.W))
   val index              = Wire(UInt(6.W))
   val align              = Wire(Bool())
-  val wtag               = RegInit(0.U(22.W)) // dirty的tag
+  val wtag               = RegInit(0.U(22.W)) // dirty block的tag
 
   // axi fire
   val raddrFire          = io.master.arvalid && io.master.arready
@@ -77,7 +77,7 @@ sealed class CohDCache extends DCache {
   val brespFire          = io.master.bvalid && io.master.bready
 
   val ctrlFire           = io.ctrlIO.valid && io.ctrlIO.ready
-  val cwdataFire         = io.wdataIO.valid && io.wdataIO.ready
+  val cwdataFire         = io.wdataIO.valid && io.wdataIO.ready // cpu和cache握手完毕
   val crdataFire         = io.rdataIO.valid && io.rdataIO.ready
   val coherenceFire      = io.coherence.valid && io.coherence.ready
 
@@ -105,20 +105,20 @@ sealed class CohDCache extends DCache {
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(raddrFire && io.axiGrant, data_trans, addr_trans),
-    data_trans  -> Mux(rdataFire && (io.master.rresp === okay || io.master.rresp === exokay), Mux(crdataFire, idle, ok), data_trans), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+    data_trans  -> Mux(rdataFire && (io.master.rresp === okay || io.master.rresp === exokay), Mux(crdataFire, idle, ok), data_trans),
     ok          -> Mux(crdataFire, idle, ok)
   ))
 
   val wState = RegInit(idle)
   wState := MuxLookup(wState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && io.ctrlIO.bits.wen, addr_trans, idle),
-    addr_trans  -> Mux(waddrFire && io.axiGrant, Mux(wdataFire, wait_resp, data_trans), addr_trans),
+    addr_trans  -> Mux(waddrFire && io.axiGrant, Mux(wdataFire, wait_resp, data_trans), addr_trans), // 当axi写数据握手完毕直接进入wait_resp状态进行应答握手
     data_trans  -> Mux(wdataFire, wait_resp, data_trans),
-    wait_resp   -> Mux(brespFire && (io.master.bresp === okay || io.master.bresp === exokay), Mux(cwdataFire, idle, ok), wait_resp), // todo: 要等待cpu和cache握手完毕，而不是和axi总线
-    ok          -> Mux(cwdataFire, idle, ok)
+    wait_resp   -> Mux(brespFire && (io.master.bresp === okay || io.master.bresp === exokay), Mux(cwdataFire, idle, ok), wait_resp),
+    ok          -> Mux(cwdataFire, idle, ok) // 当axi握手完毕但是cpu与cache未握手完毕进入ok状态
   ))
 
-  victimWay          := Mux(state === tagCompare, randCount, victimWay)
+  victimWay          := Mux(state === tagCompare, randCount, victimWay) // 随机替换
 
   // meta data
   val metaInit        = Wire(new MetaData)
@@ -139,9 +139,10 @@ sealed class CohDCache extends DCache {
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
   val hitListReg = RegInit(VecInit(List.fill(4)(false.B)))
   (0 to 3).map(i => (hitList(i) := Mux(state === tagCompare, metaArray(i)(index).valid && (metaArray(i)(index).tag === tag), false.B)))
-  hit := (hitList.asUInt).orR
-  hitListReg := Mux(state === tagCompare, hitList, hitListReg)
+  hit := (hitList.asUInt).orR // 命中标记位
+  hitListReg := Mux(state === tagCompare, hitList, hitListReg) // 锁存命中结果
 
+  // 锁存dirty标记
   when(state === tagCompare) {
     when(hit) {
       dirty := LookupTreeDefault(hitList.asUInt, false.B, List(
@@ -151,6 +152,7 @@ sealed class CohDCache extends DCache {
                 "b1000".U   -> metaArray(3)(index).dirty,
               ))
     }.otherwise {
+      // 未命中就随机选择
       dirty := LookupTree(randCount, List(
                 0.U   -> metaArray(0)(index).dirty,
                 1.U   -> metaArray(1)(index).dirty,
@@ -160,6 +162,7 @@ sealed class CohDCache extends DCache {
     }
   }
 
+  // 未命中时锁存dirty block的tag域，无法将uint转为int
   when(state === tagCompare && !hit) {
     wtag := LookupTree(randCount, List(
               0.U   -> metaArray(0)(index).tag,
@@ -172,6 +175,7 @@ sealed class CohDCache extends DCache {
   }
 
   // -----------------------------------coherence---------------------------------------
+  // TODO: 仿真速度瓶颈之一，需要优化
   val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
   val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
   for(i <- 0 to 63; j <- 0 to 3) {
@@ -182,9 +186,9 @@ sealed class CohDCache extends DCache {
   for(i <- 0 to 3) {
     for(j <- 0 to 63) {
       arbIOList64(i)(j).valid := dirtyArray(i)(j)
-      arbIOList64(i)(j).bits.no := i.U(2.W)
+      arbIOList64(i)(j).bits.no := i.U(2.W) // which ram
       arbIOList64(i)(j).bits.tag := metaArray(i)(j).tag
-      arbIOList64(i)(j).bits.index := j.U(6.W)
+      arbIOList64(i)(j).bits.index := j.U(6.W) // which set
     }
   }
   (0 to 3).map(i => (arbList64(i).io.in <> arbIOList64(i)))
@@ -196,6 +200,7 @@ sealed class CohDCache extends DCache {
   arb4.io.in <> arb4IO
   arb4.io.out.ready := true.B
 
+  // ram片选信号
   val ramCenPre = WireDefault(0.U(4.W))
   ramCenPre := LookupTree(arb4.io.out.bits.no, List(
     0.U -> 1.U,
@@ -221,6 +226,7 @@ sealed class CohDCache extends DCache {
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {
     when(hit) {
+      // 读命中
       dataBlock := LookupTree(hitList.asUInt, List(
                     "b0001".U   -> io.sram4.rdata,
                     "b0010".U   -> io.sram5.rdata,
@@ -274,29 +280,31 @@ sealed class CohDCache extends DCache {
   val allocTag = RegInit(false.B)
   allocTag := Mux(state === allocate1, true.B, Mux(state === idle, false.B, allocTag))
 
-  // axi
+  // axi申请与释放
   io.axiReq := state === writeback1 || state === allocate1 || rState === addr_trans || wState === addr_trans // todo: 可以提前申请总线请求
   io.axiReady := ((state === allocate2 || rState === data_trans) && rdataFire && io.master.rlast) || (wState === wait_resp && brespFire) || (state === coherence1 && coherenceFire)
 
   val burstAddr            = addr & "hfffffff8".U
 
-  // allocate axi, burst read
+  // axi读，采用burst
   io.master.arvalid       := state === allocate1 || rState === addr_trans
-  io.master.araddr        := Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)
+  io.master.araddr        := Mux(io.ctrlIO.bits.cacheable, burstAddr, addr) // 读写外设要用具体地址
   io.master.arlen         := Mux(rState === addr_trans, 0.U(8.W), 1.U(8.W))
   io.master.arsize        := Mux(io.ctrlIO.bits.cacheable, 3.U(3.W), io.ctrlIO.bits.size)
   io.master.arburst       := Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
-  io.master.rready        := state === allocate2 || rState === data_trans
+  io.master.rready        := state === allocate2 || rState === data_trans // 数据阶段ready
 
   // 锁存axi读取的值
-  val axiDataReg           = RegInit(0.U(64.W))
-  axiDataReg              := Mux(rState === data_trans && rdataFire, io.master.rdata, axiDataReg)
+  val axiDirectReadReg     = RegInit(0.U(64.W))
+  axiDirectReadReg        := Mux(rState === data_trans && rdataFire, io.master.rdata, axiDirectReadReg) // 外设读取时的数据锁存
 
-  val rblockBuffer         = RegInit(0.U(64.W))
-  rblockBuffer            := MuxLookup(state, rblockBuffer, List(
+  val rburstFirstDataReg   = RegInit(0.U(64.W)) // 分配时锁存第一次读取的数据（burst）
+  rburstFirstDataReg      := MuxLookup(state, rburstFirstDataReg, List(
                               allocate1 -> 0.U(64.W),
-                              allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rblockBuffer)
+                              allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg) // 当burst传输时锁存第一次传输的读数据
                             ))
+
+  // 写传输次数统计
   val wburst = RegInit(0.U(2.W))
   when(state === tagCompare || state === coherence2) {
     wburst := 0.U(2.W)
@@ -308,8 +316,11 @@ sealed class CohDCache extends DCache {
     wburst := wburst
   }
 
+  // axi写
+  val cohAddr             = Cat(colTagReg, colIndexReg, 0.U(4.W)) // 维护一致性写回的地址
+  val wbAddr              = Cat(wtag, burstAddr(9, 0)) // 普通写回的地址，由dirty tag ++ addr合成
   io.master.awvalid      := state === writeback1 || wState === addr_trans
-  io.master.awaddr       := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, Cat(colTagReg, colIndexReg, 0.U(4.W)), Cat(wtag, burstAddr(9, 0))), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr))
+  io.master.awaddr       := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, cohAddr, wbAddr), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)) // 一致性写回，普通写回，写
   io.master.awlen        := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 1.U(8.W), 0.U(8.W))
 
   if(Settings.get("sim")) {
@@ -319,12 +330,13 @@ sealed class CohDCache extends DCache {
   }
 
   io.master.awburst      := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 2.U, 0.U)
-  io.master.wvalid       := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
-  io.master.wlast        := (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
-  io.master.wstrb        := Mux(wState === addr_trans || wState === data_trans, io.wdataIO.bits.wmask, "b11111111".U)
+  io.master.wvalid       := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans // 在传输写地址时就可进行写数据的传输
+  io.master.wlast        := (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans // 外设写在地址传输阶段即可以将wlast拉高，在地址传输阶段就将写数据放入总线
+  io.master.wstrb        := Mux(wState === addr_trans || wState === data_trans, io.wdataIO.bits.wmask, "b11111111".U) // cache写回默认使用全部数据总线
   io.master.bready       := (state === writeback2 && wburst === 2.U(2.W)) || wState === wait_resp
   
   // burst write
+  // 数据选择
   when(state === writeback1 || (state === writeback2 && wburst === 0.U(2.W))) {
     io.master.wdata      := Mux(align && !io.coherence.valid, dataBlock(127, 64), dataBlock(63, 0))
   }.elsewhen(state === writeback2 && wburst === 1.U(2.W)) {
@@ -335,10 +347,11 @@ sealed class CohDCache extends DCache {
     io.master.wdata      := 0.U(64.W)
   }
 
+  // burst读的掩码和数据重新排列
   val alignMask0   = Mux(align, "hffffffffffffffff".U(128.W), ~"hffffffffffffffff".U(128.W))
   val alignMask1   = Mux(align, ~"hffffffffffffffff".U(128.W), "hffffffffffffffff".U(128.W))
-  val rdata0       = Mux(align, Cat(io.master.rdata, 0.U(64.W)), Cat(0.U(64.W), io.master.rdata))
-  val rdata1       = Mux(align, Cat(0.U(64.W), io.master.rdata), Cat(io.master.rdata, 0.U(64.W)))
+  val rdata0       = Mux(align, Cat(io.master.rdata, 0.U(64.W)), Cat(0.U(64.W), io.master.rdata)) // allocate0
+  val rdata1       = Mux(align, Cat(0.U(64.W), io.master.rdata), Cat(io.master.rdata, 0.U(64.W))) // allocate1
 
   // dataArray control
   io.sram4.addr   := index
@@ -362,7 +375,7 @@ sealed class CohDCache extends DCache {
   io.sram7.wdata  := 0.U
   io.sram7.wmask  := ~0.U(128.W)
   when(state === coherence1) {
-    // coherence
+    // coherence read, 读取脏块
     io.sram4.addr := arb4.io.out.bits.index
     io.sram4.cen  := !ramCen(0)
     io.sram5.addr := arb4.io.out.bits.index
@@ -372,7 +385,7 @@ sealed class CohDCache extends DCache {
     io.sram7.addr := arb4.io.out.bits.index
     io.sram7.cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire && io.ctrlIO.bits.cacheable) {
-    // read data
+    // read data，提前读取
     io.sram4.addr := io.ctrlIO.bits.addr(9, 4)
     io.sram4.cen  := false.B
     io.sram5.addr := io.ctrlIO.bits.addr(9, 4)
@@ -424,6 +437,7 @@ sealed class CohDCache extends DCache {
     val wmask64 = Wire(Vec(8, UInt(8.W)))
     (0 to 7).map(i => (wmask64(i) := Mux(io.wdataIO.bits.wmask(i), 0.U(8.W), "hff".U)))
     // write enable
+    // 写不命中
     when(allocTag) {
       switch(victimWay) {
         is(0.U) {
@@ -456,6 +470,7 @@ sealed class CohDCache extends DCache {
         }
       }
     }.otherwise {
+      // 写命中
       switch(hitListReg.asUInt) {
         is("b0001".U) {
           metaArray(0)(index).dirty := true.B
@@ -493,18 +508,18 @@ sealed class CohDCache extends DCache {
   val alignData = WireDefault(0.U(64.W))
   when(state === data) {
     when(allocTag) {
-      alignData := rblockBuffer
+      // 未命中
+      alignData := rburstFirstDataReg // burst第一次读取的数据即是所需数据
     }.otherwise {
+      // 读命中情况
       alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
     }
   }
 
-  // todo: 要等待cpu和cache握手完毕，而不是和axi总线
+  // cpu和cache的握手
   io.wdataIO.ready         := state === data || (wState === wait_resp && brespFire) || wState === ok
-
   io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
-  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
-
+  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDirectReadReg, 0.U(64.W))))
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
 }
 
@@ -669,13 +684,13 @@ class NoCohDCache extends DCache {
   io.master.rready        := state === allocate2 || rState === data_trans
 
   // 锁存axi读取的值
-  val axiDataReg           = RegInit(0.U(64.W))
-  axiDataReg              := Mux(rState === data_trans && rdataFire, io.master.rdata, axiDataReg)
+  val axiDirectReadReg           = RegInit(0.U(64.W))
+  axiDirectReadReg              := Mux(rState === data_trans && rdataFire, io.master.rdata, axiDirectReadReg)
 
-  val rblockBuffer         = RegInit(0.U(64.W))
-  rblockBuffer            := MuxLookup(state, rblockBuffer, List(
+  val rburstFirstDataReg         = RegInit(0.U(64.W))
+  rburstFirstDataReg            := MuxLookup(state, rburstFirstDataReg, List(
                               allocate1 -> 0.U(64.W),
-                              allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rblockBuffer)
+                              allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg)
                             ))
   val wburst = RegInit(0.U(2.W))
   when(state === tagCompare) {
@@ -699,7 +714,7 @@ class NoCohDCache extends DCache {
   }
 
   io.master.awburst      := Mux(io.ctrlIO.bits.cacheable, 2.U, 0.U)
-  io.master.wvalid       := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans
+  io.master.wvalid       := state === writeback1 || state === writeback2 || wState === addr_trans || wState === data_trans // 在传输写地址的时候就可进行写数据的传输
   io.master.wlast        := (state === writeback2 && wburst === 1.U(2.W)) || wState === addr_trans || wState === data_trans 
   io.master.wstrb        := Mux(wState === addr_trans || wState === data_trans, io.wdataIO.bits.wmask, "b11111111".U)
   io.master.bready       := (state === writeback2 && wburst === 2.U(2.W)) || wState === wait_resp
@@ -863,7 +878,7 @@ class NoCohDCache extends DCache {
   val alignData = WireDefault(0.U(64.W))
   when(state === data) {
     when(allocTag) {
-      alignData := rblockBuffer
+      alignData := rburstFirstDataReg
     }.otherwise {
       alignData := Mux(align, dataBlock(127, 64), dataBlock(63, 0))
     }
@@ -873,7 +888,7 @@ class NoCohDCache extends DCache {
   io.wdataIO.ready         := state === data || (wState === wait_resp && brespFire) || wState === ok
 
   io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
-  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDataReg, 0.U(64.W))))
+  io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDirectReadReg, 0.U(64.W))))
 
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
   io.coherence.ready       := true.B
