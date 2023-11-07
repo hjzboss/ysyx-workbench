@@ -54,6 +54,7 @@ sealed class BTB extends Module {
   val tagNum = 30 - indexNum // 忽略低两位， TODO: 压缩C扩展忽略最低位
 
   val btbInit = Wire(new BTBEntry(tagNum))
+  btbInit.valid := false.B
   btbInit.tag := 0.U
   btbInit.brType := BrType.nul
   btbInit.target := 0.U
