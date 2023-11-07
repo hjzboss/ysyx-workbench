@@ -293,7 +293,7 @@ class ClintIO extends Bundle {
 
 class BTBPredIO extends Bundle {
   // predict
-  val brType          = Output(BrType())
+  val brType          = Output(BrType)
   val predict         = Output(UInt(32.W))
   val hit             = Output(Bool())
 }
@@ -302,5 +302,5 @@ class BTBTrainIO extends Bundle {
   val valid           = Input(Bool())
   val pc              = Input(UInt(32.W))
   val target          = Input(UInt(32.W))
-  val brType          = Input(BrType())
+  val brType          = Input(BrType)
 }
