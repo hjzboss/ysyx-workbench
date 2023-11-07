@@ -145,8 +145,8 @@ class JzCore extends Module {
   idu.io.forwardB   <> forward.io.idForwardB
   idu.io.lsuForward := lsReg.io.out.exuOut
   idu.io.wbuForward := wbu.io.regWrite.value
-  idu.icPc          := icache.io.cache2cpu.pc
-  idu.icValid       := icache.io.validOut
+  idu.io.icPc       := icache.io.cache2cpu.pc
+  idu.io.icValid    := icache.io.validOut
 
   exu.io.datasrc    <> exReg.io.datasrcOut
   exu.io.aluCtrl    <> exReg.io.aluCtrlOut

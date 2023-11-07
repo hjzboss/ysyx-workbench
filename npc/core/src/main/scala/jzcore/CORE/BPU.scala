@@ -54,7 +54,7 @@ sealed class BTB extends Module {
 
   val btbInit = Wire(new BTBEntry(tagNum))
   btbInit.tag := 0.U
-  btbInit.btType := BrType.nul
+  btbInit.brType := BrType.nul
   btbInit.target := 0.U
 
   // btb主要结构
