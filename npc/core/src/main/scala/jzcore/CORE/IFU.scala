@@ -36,8 +36,8 @@ class IFU extends Module with HasResetVector {
   bpu.io.pc       := pc
   bpu.io.bpuTrain := io.bpuTrain
   val snpc         = bpu.io.npc
-
-  pc              := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+  val dnpc         = Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
+  pc              := dnpc
 
   if(Settings.get("sim")) {
     io.out.cacheable := true.B
@@ -46,6 +46,7 @@ class IFU extends Module with HasResetVector {
   }
 
   io.out.addr     := pc
+  io.out.npc      := dnpc
 
   val valid        = dontTouch(WireDefault(false.B))
   valid           := !io.stall && !io.iduRedirect.valid && !io.icRedirect.valid

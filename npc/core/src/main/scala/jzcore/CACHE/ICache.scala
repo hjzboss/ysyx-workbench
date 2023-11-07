@@ -75,6 +75,7 @@ sealed class CacheStage1 extends Module {
   io.toStage2.align     := align
   io.toStage2.pc        := io.toStage1.addr
   io.toStage2.cacheable := io.toStage1.cacheable
+  io.toStage2.npc       := io.toStage1.npc
 }
 
 // 负责meta命中检查，随机替换选择
@@ -116,6 +117,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   regInit.align         := false.B
   regInit.cacheable     := true.B
   regInit.pc            := 0.U(32.W)
+  regInit.npc           := 0.U(32.W)
   // 优先级：外部stall > flush > 内部stall
   val stage2Reg          = RegInit(regInit)
   stage2Reg             := Mux(io.stallIn, stage2Reg, Mux(io.flushIn, regInit, Mux(io.stage3Stall, stage2Reg, io.toStage2)))
@@ -187,6 +189,7 @@ sealed class CacheStage2 extends Module with HasResetVector {
   io.toStage3.cacheable := stage2Reg.cacheable
   io.toStage3.align     := stage2Reg.align
   io.toStage3.pc        := stage2Reg.pc
+  io.toStage3.npc       := stage2Reg.npc
   io.toStage3.index     := stage2Reg.index
   io.toStage3.tag       := stage2Reg.tag
 }
@@ -253,6 +256,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   io.redirect          := flushReg
   val regInit           = Wire(new Stage3IO)
   regInit.pc           := 0.U(32.W)
+  regInit.npc          := 0.U(32.W)
   regInit.cacheline    := 0.U(128.W)
   regInit.hit          := true.B
   regInit.allocAddr    := 0.U(32.W)
@@ -420,6 +424,7 @@ sealed class CacheStage3 extends Module with HasResetVector {
   }
   io.out.inst := inst
   io.out.pc   := stage3Reg.pc
+  io.out.npc  := stage3Reg.npc
 
   val validReg      = RegInit(false.B)
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    

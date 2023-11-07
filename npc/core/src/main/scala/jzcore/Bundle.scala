@@ -57,11 +57,13 @@ class RamIO extends Bundle {
 // icache pipline
 class Stage1IO extends Bundle {
   val addr      = Output(UInt(32.W))
+  val npc       = Output(UInt(32.W))
   val cacheable = Output(Bool())
 }
 
 class Stage2IO extends Bundle {
   val pc        = Output(UInt(32.W))
+  val npc       = Output(UInt(32.W))
   val cacheable = Output(Bool())
   val index     = Output(UInt(6.W))
   val tag       = Output(UInt(22.W))
@@ -69,6 +71,7 @@ class Stage2IO extends Bundle {
 }
 
 class Stage3IO extends Bundle {
+  val npc       = Output(UInt(32.W))
   val pc        = Output(UInt(32.W))
   val index     = Output(UInt(6.W))
   val tag       = Output(UInt(22.W))
@@ -211,6 +214,7 @@ class LsuOut extends Bundle {
 
 class InstrFetch extends Bundle {
   val pc            = Output(UInt(32.W))
+  val npc           = Output(UInt(32.W))
   val inst          = Output(UInt(32.W))
 }
 
