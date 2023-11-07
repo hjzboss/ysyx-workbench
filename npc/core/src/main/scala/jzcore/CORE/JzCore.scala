@@ -89,7 +89,7 @@ class JzCore extends Module {
   icache.io.cache2cpu <> idReg.io.in
   ifu.io.iduRedirect  <> idu.io.redirect
   ifu.io.icRedirect   <> icache.io.redirect
-  ifu.io.bpuTrain     <> idu.io.bpuTrain.get
+  //ifu.io.bpuTrain     <> idu.io.bpuTrain.get
 
   ifu.io.valid        <> icache.io.validIn
   icache.io.validOut  <> idReg.io.validIn

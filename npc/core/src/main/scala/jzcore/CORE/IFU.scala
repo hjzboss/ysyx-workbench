@@ -33,9 +33,9 @@ class IFU extends Module with HasResetVector {
   val bpu          = Module(new BPU)
 
   // 分支预测
-  bpu.io.pc       := pc
-  bpu.io.bpuTrain := io.bpuTrain
-  val snpc         = bpu.io.npc
+  //bpu.io.pc       := pc
+  //bpu.io.bpuTrain := io.bpuTrain
+  val snpc         = pc + 4.U
   val dnpc         = Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
   pc              := dnpc
 
