@@ -33,6 +33,7 @@ class BPU extends Module with HasResetVector {
 }
 
 sealed class BTBEntry(tagNum: Int) extends Bundle {
+  val valid   = Bool()
   val tag     = UInt(tagNum.W)
   val brType  = UInt(2.W)
   val target  = UInt(32.W)
@@ -58,7 +59,6 @@ sealed class BTB extends Module {
   btbInit.target := 0.U
 
   // btb主要结构
-  val btbVal  = RegInit(VecInit(List.fill(entryNum)(false.B))) // valid array
   val btbMain = RegInit(VecInit(List.fill(entryNum)(btbInit)))
 
   val predPc = io.pc
@@ -69,7 +69,7 @@ sealed class BTB extends Module {
   val predTag = predPc(31, indexNum+2)
 
   val pred = btbMain(predIndex)
-  val hit = btbVal(predIndex) & (pred.tag === predTag)
+  val hit = btbMain(predIndex).valid & (pred.tag === predTag)
 
   io.predict.hit    := hit
   io.predict.target := pred.target
@@ -80,17 +80,17 @@ sealed class BTB extends Module {
   val trainTag = predPc(31, indexNum+2)
   when(io.train.train) {
     // 新增btb项
-    btbVal(trainIndex) := true.B
+    btbMain(trainIndex).valid := true.B
     btbMain(trainIndex).tag := trainTag
     btbMain(trainIndex).target := io.train.target
     btbMain(trainIndex).brType := io.train.brType
   }.elsewhen(io.train.invalid) {
     // 无效btb
-    btbVal(trainIndex) := false.B
+    btbMain(trainIndex).valid := false.B
   }
 }
 
-// 返回地址栈
+// 返回地址栈，支持256层递归调用
 sealed class RAS extends Module {
   val io = IO(new Bundle{
     val push = Input(Bool())
@@ -107,7 +107,7 @@ sealed class RAS extends Module {
   val topPlus = top + 1.U
 
   val stack = RegInit(VecInit(List.fill(rasNum)(0.U(32.W))))
-  val count = RegInit(VecInit(List.fill(rasNum)(0.U(5.W)))) // 递归调用计数器, todo: 设置多大？
+  val count = RegInit(VecInit(List.fill(rasNum)(0.U(8.W)))) // 递归调用计数器
 
   val full = top === (rasNum).U
   val empty = (top === 0.U) & (count(top) === 0.U)
@@ -118,7 +118,7 @@ sealed class RAS extends Module {
   when(io.push) {
     when(topData === io.pushData) {
       // 同一个call递归调用
-      count(top) := Mux(topCount === 31.U, topCount, topCount + 1.U)
+      count(top) := Mux(topCount === 255.U, topCount, topCount + 1.U)
     }.elsewhen(!full) {
       stack(topPlus) := io.pushData
       count(topPlus) := count(topPlus) + 1.U
