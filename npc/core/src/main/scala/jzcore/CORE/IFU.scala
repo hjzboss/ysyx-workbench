@@ -30,7 +30,7 @@ class IFU extends Module with HasResetVector {
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
-  val bpu          = Module(new BPU)
+  //val bpu          = Module(new BPU)
 
   // 分支预测
   //bpu.io.pc       := pc
