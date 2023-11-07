@@ -4,6 +4,7 @@ import chisel3._
 import top.Settings
 import chisel3.util._
 
+// ipc提高0.05，需要优化
 // 分支预测模块：BTB+ras，采用静态分支预测
 class BPU extends Module with HasResetVector {
   val io = IO(new Bundle{
