@@ -32,7 +32,7 @@ class BPU extends Module with HasResetVector {
   io.npc := Mux(!hit, snpc, Mux(brType =/= BrType.ret, target, Mux(ras.io.popVal, ras.io.popData, snpc)))
 }
 
-sealed class BTBEntry(tagNum: Long) extends Bundle {
+sealed class BTBEntry(tagNum: Int) extends Bundle {
   val tag     = UInt(tagNum.W)
   val brType  = UInt(2.W)
   val target  = UInt(32.W)
@@ -48,7 +48,7 @@ sealed class BTB extends Module {
     val train = new BPUTrainIO
   })
 
-  val entryNum = Settings.getLong("btb_num") // btb entry number, todo
+  val entryNum = Settings.getInt("btb_num") // btb entry number, todo
   val indexNum = log2Up(entryNum)
   val tagNum = 30 - indexNum // 忽略低两位， TODO: 压缩C扩展忽略最低位
 
@@ -102,12 +102,12 @@ sealed class RAS extends Module {
     val popVal = Output(Bool()) // 是否是一个有效的pop
   })
 
-  val rasNum = Settings.getLong("ras_num")
+  val rasNum = Settings.getInt("ras_num")
   val top = RegInit(0.U(log2Up(rasNum).W)) // 栈顶指针
   val topPlus = top + 1.U
 
   val stack = RegInit(VecInit(List.fill(rasNum)(0.U(32.W))))
-  val count = RegInit(VecInit(List.fill(rasNum)(0.U(5.W)))) // 递归调用计数器
+  val count = RegInit(VecInit(List.fill(rasNum)(0.U(5.W)))) // 递归调用计数器, todo: 设置多大？
 
   val full = top === (rasNum).U
   val empty = (top === 0.U) & (count(top) === 0.U)
