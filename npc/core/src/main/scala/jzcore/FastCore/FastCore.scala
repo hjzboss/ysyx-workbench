@@ -86,7 +86,7 @@ class FastCore extends Module {
   idu.io.lsuForward := lsReg.io.out.exuOut
   idu.io.wbuForward := wbu.io.regWrite.value
   idu.io.icPc       := ifu.io.out.pc
-  idu.io.icValid    := ifu.io.out.validOut
+  idu.io.icValid    := ifu.io.out.valid
 
   exu.io.datasrc    <> exReg.io.datasrcOut
   exu.io.aluCtrl    <> exReg.io.aluCtrlOut
