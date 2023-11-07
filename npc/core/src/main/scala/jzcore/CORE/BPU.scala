@@ -32,7 +32,7 @@ class BPU extends Module with HasResetVector {
   io.npc := Mux(!hit, snpc, Mux(brType =/= BrType.ret, target, Mux(ras.io.popVal, ras.io.popData, snpc)))
 }
 
-sealed class BTBEntry(tagNum: Int) extends Bundle {
+sealed class BTBEntry(tagNum: Long) extends Bundle {
   val tag     = UInt(tagNum.W)
   val brType  = UInt(2.W)
   val target  = UInt(32.W)
@@ -102,7 +102,7 @@ sealed class RAS extends Module {
     val popVal = Output(Bool()) // 是否是一个有效的pop
   })
 
-  val rasNum = settings.getLong("ras_num")
+  val rasNum = Settings.getLong("ras_num")
   val top = RegInit(0.U(log2Up(rasNum).W)) // 栈顶指针
   val topPlus = top + 1.U
 
