@@ -89,6 +89,7 @@ class JzCore extends Module {
   icache.io.cache2cpu <> idReg.io.in
   ifu.io.iduRedirect  <> idu.io.redirect
   ifu.io.icRedirect   <> icache.io.redirect
+  ifu.io.bpuTrain     <> idu.io.bpuTrain
 
   ifu.io.valid        <> icache.io.validIn
   icache.io.validOut  <> idReg.io.validIn
@@ -144,6 +145,8 @@ class JzCore extends Module {
   idu.io.forwardB   <> forward.io.idForwardB
   idu.io.lsuForward := lsReg.io.out.exuOut
   idu.io.wbuForward := wbu.io.regWrite.value
+  idu.icPc          := icache.io.cache2cpu.pc
+  idu.icValid       := icache.io.validOut
 
   exu.io.datasrc    <> exReg.io.datasrcOut
   exu.io.aluCtrl    <> exReg.io.aluCtrlOut

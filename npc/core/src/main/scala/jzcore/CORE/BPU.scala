@@ -1,4 +1,3 @@
-/*
 package jzcore
 
 import chisel3._
@@ -11,7 +10,7 @@ class BPU extends Module with HasResetVector {
     val pc = Input(Bool())
     val npc = Output(UInt(32.W))
 
-    val btbTrain = new BTBTrainIO
+    val bpuTrain = new BPUTrainIO
   })
   
   val btb = Module(new BTB)
@@ -20,15 +19,15 @@ class BPU extends Module with HasResetVector {
   val snpc = io.pc + 4.U
 
   btb.io.pc := pc
-  btb.io.train := io.btbTrain
+  btb.io.train := io.bpuTrain
 
   val brType = btb.io.predict.brType
   val target = btb.io.predict.target
   val hit = btb.io.predict.hit
 
-  ras.io.push := hit & (brType === BrType.call)
-  ras.io.pushData := snpc
-  ras.io.pop := hit & (brType === BrType.ret)
+  ras.io.push := (hit & (brType === BrType.call)) | (io.bpuTrain.train & (io.bpuTrain.brType === BrType.call))
+  ras.io.pushData := Mux(io.bpuTrain.train & (io.bpuTrain.brType === BrType.call), io.bpuTrain.target, snpc)
+  ras.io.pop := (hit & (brType === BrType.ret)) | (io.bpuTrain.train & (io.bpuTrain.brType === BrType.ret))
 
   io.npc := Mux(!hit, snpc, Mux(brType =/= BrType.ret, target, Mux(ras.io.popVal, ras.io.popData, snpc)))
 }
@@ -46,7 +45,7 @@ sealed class BTB extends Module {
     // predict
     val predict = new BTBPredIO
     // training
-    val train = new BTBTrainIO
+    val train = new BPUTrainIO
   })
 
   val entryNum = 512 // btb entry number
@@ -79,11 +78,15 @@ sealed class BTB extends Module {
   // 训练部分
   val trainIndex = trainPc(indexNum+1, 2)
   val trainTag = predPc(31, indexNum+2)
-  when(io.train.valid) {
+  when(io.train.train) {
+    // 新增btb项
     btbVal(trainIndex) := true.B
     btbMain(trainIndex).tag := trainTag
     btbMain(trainIndex).target := io.train.target
-    btbMain(trainIndex).brType := io.train.btType
+    btbMain(trainIndex).brType := io.train.brType
+  }.elsewhen(io.train.invalid) {
+    // 无效btb
+    btbVal(trainIndex) := false.B
   }
 }
 
@@ -132,4 +135,4 @@ sealed class RAS extends Module {
 
   io.popData := topData
   io.popVal := !empty
-}*/
+}

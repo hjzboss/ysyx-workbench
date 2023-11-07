@@ -13,6 +13,10 @@ class IDU extends Module with HasInstrType{
 
     val validIn   = Input(Bool())
 
+    val icPc      = Input(UInt(32.W)) // icache阶段的pc，用于分支预测检查
+    val icValid   = Input(Bool()) // ic阶段是否是一个有效的指令
+    val bpuTrain  = Flipped(new BPUTrainIO)
+
     // 来自ifu
     val in        = Flipped(new InstrFetch)
 
@@ -131,11 +135,23 @@ class IDU extends Module with HasInstrType{
     AluOp.bgeu      -> (opA >= opB),
     AluOp.bltu      -> (opA < opB),
   ))
-  val brAddrPre         = Wire(UInt(32.W))
-  brAddrPre            := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
-  val brAddr            = Mux(excepInsr | int, csr.io.rdata(31, 0), brAddrPre(31, 0))
-  io.redirect.brAddr   := brAddr
-  io.redirect.valid    := (isBr(instrtype) & brMark) | excepInsr | int
+  val brAddrPre        = Wire(UInt(32.W))
+  brAddrPre           := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
+  val brAddr           = Mux(excepInsr | int, csr.io.rdata(31, 0), Mux(brMark, brAddrPre(31, 0), io.in.pc + 4.U))
+  io.redirect.brAddr  := brAddr
+  io.redirect.valid   := ((isBr(instrtype) | excepInsr) & io.icValid & (brAddr =/= io.icPc)) | int // 分支预测错误时进行跳转
+
+  val call             = ((rd === 1.U) | (rd === 5.U)) & ((((rs1 === 1.U) | (rs1 === 5.U)) & (rd === rs1)) | ((rs1 =/= 1.U) & (rs1 =/= 5.U)))
+  val ret              = (rd =/= 1.U) & (rd =/= 5.U) & ((rs1 === 1.U) | (rs1 === 5.U))
+
+  // btb train
+  // 当是分支指令且预测错误时更新btb，当不是分支指令且预测错误时无效btb
+  // 发生定时器中断时不训练btb
+  io.bpuTrain.train   := ((isBr(instrtype) & brMark) | excepInsr) & io.icValid & (brAddr =/= io.icPc) & !int
+  io.bpuTrain.pc      := io.in.pc
+  io.bpuTrain.target  := brAddr
+  io.bpuTrain.brType  := Mux(call, BrType.call, Mux(ret, BrType.ret, BrType.jump))
+  io.bpuTrain.invalid := !((isBr(instrtype) & brMark) | excepInsr) & io.icValid & (brAddr =/= io.icPc) & !int
 
   // data output
   io.datasrc.pc       := io.in.pc(31, 0)

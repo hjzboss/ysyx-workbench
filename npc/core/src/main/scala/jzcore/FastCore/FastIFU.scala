@@ -13,6 +13,7 @@ class FastIFU extends Module with HasResetVector {
 
     // from exu
     val iduRedirect   = Flipped(new RedirectIO)
+    val bpuTrain      = new BPUTrainIO
 
     // ctrl
     val stall       = Input(Bool()) // 停顿信号，停止pc的变化，并将取指的ready设置为false，保持取出的指令不变
@@ -26,7 +27,12 @@ class FastIFU extends Module with HasResetVector {
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
-  val snpc         = pc + 4.U(32.W)
+  val bpu          = Module(new BPU)
+
+  // 分支预测
+  bpu.io.pc       := pc
+  bpu.io.bpuTrain := io.bpuTrain
+  val snpc         = bpu.io.npc
 
   pc              := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, snpc))
   val imem         = Module(new IMEM)

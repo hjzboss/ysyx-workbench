@@ -15,8 +15,10 @@ class IFU extends Module with HasResetVector {
     val debug         = if(Settings.get("sim")) Some(new DebugIO) else None
     val valid         = Output(Bool()) // 是否是一条有效指令
 
-    // from exu
+    // from idu
     val iduRedirect   = Flipped(new RedirectIO)
+    val bpuTrain      = new BPUTrainIO
+
     val icRedirect    = Flipped(new RedirectIO)
 
     // to idu
@@ -28,8 +30,13 @@ class IFU extends Module with HasResetVector {
 
   // pc
   val pc           = RegInit(resetVector.U(32.W))
-  //val bpc          = Module(new BPU)
-  val snpc         = pc + 4.U(32.W)
+  val bpu          = Module(new BPU)
+
+  // 分支预测
+  bpu.io.pc       := pc
+  bpu.io.bpuTrain := io.bpuTrain
+  val snpc         = bpu.io.npc
+
   pc              := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, Mux(io.icRedirect.valid, io.icRedirect.brAddr, snpc)))
 
   if(Settings.get("sim")) {

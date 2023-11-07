@@ -298,8 +298,9 @@ class BTBPredIO extends Bundle {
   val hit             = Output(Bool())
 }
 
-class BTBTrainIO extends Bundle {
-  val valid           = Input(Bool())
+class BPUTrainIO extends Bundle {
+  val train           = Input(Bool())
+  val invalid         = Input(Bool())
   val pc              = Input(UInt(32.W))
   val target          = Input(UInt(32.W))
   val brType          = Input(BrType())

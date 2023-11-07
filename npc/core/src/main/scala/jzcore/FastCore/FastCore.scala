@@ -5,7 +5,7 @@ import chisel3.util._
 import utils._
 import top.Settings
 
-
+// no cache, no axi
 class FastCore extends Module {
   val io = IO(new Bundle {
     val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
@@ -33,6 +33,7 @@ class FastCore extends Module {
 
   ifu.io.out          <> idReg.io.in
   ifu.io.iduRedirect  <> idu.io.redirect
+  ifu.io.bpuTrain     <> idu.io.bpuTrain
   ifu.io.valid        <> idReg.io.validIn
   idReg.io.validOut   <> idu.io.validIn
 
@@ -84,6 +85,8 @@ class FastCore extends Module {
   idu.io.forwardB   <> forward.io.idForwardB
   idu.io.lsuForward := lsReg.io.out.exuOut
   idu.io.wbuForward := wbu.io.regWrite.value
+  idu.icPc          := icache.io.cache2cpu.pc
+  idu.icValid       := icache.io.validOut
 
   exu.io.datasrc    <> exReg.io.datasrcOut
   exu.io.aluCtrl    <> exReg.io.aluCtrlOut
