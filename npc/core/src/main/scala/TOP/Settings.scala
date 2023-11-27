@@ -12,10 +12,10 @@ object DefaultSettings {
     "ResetVector" -> 0x80000000L,
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
-    "mul"         -> "wallace", // fast, booth, wallace
+    "mul"         -> "booth", // fast, booth, wallace
     "div"         -> "rest", // fast, rest
     "sim"         -> true, // verilator mode， false is soc mode， no debug
-    "core"        -> "normal", // single, fast, normal
+    "core"        -> "fast", // single, fast, normal
     "btb_num"     -> 64, // btb entry num
     "ras_num"     -> 8 // ras entry num
   )
