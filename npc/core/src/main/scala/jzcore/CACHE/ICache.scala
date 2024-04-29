@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 import top.Settings
+import chisel3.util.experimental.BoringUtils
 
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
