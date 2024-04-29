@@ -64,6 +64,7 @@ static uint32_t key_dequeue() {
   return key;
 }
 
+// 在device_update中进行调用，每次nemu执行一条指令就会调用device_update来更新设备状态，使用SDL读取键盘状态，将按下键盘的键盘码入队
 void send_key(uint8_t scancode, bool is_keydown) {
   if (nemu_state.state == NEMU_RUNNING && keymap[scancode] != _KEY_NONE) {
     uint32_t am_scancode = keymap[scancode] | (is_keydown ? KEYDOWN_MASK : 0);
@@ -82,6 +83,7 @@ static uint32_t key_dequeue() {
 
 static uint32_t *i8042_data_port_base = NULL;
 
+// 将键盘码出队
 static void i8042_data_io_handler(uint32_t offset, int len, bool is_write) {
   assert(!is_write);
   assert(offset == 0);

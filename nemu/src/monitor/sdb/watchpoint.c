@@ -23,8 +23,9 @@ typedef struct watchpoint {
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
-	char expr[65535];
-	word_t value;
+  char *expr;
+  //char expr[65535]; // TODO: 有点太大了
+  word_t value;
 } WP;
 
 static WP wp_pool[NR_WP] = {};
@@ -35,7 +36,8 @@ void init_wp_pool() {
   for (i = 0; i < NR_WP; i ++) {
     wp_pool[i].NO = i;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
-		wp_pool[i].value = 0;
+    wp_pool[i].value = 0;
+    wp_pool[i].expr = NULL;
   }
 
   head = NULL;
@@ -45,23 +47,25 @@ void init_wp_pool() {
 /* TODO: Implement the functionality of watchpoint */
 
 void new_wp(char *e) {
-	if (free_ == NULL) {
-		printf("There are no idle watchpoints to assign!\n");
-		return;
-	}
-	bool success;
-	word_t res = expr(e, &success);
-	if (success) {
-		WP *w = free_;
-		free_ = free_->next;
-		w->next = head;
-		strcpy(w->expr, e);
-		w->value = res;
-		head = w;
-		printf("Hardware watchpoint %d: %s\n", head->NO, head->expr);
-	}
+  if (free_ == NULL) {
+    printf("There are no idle watchpoints to assign!\n");
+    return;
+  }
+  bool success;
+  word_t res = expr(e, &success);
+  if (success) {
+    WP *w = free_;
+    free_ = free_->next;
+    w->next = head;
+    w->expr = (char *)malloc(sizeof(strlen(e)) + 1);
+    strcpy(w->expr, e);
+    w->value = res;
+    head = w;
+    printf("Hardware watchpoint %d: %s\n", head->NO, head->expr);
+  }
 }
 
+// 将监视点插入free列表，按序
 void insert_free(WP *wp) {
 	if (free_ == NULL) {
 		free_ = wp;
@@ -85,9 +89,10 @@ void insert_free(WP *wp) {
 	}
 }
 
+// 按照编号删除监视点
 void free_wp(int no) {
-	if (head == NULL || (head->next == NULL && head->NO != no)) {
-		printf("No target watchpoint found!\n");
+	if (head == NULL) {
+		printf("watchpoint pool is empty!\n");
 	}
 	else if (head->NO == no) {
 		WP *tmp = head;
@@ -116,29 +121,30 @@ void free_wp(int no) {
 
 // Scans all non-idle watchpoints and returns true if the result of the expression changes
 void scan_watchpoint(Decode *_this) {
-	WP *cur = head;
-	bool flag = false;
-	while (cur) {
-		bool success;
-		word_t n_val = expr(cur->expr, &success);
-		assert(success);
-		if (n_val != cur->value) {
-			printf("Hardware watchpoint %d: %s\n\n", cur->NO, cur->expr);
-			printf("Old value = %lu\n", cur->value);
-			printf("New value = %lu\n\n", n_val);
-			flag = true;
-			cur->value = n_val;
-		}
-		cur = cur->next;
-	}
+  WP *cur = head;
+  bool flag = false;
+  while (cur) {
+    bool success;
+    word_t n_val = expr(cur->expr, &success);
+    assert(success);
+    if (n_val != cur->value) {
+      printf("Hardware watchpoint %d: %s\n\n", cur->NO, cur->expr);
+      printf("Old value = %lu\n", cur->value);
+      printf("New value = %lu\n\n", n_val);
+      flag = true;
+      cur->value = n_val;
+    }
+    cur = cur->next;
+  }
 
-	
-	if (flag) {
-		IFDEF(CONFIG_ITRACE, puts(_this->logbuf));
-		nemu_state.state = NEMU_STOP;
-	}
+  // 当有表达式发生变化时，停止nemu
+  if (flag) {
+    IFDEF(CONFIG_ITRACE, puts(_this->logbuf));
+    nemu_state.state = NEMU_STOP;
+  }
 }
 
+// 输出所有监视点信息
 void watchpoint_display() {
 	printf("NO\t\tWhat\t\tValue\n");
 	WP *cur = head;

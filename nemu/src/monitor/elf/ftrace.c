@@ -81,7 +81,8 @@ void print_ftrace(bool log) {
   else log_write("---ftrace message end---\n");
 }
 
-
+// 总体步骤：从elf文件头中获取段头表所在位置，读取并遍历段头表，获取符号表头和字符串表头，
+// 从符号表头中获取符号表所在位置，读取并遍历符号表，获取函数信息保存，中间需要从字符串表中查找函数名
 void init_elf(const char *file) {
   printf("read elf file\n");
   FILE *fp;
@@ -107,8 +108,8 @@ void init_elf(const char *file) {
   assert(NULL != start1);
   Elf64_Shdr *shdr = start1;
 
-  Elf64_Shdr *sym_shdr = NULL; // 符号表
-  Elf64_Shdr *str_shdr = NULL; // 字符串表
+  Elf64_Shdr *sym_shdr = NULL; // 符号表头
+  Elf64_Shdr *str_shdr = NULL; // 字符串表头
 
   // set offset
   a = fseek(fp, elf_head.e_shoff, SEEK_SET);
@@ -139,7 +140,7 @@ void init_elf(const char *file) {
 
   // function numer
   int sym_num = sym_shdr->sh_size / 24;
-  // point the file pointer to the beginning
+  // 定位到符号表位置
   rewind(fp);
   fseek(fp, sym_shdr->sh_offset, SEEK_SET);
   a = fread(sym, sym_shdr->sh_size, 1,  fp);
@@ -149,8 +150,8 @@ void init_elf(const char *file) {
   for(i = 0; i < sym_num; i++) {
     // symbol type is function
     if ((sym->st_info & 0xf) == 2) {
-      rewind(fp);
-      a = fseek(fp, str_shdr->sh_offset + sym->st_name, SEEK_SET);
+      rewind(fp); // 定位到文件头
+      a = fseek(fp, str_shdr->sh_offset + sym->st_name, SEEK_SET); // 在字符串表中获取函数名
       assert(a == 0);
       a = fread(name, MAX_FUNC_NAME_WIDTH, 1, fp);
       assert(a != 0);
