@@ -16,16 +16,16 @@ class Perf extends Module with HasResetVector {
   val icacheReq = Wire(Bool())
   val icacheHitCnt = RegInit(0.U(64.W))
   val icacheReqCnt = RegInit(0.U(64.W))
-  icacheHitCnt := Mux(icacheHit, icacheHitCnt + 1.U, icacheHit)
-  icacheReqCnt := Mux(icacheReq, icacheReqCnt + 1.U, icacheReq)
+  icacheHitCnt := Mux(icacheHit, icacheHitCnt + 1.U, icacheHitCnt)
+  icacheReqCnt := Mux(icacheReq, icacheReqCnt + 1.U, icacheReqCnt)
 
   // dcache perf
   val dcacheHit = Wire(Bool())
   val dcacheReq = Wire(Bool())
   val dcacheHitCnt = RegInit(0.U(64.W))
   val dcacheReqCnt = RegInit(0.U(64.W))
-  dcacheHitCnt := Mux(dcacheHit, dcacheHitCnt + 1.U, dcacheHit)
-  dcacheReqCnt := Mux(dcacheReq, dcacheReqCnt + 1.U, dcacheReq)
+  dcacheHitCnt := Mux(dcacheHit, dcacheHitCnt + 1.U, dcacheHitCnt)
+  dcacheReqCnt := Mux(dcacheReq, dcacheReqCnt + 1.U, dcacheReqCnt)
 
   BoringUtils.addSink(icacheHit, "icacheHit")
   BoringUtils.addSink(icacheReq, "icacheReq")
