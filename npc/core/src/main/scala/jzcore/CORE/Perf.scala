@@ -12,16 +12,16 @@ class Perf extends Module with HasResetVector {
   })
 
   // icache perf
-  val icacheHit = Wire(Bool())
-  val icacheReq = Wire(Bool())
+  val icacheHit = WireDefault(false.B)
+  val icacheReq = WireDefault(false.B)
   val icacheHitCnt = RegInit(0.U(64.W))
   val icacheReqCnt = RegInit(0.U(64.W))
   icacheHitCnt := Mux(icacheHit, icacheHitCnt + 1.U, icacheHitCnt)
   icacheReqCnt := Mux(icacheReq, icacheReqCnt + 1.U, icacheReqCnt)
 
   // dcache perf
-  val dcacheHit = Wire(Bool())
-  val dcacheReq = Wire(Bool())
+  val dcacheHit = WireDefault(false.B)
+  val dcacheReq = WireDefault(false.B)
   val dcacheHitCnt = RegInit(0.U(64.W))
   val dcacheReqCnt = RegInit(0.U(64.W))
   dcacheHitCnt := Mux(dcacheHit, dcacheHitCnt + 1.U, dcacheHitCnt)
@@ -33,8 +33,8 @@ class Perf extends Module with HasResetVector {
   BoringUtils.addSink(dcacheReq, "dcacheReq")
 
   // bpu
-  val bpuMiss = Wire(Bool())
-  val bpuReq = Wire(Bool())
+  val bpuMiss = WireDefault(false.B)
+  val bpuReq = WireDefault(false.B)
   val bpuMissCnt = RegInit(0.U(64.W))
   val bpuReqCnt = RegInit(0.U(64.W))
   bpuMissCnt := Mux(bpuMiss, bpuMissCnt + 1.U, bpuMissCnt)
