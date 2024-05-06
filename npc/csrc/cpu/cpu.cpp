@@ -385,7 +385,7 @@ static void statistic() {
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", total_inst * 1000000 / g_timer);
     if(g_timer >= 1000000) Log("CPU frequency: %ld HZ\n", cycle / (g_timer / 1000000));
-    Log("IPC = %lf\n", (total_inst / 1.0) / cycle);
+    Log("IPC = %lf", (total_inst / 1.0) / cycle);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 
