@@ -8,20 +8,24 @@ import chisel3.util.experimental.BoringUtils
 // 性能分析模块
 class Perf extends Module with HasResetVector {
   val io = IO(new Bundle {
-    val perf = new PerfIO
+    val perfIO = new PerfIO
   })
 
   // icache perf
   val icacheHit = Wire(Bool())
   val icacheReq = Wire(Bool())
-  val icacheHitCnt = RegEnable(icacheHitCnt + 1.U, 0.U(64.W), icacheHit)
-  val icacheReqCnt = RegEnable(icacheReqCnt + 1.U, 0.U(64.W), icacheReq)
+  val icacheHitCnt = RegInit(0.U(64.W))
+  val icacheReqCnt = RegInit(0.U(64.W))
+  icacheHitCnt := Mux(icacheHit, icacheHitCnt + 1.U, icacheHit)
+  icacheReqCnt := Mux(icacheReq, icacheReqCnt + 1.U, icacheReq)
 
   // dcache perf
   val dcacheHit = Wire(Bool())
   val dcacheReq = Wire(Bool())
-  val dcacheHitCnt = RegEnable(dcacheHitCnt + 1.U, 0.U(64.W), dcacheHit)
-  val dcacheReqCnt = RegEnable(dcacheReqCnt + 1.U, 0.U(64.W), dcacheReq)
+  val dcacheHitCnt = RegInit(0.U(64.W))
+  val dcacheReqCnt = RegInit(0.U(64.W))
+  dcacheHitCnt := Mux(dcacheHit, dcacheHitCnt + 1.U, dcacheHit)
+  dcacheReqCnt := Mux(dcacheReq, dcacheReqCnt + 1.U, dcacheReq)
 
   BoringUtils.addSink(icacheHit, "icacheHit")
   BoringUtils.addSink(icacheReq, "icacheReq")
@@ -31,8 +35,10 @@ class Perf extends Module with HasResetVector {
   // bpu
   val bpuMiss = Wire(Bool())
   val bpuReq = Wire(Bool())
-  val bpuMissCnt = RegEnable(bpuMissCnt + 1.U, 0.U(64.W), bpuMiss)
-  val bpuReqCnt = RegEnable(bpuReqCnt + 1.U, 0.U(64.W), bpuReq)
+  val bpuMissCnt = RegInit(0.U(64.W))
+  val bpuReqCnt = RegInit(0.U(64.W))
+  bpuMissCnt := Mux(bpuMiss, bpuMissCnt + 1.U, bpuMissCnt)
+  bpuReqCnt := Mux(bpuReq, bpuReqCnt + 1.U, bpuReqCnt)
 
   BoringUtils.addSink(bpuMiss, "bpuMiss")
   BoringUtils.addSink(bpuReq, "bpuReq")
