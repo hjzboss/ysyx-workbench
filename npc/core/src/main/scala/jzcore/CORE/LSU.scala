@@ -55,7 +55,7 @@ class LSU extends Module {
 
   io.dcacheCtrl.valid           := state === ctrl
   when(state === ctrl) {
-    printf("cacheable=%h, addr=%h", cacheable, addr)
+    printf("cacheable=%x, addr=%x", cacheable, addr)
   }
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
