@@ -46,7 +46,6 @@ class Soc extends Module {
 
     val core = Module(new JzCore)
     io.perf := core.io.perfIO
-
     core.io.interrupt := false.B
 
     core.io.master     <> sram.io.slave
