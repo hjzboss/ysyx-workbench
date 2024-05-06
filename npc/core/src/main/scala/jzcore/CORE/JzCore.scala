@@ -11,7 +11,7 @@ class JzCore extends Module {
     val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
     val lsFlag          = if(Settings.get("sim")) Some(Output(Bool())) else None
 
-    val prefIO          = new PerfIO
+    val perfIO          = new PerfIO
 
     // icache data array
     val sram0           = new RamIO
@@ -48,7 +48,7 @@ class JzCore extends Module {
   val forward = Module(new Forwarding)
 
   val pref    = Module(new Perf)
-  io.prefIO  := pref.prefIO
+  io.perfIO  := pref.perfIO
 
   clint.io.clintIO    <> lsu.io.clintIO
   clint.io.int        <> idu.io.timerInt
