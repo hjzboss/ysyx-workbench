@@ -48,7 +48,7 @@ class JzCore extends Module {
   val forward = Module(new Forwarding)
 
   val perf    = Module(new Perf)
-  io.perfIO  := perf.perfIO
+  io.perfIO  := perf.io.perfIO
 
   clint.io.clintIO    <> lsu.io.clintIO
   clint.io.int        <> idu.io.timerInt
