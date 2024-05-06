@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 import top.Settings
+import chisel3.util.experimental.BoringUtils
 
 class ArbiterIO extends Bundle {
   //val cen   = Output(Vec(len, Bool())) // valid & dirty
@@ -892,4 +893,8 @@ class NoCohDCache extends DCache {
 
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
   io.coherence.ready       := true.B
+
+  // perf
+  BoringUtils.addSource(hit, "dcacheHit")
+  BoringUtils.addSource(state === tagCompare, "dcacheReq")
 }

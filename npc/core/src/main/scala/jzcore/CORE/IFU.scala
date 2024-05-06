@@ -3,7 +3,7 @@ package jzcore
 import chisel3._
 import top.Settings
 import chisel3.util._
-
+import chisel3.util.experimental.BoringUtils
 
 trait HasResetVector {
   val resetVector = if(Settings.get("sim")) Settings.getLong("ResetVector") else Settings.getLong("SocResetVector")
@@ -19,6 +19,7 @@ class IFU extends Module with HasResetVector {
     val iduRedirect   = Flipped(new RedirectIO)
     val bpuTrain      = new BPUTrainIO
 
+    // from icache
     val icRedirect    = Flipped(new RedirectIO)
 
     // to idu

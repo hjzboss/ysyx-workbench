@@ -52,7 +52,7 @@ sealed class BTB extends Module {
 
   val entryNum = Settings.getInt("btb_num") // btb entry number, todo
   val indexNum = log2Up(entryNum)
-  val tagNum = 30 - indexNum // 忽略低两位， TODO: 压缩C扩展忽略最低位
+  val tagNum = 30 - indexNum // 忽略低两位
 
   val btbInit = Wire(new BTBEntry(tagNum))
   btbInit.valid := false.B

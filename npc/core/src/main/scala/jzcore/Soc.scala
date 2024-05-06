@@ -10,7 +10,17 @@ class Soc extends Module {
     // 传给仿真环境
     val debug      = new DebugIO
     val lsFlag     = Output(Bool())
+    val perf       = new PerfIO
   })
+
+  val perfDefault = Wire(new PerfIO)
+  perfDefault.icacheHitCnt := 0.U
+  perfDefault.icacheReqCnt := 0.U
+  perfDefault.dcacheHitCnt := 0.U
+  perfDefault.dcacheReqCnt := 0.U
+  perfDefault.bpuMissCnt   := 0.U
+  perfDefault.bpuReqCnt    := 0.U
+  io.perf := perfDefault
 
   if(Settings.getString("core") == "single") {
     val single = Module(new Single)
@@ -35,6 +45,8 @@ class Soc extends Module {
     val ram7 = Module(new Ram)
 
     val core = Module(new JzCore)
+    io.perf := core.io.perfIO
+
     core.io.interrupt := false.B
 
     core.io.master     <> sram.io.slave

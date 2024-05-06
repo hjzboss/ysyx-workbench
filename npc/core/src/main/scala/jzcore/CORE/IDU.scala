@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 import top.Settings
+import chisel3.util.experimental.BoringUtils
 
 // todo: mret指令需要处理，mret会设置mstatus中的mie为mpie
 class IDU extends Module with HasInstrType{
@@ -152,8 +153,10 @@ class IDU extends Module with HasInstrType{
     io.bpuTrain.get.target  := brAddr
     io.bpuTrain.get.brType  := Mux(call, BrType.call, Mux(ret, BrType.ret, BrType.jump))
     io.bpuTrain.get.invalid := !((isBr(instrtype) & brMark) | excepInsr) & (brAddr =/= io.in.npc) & !int
-  } else {
 
+    BoringUtils.addSource(io.redirect.valid & !io.stall, "bpuMiss")
+    BoringUtils.addSource(io.validIn & !io.stall, "bpuReq")
+  } else {
     // fast core
     val brAddrPre         = Wire(UInt(32.W))
     brAddrPre            := Mux(instrtype === InstrIJ, opA(31, 0), io.in.pc(31, 0)) + io.datasrc.imm(31, 0)
