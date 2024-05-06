@@ -897,7 +897,7 @@ class NoCohDCache extends DCache {
   // perf
   BoringUtils.addSource(hit, "dcacheHit")
   BoringUtils.addSource(state === tagCompare, "dcacheReq")
-  when(state === tagCompare) {
-    printf("dcache")
+  when(ctrlFire) {
+    printf("dcache shit")
   }
 }
