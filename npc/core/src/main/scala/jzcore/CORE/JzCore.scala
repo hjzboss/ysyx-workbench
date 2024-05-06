@@ -47,8 +47,8 @@ class JzCore extends Module {
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
 
-  val pref    = Module(new Perf)
-  io.perfIO  := pref.perfIO
+  val perf    = Module(new Perf)
+  io.perfIO  := perf.perf
 
   clint.io.clintIO    <> lsu.io.clintIO
   clint.io.int        <> idu.io.timerInt

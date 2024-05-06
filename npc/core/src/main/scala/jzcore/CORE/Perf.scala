@@ -8,7 +8,7 @@ import chisel3.util.experimental.BoringUtils
 // 性能分析模块
 class Perf extends Module with HasResetVector {
   val io = IO(new Bundle {
-    val perfIO = new PerfIO
+    val perf = new PerfIO
   })
 
   // icache perf
