@@ -54,9 +54,6 @@ class LSU extends Module {
   var flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
 
   io.dcacheCtrl.valid           := state === ctrl
-  when(state === ctrl) {
-    printf("cacheable=%x, addr=%x", cacheable, addr)
-  }
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
   io.dcacheCtrl.bits.cacheable  := cacheable

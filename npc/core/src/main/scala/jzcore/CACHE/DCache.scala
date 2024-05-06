@@ -522,6 +522,10 @@ sealed class CohDCache extends DCache {
   io.rdataIO.valid         := state === data || (rState === data_trans && rdataFire) || rState === ok
   io.rdataIO.bits.rdata    := Mux(state === data, alignData, Mux(rState === data_trans, io.master.rdata, Mux(rState === ok, axiDirectReadReg, 0.U(64.W))))
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
+
+  // perf
+  BoringUtils.addSource(hit, "dcacheHit")
+  BoringUtils.addSource(state === tagCompare, "dcacheReq")
 }
 
 
@@ -893,11 +897,4 @@ class NoCohDCache extends DCache {
 
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
   io.coherence.ready       := true.B
-
-  // perf
-  BoringUtils.addSource(hit, "dcacheHit")
-  BoringUtils.addSource(state === tagCompare, "dcacheReq")
-  when(ctrlFire) {
-    printf("dcache shit")
-  }
 }
