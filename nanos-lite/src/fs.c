@@ -53,6 +53,7 @@ char *get_name_by_fd(int fd) {
   assert(0);
 }
 
+// 初始化文件系统
 void init_fs() {
   // TODO: initialize the size of /dev/fb
   file_num = sizeof(file_table) / sizeof(Finfo);
@@ -67,6 +68,7 @@ void init_fs() {
   }
 }
 
+// 返回文件的编号
 int fs_open(const char *pathname, int flags, int mode) {
   for (int i = 3; i < file_num; i++) {
     if (strcmp(file_table[i].name, pathname) == 0) {

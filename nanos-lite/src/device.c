@@ -16,6 +16,7 @@ static const char *keyname[256] __attribute__((used)) = {
   AM_KEYS(NAME)
 };
 
+// 将buf中的len个数据写入串口
 size_t serial_write(const void *buf, size_t offset, size_t len) {
   char *buf_t = (char *)buf;
   for (int i = 0; i < len; i++) {
@@ -24,6 +25,7 @@ size_t serial_write(const void *buf, size_t offset, size_t len) {
   return len;
 }
 
+// ndl(NDL_PollEvent()) -> (navy syscall)_read -> (nanos)fs_read -> events_read 
 size_t events_read(void *buf, size_t offset, size_t len) {
   AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
   if (ev.keycode == AM_KEY_NONE) {
@@ -33,10 +35,11 @@ size_t events_read(void *buf, size_t offset, size_t len) {
   return strlen(buf);
 }
 
+// 读取屏幕的宽高，buf中保存的顺序是宽 高
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
   AM_GPU_CONFIG_T info = io_read(AM_GPU_CONFIG);
   int w = info.width, h = info.height;
-  sprintf(buf, "WIDTH: %d\nHEIGHT: %d\n", w, h);
+  sprintf(buf, "%d %d", w, h);
   return strlen(buf);
 }
 
@@ -49,6 +52,7 @@ size_t fb_write(const void *buf, size_t offset, size_t len) {
   int y = xy / w;
   assert(y <= h);
   // 向(x, y)处写入len个字节，由于是按像素大小(32位)写入，因此写入的长度是len / 4
+  // int x, y; void *pixels; int w, h; bool sync
   io_write(AM_GPU_FBDRAW, x, y, (char *)buf, len / 4, 1, true);
   return len;
 }

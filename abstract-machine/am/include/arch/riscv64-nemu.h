@@ -7,9 +7,9 @@ struct Context {
   void *pdir;
 };
 
-#define GPR1 gpr[17] // a7
+#define GPR1 gpr[17] // a7为riscv系统调用号寄存器
 #define GPR2 gpr[10]
 #define GPR3 gpr[11]
 #define GPR4 gpr[12]
-#define GPRx gpr[10]
+#define GPRx gpr[10] // a0为返回值或函数参数
 #endif

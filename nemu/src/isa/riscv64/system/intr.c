@@ -15,6 +15,8 @@
 
 #include <isa.h>
 
+// 中断处理，将mie保存到mpie，保存权限级别到mpp（忽略），清除mie，保存pc，跳转mtvec
+// 默认不是设备中断
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   /* TODO: Trigger an interrupt/exception with ``NO''.
    * Then return the address of the interrupt/exception vector.
@@ -25,12 +27,13 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   mstatus &= ~0x088; // clear mpie and mie
   mstatus |= mpie; // set mpie=mie and mie=0
   cpu.csr[0] = mstatus;
-  cpu.csr[3] = 0xb; // mcause syscall
-  cpu.csr[2] = epc;  // mepc
+  cpu.csr[3] = 0xb; // mcause syscall，默认设置为系统调用
+  cpu.csr[2] = NO;  // mepc，由软件进行更新
   //printf("nemu: ecall, mstatus=%lx\n", mstatus);
   return cpu.csr[1]; // mtvec
 }
 
+// 恢复mie位，返回mpec
 word_t isa_mret() {
   // set mstatus and return epc
   word_t mstatus = cpu.csr[0];

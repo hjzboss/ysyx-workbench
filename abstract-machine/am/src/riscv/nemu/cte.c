@@ -4,6 +4,7 @@
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
+// c是trap.s中的sp，a0传了个指针
 Context* __am_irq_handle(Context *c) {
   //printf("mcause=%x, mstatus=%x, mepc=%p\n", c->mcause, c->mstatus, c->mepc);
   if (user_handler) {

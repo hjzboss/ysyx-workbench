@@ -28,9 +28,10 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
 
 // 向屏幕(x, y)坐标处绘制w*h的矩形图像， 图像像素按行优先方式存储在pixels中, 每个像素用32位整数以00RRGGBB的方式描述颜色
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
+  // 获取屏幕宽高
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
-  int height = data & 0x0000ffff;
+  int height = data & 0x0ffff;
   if((ctl->x + ctl->w > width) || (ctl->y + ctl->h > height)) {
     panic("out of display range");
   }
@@ -43,6 +44,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
     }
     fb += width - ctl->w;
   }
+  // 同步屏幕
   if (ctl->sync) {
     outl(SYNC_ADDR, 1);
   }

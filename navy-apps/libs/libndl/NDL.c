@@ -9,10 +9,11 @@
 
 static int evtdev = -1;
 static int fbdev = -1;
-static int screen_w = 0, screen_h = 0, screen_x = 0, screen_y = 0; // canvas size and location
-static int fb_w = 0, fb_h = 0; // frame buffer size
+static int canvas_w = 0, canvas_h = 0, canvas_x = 0, canvas_y = 0; // 打开的画布的宽高
+static int screen_w = 0, screen_h = 0; // frame buffer size，屏幕的宽高
 static int fb_fd;
 
+// 以毫秒为单位返回系统时间
 uint32_t NDL_GetTicks() {
   struct timeval *tv = (struct timeval *)malloc(sizeof(struct timeval));
   gettimeofday(tv, NULL);
@@ -33,9 +34,9 @@ void NDL_OpenCanvas(int *w, int *h) {
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
-    screen_w = *w; screen_h = *h;
+    canvas_w = *w; canvas_h = *h;
     char buf[64];
-    int len = sprintf(buf, "%d %d", screen_w, screen_h);
+    int len = sprintf(buf, "%d %d", canvas_w, canvas_h);
     // let NWM resize the window and create the frame buffer
     write(fbctl, buf, len);
     while (1) {
@@ -53,58 +54,49 @@ void NDL_OpenCanvas(int *w, int *h) {
   assert(len != -1);
   
   // get frame buffer size
-  char *first_item = strtok(buf, "\n");
-  char *second_item = strtok(NULL, "\n");
-  strtok(first_item, " ");
-  char *width_s = strtok(NULL, " ");
-  assert(width_s != NULL);
-  strtok(second_item, " ");
+  char *width_s = strtok(buf, " ");
   char *height_s = strtok(NULL, " ");
+  assert(width_s != NULL);
   assert(height_s != NULL);
 
-  fb_w = atoi(width_s);
-  fb_h = atoi(height_s);
-  assert(fb_w > 0 && fb_h > 0);
+  screen_w = atoi(width_s);
+  screen_h = atoi(height_s);
+  assert(screen_w > 0 && screen_h > 0);
   
-  // 判断画布的大小是否正常
+  // 判断画布的大小是否正常，如果不正常就将画布的大小设置为原始屏幕的大小
   int canvas_w = *w;
   int canvas_h = *h;
-  if (canvas_w > fb_w || canvas_w == 0)
-    screen_w = fb_w;
+  if (canvas_w > screen_w || canvas_w == 0)
+    canvas_w = screen_w;
   else
-    screen_w = canvas_w;
+    canvas_w = canvas_w;
 
-  if (canvas_h > fb_h || canvas_h == 0)
-    screen_h = fb_h;
+  if (canvas_h > screen_h || canvas_h == 0)
+    canvas_h = screen_h;
   else
-    screen_h = canvas_h;
+    canvas_h = canvas_h;
 
-  *w = screen_w;
-  *h = screen_h;
+  *w = canvas_w;
+  *h = canvas_h;
 
-  screen_x = fb_w / 2 - screen_w / 2;
-  screen_y = fb_h / 2 - screen_h / 2;
+  // 将画布的坐标轴定位在屏幕中间
+  canvas_x = screen_w / 2 - canvas_w / 2;
+  canvas_y = screen_h / 2 - canvas_h / 2;
 }
 
 // 向画布`(x, y)`坐标处绘制`w*h`的矩形图像, 并将该绘制区域同步到屏幕上
 // 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
+// 来自于miniSdl的调用，sdl传入的是颜色数据
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int fb_fd = open("/dev/fb", 0, 0);
-  int dw = w, dh = h;
-  assert(x + screen_x >= 0 && x + screen_x + w <= fb_w);
-  assert(y + screen_y >= 0 && y + screen_y + h <= fb_h);
+  assert(x + canvas_x >= 0 && x + canvas_x + w <= screen_w);
+  assert(y + canvas_y >= 0 && y + canvas_y + h <= screen_h);
 
-  /*
-  if (x == 0 & y == 0 & w == 0 & h == 0) {
-    dw = screen_w;
-    dh = screen_h;
-  }
-  */
-
-  for(int i = 0; i < dh; i++) {
+  for(int i = 0; i < h; i++) {
     // 逐行绘制
-    lseek(fb_fd, ((y + screen_y + i) * fb_w + x + screen_x) * 4, SEEK_SET);
-    write(fb_fd, pixels + i * dw, dw * 4);
+    lseek(fb_fd, ((y + canvas_y + i) * screen_w + x + canvas_x) * 4, SEEK_SET);
+    // 一次绘制一行
+    write(fb_fd, pixels + i * w, w * 4);
   }
 }
 
