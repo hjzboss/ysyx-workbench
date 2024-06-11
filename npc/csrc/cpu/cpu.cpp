@@ -19,6 +19,8 @@ static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
 static bool visit_device = false;
 
+uint64_t device_update_cnt = 0; // 设备更新计数器
+
 CPUState npc_cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
@@ -371,7 +373,11 @@ void execute(uint64_t n) {
     total_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
-    IFDEF(CONFIG_DEVICE, device_update());
+    device_update_cnt++;
+    if(device_update_cnt > 1000) {
+      IFDEF(CONFIG_DEVICE, device_update());
+      device_update_cnt = 0;
+    }
   }
 }
 
