@@ -55,7 +55,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
     // 1. 填充计算
     int fix_num = 0; // 填充0的数目
     bool fix_zero = false;
-    // 判断是否要填充0
+    // 判断是要填充0还是空格
     if (*p == '0') {
       ++p;
       char tmp = *p;
@@ -85,7 +85,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         ival = va_arg(ap, int);
         num2str(str, ival, 10);
         len = strlen(str);
-        rem = fix_num - len;
+        rem = fix_num - len; // 剩下需要补的长度
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
           for (; rem; rem--) *out++ = fix_ch;

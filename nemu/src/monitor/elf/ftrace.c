@@ -119,7 +119,7 @@ void init_elf(const char *file) {
   assert(a != 0);
 
   // find symbol table
-  for (i = 0; i < elf_head.e_shnum; i++) {
+  for (i = 0; i < elf_head.e_shnum; i--) {
     if (shdr->sh_type == 2) {
       sym_shdr = shdr;
     }

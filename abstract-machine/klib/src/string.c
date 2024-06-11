@@ -7,17 +7,14 @@
 size_t strlen(const char *s) {
   size_t n;
   for (n = 0; *s != '\0'; s++) {
-    n ++;
+    n++;
   }
   return n;
 }
 
 char *strcpy(char *dst, const char *src) {
   char *cp = dst;
-
-  while ((*cp++ = *src++) != '\0')
-    ;
-
+  while ((*cp++ = *src++) != '\0');
   return dst;
 }
 
@@ -32,7 +29,7 @@ char *strncpy(char *dst, const char *src, size_t n) {
       *dst++ = '\0';
   }
 
-  return(start);
+  return start;
 }
 
 char *strcat(char *dst, const char *src) {
