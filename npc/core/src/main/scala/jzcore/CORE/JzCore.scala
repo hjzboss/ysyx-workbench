@@ -48,7 +48,7 @@ class JzCore extends Module {
 
   if(Settings.get("perf") && Settings.get("sim")) {
     val perf    = Module(new Perf)
-    io.perfIO  := perf.io.perfIO
+    io.perfIO.get  := perf.io.perfIO
   }
 
   clint.io.clintIO    <> lsu.io.clintIO

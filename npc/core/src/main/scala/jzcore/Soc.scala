@@ -47,7 +47,7 @@ class Soc extends Module {
 
     val core = Module(new JzCore)
     if(Settings.get("perf") && Settings.get("sim")) {
-      io.perf := core.io.perfIO
+      io.perf := core.io.perfIO.get
     }
     core.io.interrupt := false.B
 
