@@ -115,6 +115,7 @@ class CSR extends Module {
   }
 
   if(Settings.get("sim")) {
+    // DPI-C
     val csrReg = Module(new CsrReg)
     // csr0: mstatus, csr1: mtvec, csr2: mepc, csr3: mcause
     csrReg.io.mstatus := mstatus
