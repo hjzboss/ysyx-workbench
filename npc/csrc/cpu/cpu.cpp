@@ -374,7 +374,7 @@ void execute(uint64_t n) {
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     device_update_cnt++;
-    if(device_update_cnt > 100000) {
+    if(device_update_cnt > 1000) {
       IFDEF(CONFIG_DEVICE, device_update());
       device_update_cnt = 0;
     }

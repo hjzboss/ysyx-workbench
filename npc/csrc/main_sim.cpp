@@ -23,6 +23,6 @@ int main(int argc, char** argv, char** env) {
 
   delete_cpu();
 
-  // Fin
+  // Finish
   exit(0);
 }
