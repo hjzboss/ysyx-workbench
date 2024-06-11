@@ -44,16 +44,16 @@ static struct rule {
   {" +", TK_NOTYPE},																						// spaces
   {"\\+", PLUS},																								// plus
   {"==", TK_EQ},																								// equal
-	{"0x[0-9a-f]+", HEX},																					// hex
-	{"\\$(0|ra|gp|t[p0-6]|s10|s11|s[p0-9]|a[0-7])", REG},								// reg
-	{"[0-9]+", INTEGER},																					// integer
-	{"-", MINUS},																									// minus
-	{"\\*", UNDET},																								// times and pointer dereference
-	{"/", DIVIDE},																								// divide
-	{"\\(", L_PARENTHESIS},																				// left parenthesis
-	{"\\)", R_PARENTHESIS},																				// right parenthesis
-	{"!=", NOT_EQ},																								// not equal
-	{"&&", AND},																									// and
+  {"0x[0-9a-f]+", HEX},																					// hex
+  {"\\$(0|ra|gp|t[p0-6]|s10|s11|s[p0-9]|a[0-7])", REG},					// reg
+  {"[0-9]+", INTEGER},																					// integer
+  {"-", MINUS},																									// minus
+  {"\\*", UNDET},																								// times and pointer dereference
+  {"/", DIVIDE},																								// divide
+  {"\\(", L_PARENTHESIS},																				// left parenthesis
+  {"\\)", R_PARENTHESIS},																				// right parenthesis
+  {"!=", NOT_EQ},																								// not equal
+  {"&&", AND},																									// and
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -106,83 +106,85 @@ static bool make_token(char *e) {
         position += substr_len;
 
         /* TODO: Now a new token is recognized with rules[i]. Add codes
-         * to record the token in the array `tokens'. For certain types
-         * of tokens, some extra actions should be performed.
-         */
+          * to record the token in the array `tokens'. For certain types
+          * of tokens, some extra actions should be performed.
+          */
 
         switch (rules[i].token_type) {
-					case PLUS: case TK_EQ: case MINUS: case DIVIDE: 
-					case L_PARENTHESIS: case R_PARENTHESIS:
-						tokens[nr_token].type = rules[i].token_type;
-						tokens[nr_token].str[0] = '\0';
-						nr_token ++;
-						break;
-					case REG:
-						tokens[nr_token].type = rules[i].token_type;
-						strncpy(tokens[nr_token].str, substr_start, substr_len);
-						tokens[nr_token].str[substr_len] = '\0';
-						nr_token ++;
-						break;
-					case UNDET:
-						// Distinguish between pointer dereference symbols and multiplication symbols
-						if (nr_token == 0) {
-							tokens[nr_token].type = POINT;
-						}
-						else {
-							int nr_tmp = nr_token - 1;
-							if (tokens[nr_tmp].type == INTEGER || tokens[nr_tmp].type == R_PARENTHESIS
-									|| tokens[nr_tmp].type == HEX || tokens[nr_tmp].type == REG)
-								tokens[nr_token].type = TIMES;
-							else
-								tokens[nr_token].type = POINT;
-						}
-						tokens[nr_token].str[0] = '\0';
-						nr_token ++;
-						break;
-					case HEX:
-					case INTEGER:
-						int type = rules[i].token_type;
-						if (substr_len >= 65535) {      
-							printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
-							return false;
-						} 
-						else {
-							int index = type == INTEGER ? 0 : 2;
-							int len = type == INTEGER ? 0 : 2;
-							// Eliminate the extra 0s at the beginning of the string
-							while (index <= substr_len - 1) {
-								if (*(substr_start + index) == '0') {
-									if (index == substr_len - 1) {
-										len += 1;
-										break;
-									}
-									++ index;
-								}
-								else {
-									if (len + substr_len - index >= 32) {
-										printf("matched integer is too long at position %d\n%s\n%*.s^\n", position, e, position, "");
-										return false;
-									}
-									len = substr_len - index;
-									break;
-								}
-							}
-							// Copy positive integers into tokens array
-							char *s = substr_start + index;
-							tokens[nr_token].type = rules[i].token_type;
-							if (type == HEX) {
-								tokens[nr_token].str[0] = '0';
-								tokens[nr_token].str[1] = 'x';
-								strncpy(tokens[nr_token].str + 2, s, len);
-								tokens[nr_token].str[len + 2] = '\0';
-							}
-							else {
-								strncpy(tokens[nr_token].str, s, len);
-								tokens[nr_token].str[len] = '\0';
-							}
-							nr_token ++;
-						}
-						break;
+          case PLUS: case TK_EQ: case MINUS: case DIVIDE: 
+          case L_PARENTHESIS: case R_PARENTHESIS:
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].str[0] = '\0';
+            nr_token ++;
+            break;
+          case REG:
+            tokens[nr_token].type = rules[i].token_type;
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            nr_token ++;
+            break;
+          case UNDET:
+            // Distinguish between pointer dereference symbols and multiplication symbols
+            if (nr_token == 0) {
+              tokens[nr_token].type = POINT;
+            }
+            else {
+              int nr_tmp = nr_token - 1;
+              if (tokens[nr_tmp].type == INTEGER || tokens[nr_tmp].type == R_PARENTHESIS
+                  || tokens[nr_tmp].type == HEX || tokens[nr_tmp].type == REG)
+                tokens[nr_token].type = TIMES;
+              else
+                tokens[nr_token].type = POINT;
+            }
+            tokens[nr_token].str[0] = '\0';
+            nr_token ++;
+            break;
+          case HEX:
+          case INTEGER:
+            int type = rules[i].token_type;
+            if (substr_len >= 65535) {      
+              printf("matched integer is too big at position %d\n%s\n%*.s^\n", position, e, position, "");
+              return false;
+            } 
+            else {
+              /*
+                                                substr_len
+                  ┌───────────────┬──────────────────────────────────────────────────────────┐
+                  │    index      │             len                                          │
+                  └───────────────┴──────────────────────────────────────────────────────────┘
+              */
+              int index = type == INTEGER ? 0 : 2;
+              int len = type == INTEGER ? 0 : 2;
+              // Eliminate the extra 0s at the beginning of the string, such as 00003456 and 0x00003545
+              while (index <= substr_len - 1) {
+                if (*(substr_start + index) == '0') {
+                  if (index == substr_len - 1) {
+                    len += 1;
+                    break;
+                  }
+                  ++ index;
+                }
+                else {
+                  len = substr_len - index;
+                  break;
+                }
+              }
+              // Copy positive integers into tokens array
+              char *s = substr_start + index;
+              tokens[nr_token].type = rules[i].token_type;
+              if (type == HEX) {
+                tokens[nr_token].str[0] = '0';
+                tokens[nr_token].str[1] = 'x';
+                strncpy(tokens[nr_token].str + 2, s, len);
+                tokens[nr_token].str[len + 2] = '\0';
+              }
+              else {
+                strncpy(tokens[nr_token].str, s, len);
+                tokens[nr_token].str[len] = '\0';
+              }
+              nr_token ++;
+            }
+            break;
           default: 
         }
         break;
@@ -199,160 +201,148 @@ static bool make_token(char *e) {
 }
 
 bool check_parentheses(int p, int q) {
-	bool flag = true;
-	if (tokens[p].type != L_PARENTHESIS || tokens[q].type != R_PARENTHESIS)
-		flag = false;
+  bool flag = true;
+  if (tokens[p].type != L_PARENTHESIS || tokens[q].type != R_PARENTHESIS)
+    flag = false;
 
-	int top = -1;
-	int index = p;
-	while(index <= q) {
-		int type = tokens[index].type;
-		if (type == L_PARENTHESIS) {
-			++top;
-		}
-		else if (type == R_PARENTHESIS) {
-			if (top == -1)
-				assert(0);
-			else if(--top == -1 && index < q)
-				flag = false;
-		}
-		index += 1;
-	}
-	
-	assert(top == -1);
-	return flag;
+  int top = -1;
+  int index = p;
+  while(index <= q) {
+    int type = tokens[index].type;
+    if (type == L_PARENTHESIS) {
+      ++top;
+    }
+    else if (type == R_PARENTHESIS) {
+      if (top == -1)
+        assert(0);
+      else if(--top == -1 && index < q)
+        flag = false;
+    }
+    index += 1;
+  }
+
+  assert(top == -1);
+  return flag;
 }
 
 static word_t is_overflow(word_t val1, word_t val2, int op) {
-	word_t result;
-	switch(op) {
-		case PLUS:
-			result = val1 + val2;
-			if (result < val1 || result < val2) {
-				printf("An overflow occurs during addition: %lu+%lu\n", val1, val2);
-				assert(0);
-			}
-			break;
-		case MINUS:
-			result = val1 - val2;
-			if (result > val1) {
-				printf("An overflow occurs during subtraction: %lu-%lu\n", val1, val2);
-				assert(0);
-			}
-			break;
-		case TIMES:
-			result = val1 * val2;
-			if (val1 && result / val1 != val2) {
-				printf("An overflow occurs during multiplication: %lu*%lu\n", val1, val2);
-				assert(0);
-			}
-			break;
-		case DIVIDE:
-			if (!val2) {
-				printf("divide zero! error evaluation: %lu / %lu\n", val1, val2);
-				assert(0);
-			}
-			result = val1 / val2;
-			break;
-		case POINT:
-			if (val2 > 4294967295) {
-				printf("An overflow occurs during pointer dereference: *%lu\n", val2);
-				assert(0);				
-			}
-			result = paddr_read(val2, 8);
-			break;
-		default:
-			printf("Unknown operator!\n");
-			assert(0);
-	}
+  word_t result;
+  switch(op) {
+    case PLUS:
+      result = val1 + val2;
+      if (result < val1 || result < val2) {
+        printf("An overflow occurs during addition: %lu+%lu\n", val1, val2);
+        assert(0);
+      }
+      break;
+    case MINUS:
+      result = val1 - val2;
+      if (result > val1) {
+        printf("An overflow occurs during subtraction: %lu-%lu\n", val1, val2);
+        assert(0);
+      }
+      break;
+    case TIMES:
+      result = val1 * val2;
+      if (val1 && result / val1 != val2) {
+        printf("An overflow occurs during multiplication: %lu*%lu\n", val1, val2);
+        assert(0);
+      }
+      break;
+    case DIVIDE:
+      if (!val2) {
+        printf("divide zero! error evaluation: %lu / %lu\n", val1, val2);
+        assert(0);
+      }
+      result = val1 / val2;
+      break;
+    case POINT:
+    // TODO
+      if (val2 > 4294967295) {
+        printf("An overflow occurs during pointer dereference: *%lu\n", val2);
+        assert(0);				
+      }
+      result = paddr_read(val2, 8);
+      break;
+    default:
+      printf("Unknown operator!\n");
+      assert(0);
+  }
 
-	return result;
+  return result;
 }
 
 word_t eval(int p, int q) {
-	//printf("p=%d, q=%d\n", p, q);
-	if (p > q)
-		assert(0);
-	else if (p == q) {
-		if (tokens[p].type == REG) {	
-			bool reg_success;
-			word_t reg = isa_reg_str2val(tokens[p].str + 1, &reg_success);
-			assert(reg_success);
-			return reg;
-		}
-		else if (tokens[p].type == INTEGER) {
-			char *tmp = NULL;
-			// Check for integer overflow
-			/*
-			if (strcmp(tokens[p].str, integer_max)) {
-				printf("Integer overflow: %s\n", tokens[p].str);
-				assert(0);
-			};*/
-			return strtol(tokens[p].str, &tmp, 10);
-		}
-		else if (tokens[p].type == HEX) {
-			char *tmp = NULL;
-			/*
-			if (strcmp(tokens[p].str, hex_max) > 0) {
-				printf("Integer overflow: %s\n", tokens[p].str);
-				assert(0);					
-			}*/
-			return strtol(tokens[p].str, &tmp, 16);
-		}
-		else {
-			printf("Error type!\n");
-			assert(0);
-		}
-	} 
-	else if (check_parentheses(p, q) == true) {
-		return eval(p + 1, q - 1);
-	}
+  //printf("p=%d, q=%d\n", p, q);
+  if (p > q)
+    assert(0);
+  else if (p == q) {
+    if (tokens[p].type == REG) {	
+      bool reg_success;
+      word_t reg = isa_reg_str2val(tokens[p].str + 1, &reg_success);
+      assert(reg_success);
+      return reg;
+    }
+    else if (tokens[p].type == INTEGER) {
+      char *tmp = NULL;
+      return strtol(tokens[p].str, &tmp, 10);
+    }
+    else if (tokens[p].type == HEX) {
+      char *tmp = NULL;
+      return strtol(tokens[p].str, &tmp, 16);
+    }
+    else {
+      printf("Error type!\n");
+      assert(0);
+    }
+  } 
+  else if (check_parentheses(p, q) == true) {
+    return eval(p + 1, q - 1);
+  }
 	else {
-		int op = -1;
-		int op_type = -1;
-		int cnt = 0;
-		for (int i = p; i <= q; i ++) {
-			int type = tokens[i].type;
-			if (type == L_PARENTHESIS)
-				cnt ++;
-			else if (type == R_PARENTHESIS)
-				cnt --;
-			else if (cnt || type == INTEGER || type == REG || type == HEX)
-				// Operators inside parentheses are ignored
-				continue;
-			else {
-				if (op == -1 || type <= op_type
-						|| (op_type == TK_EQ && type == NOT_EQ)
-						|| (op_type == PLUS && type == MINUS)
-						|| (op_type == TIMES && type == DIVIDE)) {
-					op = i;
-					assert(type != 0);
-					op_type = type;
-				}
-			}
-		}
+    int op = -1; // 操作符的位置
+    int op_type = -1; // 操作符类型
+    int stack = 0; // 一个虚拟栈
+    for (int i = p; i <= q; i ++) {
+      int type = tokens[i].type;
+      if (type == L_PARENTHESIS)
+        stack ++;
+      else if (type == R_PARENTHESIS)
+        stack --;
+      else if (stack || type == INTEGER || type == REG || type == HEX)
+        // Operators inside parentheses are ignored
+        continue;
+      else {
+        if (op == -1 || type <= op_type
+            || (op_type == TK_EQ && type == NOT_EQ)
+            || (op_type == PLUS && type == MINUS)
+            || (op_type == TIMES && type == DIVIDE)) {
+          op = i;
+          assert(type != 0);
+          op_type = type;
+        }
+      }
+    }
 		
 		assert(op != -1);
 		word_t val1, val2;
 
-		if (op_type != POINT)
-			val1 = eval(p, op - 1);
-		else
-			val1 = 0;
-		val2 = eval(op + 1, q);
+    // 如果是指针忽略左边的值
+    val1 = op_type == POINT ? 0 : eval(p, op - 1);
+    val2 = eval(op + 1, q);
 
-		switch (op_type) {
-			case PLUS: return is_overflow(val1, val2, PLUS); break;
-			case MINUS: return is_overflow(val1, val2, MINUS); break;
-			case TIMES: return is_overflow(val1, val2, TIMES); break;
-			case DIVIDE: return is_overflow(val1, val2, DIVIDE); break;
-			case AND: return val1 && val2; break;
-			case TK_EQ: return val1 == val2; break;
-			case NOT_EQ: return val1 != val2; break;
-			case POINT: return is_overflow(val1, val2, POINT); break;
-			default: printf("op=%d, type=%d\n", op, op_type); assert(0);
-		}
-	}
+    switch (op_type) {
+      case PLUS: return is_overflow(val1, val2, PLUS); break;
+      case MINUS: return is_overflow(val1, val2, MINUS); break;
+      case TIMES: return is_overflow(val1, val2, TIMES); break;
+      case DIVIDE: return is_overflow(val1, val2, DIVIDE); break;
+      case AND: return val1 && val2; break;
+      case TK_EQ: return val1 == val2; break;
+      case NOT_EQ: return val1 != val2; break;
+      case POINT: return is_overflow(val1, val2, POINT); break;
+      default: printf("op=%d, type=%d\n", op, op_type); assert(0);
+    }
+  }
 }
 
 word_t expr(char *e, bool *success) {
@@ -362,7 +352,7 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-	word_t res = eval(0, nr_token-1);
-	*success = true;
-	return res;
+  word_t res = eval(0, nr_token-1);
+  *success = true;
+  return res;
 }

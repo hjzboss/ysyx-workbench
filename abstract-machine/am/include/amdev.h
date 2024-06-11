@@ -3,6 +3,8 @@
 
 // **MAY SUBJECT TO CHANGE IN THE FUTURE**
 
+// 将寄存器reg的编号设置为id，AM_reg设置为一个枚举值，值为id
+// am.h中定义了读写函数io_read和io_write，klib-macro.h中进一步提供了io_read和io_write和宏定义
 #define AM_DEVREG(id, reg, perm, ...) \
   enum { AM_##reg = (id) }; \
   typedef struct { __VA_ARGS__; } AM_##reg##_T;

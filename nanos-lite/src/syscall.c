@@ -127,10 +127,13 @@ void syscall_gettimeofday(Context *c, uintptr_t *a) {
   c->GPRx = 0;
 }
 
-
+// 识别系统调用号，分发给不同的系统调用函数处理
+// 系统调用在应用层于navy-apps/libs/libos/src/syscall.c实现
+// navy-apps(ecall) -> trap.s(mtvec) -> __am_irq_handle(mcause -> event) -> do_event -> do_syscall
 void do_syscall(Context *c) {
   uintptr_t a[4];
-  a[0] = c->GPR1;
+  a[0] = c->GPR1; // 系统调用号
+  // 3个参数
   a[1] = c->GPR2;
   a[2] = c->GPR3;
   a[3] = c->GPR4;

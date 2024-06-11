@@ -15,6 +15,7 @@
 #define putstr(s) \
   ({ for (const char *p = s; *p; p++) putch(*p); })
 
+// 传入的参数为AM_开头的枚举值，在amdev.h中定义
 #define io_read(reg) \
   ({ reg##_T __io_param; \
     ioe_read(reg, &__io_param); \

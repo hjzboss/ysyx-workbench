@@ -7,33 +7,29 @@
 size_t strlen(const char *s) {
   size_t n;
   for (n = 0; *s != '\0'; s++) {
-    n ++;
+    n++;
   }
   return n;
 }
 
 char *strcpy(char *dst, const char *src) {
   char *cp = dst;
-
-  while ((*cp++ = *src++) != '\0')
-    ;
-
+  while ((*cp++ = *src++) != '\0');
   return dst;
 }
 
 char *strncpy(char *dst, const char *src, size_t n) {
-	char* start = dst;
+  char* start = dst;
 
-	while (n && (*dst++ = *src++))
-		n--;
+  while (n && (*dst++ = *src++))
+    n--;
 
-	if(n) {
-		while (--n)
-			*dst++ = '\0';
+  if(n) {
+    while (--n)
+      *dst++ = '\0';
   }
 
-	return(start);
-
+  return start;
 }
 
 char *strcat(char *dst, const char *src) {
@@ -96,6 +92,7 @@ void *memmove(void *dst, const void *src, size_t n) {
       *d++ = *s++;
   }
   else {
+    // 当s的位置在d之前的话，需要考虑覆盖问题，
     char *lasts = s + (n - 1);
     char *lastd = d + (n - 1);
     while (n--)
@@ -118,7 +115,7 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 
   while (n-- > 0) {
     if (*p1++ != *p2++)
-	    return p1[-1] < p2[-1] ? -1 : 1;
+      return p1[-1] < p2[-1] ? -1 : 1; // 比较之前所在的位置
   }
   return 0;
 }

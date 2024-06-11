@@ -309,3 +309,12 @@ class BPUTrainIO extends Bundle {
   val target          = Input(UInt(32.W))
   val brType          = Input(BrType())
 }
+
+class PerfIO extends Bundle {
+  val icacheHitCnt = Output(UInt(64.W))
+  val icacheReqCnt = Output(UInt(64.W))
+  val dcacheHitCnt = Output(UInt(64.W))
+  val dcacheReqCnt = Output(UInt(64.W))
+  val bpuMissCnt   = Output(UInt(64.W))
+  val bpuReqCnt    = Output(UInt(64.W))
+}

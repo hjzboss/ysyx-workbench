@@ -32,6 +32,7 @@ class FastIFU extends Module with HasResetVector {
   val imem         = Module(new IMEM)
   imem.io.pc      := pc
   io.out.pc       := pc
+  io.out.npc      := Mux(io.stall, pc, Mux(io.iduRedirect.valid, io.iduRedirect.brAddr, snpc))
   io.out.inst     := imem.io.inst
 
 

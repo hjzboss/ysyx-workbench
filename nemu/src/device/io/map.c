@@ -116,6 +116,7 @@ void init_map() {
   p_space = io_space;
 }
 
+// 先调回调函数向对应的寄存器准备好数据，再读
 word_t map_read(paddr_t addr, int len, IOMap *map) {
   assert(len >= 1 && len <= 8);
   check_bound(map, addr, 1);
@@ -126,6 +127,7 @@ word_t map_read(paddr_t addr, int len, IOMap *map) {
   return ret;
 }
 
+// 先向对应的地址空间写数据，再调回调函数
 void map_write(paddr_t addr, int len, word_t data, IOMap *map) {
   assert(len >= 1 && len <= 8);
   check_bound(map, addr, 0);

@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import utils._
 import top.Settings
+import chisel3.util.experimental.BoringUtils
 
 sealed class IcArbiter extends Module {
   val io = IO(new Bundle {
@@ -429,6 +430,12 @@ sealed class CacheStage3 extends Module with HasResetVector {
   val validReg      = RegInit(false.B)
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    
   io.validOut      := validReg && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || (state === data && rdataFire && io.master.rlast) || state === stall)
+
+  if(Settings.get("perf") && Settings.get("sim")) {
+    // pref，icache命中率
+    BoringUtils.addSource(io.validOut & stage3Reg.hit, "icacheHit")
+    BoringUtils.addSource(io.validOut, "icacheReq")
+  }
 }
 
 class ICache extends Module {

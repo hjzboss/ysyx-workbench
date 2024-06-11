@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 // 一张画布中的指定矩形区域复制到另一张画布的指定位置
+// 本质就是像素的转储
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
@@ -14,6 +15,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   int dst_w, dst_h, dst_x, dst_y;
 
   if (srcrect == NULL) {
+    // 整张画布复制
     src_w = src->w;
     src_h = src->h;
     src_x = src_y = 0;
@@ -53,6 +55,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     }
   }
   else {
+    // 32
     uint32_t *src_pixels = (uint32_t *)src->pixels;
     uint32_t *dst_pixels = (uint32_t *)dst->pixels;
     assert(src_pixels && dst_pixels);
@@ -272,6 +275,8 @@ static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
 }
 
 // 功能是将surface中(x, y)处的矩形区域同步到屏幕上，其中像素在color中，需要用pixels和x,y来定位到指定的color
+// NDL中的像素数据对应的是sdl中的颜色数据，而不是sdl中的像素，如果要在屏幕上绘制，则需要将颜色数据同步到屏幕
+// 1. 将像素转换为颜色数据 2. 将颜色进行ConvertPixelsARGB_ABGR 3.同步
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   /*
   Each pixel in an 8-bit surface is an index into the colors field of the SDL_Palette structure store in SDL_PixelFormat. 

@@ -125,6 +125,8 @@ typedef	__uint128_t fixedptud;
  * Putting them only in macros will effectively make them optional. */
 #define fixedpt_tofloat(T) ((float) ((T)*((float)(1)/(float)(1L << FIXEDPT_FBITS))))
 
+// A = a(浮点) * 2^8
+
 /* Multiplies two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
   return (A * B) / FIXEDPT_ONE;
@@ -150,6 +152,7 @@ static inline fixedpt fixedpt_abs(fixedpt A) {
   return A > 0 ? A : -A;
 }
 
+// 返回小于等于x的最大整数
 static inline fixedpt fixedpt_floor(fixedpt A) {
   if (A == 0 || fixedpt_fracpart(A) == 0)
     return A;
@@ -159,6 +162,7 @@ static inline fixedpt fixedpt_floor(fixedpt A) {
     return fixedpt_fromint(fixedpt_toint(A));
 }
 
+// 返回大于等于x的最小整数值
 static inline fixedpt fixedpt_ceil(fixedpt A) {
   if (A == 0 || fixedpt_fracpart(A) == 0)
     return A;

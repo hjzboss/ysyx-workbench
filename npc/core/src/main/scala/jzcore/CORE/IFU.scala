@@ -19,6 +19,7 @@ class IFU extends Module with HasResetVector {
     val iduRedirect   = Flipped(new RedirectIO)
     val bpuTrain      = new BPUTrainIO
 
+    // from icache
     val icRedirect    = Flipped(new RedirectIO)
 
     // to idu

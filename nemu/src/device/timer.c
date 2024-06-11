@@ -19,6 +19,7 @@
 
 static uint32_t *rtc_port_base = NULL;
 
+// nemu中的timer寄存器设置为两个32位的，而不是一个64位的，32位的CPU无法一次访问64位的设备寄存器, 因此将一个64位的功能拆分成两个32位的设备寄存器, 可同时支持接入32位和64位CPU.
 static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
   assert(offset == 0 || offset == 4);
   if (!is_write && offset == 4) {

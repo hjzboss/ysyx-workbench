@@ -60,7 +60,7 @@ static int decode_exec(Decode *s) {
   int dest = 0;
   word_t src1 = 0, src2 = 0, imm = 0;
   word_t csr = 0;
-  s->dnpc = s->snpc;
+  s->dnpc = s->snpc; // 默认为pc+4
 
 #define INSTPAT_INST(s) ((s)->isa.inst.val)
 #define INSTPAT_MATCH(s, name, type, ... /* execute body */ ) { \
@@ -147,7 +147,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi , Z, R(dest) = cpu.csr[csr]; cpu.csr[csr] |= imm);
   INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci , Z, R(dest) = cpu.csr[csr]; cpu.csr[csr] = cpu.csr[csr] & ~imm);
 
-  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , N, s->dnpc = isa_raise_intr(0, s->pc));
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , N, s->dnpc = isa_raise_intr(0xb, s->pc));
   INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , N, s->dnpc = isa_mret()); // mepc
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   INSTPAT("??????? ????? ????? 001 ????? 00011 11", fence_i, N, ); // do nothing, no cache

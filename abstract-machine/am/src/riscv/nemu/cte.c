@@ -4,6 +4,7 @@
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
+// c是trap.s中的sp，a0传了个指针
 Context* __am_irq_handle(Context *c) {
   //printf("mcause=%x, mstatus=%x, mepc=%p\n", c->mcause, c->mstatus, c->mepc);
   if (user_handler) {
@@ -26,12 +27,13 @@ Context* __am_irq_handle(Context *c) {
 
 extern void __am_asm_trap(void);
 
+// nanos在初始化的时候调用，用于注册异常处理函数
 bool cte_init(Context*(*handler)(Event, Context*)) {
   // initialize exception entry
   asm volatile("csrw mtvec, %0" : : "r"(__am_asm_trap));
 
   // register event handler
-  user_handler = handler;
+  user_handler = handler; // 操作系统的异常处理函数
 
   return true;
 }

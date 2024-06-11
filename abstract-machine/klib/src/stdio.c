@@ -6,24 +6,18 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 
+// 将数字num转换为字符串str，基于基数base，目前不支持负数转换
 void num2str(char* str, uint64_t num, int base) {
   char tmp[32];
   int len = 0;
-  bool is_neg = false;
   if (num == 0) tmp[len++] = 0;
-  /*
-  else if(num >> 31) {
-    // 负数
-    num = ((~num) + 1);
-    str[0] = '-';
-    is_neg = true;
-  }*/
-  else while (num) {
-    tmp[len++] = num % base;
-    num = num / base;
-  }
-  // todo
-  int i = is_neg ? 1 : 0;
+  else {
+    while (num) {
+      tmp[len++] = num % base;
+      num = num / base;
+    }
+  } 
+  int i = 0;
   while (len-- > 0) {
     if (tmp[len] < 10) str[i] = tmp[len] + '0';
     else str[i] = tmp[len] - 10 + 'A';
@@ -36,13 +30,14 @@ void num2str(char* str, uint64_t num, int base) {
 int printf(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  char buf[20000];
+  char buf[20000]; // TODO：buf空间能否动态申请？
   int arg_cnt = vsprintf(buf, fmt, ap);
   va_end(ap);
   putstr(buf);
   return arg_cnt;
 }
 
+// 支持%d, %c, %u, %x, %s和%p，支持填充0
 int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
@@ -57,9 +52,10 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       continue;
     }
     ++p;
+    // 1. 填充计算
     int fix_num = 0; // 填充0的数目
     bool fix_zero = false;
-    // 判断是否要填充0
+    // 判断是要填充0还是空格
     if (*p == '0') {
       ++p;
       char tmp = *p;
@@ -80,6 +76,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         ++p;
       } while (*p <= '9' && *p >= '0');
     }
+    // 2. 空格与0填充和占位符转换
     int fix_ch;
     int rem;
     switch (*p) {
@@ -88,10 +85,10 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         ival = va_arg(ap, int);
         num2str(str, ival, 10);
         len = strlen(str);
-        rem = fix_num - len;
+        rem = fix_num - len; // 剩下需要补的长度
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
-          for (int i = 0; i < rem; i++) *out++ = fix_ch;
+          for (; rem; rem--) *out++ = fix_ch;
         }
         // todo
         strcpy(out, str);
@@ -105,7 +102,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
-          for (int i = 0; i < rem; i++) *out++ = fix_ch;
+          for (; rem; rem--) *out++ = fix_ch;
         }
         // todo
         strcpy(out, str);
@@ -120,7 +117,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         *out++ = 'x';
         rem = 16 - len;
         if (rem > 0) {
-          for (int i = 0; i < rem; i++) *out++ = '0';
+          for (; rem; rem--) *out++ = '0';
         }
         // todo
         strcpy(out, str);
@@ -134,7 +131,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         rem = fix_num - len;
         if (rem > 0) {
           fix_ch = fix_zero ? '0' : ' ';
-          for (int i = 0; i < rem; i++) *out++ = fix_ch;
+          for (; rem; rem--) *out++ = fix_ch;
         }
         // todo
         strcpy(out, str);

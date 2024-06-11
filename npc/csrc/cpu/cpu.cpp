@@ -19,6 +19,8 @@ static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
 static bool visit_device = false;
 
+uint64_t device_update_cnt = 0; // 设备更新计数器
+
 CPUState npc_cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
@@ -27,6 +29,18 @@ IFDEF(CONFIG_DTRACE, void free_dtrace());
 void difftest_skip_ref();
 void difftest_step();
 #endif
+
+// cpu perf
+typedef struct
+{
+  uint64_t icachehit;
+  uint64_t icachereq;
+  uint64_t dcachehit;
+  uint64_t dcachereq;
+  uint64_t bpumiss;
+  uint64_t bpureq;
+} perf_t;
+perf_t cpu_perf;
 
 // itrace iringbuf
 #ifdef CONFIG_ITRACE
@@ -254,6 +268,7 @@ long init_cpu(char *dir) {
 
   top->clock = 0;
   reset(4);
+  cpu_perf = {0};
 
   npc_cpu.pc = RESET_ADDR;
   npc_cpu.npc = RESET_ADDR + 4;
@@ -295,7 +310,7 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
     eval_wave();
     cnt += 1;
     if (cnt == 5000) {
-      printf("跑飞了\n");
+      printf("flyyyyyy!!!!\n");
       break; // 防止跑飞
     }
   }
@@ -303,6 +318,12 @@ static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *i
   *npc = top->io_debug_nextPc;
   *inst = top->io_debug_inst;
   *lsFlag = top->io_lsFlag;
+  cpu_perf.icachehit = top->io_perf_icacheHitCnt;
+  cpu_perf.icachereq = top->io_perf_icacheReqCnt;
+  cpu_perf.dcachehit = top->io_perf_dcacheHitCnt;
+  cpu_perf.dcachereq = top->io_perf_dcacheReqCnt;
+  cpu_perf.bpumiss = top->io_perf_bpuMissCnt;
+  cpu_perf.bpureq = top->io_perf_bpuReqCnt;
   eval_wave();
   eval_wave();
   cycle += (cnt + 1);
@@ -352,7 +373,11 @@ void execute(uint64_t n) {
     total_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
-    IFDEF(CONFIG_DEVICE, device_update());
+    device_update_cnt++;
+    if(device_update_cnt > 1000) {
+      IFDEF(CONFIG_DEVICE, device_update());
+      device_update_cnt = 0;
+    }
   }
 }
 
@@ -365,10 +390,14 @@ static void statistic() {
   Log("total guest instructions = " NUMBERIC_FMT, total_inst);
   if (g_timer > 0) {
     Log("simulation frequency = " NUMBERIC_FMT " inst/s", total_inst * 1000000 / g_timer);
-    if(g_timer >= 1000000) Log("CPU frequency: %ld HZ\n", cycle / (g_timer / 1000000));
-    Log("IPC = %lf\n", (total_inst / 1.0) / cycle);
+    if(g_timer >= 1000000) Log("CPU frequency: %ld HZ", cycle / (g_timer / 1000000));
+    Log("IPC = %lf", (total_inst / 1.0) / cycle);
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
+
+  Log("icache hit rate = %lf, hit = %d, req = %d", (cpu_perf.icachehit / 1.0) / cpu_perf.icachereq, cpu_perf.icachehit, cpu_perf.icachereq);
+  Log("dcache hit rate = %lf, hit = %d, req = %d", (cpu_perf.dcachehit / 1.0) / cpu_perf.dcachereq, cpu_perf.dcachehit, cpu_perf.dcachereq);
+  Log("Branch prediction accuracy = %lf, miss = %d, req = %d", ((cpu_perf.bpureq - cpu_perf.bpumiss) / 1.0) / cpu_perf.bpureq, cpu_perf.bpumiss, cpu_perf.bpureq);
 }
 
 void assert_fail_msg() {
