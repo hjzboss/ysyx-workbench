@@ -10,8 +10,7 @@ class JzCore extends Module {
   val io = IO(new Bundle {
     val debug           = if(Settings.get("sim")) Some(new DebugIO) else None
     val lsFlag          = if(Settings.get("sim")) Some(Output(Bool())) else None
-
-    val perfIO          = new PerfIO
+    val perfIO          = if(Settings.get("perf") && Settings.get("sim")) Some(new PerfIO) else None
 
     // icache data array
     val sram0           = new RamIO
@@ -47,8 +46,10 @@ class JzCore extends Module {
   val wbReg   = Module(new WB_REG)
   val forward = Module(new Forwarding)
 
-  val perf    = Module(new Perf)
-  io.perfIO  := perf.io.perfIO
+  if(Settings.get("perf") && Settings.get("sim")) {
+    val perf    = Module(new Perf)
+    io.perfIO  := perf.io.perfIO
+  }
 
   clint.io.clintIO    <> lsu.io.clintIO
   clint.io.int        <> idu.io.timerInt

@@ -17,7 +17,8 @@ object DefaultSettings {
     "sim"         -> true, // true: verilator mode， false: soc mode
     "core"        -> "normal", // single, fast, normal
     "btb_num"     -> 64, // btb entry num
-    "ras_num"     -> 8 // ras entry num
+    "ras_num"     -> 8, // ras entry num
+    "perf"        -> false
   )
 }
 

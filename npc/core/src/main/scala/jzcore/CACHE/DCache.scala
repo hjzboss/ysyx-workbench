@@ -524,8 +524,10 @@ sealed class CohDCache extends DCache {
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
 
   // perf
-  BoringUtils.addSource(hit, "dcacheHit")
-  BoringUtils.addSource(state === tagCompare, "dcacheReq")
+  if(Settings.get("perf")) {
+    BoringUtils.addSource(hit, "dcacheHit")
+    BoringUtils.addSource(state === tagCompare, "dcacheReq")
+  }
 }
 
 
@@ -897,4 +899,10 @@ class NoCohDCache extends DCache {
 
   io.ctrlIO.ready          := state === idle && rState === idle && wState === idle
   io.coherence.ready       := true.B
+
+  // perf
+  if(Settings.get("perf") && Settings.get("sim")) {
+    BoringUtils.addSource(hit, "dcacheHit")
+    BoringUtils.addSource(state === tagCompare, "dcacheReq")
+  }
 }

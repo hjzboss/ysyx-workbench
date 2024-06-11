@@ -3,7 +3,7 @@ package jzcore
 import chisel3._
 import top.Settings
 import chisel3.util._
-import chisel3.util.experimental.BoringUtils
+
 
 trait HasResetVector {
   val resetVector = if(Settings.get("sim")) Settings.getLong("ResetVector") else Settings.getLong("SocResetVector")

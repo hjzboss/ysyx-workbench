@@ -153,9 +153,10 @@ class IDU extends Module with HasInstrType{
     io.bpuTrain.get.target  := brAddr
     io.bpuTrain.get.brType  := Mux(call, BrType.call, Mux(ret, BrType.ret, BrType.jump))
     io.bpuTrain.get.invalid := !((isBr(instrtype) & brMark) | excepInsr) & (brAddr =/= io.in.npc) & !int
-
-    BoringUtils.addSource(io.redirect.valid & !io.stall, "bpuMiss")
-    BoringUtils.addSource(io.validIn & !io.stall, "bpuReq")
+    if(Settings.get("perf") && Settings.get("sim")) {
+      BoringUtils.addSource(io.redirect.valid & !io.stall, "bpuMiss")
+      BoringUtils.addSource(io.validIn & !io.stall, "bpuReq")
+    }
   } else {
     // fast core
     val brAddrPre         = Wire(UInt(32.W))

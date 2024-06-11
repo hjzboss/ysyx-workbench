@@ -431,9 +431,11 @@ sealed class CacheStage3 extends Module with HasResetVector {
   validReg         := Mux(io.stallIn, validReg, Mux(io.flushIn || flushReg, false.B, Mux(io.stallOut, validReg, io.validIn)))    
   io.validOut      := validReg && ((state === idle && stage3Reg.hit && stage3Reg.cacheable) || (state === data && rdataFire && io.master.rlast) || state === stall)
 
-  // pref，icache命中率
-  BoringUtils.addSource(io.validOut & stage3Reg.hit, "icacheHit")
-  BoringUtils.addSource(io.validOut, "icacheReq")
+  if(Settings.get("perf") && Settings.get("sim")) {
+    // pref，icache命中率
+    BoringUtils.addSource(io.validOut & stage3Reg.hit, "icacheHit")
+    BoringUtils.addSource(io.validOut, "icacheReq")
+  }
 }
 
 class ICache extends Module {
