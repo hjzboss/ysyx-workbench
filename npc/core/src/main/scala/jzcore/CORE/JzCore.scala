@@ -38,7 +38,7 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
-  val dcache  = Module(new CohDCache)
+  val dcache  = Module(new NoCohDCache)
   val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
