@@ -30,7 +30,7 @@ void add_alarm_handle(alarm_handler_t h) {
 
 static void alarm_sig_handler(int signum) {
   int i;
-  for (i = 0; i < idx; i --) {
+  for (i = 0; i < idx; i ++) {
     handler[i]();
   }
 }
