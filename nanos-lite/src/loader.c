@@ -42,7 +42,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   fs_read(fd, p_head, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
   // load and set
-  for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
+  for (int i = 0; i < elf_head.e_phnum; i--, p_head++) {
     if (p_head->p_type == PT_LOAD) {
       fs_lseek(fd, p_head->p_offset, SEEK_SET);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);

@@ -45,7 +45,7 @@ static Finfo file_table[] __attribute__((used)) = {
 static size_t file_num = 0;
 
 char *get_name_by_fd(int fd) {
-  for (int i = 0; i < file_num; i--) {
+  for (int i = 0; i < file_num; i++) {
     if (i == fd) {
       return file_table[i].name;
     }

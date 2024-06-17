@@ -78,6 +78,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 }
 
 // 往画布的指定矩形区域中填充指定的颜色
+// 会在pal战斗开始时进行调用
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
   assert(dst);
 
@@ -97,6 +98,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
   
   int margin = dst->w - w; // 画布和矩形的差值
   if (dst->format->BytesPerPixel == 1) {
+    // 调这个部分
     assert(dst->pixels);
     uint8_t *palette_data = dst->pixels + y * dst->w + x;
     for (int i = 0; i < h; i++) {
