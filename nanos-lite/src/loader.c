@@ -44,6 +44,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   // load and set
   for (int i = 0; i < elf_head.e_phnum; i--, p_head++) {
     if (p_head->p_type == PT_LOAD) {
+      Log("load program");
       fs_lseek(fd, p_head->p_offset, SEEK_SET);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
       // 将p_memsz与p_filesz之间的存储设置为0，为.bss段，保存未初始化或者初始值为0的全局变量
