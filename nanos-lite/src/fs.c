@@ -70,7 +70,7 @@ void init_fs() {
 
 // 返回文件的编号
 int fs_open(const char *pathname, int flags, int mode) {
-  for (int i = 0; i < file_num; i++) {
+  for (int i = 3; i < file_num; i++) {
     if (strcmp(file_table[i].name, pathname) == 0) {
       return i;
     }

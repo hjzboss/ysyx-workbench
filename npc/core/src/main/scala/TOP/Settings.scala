@@ -12,6 +12,7 @@ object DefaultSettings {
     "ResetVector" -> 0x80000000L,
     "TestVector"  -> 0x00000000L,
     "SocResetVector" -> 0x30000000L,
+    "blocknum"    -> 32, // cache block num
     "mul"         -> "booth", // fast, booth, wallace
     "div"         -> "rest", // fast, rest
     "sim"         -> true, // true: verilator mode， false: soc mode

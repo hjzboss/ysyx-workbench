@@ -65,10 +65,10 @@ sealed class CohDCache extends DCache {
   val dirty              = dontTouch(WireDefault(false.B))
   val addr               = RegInit(0.U(32.W))
   val wen                = RegInit(false.B)
-  val tag                = Wire(UInt(22.W))
-  val index              = Wire(UInt(6.W))
+  val tag                = Wire(UInt(23.W))
+  val index              = Wire(UInt(5.W))
   val align              = Wire(Bool())
-  val wtag               = RegInit(0.U(22.W)) // dirty block的tag
+  val wtag               = RegInit(0.U(23.W)) // dirty block的tag
 
   // axi fire
   val raddrFire          = io.master.arvalid && io.master.arready
@@ -125,14 +125,14 @@ sealed class CohDCache extends DCache {
   val metaInit        = Wire(new MetaData)
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
-  metaInit.tag       := 0.U(22.W)
-  val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(64)(metaInit))))
+  metaInit.tag       := 0.U(23.W)
+  val metaArray       = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
   
   // ---------------------------address decode-----------------------------------------
   addr       := Mux(state === idle && ctrlFire, io.ctrlIO.bits.addr, addr)
   wen        := Mux(state === idle && ctrlFire, io.ctrlIO.bits.wen, wen)
-  tag        := addr(31, 10)
-  index      := addr(9, 4)
+  tag        := addr(31, 9)
+  index      := addr(8, 4)
   align      := addr(3)
 
   // ---------------------lookup metaArray and dataArray-------------------------------
@@ -177,15 +177,15 @@ sealed class CohDCache extends DCache {
 
   // -----------------------------------coherence---------------------------------------
   // TODO: 仿真速度瓶颈之一，需要优化
-  val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
-  val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
-  for(i <- 0 to 63; j <- 0 to 3) {
+  val arbList64 = List.fill(4)(Module(new CohArbiter(32)))
+  val dirtyArray = List.fill(4)(VecInit(List.fill(32)(false.B)))
+  for(i <- 0 to 31; j <- 0 to 3) {
     dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
   }
 
-  val arbIOList64 = List.fill(4)(Wire(Vec(64, Decoupled(new ArbiterIO))))
+  val arbIOList64 = List.fill(4)(Wire(Vec(32, Decoupled(new ArbiterIO))))
   for(i <- 0 to 3) {
-    for(j <- 0 to 63) {
+    for(j <- 0 to 31) {
       arbIOList64(i)(j).valid := dirtyArray(i)(j)
       arbIOList64(i)(j).bits.no := i.U(2.W) // which ram
       arbIOList64(i)(j).bits.tag := metaArray(i)(j).tag
@@ -319,7 +319,7 @@ sealed class CohDCache extends DCache {
 
   // axi写
   val cohAddr             = Cat(colTagReg, colIndexReg, 0.U(4.W)) // 维护一致性写回的地址
-  val wbAddr              = Cat(wtag, burstAddr(9, 0)) // 普通写回的地址，由dirty tag ++ addr合成
+  val wbAddr              = Cat(wtag, burstAddr(8, 0)) // 普通写回的地址，由dirty tag ++ addr合成
   io.master.awvalid      := state === writeback1 || wState === addr_trans
   io.master.awaddr       := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, cohAddr, wbAddr), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)) // 一致性写回，普通写回，写
   io.master.awlen        := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 1.U(8.W), 0.U(8.W))
@@ -387,13 +387,13 @@ sealed class CohDCache extends DCache {
     io.sram7.cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire && io.ctrlIO.bits.cacheable) {
     // read data，提前读取
-    io.sram4.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram4.addr := io.ctrlIO.bits.addr(8, 4)
     io.sram4.cen  := false.B
-    io.sram5.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram5.addr := io.ctrlIO.bits.addr(8, 4)
     io.sram5.cen  := false.B
-    io.sram6.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram6.addr := io.ctrlIO.bits.addr(8, 4)
     io.sram6.cen  := false.B
-    io.sram7.addr := io.ctrlIO.bits.addr(9, 4)
+    io.sram7.addr := io.ctrlIO.bits.addr(8, 4)
     io.sram7.cen  := false.B
   }.elsewhen(state === allocate2 && rdataFire) {
     // allocate metaArray
@@ -531,6 +531,7 @@ sealed class CohDCache extends DCache {
 }
 
 
+/*
 // 不支持一致性的dcache，加快仿真
 class NoCohDCache extends DCache {
   // random replace count
@@ -906,3 +907,4 @@ class NoCohDCache extends DCache {
     BoringUtils.addSource(state === tagCompare, "dcacheReq")
   }
 }
+*/
