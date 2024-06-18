@@ -44,7 +44,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   // load and set
   Log("load program begin");
-  for (int i = 0; i < elf_head.e_phnum; i--, p_head++) {
+  for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
     if (p_head->p_type == PT_LOAD) {
       Log("load program");
       fs_lseek(fd, p_head->p_offset, SEEK_SET);
