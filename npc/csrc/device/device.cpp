@@ -13,7 +13,7 @@ void vga_update_screen();
 void device_update() {
   vga_update_screen();
   device_update_cnt++;
-  if(device_update_cnt > 10000) {
+  if(device_update_cnt > 10000000) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
