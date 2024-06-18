@@ -36,24 +36,24 @@ sealed class CacheStage1 extends Module {
     // data array
     val sram0_cen       = Output(Bool())
     val sram0_wen       = Output(Bool())
-    val sram0_addr      = Output(UInt(5.W))
+    val sram0_addr      = Output(UInt(6.W))
 
     val sram1_cen       = Output(Bool())
     val sram1_wen       = Output(Bool())
-    val sram1_addr      = Output(UInt(5.W))
+    val sram1_addr      = Output(UInt(6.W))
 
     val sram2_cen       = Output(Bool())
     val sram2_wen       = Output(Bool())
-    val sram2_addr      = Output(UInt(5.W))
+    val sram2_addr      = Output(UInt(6.W))
 
     val sram3_cen       = Output(Bool())
     val sram3_wen       = Output(Bool())
-    val sram3_addr      = Output(UInt(5.W))
+    val sram3_addr      = Output(UInt(6.W))
   })
 
   // decode
-  val tag        = io.toStage1.addr(31, 9)
-  val index      = io.toStage1.addr(8, 4)
+  val tag        = io.toStage1.addr(31, 10)
+  val index      = io.toStage1.addr(9, 4)
   val align      = io.toStage1.addr(3, 2)
 
   val valid      = !io.stall
@@ -113,8 +113,8 @@ sealed class CacheStage2 extends Module with HasResetVector {
 
   // pipline reg
   val regInit            = Wire(new Stage2IO)
-  regInit.index         := 0.U(5.W)
-  regInit.tag           := 0.U(23.W)
+  regInit.index         := 0.U(6.W)
+  regInit.tag           := 0.U(22.W)
   regInit.align         := false.B
   regInit.cacheable     := true.B
   regInit.pc            := 0.U(32.W)
@@ -144,8 +144,8 @@ sealed class CacheStage2 extends Module with HasResetVector {
   val metaInit           = Wire(new MetaData)
   metaInit.valid        := false.B
   metaInit.dirty        := false.B
-  metaInit.tag          := 0.U(23.W)
-  val metaArray          = List.fill(4)(RegInit(VecInit(Seq.fill(32)(metaInit))))
+  metaInit.tag          := 0.U(22.W)
+  val metaArray          = List.fill(4)(RegInit(VecInit(Seq.fill(64)(metaInit))))
 
   // metaArray lookup
   val hitList    = dontTouch(VecInit(List.fill(4)(false.B)))
@@ -221,25 +221,25 @@ sealed class CacheStage3 extends Module with HasResetVector {
     val sram0_cen       = Output(Bool())
     val sram0_wen       = Output(Bool())
     val sram0_wmask     = Output(UInt(128.W))
-    val sram0_addr      = Output(UInt(5.W))
+    val sram0_addr      = Output(UInt(6.W))
     val sram0_wdata     = Output(UInt(128.W)) 
 
     val sram1_cen       = Output(Bool())
     val sram1_wen       = Output(Bool())
     val sram1_wmask     = Output(UInt(128.W))
-    val sram1_addr      = Output(UInt(5.W))
+    val sram1_addr      = Output(UInt(6.W))
     val sram1_wdata     = Output(UInt(128.W)) 
 
     val sram2_cen       = Output(Bool())
     val sram2_wen       = Output(Bool())
     val sram2_wmask     = Output(UInt(128.W))
-    val sram2_addr      = Output(UInt(5.W))
+    val sram2_addr      = Output(UInt(6.W))
     val sram2_wdata     = Output(UInt(128.W)) 
 
     val sram3_cen       = Output(Bool())
     val sram3_wen       = Output(Bool())
     val sram3_wmask     = Output(UInt(128.W))
-    val sram3_addr      = Output(UInt(5.W))
+    val sram3_addr      = Output(UInt(6.W))
     val sram3_wdata     = Output(UInt(128.W)) 
 
     val metaAlloc       = new MetaAllocIO
@@ -264,8 +264,8 @@ sealed class CacheStage3 extends Module with HasResetVector {
   regInit.cacheable    := true.B
   regInit.victim       := 0.U(2.W)
   regInit.align        := 0.U(2.W)
-  regInit.tag          := 0.U(23.W)
-  regInit.index        := 0.U(5.W)
+  regInit.tag          := 0.U(22.W)
+  regInit.index        := 0.U(6.W)
   // pipline reg
   val stage3Reg         = RegInit(regInit)
   stage3Reg            := Mux(io.stallIn, stage3Reg, Mux(io.flushIn || flushReg, regInit, Mux(io.stallOut, stage3Reg, io.toStage3)))

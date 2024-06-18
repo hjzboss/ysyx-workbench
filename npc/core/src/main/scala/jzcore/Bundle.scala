@@ -50,7 +50,7 @@ class RamIO extends Bundle {
   val cen       = Output(Bool())
   val wen       = Output(Bool())
   val wmask     = Output(UInt(128.W))
-  val addr      = Output(UInt(5.W))
+  val addr      = Output(UInt(6.W))
   val wdata     = Output(UInt(128.W)) 
 }
 
@@ -65,16 +65,16 @@ class Stage2IO extends Bundle {
   val pc        = Output(UInt(32.W))
   val npc       = Output(UInt(32.W))
   val cacheable = Output(Bool())
-  val index     = Output(UInt(5.W))
-  val tag       = Output(UInt(23.W))
+  val index     = Output(UInt(6.W))
+  val tag       = Output(UInt(22.W))
   val align     = Output(UInt(2.W))
 }
 
 class Stage3IO extends Bundle {
   val npc       = Output(UInt(32.W))
   val pc        = Output(UInt(32.W))
-  val index     = Output(UInt(5.W))
-  val tag       = Output(UInt(23.W))
+  val index     = Output(UInt(6.W))
+  val tag       = Output(UInt(22.W))
   val align     = Output(UInt(2.W))
   val cacheline = Output(UInt(128.W))
   val hit       = Output(Bool())
@@ -84,8 +84,8 @@ class Stage3IO extends Bundle {
 }
 
 class MetaAllocIO extends Bundle {
-  val tag       = Output(UInt(23.W))
-  val index     = Output(UInt(5.W))
+  val tag       = Output(UInt(22.W))
+  val index     = Output(UInt(6.W))
   val victim    = Output(UInt(2.W))
   val valid     = Output(Bool())
 }
@@ -110,7 +110,7 @@ class CacheReadIO extends Bundle {
 class MetaData extends Bundle {
   val valid         = Bool()
   val dirty         = Bool()
-  val tag           = UInt(23.W)
+  val tag           = UInt(22.W)
 }
 
 class RFReadIO extends Bundle {
