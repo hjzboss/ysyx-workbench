@@ -23,7 +23,7 @@ class Ram extends BlackBox {
     val CEN   = Input(Bool())
     val WEN   = Input(Bool())
     val BWEN  = Input(UInt(128.W))
-    val A     = Input(UInt(6.W))
+    val A     = Input(UInt(5.W))
     val D     = Input(UInt(128.W)) 
   })
 }
