@@ -29,6 +29,7 @@ size_t get_ramdisk_size();
 // 返回程序的入口地址
 static uintptr_t loader(PCB *pcb, const char *filename) {
   Log("load %s begin", filename);
+  Log("open");
   int fd = fs_open(filename, 0, 0);
   Elf_Ehdr elf_head;
   fs_read(fd, &elf_head, sizeof(Elf_Ehdr));
@@ -42,16 +43,19 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   fs_read(fd, p_head, sizeof(Elf_Phdr) * elf_head.e_phnum);
 
   // load and set
+  Log("load program begin");
   for (int i = 0; i < elf_head.e_phnum; i++, p_head++) {
     if (p_head->p_type == PT_LOAD) {
+      Log("load program");
       fs_lseek(fd, p_head->p_offset, SEEK_SET);
       fs_read(fd, (uint8_t *)p_head->p_vaddr, p_head->p_filesz);
       // 将p_memsz与p_filesz之间的存储设置为0，为.bss段，保存未初始化或者初始值为0的全局变量
       memset((uint8_t *)p_head->p_vaddr + p_head->p_filesz, 0, p_head->p_memsz - p_head->p_filesz);      
     }
   }
-
+  Log("load program end");
   fs_close(fd);
+  Log("close");
   asm volatile("fence.i"); // 同步（npc中的cache一致性）
   Log("load %s end", filename);
   return elf_head.e_entry;
