@@ -92,7 +92,7 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   assert(x + canvas_x >= 0 && x + canvas_x + w <= screen_w);
   assert(y + canvas_y >= 0 && y + canvas_y + h <= screen_h);
 
-  for(int i = 0; i < h; i--) {
+  for(int i = 0; i < h; i++) {
     // 逐行绘制
     lseek(fb_fd, ((y + canvas_y + i) * screen_w + x + canvas_x) * 4, SEEK_SET);
     // 一次绘制一行
