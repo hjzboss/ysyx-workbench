@@ -395,9 +395,9 @@ static void statistic() {
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 
-  Log("icache hit rate = %lf, hit = %d, req = %d", (cpu_perf.icachehit / 1.0) / cpu_perf.icachereq, cpu_perf.icachehit, cpu_perf.icachereq);
-  Log("dcache hit rate = %lf, hit = %d, req = %d", (cpu_perf.dcachehit / 1.0) / cpu_perf.dcachereq, cpu_perf.dcachehit, cpu_perf.dcachereq);
-  Log("Branch prediction accuracy = %lf, miss = %d, req = %ld", ((cpu_perf.bpureq - cpu_perf.bpumiss) / 1.0) / cpu_perf.bpureq, cpu_perf.bpumiss, cpu_perf.bpureq);
+  Log("icache hit rate = %lf, hit = %ld, req = %ld", (cpu_perf.icachehit / 1.0) / cpu_perf.icachereq, cpu_perf.icachehit, cpu_perf.icachereq);
+  Log("dcache hit rate = %lf, hit = %ld, req = %ld", (cpu_perf.dcachehit / 1.0) / cpu_perf.dcachereq, cpu_perf.dcachehit, cpu_perf.dcachereq);
+  Log("Branch prediction accuracy = %lf, miss = %ld, req = %ld", ((cpu_perf.bpureq - cpu_perf.bpumiss) / 1.0) / cpu_perf.bpureq, cpu_perf.bpumiss, cpu_perf.bpureq);
 }
 
 void assert_fail_msg() {
