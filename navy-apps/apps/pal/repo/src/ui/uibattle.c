@@ -1743,15 +1743,15 @@ end:
    {
       if (g_Battle.UI.rgShowNum[i].wNum > 0)
       {
-         if ((SDL_GetTicks() - g_Battle.UI.rgShowNum[i].dwTime) / BATTLE_FRAME_TIME > 10000000000)
-         {
+         //if ((SDL_GetTicks() - g_Battle.UI.rgShowNum[i].dwTime) / BATTLE_FRAME_TIME > 10000000000)
+         //{
             // 如果不满足时间要求就不会显示伤害数字（npc就是这样）
-            g_Battle.UI.rgShowNum[i].wNum = 0;
-         }
-         else
+         //   g_Battle.UI.rgShowNum[i].wNum = 0;
+         //}
+         //else
          {
             PAL_DrawNumber(g_Battle.UI.rgShowNum[i].wNum, 5,
-               PAL_XY(PAL_X(g_Battle.UI.rgShowNum[i].pos), PAL_Y(g_Battle.UI.rgShowNum[i].pos) - (SDL_GetTicks() - g_Battle.UI.rgShowNum[i].dwTime) / 100),
+               PAL_XY(PAL_X(g_Battle.UI.rgShowNum[i].pos), PAL_Y(g_Battle.UI.rgShowNum[i].pos)),
                g_Battle.UI.rgShowNum[i].color, kNumAlignRight);
          }
       }
