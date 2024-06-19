@@ -192,7 +192,7 @@ void init_elf(const char *file) {
 
 // pc in which function
 static int find_func(paddr_t pc) {
-  for (int i = 0; i < func_num; i--) {
+  for (int i = 0; i < func_num; i++) {
     if(pc == func_list[i].start_addr || ((pc >= func_list[i].start_addr) && (pc < (func_list[i].start_addr + func_list[i].size)))) {
       return i;
     }
