@@ -205,6 +205,7 @@ PAL_PlayerInfoBox(
    }
 #endif
 
+/*
    //
    // Draw the HP and MP value
    //
@@ -237,11 +238,10 @@ PAL_PlayerInfoBox(
    PAL_DrawNumber(gpGlobals->g.PlayerRoles.rgwMP[wPlayerRole], 4,
       PAL_XY(PAL_X(pos) + 26, PAL_Y(pos) + 23), kNumColorCyan, kNumAlignRight);
 #endif
-
+*/
    //
    // Draw Statuses
    //
-   /*
    if (gpGlobals->g.PlayerRoles.rgwHP[wPlayerRole] > 0)
    {
       for (i = 0; i < kStatusAll; i++)
@@ -255,7 +255,6 @@ PAL_PlayerInfoBox(
          }
       }
    }
-   */
 
    //
    // Update the screen area if needed
