@@ -205,7 +205,6 @@ PAL_PlayerInfoBox(
    }
 #endif
 
-/*
    //
    // Draw the HP and MP value
    //
@@ -238,7 +237,7 @@ PAL_PlayerInfoBox(
    PAL_DrawNumber(gpGlobals->g.PlayerRoles.rgwMP[wPlayerRole], 4,
       PAL_XY(PAL_X(pos) + 26, PAL_Y(pos) + 23), kNumColorCyan, kNumAlignRight);
 #endif
-*/
+
    //
    // Draw Statuses
    //
@@ -1732,7 +1731,7 @@ end:
    else if (g_Battle.UI.szNextMsg[0] != '\0')
    {
       wcscpy(g_Battle.UI.szMsg, g_Battle.UI.szNextMsg);
-      g_Battle.UI.dwMsgShowTime = SDL_GetTicks() + g_Battle.UI.wNextMsgDuration;
+      //g_Battle.UI.dwMsgShowTime = SDL_GetTicks() + g_Battle.UI.wNextMsgDuration;
       g_Battle.UI.szNextMsg[0] = '\0';
    }
 #endif
