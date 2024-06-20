@@ -187,7 +187,7 @@ PAL_PlayerInfoBox(
    //
    // Draw the Time meter bar
    //
-   if (iTimeMeter >= 100)
+   if (1)
    {
       rect.x = PAL_X(pos) + 33;
       rect.y = PAL_Y(pos) + 6;
@@ -913,7 +913,6 @@ PAL_BattleUIUpdate(
          // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
             w, j, FALSE);
-         printf("shit\n");
       }
    }
 
