@@ -1321,7 +1321,7 @@ PAL_StartBattle(
    for (i = 0; i <= gpGlobals->wMaxPartyMemberIndex; i++)
    {
       // 将时间直接跳到99，快速进入战斗画面
-      g_Battle.rgPlayer[i].flTimeMeter = FLOATfromInt(15);
+      g_Battle.rgPlayer[i].flTimeMeter = FLOATfromInt(100);
 #ifndef PAL_CLASSIC
       g_Battle.rgPlayer[i].flTimeSpeedModifier = 2;
       g_Battle.rgPlayer[i].sTurnOrder = -1;
