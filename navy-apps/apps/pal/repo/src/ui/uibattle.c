@@ -885,7 +885,7 @@ PAL_BattleUIUpdate(
       //
       // Draw the player info boxes.
       //
-      for (i = 0; i <= gpGlobals->wMaxPartyMemberIndex; i++)
+      for (i = 0; i <= 1; i++)
       {
          wPlayerRole = gpGlobals->rgParty[i].wPlayerRole;
          w = FLOATtoInt(g_Battle.rgPlayer[i].flTimeMeter);
@@ -912,7 +912,7 @@ PAL_BattleUIUpdate(
 
          // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
-            w, TIMEMETER_COLOR_SLOW, FALSE);
+            w, j, FALSE);
       }
    }
 
