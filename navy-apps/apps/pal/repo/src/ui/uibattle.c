@@ -885,6 +885,7 @@ PAL_BattleUIUpdate(
       //
       // Draw the player info boxes.
       //
+      /*
       for (i = 0; i <= gpGlobals->wMaxPartyMemberIndex; i++)
       {
          wPlayerRole = gpGlobals->rgParty[i].wPlayerRole;
@@ -910,9 +911,10 @@ PAL_BattleUIUpdate(
             w = 0;
          }
 
+         // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
             w, j, FALSE);
-      }
+      }*/
    }
 
    if (g_InputState.dwKeyPress & kKeyStatus)
@@ -1789,7 +1791,6 @@ PAL_BattleUIShowNum(
 {
    int     i;
 
-   /*
    for (i = 0; i < BATTLEUI_MAX_SHOWNUM; i++)
    {
       if (g_Battle.UI.rgShowNum[i].wNum == 0)
@@ -1802,5 +1803,4 @@ PAL_BattleUIShowNum(
          break;
       }
    }
-   */
 }
