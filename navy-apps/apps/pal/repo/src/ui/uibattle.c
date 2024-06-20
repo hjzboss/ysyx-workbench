@@ -567,6 +567,7 @@ PAL_BattleUIShowText(
 
 --*/
 {
+   /*
    if (!SDL_TICKS_PASSED(SDL_GetTicks(), g_Battle.UI.dwMsgShowTime))
    {
       wcscpy(g_Battle.UI.szNextMsg, lpszText);
@@ -577,6 +578,7 @@ PAL_BattleUIShowText(
       wcscpy(g_Battle.UI.szMsg, lpszText);
       g_Battle.UI.dwMsgShowTime = SDL_GetTicks() + wDuration;
    }
+   */
 }
 
 VOID
@@ -1731,7 +1733,7 @@ end:
    else if (g_Battle.UI.szNextMsg[0] != '\0')
    {
       wcscpy(g_Battle.UI.szMsg, g_Battle.UI.szNextMsg);
-      //g_Battle.UI.dwMsgShowTime = SDL_GetTicks() + g_Battle.UI.wNextMsgDuration;
+      g_Battle.UI.dwMsgShowTime = SDL_GetTicks() + g_Battle.UI.wNextMsgDuration;
       g_Battle.UI.szNextMsg[0] = '\0';
    }
 #endif
