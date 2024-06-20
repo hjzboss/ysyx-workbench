@@ -184,6 +184,7 @@ PAL_PlayerInfoBox(
    rect.y += 7;
    SDL_FillRect(gpScreen, &rect, 0xBD);
 
+   /*
    //
    // Draw the Time meter bar
    //
@@ -203,6 +204,7 @@ PAL_PlayerInfoBox(
       rect.h = 4;
       SDL_FillRect(gpScreen, &rect, bTimeMeterColor);
    }
+   */
 #endif
 
    //
@@ -885,7 +887,6 @@ PAL_BattleUIUpdate(
       //
       // Draw the player info boxes.
       //
-      /*
       for (i = 0; i <= gpGlobals->wMaxPartyMemberIndex; i++)
       {
          wPlayerRole = gpGlobals->rgParty[i].wPlayerRole;
@@ -914,7 +915,7 @@ PAL_BattleUIUpdate(
          // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
             w, j, FALSE);
-      }*/
+      }
    }
 
    if (g_InputState.dwKeyPress & kKeyStatus)
