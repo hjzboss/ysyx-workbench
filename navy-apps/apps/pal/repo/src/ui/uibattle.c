@@ -241,6 +241,7 @@ PAL_PlayerInfoBox(
    //
    // Draw Statuses
    //
+   /*
    if (gpGlobals->g.PlayerRoles.rgwHP[wPlayerRole] > 0)
    {
       for (i = 0; i < kStatusAll; i++)
@@ -254,6 +255,7 @@ PAL_PlayerInfoBox(
          }
       }
    }
+   */
 
    //
    // Update the screen area if needed
@@ -1789,7 +1791,6 @@ PAL_BattleUIShowNum(
 {
    int     i;
 
-   /*
    for (i = 0; i < BATTLEUI_MAX_SHOWNUM; i++)
    {
       if (g_Battle.UI.rgShowNum[i].wNum == 0)
@@ -1802,5 +1803,4 @@ PAL_BattleUIShowNum(
          break;
       }
    }
-   */
 }
