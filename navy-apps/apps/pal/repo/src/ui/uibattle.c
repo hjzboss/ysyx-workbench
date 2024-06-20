@@ -187,7 +187,7 @@ PAL_PlayerInfoBox(
    //
    // Draw the Time meter bar
    //
-   if (1)
+   if (iTimeMeter >= 100)
    {
       rect.x = PAL_X(pos) + 33;
       rect.y = PAL_Y(pos) + 6;
