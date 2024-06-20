@@ -433,7 +433,6 @@ PAL_BattleUIMiscMenuUpdate(
 
 --*/
 {
-   /*
    //
    // Draw the menu
    //
@@ -466,7 +465,7 @@ PAL_BattleUIMiscMenuUpdate(
    {
       return 0;
    }
-*/
+
    return 0xFFFF;
 }
 
@@ -1790,6 +1789,7 @@ PAL_BattleUIShowNum(
 {
    int     i;
 
+   /*
    for (i = 0; i < BATTLEUI_MAX_SHOWNUM; i++)
    {
       if (g_Battle.UI.rgShowNum[i].wNum == 0)
@@ -1802,4 +1802,5 @@ PAL_BattleUIShowNum(
          break;
       }
    }
+   */
 }

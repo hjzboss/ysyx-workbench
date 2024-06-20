@@ -381,7 +381,9 @@ PAL_BattleMain(
       PAL_DelayUntil(dwTime);
 
       uint32_t now = SDL_GetTicks();
-      UpdateFPS(now);
+
+      // TODO: 取消fps显示来加速
+      //UpdateFPS(now);
 
       //
       // Set the time of the next frame.
