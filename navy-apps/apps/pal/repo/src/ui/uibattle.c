@@ -912,7 +912,7 @@ PAL_BattleUIUpdate(
 
          // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
-            w, j, TRUE);
+            w, 0, FALSE);
       }
    }
 
