@@ -248,11 +248,9 @@ PAL_PlayerInfoBox(
          if (gpGlobals->rgPlayerStatus[wPlayerRole][i] > 0 &&
             rgwStatusWord[i] != 0)
          {
-            /*
             PAL_DrawText(PAL_GetWord(rgwStatusWord[i]),
                PAL_XY(PAL_X(pos) + rgStatusPos[i][0], PAL_Y(pos) + rgStatusPos[i][1]),
                rgbStatusColor[i], TRUE, FALSE, FALSE);
-               */
          }
       }
    }
@@ -1791,6 +1789,7 @@ PAL_BattleUIShowNum(
 {
    int     i;
 
+   /*
    for (i = 0; i < BATTLEUI_MAX_SHOWNUM; i++)
    {
       if (g_Battle.UI.rgShowNum[i].wNum == 0)
@@ -1803,4 +1802,5 @@ PAL_BattleUIShowNum(
          break;
       }
    }
+   */
 }
