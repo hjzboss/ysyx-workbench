@@ -184,7 +184,6 @@ PAL_PlayerInfoBox(
    rect.y += 7;
    SDL_FillRect(gpScreen, &rect, 0xBD);
 
-   /*
    //
    // Draw the Time meter bar
    //
@@ -204,7 +203,6 @@ PAL_PlayerInfoBox(
       rect.h = 4;
       SDL_FillRect(gpScreen, &rect, bTimeMeterColor);
    }
-   */
 #endif
 
    //
@@ -914,7 +912,7 @@ PAL_BattleUIUpdate(
 
          // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
-            w, j, FALSE);
+            w, j, TRUE);
       }
    }
 
