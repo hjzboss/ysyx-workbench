@@ -433,6 +433,7 @@ PAL_BattleUIMiscMenuUpdate(
 
 --*/
 {
+   /*
    //
    // Draw the menu
    //
@@ -465,7 +466,7 @@ PAL_BattleUIMiscMenuUpdate(
    {
       return 0;
    }
-
+*/
    return 0xFFFF;
 }
 
@@ -567,7 +568,6 @@ PAL_BattleUIShowText(
 
 --*/
 {
-   /*
    if (!SDL_TICKS_PASSED(SDL_GetTicks(), g_Battle.UI.dwMsgShowTime))
    {
       wcscpy(g_Battle.UI.szNextMsg, lpszText);
@@ -578,7 +578,6 @@ PAL_BattleUIShowText(
       wcscpy(g_Battle.UI.szMsg, lpszText);
       g_Battle.UI.dwMsgShowTime = SDL_GetTicks() + wDuration;
    }
-   */
 }
 
 VOID
