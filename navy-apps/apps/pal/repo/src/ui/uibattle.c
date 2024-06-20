@@ -1750,9 +1750,11 @@ end:
          //}
          //else
          {
+            // 此处调整伤害数字的位置，位置会随着时间往上移动，移动太快会导致不显示数字
             PAL_DrawNumber(g_Battle.UI.rgShowNum[i].wNum, 5,
                PAL_XY(PAL_X(g_Battle.UI.rgShowNum[i].pos), PAL_Y(g_Battle.UI.rgShowNum[i].pos)),
                g_Battle.UI.rgShowNum[i].color, kNumAlignRight);
+            g_Battle.UI.rgShowNum[i].wNum = 0;
          }
       }
    }
