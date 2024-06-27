@@ -53,7 +53,6 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   int arg_cnt = 0;
   char str[32];
   for (p = (char *)fmt; *p; p++) {
-    assert(0);
     // 直接输出
     if (*p != '%') {
       *out++ = *p;
