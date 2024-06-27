@@ -44,6 +44,7 @@ int printf(const char *fmt, ...) {
 }
 
 // 支持%d, %c, %u, %x, %s和%p，支持填充0和空格
+// 此处错误也可能导致所有程序卡住
 int vsprintf(char *out, const char *fmt, va_list ap) {
   char *p, *sval;
   int ival;
@@ -105,7 +106,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         *out++ = '0';
         *out++ = 'x';
         rem = 16 - len;
-        for (; rem; rem--) 
+        for (; rem > 0; rem--) 
           *out++ = '0';
         strcpy(out, str);
         out += len;
@@ -116,7 +117,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         num2str(str, ival, 16);
         len = strlen(str);
         rem = fix_num - len;
-        for (; rem; rem--) 
+        for (; rem > 0; rem--) 
           *out++ = fix_ch;
         strcpy(out, str);
         out += len;
