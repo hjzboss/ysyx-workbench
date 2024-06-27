@@ -61,7 +61,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
     }
     ++p;
     // 1. 填充计算
-    int fix_num = 0; // 填充0的数目
+    int fix_num = 0; // 填充0或者空格的数目
     int fix_ch = ' ';
     if(*p == '0') {
       ++p;
@@ -72,7 +72,6 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       ++p;
     }
 
-    assert(0);
     // 2. 空格与0填充和占位符转换
     int rem;
     switch (*p) {
@@ -82,7 +81,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         num2str(str, ival, 10);
         len = strlen(str);
         rem = fix_num - len; // 剩下需要补的长度
-        for (; rem; rem--) 
+        for (; rem > 0; rem--) 
           *out++ = fix_ch;
         // todo
         strcpy(out, str);
@@ -94,7 +93,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
         num2str(str, uval, 10);
         len = strlen(str);
         rem = fix_num - len;
-        for (; rem; rem--) 
+        for (; rem > 0; rem--) 
           *out++ = fix_ch;
         strcpy(out, str);
         out += len;
