@@ -1756,7 +1756,7 @@ end:
             PAL_DrawNumber(g_Battle.UI.rgShowNum[i].wNum, 5,
                PAL_XY(PAL_X(g_Battle.UI.rgShowNum[i].pos), PAL_Y(g_Battle.UI.rgShowNum[i].pos)),
                g_Battle.UI.rgShowNum[i].color, kNumAlignRight);
-            g_Battle.UI.rgShowNum[i].wNum = 0;
+            //g_Battle.UI.rgShowNum[i].wNum = 0;
          }
       }
    }
