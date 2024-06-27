@@ -384,6 +384,7 @@ void execute(uint64_t n) {
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     // 执行10000次更新一次外设
+    device_update_cnt++;
     if(device_update_cnt > 10000) {
       IFDEF(CONFIG_DEVICE, device_update());
       device_update_cnt = 0;
