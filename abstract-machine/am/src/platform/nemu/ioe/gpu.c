@@ -35,7 +35,11 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   if((ctl->x + ctl->w > width) || (ctl->y + ctl->h > height)) {
     panic("out of display range");
   }
+
+  // 获取显存
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
+
+  // 写入显存
   uint32_t *pixels_tmp = (uint32_t *)ctl->pixels;
   fb += width * ctl->y + ctl->x; // 定位屏幕
   for (int j = 0; j < ctl->h; j++) {
@@ -44,7 +48,8 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
     }
     fb += width - ctl->w;
   }
-  // 同步屏幕
+
+  // 同步
   if (ctl->sync) {
     outl(SYNC_ADDR, 1);
   }

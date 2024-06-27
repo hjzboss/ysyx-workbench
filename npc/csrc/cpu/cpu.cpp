@@ -128,7 +128,11 @@ extern "C" void c_break(long long halt_ret, long long pc) {
 
 extern "C" void pmem_read(long long raddr, long long *rdata) {
   // 总是读取地址为`raddr & ~0x7ull`的8字节返回给`rdata`
-  if (raddr < 0x80000000ull) { *rdata = rand(); return; }
+  if (raddr < 0x80000000ull) { 
+    *rdata = rand(); 
+    return; 
+  }
+
   if (raddr == CONFIG_TIMER_MMIO || raddr == CONFIG_TIMER_MMIO + 8) {
     IFDEF(CONFIG_DIFFTEST, visit_device = true;)
     // timer
@@ -141,7 +145,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
       gettimeofday(&now, NULL);
       long seconds = now.tv_sec - boot_time.tv_sec;
       long useconds = now.tv_usec - boot_time.tv_usec;
-      *rdata = seconds * 1000000;
+      *rdata = seconds * 1000000 + useconds;
     }
     return;
   }
@@ -157,6 +161,7 @@ extern "C" void pmem_read(long long raddr, long long *rdata) {
     *rdata = i8042_data_io_handler();
   }
   else {
+    // 读物理内存
     *rdata = paddr_read(raddr & ~0x7ull, 8);
   }
 }
@@ -167,7 +172,11 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
   if (wmask == 0) return;
-  if (waddr < 0x80000000ull) { printf("addr=%016llx out of bound\n", waddr); c_break(1, top->io_debug_pc); return; }
+  if (waddr < 0x80000000ull) { 
+    printf("addr=%016llx out of bound\n", waddr); 
+    c_break(1, top->io_debug_pc); 
+    return; 
+  }
   else if (waddr == CONFIG_SERIAL_MMIO) {
     // uart
     putchar(wdata);
@@ -186,13 +195,12 @@ extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
     uint8_t tmp = wmask;
     // 将8位的掩码转换为64位的掩码
     for(int i = 0; i < 8; i++, index++) {
-      if(tmp & 0x01 == 0x01) {
+      if(tmp & 0x01) {
         *index = 0xff;
       }
       tmp = tmp >> 1;
     }
 
-    //printf("wmask=%d, wmask64=%lx\n", wmask, wmask_64);
     if (check_vmem_bound(waddr)) {
       // vga显存
       IFDEF(CONFIG_DIFFTEST, visit_device = true;)
@@ -305,19 +313,21 @@ void delete_cpu() {
 
 static void isa_exec_once(uint64_t *pc, uint64_t *npc, bool *lsFlag, uint32_t *inst) {
   int cnt = 0;
+  // 执行完一条指令为止
   while (!top->io_debug_valid) {
     eval_wave();
     eval_wave();
     cnt += 1;
     if (cnt == 5000) {
       printf("flyyyyyy!!!!\n");
-      break; // 防止跑飞
+      break; // 跑飞了就退出
     }
   }
   *pc  = top->io_debug_pc;
   *npc = top->io_debug_nextPc;
   *inst = top->io_debug_inst;
-  *lsFlag = top->io_lsFlag;
+  *lsFlag = top->io_lsFlag; // 访存标记
+  // perf
   cpu_perf.icachehit = top->io_perf_icacheHitCnt;
   cpu_perf.icachereq = top->io_perf_icacheReqCnt;
   cpu_perf.dcachehit = top->io_perf_dcacheHitCnt;
@@ -373,6 +383,7 @@ void execute(uint64_t n) {
     total_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
+    // 执行10000次更新一次外设
     if(device_update_cnt > 10000) {
       IFDEF(CONFIG_DEVICE, device_update());
       device_update_cnt = 0;
@@ -394,6 +405,7 @@ static void statistic() {
   }
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 
+  // perf
   Log("icache hit rate = %lf, hit = %ld, req = %ld", (cpu_perf.icachehit / 1.0) / cpu_perf.icachereq, cpu_perf.icachehit, cpu_perf.icachereq);
   Log("dcache hit rate = %lf, hit = %ld, req = %ld", (cpu_perf.dcachehit / 1.0) / cpu_perf.dcachereq, cpu_perf.dcachehit, cpu_perf.dcachereq);
   Log("Branch prediction accuracy = %lf, miss = %ld, req = %ld", ((cpu_perf.bpureq - cpu_perf.bpumiss) / 1.0) / cpu_perf.bpureq, cpu_perf.bpumiss, cpu_perf.bpureq);
@@ -435,7 +447,6 @@ void cpu_exec(uint64_t n) {
            (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           npc_state.halt_pc);
-          //printf("halt_ret=%d\n", npc_state.halt_ret);
           printf("\n");
     // fall through
     case NPC_QUIT: statistic();

@@ -19,6 +19,7 @@ void __am_gpu_init() {
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
+  // 获取屏幕的宽高
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
@@ -28,14 +29,20 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   };
 }
 
+// 向屏幕(x, y)位置画一块(w, h)的矩形，然后同步
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
+  // 读取屏幕的大小
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   int width = data >> 16;
   int height = data & 0x0000ffff;
   if((ctl->x + ctl->w > width) || (ctl->y + ctl->h > height)) {
-    panic("out of display range");
+    panic("am gpu out of display range");
   }
+
+  // 获取显存
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
+
+  // 写入显存
   uint32_t *pixels_tmp = (uint32_t *)ctl->pixels;
   fb += width * ctl->y + ctl->x;
   for (int j = 0; j < ctl->h; j++) {
@@ -44,7 +51,8 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
     }
     fb += width - ctl->w;
   }
-  // update
+
+  // 同步
   if (ctl->sync) {
     outl(SYNC_ADDR, 1);
   }

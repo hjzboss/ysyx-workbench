@@ -51,6 +51,7 @@ void     halt        (int code) __attribute__((__noreturn__));
 // -------------------- IOE: Input/Output Devices --------------------
 // NEMU作为一个平台, 设备的行为是与ISA无关的, 因此我们只需要在abstract-machine/am/src/platform/nemu/ioe/目录下实现一份IOE, 来供NEMU平台的架构共享. 
 bool     ioe_init    (void);
+// 实际上是调用第reg号函数来读取数据到buf
 void     ioe_read    (int reg, void *buf); // 从编号为reg的寄存器中读出内容到缓冲区buf中
 void     ioe_write   (int reg, void *buf); // 往编号为reg寄存器中写入缓冲区buf中的内容
 #include "amdev.h"
