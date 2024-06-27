@@ -2,16 +2,15 @@
 #include <klib.h>
 #include "npc.h"
 
-//static uint64_t boot_time = 0;
 inline uint64_t ind(uint64_t addr) { return *(volatile uint64_t *)addr; }
 
-
 void __am_timer_init() {
+  // 初始化硬件计时器
   (uint64_t)ind(RTC_INIT);
 }
 
+// 懒得兼容32位了。。。
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
-  //uptime->us = (((uint64_t)inl(RTC_ADDR + 4)) << 32) | inl(RTC_ADDR);
   uptime->us = ind(RTC_ADDR);
 }
 

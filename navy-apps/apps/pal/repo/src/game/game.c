@@ -120,7 +120,7 @@ PAL_GameMain(
       PAL_DelayUntil(dwTime);
 
       uint32_t now = SDL_GetTicks();
-      UpdateFPS(now);
+      //UpdateFPS(now);
 
       //
       // Set the time of the next frame.

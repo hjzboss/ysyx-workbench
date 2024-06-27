@@ -807,6 +807,7 @@ PAL_BattleUIUpdate(
 
    s_iFrame++;
 
+   // 自动攻击绘图，目前需要弄清绘图消失的原因
    if (g_Battle.UI.fAutoAttack && !gpGlobals->fAutoBattle)
    {
       //
@@ -910,6 +911,7 @@ PAL_BattleUIUpdate(
             w = 0;
          }
 
+         // 更新玩家信息栏
          PAL_PlayerInfoBox(PAL_XY(91 + 77 * i, 165), wPlayerRole,
             w, j, FALSE);
       }
@@ -1743,16 +1745,18 @@ end:
    {
       if (g_Battle.UI.rgShowNum[i].wNum > 0)
       {
-         if ((SDL_GetTicks() - g_Battle.UI.rgShowNum[i].dwTime) / BATTLE_FRAME_TIME > 10)
-         {
+         //if ((SDL_GetTicks() - g_Battle.UI.rgShowNum[i].dwTime) / BATTLE_FRAME_TIME > 10000000000)
+         //{
             // 如果不满足时间要求就不会显示伤害数字（npc就是这样）
-            g_Battle.UI.rgShowNum[i].wNum = 0;
-         }
-         else
+         //   g_Battle.UI.rgShowNum[i].wNum = 0;
+         //}
+         //else
          {
+            // 此处调整伤害数字的位置，位置会随着时间往上移动，移动太快会导致不显示数字
             PAL_DrawNumber(g_Battle.UI.rgShowNum[i].wNum, 5,
-               PAL_XY(PAL_X(g_Battle.UI.rgShowNum[i].pos), PAL_Y(g_Battle.UI.rgShowNum[i].pos) - (SDL_GetTicks() - g_Battle.UI.rgShowNum[i].dwTime) / BATTLE_FRAME_TIME),
+               PAL_XY(PAL_X(g_Battle.UI.rgShowNum[i].pos), PAL_Y(g_Battle.UI.rgShowNum[i].pos)),
                g_Battle.UI.rgShowNum[i].color, kNumAlignRight);
+            g_Battle.UI.rgShowNum[i].wNum = 0;
          }
       }
    }

@@ -46,6 +46,7 @@ static uint32_t key_dequeue() {
   return key;
 }
 
+// 将键盘码入队
 void send_key(uint8_t scancode, bool is_keydown) {
   if (npc_state.state == NPC_RUNNING && keymap[scancode] != _KEY_NONE) {
     uint32_t am_scancode = keymap[scancode] | (is_keydown ? KEYDOWN_MASK : 0);

@@ -10,10 +10,16 @@ Context* __am_irq_handle(Context *c) {
     switch (c->mcause) {
       // 系统调用
       case 0xb:
-        if (c->GPR1 == -1) ev.event = EVENT_YIELD;
-        else ev.event = EVENT_SYSCALL;
+        if (c->GPR1 == -1)
+          ev.event = EVENT_YIELD;
+        else
+          ev.event = EVENT_SYSCALL;
         break;
-      default: ev.event = EVENT_ERROR; break;
+      default: 
+        ev.event = EVENT_ERROR; 
+        printf("EVENT_ERROR in am!\n");
+        assert(0);
+        break;
     }
 
     c = user_handler(ev, c);
