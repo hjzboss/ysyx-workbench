@@ -819,9 +819,9 @@ PAL_BattleUIUpdate(
       }
       else
       {
-         //LPCWSTR itemText = PAL_GetWord(BATTLEUI_LABEL_AUTO);
-         //PAL_DrawText(itemText, PAL_XY(312-PAL_TextWidth(itemText), 10),
-         //   MENUITEM_COLOR_CONFIRMED, TRUE, FALSE, FALSE);
+         LPCWSTR itemText = PAL_GetWord(BATTLEUI_LABEL_AUTO);
+         PAL_DrawText(itemText, PAL_XY(312-PAL_TextWidth(itemText), 10),
+            MENUITEM_COLOR_CONFIRMED, TRUE, FALSE, FALSE);
       }
    }
 
