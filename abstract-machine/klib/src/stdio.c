@@ -38,7 +38,6 @@ int printf(const char *fmt, ...) {
   va_start(ap, fmt);
   char buf[20000]; // TODO：buf空间能否动态申请？
   int arg_cnt = vsprintf(buf, fmt, ap);
-  assert(0);
   va_end(ap);
   putstr(buf);
   return arg_cnt;
@@ -54,6 +53,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   int arg_cnt = 0;
   char str[32];
   for (p = (char *)fmt; *p; p++) {
+    assert(0);
     // 直接输出
     if (*p != '%') {
       *out++ = *p;
