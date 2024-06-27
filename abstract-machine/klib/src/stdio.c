@@ -38,6 +38,7 @@ int printf(const char *fmt, ...) {
   va_start(ap, fmt);
   char buf[20000]; // TODO：buf空间能否动态申请？
   int arg_cnt = vsprintf(buf, fmt, ap);
+  assert(0);
   va_end(ap);
   putstr(buf);
   return arg_cnt;
