@@ -72,6 +72,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
       ++p;
     }
 
+    assert(0);
     // 2. 空格与0填充和占位符转换
     int rem;
     switch (*p) {
