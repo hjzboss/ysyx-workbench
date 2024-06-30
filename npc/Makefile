@@ -31,7 +31,7 @@ test:
 
 verilog:
 	$(call git_commit, "generate verilog")
-	sudo mkdir -p $(NPC_BUILD_DIR)/sim
+	mkdir -p $(NPC_BUILD_DIR)/sim
 	mill -i __.test.runMain Elaborate -td $(NPC_BUILD_DIR)
 
 help:
