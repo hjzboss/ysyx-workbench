@@ -41,12 +41,11 @@ LFLAGS += $(DIFFSET_SO)
 #NPC_FLAG += -d ${DIFFSET_SO}
 #VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
 
-sim:
-	make -C ${NPC_HOME} verilog
+sim: $(SIM_CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
-	$(VERILATOR) $(VERILATOR_SIMFLAG) $(SIM_CSRC) $(VSRC)
+	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
 	$(SIM_OBJ_DIR)/V${USER_ID}_$(TOPNAME) $(NPC_FLAG)
 #	@echo "wave"
 #	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
