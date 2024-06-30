@@ -64,12 +64,13 @@ VERILATOR_SIMFLAG_NPC += --cc --exe --build -MMD
 # C++ compiler arguments for makefile
 VERILATOR_SIMFLAG_NPC += -CFLAGS "${CFLAGS_NPC}"
 # open trace
-VERILATOR_SIMFLAG_NPC += --trace --Mdir $(SIM_OBJ_DIR)
+VERILATOR_SIMFLAG_NPC += --trace --Mdir $(NPC_SIM_OBJ_DIR)
 # top module
 VERILATOR_SIMFLAG_NPC += --top-module ${USER_ID}_$(TOPNAME)
 # 链接
 VERILATOR_SIMFLAG_NPC += -LDFLAGS "$(LFLAGS_NPC)"
-VERILATOR_SIMFLAG_NPC += -I${NPC_BUILD_DIR}
+
+#VERILATOR_SIMFLAG_NPC += -I${NPC_BUILD_DIR}
 
 # 仿真
 sim: 
