@@ -43,7 +43,7 @@ DIFFSET_SO := ${NEMU_HOME}/build/riscv64-nemu-interpreter-so
 LFLAGS_NPC += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 
 # npc c参数
-CFLAGS_NPC += -I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/include -std=c++14 -fno-exceptions -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
+CFLAGS_NPC = -I${NPC_HOME}/include -O2 -I/usr/lib/llvm-14/include -std=c++14 -fno-exceptions -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 
 # difftest
 ifneq ($(DIFF),)
