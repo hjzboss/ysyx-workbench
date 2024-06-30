@@ -1,6 +1,6 @@
 include $(AM_HOME)/scripts/isa/riscv64.mk
-include $(NPC_HOME)/scripts/sim-npc.mk
-include $(NPC_HOME)/../Makefile
+#include $(NPC_HOME)/scripts/sim-npc.mk
+#include $(NPC_HOME)/../Makefile
 
 AM_SRCS := riscv/npc/start.S \
            riscv/npc/trm.c \
@@ -25,5 +25,5 @@ image: $(IMAGE).elf
 	@echo + OBJCOPY "->" $(IMAGE_REL).bin
 	@$(OBJCOPY) -S --set-section-flags .bss=alloc,contents -O binary $(IMAGE).elf $(IMAGE).bin
 
-run: image sim
-
+run: image
+	make -C $(NPC_HOME) sim $(WAVE) $(DIFF)
