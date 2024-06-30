@@ -73,7 +73,7 @@ VERILATOR_SIMFLAG_NPC += -LDFLAGS "$(LFLAGS_NPC)"
 # 仿真
 sim: 
 	@echo "generate verilog"
-	make -C ${NPC_HOME} verilog
+#	make -C ${NPC_HOME} verilog
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(NPC_SIM_OBJ_DIR)
 	@echo "build npc verilator"
