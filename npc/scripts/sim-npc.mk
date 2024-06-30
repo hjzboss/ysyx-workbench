@@ -11,7 +11,7 @@ USER_ID = ysyx_22050853
 TOPNAME = Soc
 
 # verilog source
-VSRC_NPC = ${NPC_BUILD_DIR}/${TOPNAME}.v
+VSRC_NPC = ${NPC_BUILD_DIR}/${USER_ID}_${TOPNAME}.v
 VSRC_NPC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
 # cpp source
