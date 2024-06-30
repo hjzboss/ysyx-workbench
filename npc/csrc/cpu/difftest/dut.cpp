@@ -106,7 +106,6 @@ void init_difftest(char *ref_so_file, long img_size) {
 }
 
 void difftest_step() {
-  printf("diff\n");
   NEMUCPUState ref_r;
 
   if (is_skip_ref) {
