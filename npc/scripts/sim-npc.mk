@@ -33,15 +33,16 @@ DIFFSET_SO := ${NEMU_HOME}/build/riscv64-nemu-interpreter-so
 NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
 NPC_FLAG += -i $(IMAGE_OBJ)
 NPC_FLAG += -e ${IMAGE}.elf
-NPC_FLAG += -d ${DIFFSET_SO}
 NPC_FLAG += -b
 
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 LFLAGS += $(DIFFSET_SO)
 
-VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
+# difftest
+#NPC_FLAG += -d ${DIFFSET_SO}
+#VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
 
-sim: $(SIM_CSRC) $(VSRC)
+sim: $(SIM_CSRC) $(VSRC) verilog
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"

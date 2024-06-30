@@ -32,6 +32,7 @@ test:
 verilog:
 	$(call git_commit, "generate verilog")
 	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/sim
 	mill -i __.test.runMain Elaborate -td $(BUILD_DIR)
 
 help:
