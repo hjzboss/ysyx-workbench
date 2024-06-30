@@ -38,8 +38,8 @@ LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 LFLAGS += $(DIFFSET_SO)
 
 # difftest
-#NPC_FLAG += -d ${DIFFSET_SO}
-#VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
+NPC_FLAG += -d ${DIFFSET_SO}
+VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
 
 sim: $(SIM_CSRC) $(VSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
