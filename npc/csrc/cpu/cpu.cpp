@@ -113,8 +113,6 @@ static void trace_and_difftest() {
   IFDEF(CONFIG_ITRACE, npc_log_write("%s\n", npc_cpu.logbuf));
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(npc_cpu.logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step());
-	// watchpoint
-	//IFDEF(CONFIG_WATCHPOINT, scan_watchpoint(_this));
 }
 
 
@@ -383,12 +381,8 @@ void execute(uint64_t n) {
     total_inst ++;
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
-    // 执行10000次更新一次外设
-    //device_update_cnt++;
-    //if(device_update_cnt > 1000) {
-      IFDEF(CONFIG_DEVICE, device_update());
-      device_update_cnt = 0;
-    //}
+    IFDEF(CONFIG_DEVICE, device_update());
+    device_update_cnt = 0;
   }
 }
 
