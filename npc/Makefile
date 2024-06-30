@@ -32,7 +32,7 @@ test:
 verilog:
 	$(call git_commit, "generate verilog")
 	mkdir -p $(NPC_BUILD_DIR)
-	sudo mill -i __.test.runMain Elaborate -td $(NPC_BUILD_DIR)
+	mill -i __.test.runMain Elaborate -td $(NPC_BUILD_DIR)
 
 help:
 	mill -i __.test.runMain Elaborate --help
