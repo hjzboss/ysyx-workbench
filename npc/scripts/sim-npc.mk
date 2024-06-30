@@ -7,7 +7,6 @@ USER_ID = ysyx_22050853
 TOPNAME = Soc
 
 VSRC = ${BUILD_DIR}/${TOPNAME}.v
-#VSRC = $(shell find $(abspath ${BUILD_DIR}) -name "*.v")
 VSRC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
 SIM_CSRC = $(shell find $(abspath ${NPC_HOME}/csrc) -name "*.cpp")
@@ -33,19 +32,21 @@ DIFFSET_SO := ${NEMU_HOME}/build/riscv64-nemu-interpreter-so
 NPC_FLAG += -l $(BUILD_DIR)/npc-log.txt
 NPC_FLAG += -i $(IMAGE_OBJ)
 NPC_FLAG += -e ${IMAGE}.elf
-NPC_FLAG += -d ${DIFFSET_SO}
 NPC_FLAG += -b
 
 LFLAGS += $(shell llvm-config --libs) -lreadline -ldl -pie -lSDL2
 LFLAGS += $(DIFFSET_SO)
 
-VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
+# difftest
+#NPC_FLAG += -d ${DIFFSET_SO}
+#VERILATOR_SIMFLAG += -LDFLAGS "$(LFLAGS)"
 
-sim: $(SIM_CSRC) $(VSRC)
+sim:
+	make -C ${NPC_HOME} verilog
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(SIM_OBJ_DIR)
 	@echo "build"
-	$(VERILATOR) $(VERILATOR_SIMFLAG) $^
+	$(VERILATOR) $(VERILATOR_SIMFLAG) $(SIM_CSRC) $(VSRC)
 	$(SIM_OBJ_DIR)/V${USER_ID}_$(TOPNAME) $(NPC_FLAG)
 #	@echo "wave"
 #	gtkwave $(SIM_OBJ_DIR)/$(WAVE)
