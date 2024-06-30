@@ -70,8 +70,6 @@ VERILATOR_SIMFLAG_NPC += --top-module ${USER_ID}_$(TOPNAME)
 # 链接
 VERILATOR_SIMFLAG_NPC += -LDFLAGS "$(LFLAGS_NPC)"
 
-#VERILATOR_SIMFLAG_NPC += -I${NPC_BUILD_DIR}
-
 # 仿真
 sim: 
 	@echo "generate verilog"
