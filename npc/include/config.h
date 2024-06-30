@@ -3,7 +3,9 @@
 
 #include <macro.h>
 
+// 这两个宏定义由makefile产生
 //#define CONFIG_WAVE 1 // 启动波形仿真
+//#define CONFIG_DIFFTEST 1 // 启动difftest
 
 #define CSR_NUM 4
 
@@ -13,7 +15,6 @@
 //#define CONFIG_TRACE 1
 //#define CONFIG_ITRACE 1
 //#define CONFIG_FTRACE 1
-//#define CONFIG_DIFFTEST 1
 //#define CONFIG_MTRACE 1
 
 #define CONFIG_DEVICE 1
