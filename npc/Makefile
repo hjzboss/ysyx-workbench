@@ -8,9 +8,9 @@ include ./scripts/sim-npc.mk
 VERILATOR_FPGAFLAG = -Wall --cc \
 										 -MMD --build --Mdir $(FPGA_OBJ_DIR) 
 
-SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
+SRC_AUTO_BIND = $(abspath $(NPC_BUILD_DIR)/auto_bind.cpp)
 
-#FPGA_OBJ_DIR = $(BUILD_DIR)/fpga/obj_dir
+#FPGA_OBJ_DIR = $(NPC_BUILD_DIR)/fpga/obj_dir
 #BIN = $(FPGA_OBJ_DIR)/$(TOPNAME)
 
 #传递给preproject连接器的信息，添加SDL2库信息
@@ -31,8 +31,8 @@ test:
 
 verilog:
 	$(call git_commit, "generate verilog")
-	sudo mkdir -p $(BUILD_DIR)/sim
-	mill -i __.test.runMain Elaborate -td $(BUILD_DIR)
+	sudo mkdir -p $(NPC_BUILD_DIR)/sim
+	mill -i __.test.runMain Elaborate -td $(NPC_BUILD_DIR)
 
 help:
 	mill -i __.test.runMain Elaborate --help
@@ -50,7 +50,7 @@ checkformat:
 	mill -i __.checkFormat
 
 clean:
-	-rm -rf $(BUILD_DIR)
+	-rm -rf $(NPC_BUILD_DIR)
 
 .PHONY: test verilog help compile bsp reformat checkformat clean
 
