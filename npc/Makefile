@@ -33,7 +33,6 @@ verilog:
 	$(call git_commit, "generate verilog")
 	mkdir -p $(NPC_BUILD_DIR)/sim
 	mill -i __.test.runMain Elaborate -td $(NPC_BUILD_DIR)
-	mv $(NPC_BUILD_DIR)/$(TOPNAME).v $(NPC_BUILD_DIR)/${USER_ID}_${TOPNAME}.v
 
 help:
 	mill -i __.test.runMain Elaborate --help

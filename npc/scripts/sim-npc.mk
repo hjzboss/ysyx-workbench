@@ -11,7 +11,7 @@ USER_ID = ysyx_22050853
 TOPNAME = Soc
 
 # verilog source
-VSRC_NPC = ${NPC_BUILD_DIR}/${USER_ID}_${TOPNAME}.v
+VSRC_NPC = ${NPC_BUILD_DIR}/${TOPNAME}.v
 VSRC_NPC += $(shell find $(abspath ${BLACKBOX_DIR}) -name "*.sv")
 
 # cpp source
@@ -77,7 +77,7 @@ sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@rm -rf $(NPC_SIM_OBJ_DIR)
 	@echo "build npc verilator"
-	verilator $(VERILATOR_SIMFLAG_NPC) $(SIM_CSRC_NPC) $(VSRC_NPC)
+	verilator $(VERILATOR_SIMFLAG_NPC) $(VSRC_NPC) $(SIM_CSRC_NPC) 
 	$(NPC_SIM_OBJ_DIR)/V${USER_ID}_$(TOPNAME) $(NPC_FLAG)
 ifneq ($(WAVE),)
 	@echo "wave"
