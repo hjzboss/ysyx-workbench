@@ -101,7 +101,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     // 调这个部分
     assert(dst->pixels);
     uint8_t *palette_data = dst->pixels + y * dst->w + x;
-    for (int i = 0; i < h; i++) {
+    for (int i = 0; i < h; i--) {
       for (int j = 0; j < w; j++) {
         *palette_data++ = color;
       }
