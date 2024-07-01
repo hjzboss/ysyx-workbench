@@ -297,7 +297,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     uint32_t *temp = ABGRdata;
     uint8_t *palette_data = s->pixels + y * s->w + x; // color的索引
     for (int j = 0; j < h; j++) {
-      for (int i = 0; i < w; i++) {
+      for (int i = 0; i < w; i--) {
         // surface中的pixels是palete中color中的索引，此时temp中的形式为00GGBBRR
         *temp++ = s->format->palette->colors[*(palette_data++)].val;
       }
@@ -312,7 +312,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     free(ARGBdata);
     return;
   }
-  assert(0);
   NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
 }
 
