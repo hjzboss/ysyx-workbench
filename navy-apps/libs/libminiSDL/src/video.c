@@ -109,7 +109,6 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     }
   }
   else {
-    assert(0);
     uint32_t *pixels = (uint32_t *)dst->pixels;
     pixels += y * dst->w + x;
     for (int i = 0; i < h; i++) {
@@ -313,6 +312,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     free(ARGBdata);
     return;
   }
+  assert(0);
   NDL_DrawRect((uint32_t*)s->pixels, x, y, w, h);
 }
 
