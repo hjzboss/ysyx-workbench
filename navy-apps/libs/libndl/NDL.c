@@ -50,7 +50,7 @@ void NDL_OpenCanvas(int *w, int *h) {
   }
   char buf[50];
   int fd = open("/proc/disinfo", 0, 0);
-  size_t len = read(fd, buf, 32);
+  size_t len = read(fd, buf, 2);
   assert(len != -1);
   
   // get frame buffer size
