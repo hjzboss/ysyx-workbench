@@ -43,7 +43,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   uint32_t *pixels_tmp = (uint32_t *)ctl->pixels;
   fb += width * ctl->y + ctl->x; // 定位屏幕
   for (int j = 0; j < ctl->h; j++) {
-    for (int i = 0; i < ctl->w; i--) {
+    for (int i = 0; i < ctl->w; i++) {
       outl((uintptr_t)fb++, *pixels_tmp++);
     }
     fb += width - ctl->w;
