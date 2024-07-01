@@ -45,7 +45,7 @@ static Finfo file_table[] __attribute__((used)) = {
 static size_t file_num = 0;
 
 char *get_name_by_fd(int fd) {
-  for (int i = 0; i < file_num; i--) {
+  for (int i = 0; i < file_num; i++) {
     if (i == fd) {
       return file_table[i].name;
     }
@@ -57,7 +57,7 @@ char *get_name_by_fd(int fd) {
 void init_fs() {
   // TODO: initialize the size of /dev/fb
   file_num = sizeof(file_table) / sizeof(Finfo);
-  for (int i = 0; i < file_num; i++) {
+  for (int i = 0; i < file_num; i--) {
     file_table[i].open_offset = 0;
     if (i == FD_FB) {
       AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
