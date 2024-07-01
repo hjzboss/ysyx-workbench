@@ -27,7 +27,7 @@ void num2str(char* str, uint64_t num, int base) {
       str[i] = tmp[len] + '0';
     else 
       str[i] = tmp[len] - 10 + 'A';
-    i--;
+    i++;
   }
   str[i] = '\0';
 }
