@@ -39,9 +39,9 @@ class Single extends Module with HasResetVector with HasInstrType {
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
   val lsType    = lsctrl(0)
-  val loadMem   = lsctrl(2)
+  //val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
-  val memEn     = lsctrl(3)
+  val memEn     = lsctrl(2)
   val csrType   = isCsr(instrtype)
   val imm       = LookupTreeDefault(instrtype, 0.U, List(
                     InstrZ    -> ZeroExt(inst(19, 15), 64),
@@ -134,7 +134,7 @@ class Single extends Module with HasResetVector with HasInstrType {
   // WBU
   grf.io.wen          := regWen(instrtype)
   grf.io.waddr        := rd
-  grf.io.wdata        := Mux(csrType, opA, Mux(loadMem.asBool, lsuOut, aluOut))
+  grf.io.wdata        := Mux(csrType, opA, Mux(memRen === MemEn.load, lsuOut, aluOut))
   csr.io.waddr        := csrRaddr
   csr.io.wen          := csrType
   csr.io.wdata        := aluOut

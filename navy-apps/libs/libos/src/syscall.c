@@ -74,6 +74,7 @@ void *_sbrk(intptr_t increment) {
     old_brk = (intptr_t)&_end;
   }
   intptr_t new_brk = old_brk + increment;
+  // TODO: 目前总是返回0
   assert(_syscall_(SYS_brk, new_brk, 0, 0) == 0);
   intptr_t old_brk_tmp = old_brk;
   // 更新program break，返回旧的program break

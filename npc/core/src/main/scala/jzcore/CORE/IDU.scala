@@ -28,7 +28,7 @@ class IDU extends Module with HasInstrType{
     val aluCtrl   = new AluIO
     val ctrl      = new CtrlFlow
 
-    // 写回ifu,todo:需要移动到idu阶段
+    // 写回ifu
     val redirect  = new RedirectIO
 
     val rs1       = Output(UInt(5.W))
@@ -69,9 +69,9 @@ class IDU extends Module with HasInstrType{
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
   val lsType    = lsctrl(0)
-  val loadMem   = lsctrl(2)
+  //val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
-  val memEn     = lsctrl(3)
+  val memEn     = lsctrl(2)
   val csrType   = isCsr(instrtype)
   val imm       = LookupTreeDefault(instrtype, 0.U, List(
                     InstrZ    -> ZeroExt(inst(19, 15), 64),
@@ -178,7 +178,7 @@ class IDU extends Module with HasInstrType{
   io.ctrl.rd          := rd
   io.ctrl.regWen      := regWen(instrtype) & !int
   io.ctrl.lsType      := lsType
-  io.ctrl.loadMem     := loadMem
+  //io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.csrWen      := csrType & !int
   io.ctrl.csrWaddr    := csrRaddr

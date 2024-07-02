@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 
 // 集中式控制模块
+// 流水线寄存器中停顿优先级大于刷新
 class CTRL extends Module {
   val io = IO(new Bundle {
     val icStall     = Input(Bool())
@@ -46,7 +47,11 @@ class CTRL extends Module {
 
   val branch      = io.branch & ~io.brUse // 当出现brUse时说明操作数还没准备好，并不是真正的跳转有效
 
-  // 当取指未完成时停顿之前所有阶段，当前面指令有csr操作是时候停顿后面阶段pc的指令
+  // 当icache取指未完成时停顿之前所有阶段
+  // 当前面指令有csr操作是时候停顿后面阶段pc的指令
+  // 当lsu没有访存完成，或者exu没有执行完成都要停顿之前所有阶段
+  // 发现load-use也要停一拍
+  // 发现分支指令存在数据依赖也要停顿
   io.stallICache := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
   io.stallPc     := !io.lsuReady | loadUse | (io.icStall & !branch) | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse
   io.stallIduReg := !io.lsuReady | loadUse | !io.exuReady | io.exuCsr | io.lsuCsr | io.wbuCsr | io.brUse

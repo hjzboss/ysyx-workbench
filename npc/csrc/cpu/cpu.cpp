@@ -19,8 +19,6 @@ static struct timeval boot_time = {};
 // 设置是否访问了外设，如果在指令执行过程中访问了外设，就设为1；然后在下次执行的时候就会调用difftest_skip_ref
 static bool visit_device = false;
 
-uint64_t device_update_cnt = 0; // 设备更新计数器
-
 CPUState npc_cpu = {};
 
 IFDEF(CONFIG_MTRACE, void free_mtrace());
@@ -343,6 +341,7 @@ static void cpu_exec_once() {
   isa_exec_once(&pc, &npc_cpu.pc, &lsFlag, &npc_cpu.inst);
 #ifdef CONFIG_DIFFTEST
   // 由于访存会在lsu阶段产生，会提前设置visit_device信号，因此要用个lsflag信号
+  // TODO: 遇见连续的访存指令可能漏侦测
   if (visit_device && lsFlag) {
     difftest_skip_ref();
     visit_device = false;
@@ -382,7 +381,6 @@ void execute(uint64_t n) {
     trace_and_difftest();
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
-    device_update_cnt = 0;
   }
 }
 
@@ -398,7 +396,8 @@ static void statistic() {
     if(g_timer >= 1000000) Log("CPU frequency: %ld HZ", cycle / (g_timer / 1000000));
     Log("IPC = %lf", (total_inst / 1.0) / cycle);
   }
-  else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
+  else 
+    Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 
   // perf
   Log("icache hit rate = %lf, hit = %ld, req = %ld", (cpu_perf.icachehit / 1.0) / cpu_perf.icachereq, cpu_perf.icachehit, cpu_perf.icachereq);

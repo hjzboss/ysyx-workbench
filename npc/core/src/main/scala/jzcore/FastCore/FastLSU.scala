@@ -69,7 +69,7 @@ class FastLSU extends Module {
   pc                    := io.in.pc
 
   io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, lsuOut)
-  io.out.loadMem        := io.in.loadMem
+  io.out.loadMem        := io.in.lsuRen
   io.out.exuOut         := io.in.exuOut
   io.out.rd             := io.in.rd
   io.out.regWen         := io.in.regWen

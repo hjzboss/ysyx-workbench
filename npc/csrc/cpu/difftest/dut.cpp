@@ -22,6 +22,7 @@ NEMUCPUState cpu_diff = {};
 
 static void checkregs(NEMUCPUState *ref) {
   bool same = true;
+  // gpr+pc+csr
   int list_len = 33 + CSR_NUM;
   bool err_list[list_len] = {};
   // check next pc

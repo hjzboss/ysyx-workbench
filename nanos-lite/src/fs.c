@@ -13,10 +13,10 @@ typedef size_t (*WriteFn) (const void *buf, size_t offset, size_t len);
 typedef struct {
   char *name;
   size_t size;
-  size_t disk_offset;
+  size_t disk_offset; // 文件在磁盘中的偏移量
   ReadFn read;
   WriteFn write;
-  size_t open_offset; // 当前读写的位置
+  size_t open_offset; // 当前读写的位置偏移量
 } Finfo;
 
 enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_FB, FD_DISINFO, FD_EVENTS};
@@ -64,13 +64,14 @@ void init_fs() {
       // 初始化显存的大小，每个像素32位(4字节)
       // 每个像素是`00rrggbb`的形式, 8位颜色
       file_table[i].size = cfg.width * cfg.height * 4;
+      Log("nanos initial gpu size: %u, width=%d, height=%d", file_table[i].size, cfg.width, cfg.height);
     }
   }
 }
 
 // 返回文件的编号
 int fs_open(const char *pathname, int flags, int mode) {
-  for (int i = 3; i < file_num; i++) {
+  for (int i = FD_FB; i < file_num; i++) {
     if (strcmp(file_table[i].name, pathname) == 0) {
       return i;
     }

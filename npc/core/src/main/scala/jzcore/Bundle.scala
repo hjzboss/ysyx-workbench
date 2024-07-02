@@ -151,7 +151,7 @@ class CtrlFlow extends Bundle {
   val rd            = Output(UInt(5.W)) // 目的寄存器
   val regWen        = Output(Bool()) // 寄存器写使能
   val lsType        = Output(UInt(4.W)) // 访存指令类型
-  val loadMem       = Output(Bool()) // 写回的值是否来自存储器
+  //val loadMem       = Output(Bool()) // 写回的值是否来自存储器
   val wmask         = Output(UInt(8.W)) // 写腌码
   val csrWen        = Output(Bool()) // csr写使能
   val csrWaddr      = Output(UInt(12.W))
@@ -175,7 +175,7 @@ class ExuOut extends Bundle {
   val lsuRen        = Output(Bool())
   val lsuAddr       = Output(UInt(32.W))
   val lsuWdata      = Output(UInt(64.W))
-  val loadMem       = Output(Bool())
+  //val loadMem       = Output(Bool())
 
   val exuOut        = Output(UInt(64.W))
   val rd            = Output(UInt(5.W))

@@ -23,7 +23,7 @@ class LS_REG extends Module with HasResetVector {
   exuOutReset.lsuRen      := false.B
   exuOutReset.lsuAddr     := 0.U(64.W)
   exuOutReset.lsuWdata    := 0.U(64.W)
-  exuOutReset.loadMem     := false.B
+  //exuOutReset.loadMem     := false.B
   exuOutReset.exuOut      := 0.U(64.W)
   exuOutReset.rd          := 0.U(5.W)
   exuOutReset.regWen      := false.B

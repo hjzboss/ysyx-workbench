@@ -16,9 +16,10 @@ int SDL_PushEvent(SDL_Event *ev) {
   return 0;
 }
 
+// 获取键盘信息
 int SDL_PollEvent(SDL_Event *ev) {
   char buf[64];
-  if (NDL_PollEvent(buf, sizeof(buf)) == 1) {
+  if (NDL_PollEvent(buf, sizeof(buf)) != 0) {
     char *keyname = strtok(buf, " ");
     int keycode = strtol(strtok(NULL, " "), NULL, 10);
     int keydown = strtol(strtok(NULL, " "), NULL, 10);

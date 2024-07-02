@@ -65,6 +65,7 @@ class Booth extends Mul {
     multiplier := multiplier
   }
 
+  // 乘数全0就停止
   io.out.valid         := state === busy & !multiplier.orR
   io.out.bits.resultLo := Mux(io.in.mulw, SignExt(result(31, 0), 64), result(63, 0))
   io.out.bits.resultHi := result(127, 64)

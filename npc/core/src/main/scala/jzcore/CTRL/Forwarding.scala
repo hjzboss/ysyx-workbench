@@ -10,7 +10,7 @@ class Forwarding extends Module {
     val exuRd     = Input(UInt(5.W))
     val exuRegWen = Input(Bool())
     val brUse     = Output(Bool()) // 分支指令依赖于执行阶段的计算结果
-    val loadMem   = Input(Bool())
+    val memRen    = Input(Bool())
 
     // 目的寄存器编号
     val lsuRd     = Input(UInt(5.W))
@@ -34,11 +34,11 @@ class Forwarding extends Module {
     val exForwardB = Output(Forward())
   })
 
-  // 当译码阶段分支计算的源操作数依赖于执行阶段的结果时停顿一拍，只旁路访存阶段和写回阶段的结果（利用流水线寄存器防止亚稳态）
+  // 当译码阶段分支计算的源操作数依赖于执行阶段的结果时停顿一拍，只旁路访存阶段和写回阶段的结果(为了减少运算单元的延迟)
   val exBrUse1 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs1
   val exBrUse2 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs2
-  val lsBrUse1 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1 && io.loadMem
-  val lsBrUse2 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2 && io.loadMem
+  val lsBrUse1 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1 && io.memRen
+  val lsBrUse2 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2 && io.memRen
   io.brUse := io.isBr & (exBrUse1 | exBrUse2 | lsBrUse1 | lsBrUse2)
 
   // idu阶段的旁路
@@ -46,14 +46,34 @@ class Forwarding extends Module {
   val idForwardBLsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2
   val idForwardAWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.idRs1
   val idForwardBWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.idRs2
-  io.idForwardA := Mux(idForwardALsu, Forward.lsuData, Mux(idForwardAWbu, Forward.wbuData, Forward.normal))
-  io.idForwardB := Mux(idForwardBLsu, Forward.lsuData, Mux(idForwardBWbu, Forward.wbuData, Forward.normal))
+  io.idForwardA := PriorityMux(Seq(
+    idForwardALsu -> Forward.lsuData,
+    idForwardAWbu -> Forward.wbuData,
+    true.B        -> Forward.normal
+  ))
+  io.idForwardB := PriorityMux(Seq(
+    idForwardBLsu -> Forward.lsuData,
+    idForwardBWbu -> Forward.wbuData,
+    true.B        -> Forward.normal
+  ))
+  //io.idForwardA := Mux(idForwardALsu, Forward.lsuData, Mux(idForwardAWbu, Forward.wbuData, Forward.normal))
+  //io.idForwardB := Mux(idForwardBLsu, Forward.lsuData, Mux(idForwardBWbu, Forward.wbuData, Forward.normal))
 
   // exu阶段的旁路
   val exForwardALsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.exRs1
   val exForwardBLsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.exRs2
   val exForwardAWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.exRs1
   val exForwardBWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.exRs2
-  io.exForwardA := Mux(exForwardALsu, Forward.lsuData, Mux(exForwardAWbu, Forward.wbuData, Forward.normal))
-  io.exForwardB := Mux(exForwardBLsu, Forward.lsuData, Mux(exForwardBWbu, Forward.wbuData, Forward.normal))
+  io.exForwardA := PriorityMux(Seq(
+    exForwardALsu -> Forward.lsuData,
+    exForwardAWbu -> Forward.wbuData,
+    true.B        -> Forward.normal
+  ))
+  io.exForwardB := PriorityMux(Seq(
+    exForwardBLsu -> Forward.lsuData,
+    exForwardBWbu -> Forward.wbuData,
+    true.B        -> Forward.normal
+  ))
+  //io.exForwardA := Mux(exForwardALsu, Forward.lsuData, Mux(exForwardAWbu, Forward.wbuData, Forward.normal))
+  //io.exForwardB := Mux(exForwardBLsu, Forward.lsuData, Mux(exForwardBWbu, Forward.wbuData, Forward.normal))
 }
