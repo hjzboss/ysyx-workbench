@@ -69,13 +69,13 @@ class Forwarding extends Module {
   val exForwardAWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.exRs1
   val exForwardBWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.exRs2
   io.exForwardA := PriorityMux(Seq(
-    idForwardALsu -> Forward.lsuData,
-    idForwardAWbu -> Forward.wbuData,
+    exForwardALsu -> Forward.lsuData,
+    exForwardAWbu -> Forward.wbuData,
     true.B        -> Forward.normal
   ))
   io.exForwardB := PriorityMux(Seq(
-    idForwardBLsu -> Forward.lsuData,
-    idForwardBWbu -> Forward.wbuData,
+    exForwardBLsu -> Forward.lsuData,
+    exForwardBWbu -> Forward.wbuData,
     true.B        -> Forward.normal
   ))
 
