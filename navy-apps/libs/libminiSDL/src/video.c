@@ -56,6 +56,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   }
   else {
     // 32
+    printf("fuck\n");
     uint32_t *src_pixels = (uint32_t *)src->pixels;
     uint32_t *dst_pixels = (uint32_t *)dst->pixels;
     assert(src_pixels && dst_pixels);
@@ -100,12 +101,12 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
   if (dst->format->BytesPerPixel == 1) {
     // 调这个部分
     assert(dst->pixels);
-    uint8_t *palette_data = dst->pixels + y * dst->w + x;
+    uint8_t *pixels = dst->pixels + y * dst->w + x;
     for (int i = 0; i < h; i++) {
       for (int j = 0; j < w; j++) {
-        *palette_data++ = color;
+        *pixels++ = color;
       }
-      palette_data += margin;
+      pixels += margin;
     }
   }
   else {
