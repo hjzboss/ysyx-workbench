@@ -64,7 +64,7 @@ void init_fs() {
       // 初始化显存的大小，每个像素32位(4字节)
       // 每个像素是`00rrggbb`的形式, 8位颜色
       file_table[i].size = cfg.width * cfg.height * 4;
-      Log("nanos initial gpu size: %lu, width=%d, height=%d", file_table[i].size, cfg.width, cfg.height);
+      Log("nanos initial gpu size: %u, width=%d, height=%d", file_table[i].size, cfg.width, cfg.height);
     }
   }
 }
