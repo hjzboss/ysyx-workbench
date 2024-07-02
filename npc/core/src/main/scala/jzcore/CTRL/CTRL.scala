@@ -65,4 +65,5 @@ class CTRL extends Module {
   io.flushIduReg := branch
   // 当发现是csr指令时进行刷新
   io.flushExuReg := loadUse | io.exuCsr | io.lsuCsr | io.wbuCsr
+}
 
