@@ -5,6 +5,8 @@ import chisel3.util._
 import utils._
 
 // 部分积生成器
+// assign p = ~(~(sel_negative & ~x) & ~(sel_double_negative & ~x_sub) 
+//           & ~(sel_positive & x ) & ~(sel_double_positive &  x_sub));
 sealed class PGenerator extends Module {
   val io = IO(new Bundle {
     val yAdd  = Input(Bool())
