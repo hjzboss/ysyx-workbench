@@ -67,7 +67,7 @@ class EXU extends Module {
   io.out.lsuRen        := io.ctrl.memRen
   io.out.lsuAddr       := aluOut(31, 0)
   io.out.lsuWdata      := opBPre
-  io.out.loadMem       := io.ctrl.loadMem
+  //io.out.loadMem       := io.ctrl.loadMem
   io.out.coherence     := io.ctrl.coherence
 
   // exu output

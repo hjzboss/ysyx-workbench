@@ -6,11 +6,11 @@ import chisel3.util._
 // 旁路单元
 class Forwarding extends Module {
   val io = IO(new Bundle {
-    //val isBr      = Input(Bool()) // idu, 检测出分支指令
+    val isBr      = Input(Bool()) // idu, 检测出分支指令
     val exuRd     = Input(UInt(5.W))
     val exuRegWen = Input(Bool())
-    //val brUse     = Output(Bool()) // 分支指令依赖于执行阶段的计算结果
-    //val loadMem   = Input(Bool())
+    val brUse     = Output(Bool()) // 分支指令依赖于执行阶段的计算结果
+    val memRen    = Input(Bool())
 
     // 目的寄存器编号
     val lsuRd     = Input(UInt(5.W))
@@ -34,28 +34,24 @@ class Forwarding extends Module {
     val exForwardB = Output(Forward())
   })
 
-  // 当译码阶段分支计算的源操作数依赖于执行阶段的结果时停顿一拍，只旁路访存阶段和写回阶段的结果（利用流水线寄存器防止亚稳态）
-  //val exBrUse1 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs1
-  //val exBrUse2 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs2
-  //val lsBrUse1 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1 && io.loadMem
-  //val lsBrUse2 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2 && io.loadMem
-  //io.brUse := io.isBr & (exBrUse1 | exBrUse2 | lsBrUse1 | lsBrUse2)
+  // 当译码阶段分支计算的源操作数依赖于执行阶段的结果时停顿一拍，只旁路访存阶段和写回阶段的结果(为了减少运算单元的延迟)
+  val exBrUse1 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs1
+  val exBrUse2 = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs2
+  val lsBrUse1 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1 && io.memRen
+  val lsBrUse2 = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2 && io.memRen
+  io.brUse := io.isBr & (exBrUse1 | exBrUse2 | lsBrUse1 | lsBrUse2)
 
   // idu阶段的旁路
   val idForwardALsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs1
   val idForwardBLsu = io.lsuRegWen && io.lsuRd =/= 0.U(5.W) && io.lsuRd === io.idRs2
   val idForwardAWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.idRs1
   val idForwardBWbu = io.wbuRegWen && io.wbuRd =/= 0.U(5.W) && io.wbuRd === io.idRs2
-  val idForwardAExu = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs1
-  val idForwardBExu = io.exuRegWen && io.exuRd =/= 0.U(5.W) && io.exuRd === io.idRs2
   io.idForwardA := PriorityMux(Seq(
-    idForwardAExu -> Forward.exuData,
     idForwardALsu -> Forward.lsuData,
     idForwardAWbu -> Forward.wbuData,
     true.B        -> Forward.normal
   ))
   io.idForwardB := PriorityMux(Seq(
-    idForwardBExu -> Forward.exuData,
     idForwardBLsu -> Forward.lsuData,
     idForwardBWbu -> Forward.wbuData,
     true.B        -> Forward.normal
@@ -78,7 +74,6 @@ class Forwarding extends Module {
     exForwardBWbu -> Forward.wbuData,
     true.B        -> Forward.normal
   ))
-
   //io.exForwardA := Mux(exForwardALsu, Forward.lsuData, Mux(exForwardAWbu, Forward.wbuData, Forward.normal))
   //io.exForwardB := Mux(exForwardBLsu, Forward.lsuData, Mux(exForwardBWbu, Forward.wbuData, Forward.normal))
 }

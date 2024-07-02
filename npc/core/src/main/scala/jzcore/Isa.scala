@@ -173,18 +173,18 @@ object RV64IM extends HasInstrType {
   )
 
   val lsTypeTable = Array(
-    LD      -> List(LsType.ld, Wmask.nop, RegWrite.loadMem, MemEn.load),
-    LW      -> List(LsType.lw, Wmask.nop, RegWrite.loadMem, MemEn.load),
-    LH      -> List(LsType.lh, Wmask.nop, RegWrite.loadMem, MemEn.load),
-    LB      -> List(LsType.lb, Wmask.nop, RegWrite.loadMem, MemEn.load),
-    LBU     -> List(LsType.lbu, Wmask.nop, RegWrite.loadMem, MemEn.load),
-    LHU     -> List(LsType.lhu, Wmask.nop, RegWrite.loadMem, MemEn.load),
-    LWU     -> List(LsType.lwu, Wmask.nop, RegWrite.loadMem, MemEn.load),
+    LD      -> List(LsType.ld, Wmask.nop, MemEn.load),
+    LW      -> List(LsType.lw, Wmask.nop, MemEn.load),
+    LH      -> List(LsType.lh, Wmask.nop, MemEn.load),
+    LB      -> List(LsType.lb, Wmask.nop, MemEn.load),
+    LBU     -> List(LsType.lbu, Wmask.nop, MemEn.load),
+    LHU     -> List(LsType.lhu, Wmask.nop, MemEn.load),
+    LWU     -> List(LsType.lwu, Wmask.nop, MemEn.load),
 
-    SD      -> List(LsType.sd, Wmask.double, RegWrite.loadAlu, MemEn.store),
-    SW      -> List(LsType.sw, Wmask.word, RegWrite.loadAlu, MemEn.store),
-    SH      -> List(LsType.sh, Wmask.half, RegWrite.loadAlu, MemEn.store),
-    SB      -> List(LsType.sb, Wmask.byte, RegWrite.loadAlu, MemEn.store),
+    SD      -> List(LsType.sd, Wmask.double, MemEn.store),
+    SW      -> List(LsType.sw, Wmask.word, MemEn.store),
+    SH      -> List(LsType.sh, Wmask.half, MemEn.store),
+    SB      -> List(LsType.sb, Wmask.byte, MemEn.store),
   )
 
   val systemCtrl = Array(
@@ -197,6 +197,6 @@ object Instruction extends HasInstrType {
   //def NOP = 0x00000013.U
   def NOP = 0x00000000.U
   val DecodeDefault = List(InstrN, SrcType.nul, SrcType.nul, AluOp.nop)
-  val LsDefault     = List(LsType.nop, Wmask.nop, RegWrite.loadAlu, MemEn.nop)
+  val LsDefault     = List(LsType.nop, Wmask.nop, MemEn.nop)
   val SystemDefault = List(System.nop)
 }

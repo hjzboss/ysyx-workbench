@@ -37,7 +37,6 @@ class IDU extends Module with HasInstrType{
     // 旁路数据
     val lsuForward  = Input(UInt(64.W))
     val wbuForward  = Input(UInt(64.W))
-    val exuForward  = Input(UInt(64.W))
 
     val forwardA  = Input(Forward())
     val forwardB  = Input(Forward())
@@ -70,9 +69,9 @@ class IDU extends Module with HasInstrType{
   val aluSrc1   = ctrlList(1)
   val aluSrc2   = ctrlList(2)
   val lsType    = lsctrl(0)
-  val loadMem   = lsctrl(2)
+  //val loadMem   = lsctrl(2)
   val wmask     = lsctrl(1)
-  val memEn     = lsctrl(3)
+  val memEn     = lsctrl(2)
   val csrType   = isCsr(instrtype)
   val imm       = LookupTreeDefault(instrtype, 0.U, List(
                     InstrZ    -> ZeroExt(inst(19, 15), 64),
@@ -116,13 +115,11 @@ class IDU extends Module with HasInstrType{
   // branch detected
   // forward
   val opA = LookupTreeDefault(io.forwardA, grf.io.src1, List(
-    Forward.exuData     -> io.exuForward,
     Forward.lsuData     -> io.lsuForward,
     Forward.wbuData     -> io.wbuForward,
     Forward.normal      -> grf.io.src1
   ))
   val opB = LookupTreeDefault(io.forwardB, grf.io.src2, List(
-    Forward.exuData     -> io.exuForward,
     Forward.lsuData     -> io.lsuForward,
     Forward.wbuData     -> io.wbuForward,
     Forward.normal      -> grf.io.src2
@@ -181,14 +178,14 @@ class IDU extends Module with HasInstrType{
   io.ctrl.rd          := rd
   io.ctrl.regWen      := regWen(instrtype) & !int
   io.ctrl.lsType      := lsType
-  io.ctrl.loadMem     := loadMem
+  //io.ctrl.loadMem     := loadMem
   io.ctrl.wmask       := wmask
   io.ctrl.csrWen      := csrType & !int
   io.ctrl.csrWaddr    := csrRaddr
   // ecall优先级大于clint
   io.ctrl.excepNo     := Mux(systemCtrl === System.ecall, "hb".U(64.W), Mux(csr.io.int, true.B ## 7.U(63.W), 0.U)) // todo: only syscall and timer
   io.ctrl.exception   := exception // type of exception
-  io.ctrl.csrChange   := instrtype === InstrE | io.ctrl.csrWen | int // change csr status(include mret), TODO
+  io.ctrl.csrChange   := instrtype === InstrE | io.ctrl.csrWen | int // change csr status(include mret)
   io.ctrl.mret        := systemCtrl === System.mret // change mstatus
   io.ctrl.memWen      := memEn === MemEn.store & !int
   io.ctrl.memRen      := memEn === MemEn.load & !int
