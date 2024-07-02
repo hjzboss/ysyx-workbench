@@ -135,6 +135,7 @@ object Forward {
   def normal      = "b00".U
   def lsuData     = "b01".U
   def wbuData     = "b10".U
+  def exuData     = "b11".U
 
   def apply() = UInt(2.W)
 }

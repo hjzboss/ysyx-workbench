@@ -25,7 +25,7 @@ uint32_t NDL_GetTicks() {
 int NDL_PollEvent(char *buf, int len) {
   // keyboard input
   int fd = open("/dev/events", 0, 0);
-  return read(fd, buf, len) == 0 ? 0 : 1;
+  return read(fd, buf, len) != 0;
 }
 
 // 打开一张(*w) X (*h)的画布
@@ -50,7 +50,7 @@ void NDL_OpenCanvas(int *w, int *h) {
   }
   char buf[50];
   int fd = open("/proc/disinfo", 0, 0);
-  size_t len = read(fd, buf, 2);
+  size_t len = read(fd, buf, 32);
   assert(len != -1);
   
   // get frame buffer size

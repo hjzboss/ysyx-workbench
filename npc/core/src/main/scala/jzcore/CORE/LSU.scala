@@ -25,6 +25,7 @@ class LSU extends Module {
     // clint接口
     val clintIO     = Flipped(new ClintIO)
 
+    // 仿真环境
     val lsFlag        = if(Settings.get("sim")) Some(Output(Bool())) else None
   })
 
@@ -53,11 +54,12 @@ class LSU extends Module {
   val cacheable = if(Settings.get("sim")) { addr =/= 0xa0000048L.U && addr =/= 0xa0000050L.U && addr =/= 0xa0000100L.U && addr =/= 0xa0000080L.U && addr =/= 0xa00003f8L.U && addr =/= 0xa0000108L.U && !(addr >= 0xa1000000L.U && addr <= 0xa2000000L.U) } else { addr <= "hffff_ffff".U && addr >= "h8000_0000".U }
   var flash = addr <= "h3fff_ffff".U && addr >= "h3000_0000".U
 
+  // 控制信息阶段
   io.dcacheCtrl.valid           := state === ctrl
   io.dcacheCtrl.bits.wen        := writeTrans
   io.dcacheCtrl.bits.addr       := addr
   io.dcacheCtrl.bits.cacheable  := cacheable
-  // 指定cache访问axi的size
+  // 指定cache访问axi的size，访问内存的宽度为64位，外设访问的宽度由软件控制
   val size                      = LookupTree(io.in.lsType, Seq(
                                       LsType.ld   -> AxiWidth.double,
                                       LsType.lw   -> AxiWidth.word,
@@ -78,6 +80,7 @@ class LSU extends Module {
   io.dcacheWrite.valid          := state === data
 
   if(Settings.get("sim")) {
+    // 写数据64位对齐
     io.dcacheWrite.bits.wdata     := io.in.lsuWdata << (ZeroExt(addr(2, 0), 6) << 3.U)
     io.dcacheWrite.bits.wmask     := io.in.wmask << addr(2, 0)
   } else {
@@ -97,6 +100,7 @@ class LSU extends Module {
   // 数据对齐
   val align64            = Cat(addr(2, 0), 0.U(3.W))
   val align32            = Mux(flash, Cat(addr(1, 0), 0.U(3.W)), 0.U) // todo: sdram的访问可能需要配置
+  // 64位对齐或者32位对齐（soc）
   val rdata              = if(Settings.get("sim")) { io.dcacheRead.bits.rdata >> align64 } else { Mux(cacheable, io.dcacheRead.bits.rdata >> align64, io.dcacheRead.bits.rdata >> align32) }
   val lsuOut             = LookupTree(io.in.lsType, Seq(
                             LsType.ld   -> rdata,
@@ -116,6 +120,7 @@ class LSU extends Module {
   val pc                 = dontTouch(Wire(UInt(32.W)))
   pc                    := io.in.pc
 
+  // wbu
   io.out.lsuOut         := Mux(clintSel, io.clintIO.rdata, lsuOut)
   io.out.loadMem        := io.in.loadMem
   io.out.exuOut         := io.in.exuOut
@@ -128,13 +133,13 @@ class LSU extends Module {
   io.out.csrWen         := io.in.csrWen
   io.out.csrValue       := io.in.csrValue
   io.out.mret           := io.in.mret
+  // ctrl
   io.out.csrChange      := io.in.csrChange
-
   io.ready              := (state === idle && !(readTrans || writeTrans) && !io.in.coherence) || (state === data && (readFire || writeFire)) || (state === coherence && coherenceFire) || clintSel
 
   if(Settings.get("sim")) {
     // 传给仿真环境，用于外设访问的判定
-    io.lsFlag.get           := io.in.lsuRen || io.in.lsuWen
+    io.lsFlag.get           := io.in.lsuRen | io.in.lsuWen
     io.out.ebreak.get       := io.in.ebreak.get
     io.out.haltRet.get      := io.in.haltRet.get
   }

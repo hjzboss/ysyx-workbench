@@ -113,7 +113,7 @@ class JzCore extends Module {
   ctrl.io.lsuReady    <> lsu.io.ready
   ctrl.io.exuReady    <> exu.io.ready
   ctrl.io.branch      := idu.io.redirect.valid
-  ctrl.io.brUse       <> forward.io.brUse
+  //ctrl.io.brUse       <> forward.io.brUse
   ctrl.io.stallICache <> icache.io.stallIn
   idReg.io.stall      := ctrl.io.stallIduReg
   idu.io.stall        := ctrl.io.stallIduReg
@@ -138,7 +138,7 @@ class JzCore extends Module {
   forward.io.idRs2    := idu.io.rs2
   forward.io.exRs1    := exReg.io.ctrlOut.rs1
   forward.io.exRs2    := exReg.io.ctrlOut.rs2
-  forward.io.loadMem  := lsReg.io.out.loadMem
+  //forward.io.loadMem  := lsReg.io.out.loadMem
 
   idu.io.in         <> idReg.io.out
   idu.io.regWrite   <> wbu.io.regWrite
@@ -146,11 +146,12 @@ class JzCore extends Module {
   idu.io.datasrc    <> exReg.io.datasrcIn
   idu.io.aluCtrl    <> exReg.io.aluCtrlIn
   idu.io.ctrl       <> exReg.io.ctrlIn
-  idu.io.isBr       <> forward.io.isBr
+  //idu.io.isBr       <> forward.io.isBr
   idu.io.forwardA   <> forward.io.idForwardA
   idu.io.forwardB   <> forward.io.idForwardB
   idu.io.lsuForward := lsReg.io.out.exuOut
   idu.io.wbuForward := wbu.io.regWrite.value
+  idu.io.exuForward := exu.io.out.exuOut
 
   exu.io.datasrc    <> exReg.io.datasrcOut
   exu.io.aluCtrl    <> exReg.io.aluCtrlOut
