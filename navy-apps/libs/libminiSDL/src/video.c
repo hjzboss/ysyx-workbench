@@ -56,7 +56,6 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   }
   else {
     // 32
-    printf("fuck\n");
     uint32_t *src_pixels = (uint32_t *)src->pixels;
     uint32_t *dst_pixels = (uint32_t *)dst->pixels;
     assert(src_pixels && dst_pixels);
