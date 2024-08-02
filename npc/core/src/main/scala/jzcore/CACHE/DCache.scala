@@ -214,8 +214,6 @@ sealed class CohDCache extends DCache {
   }.elsewhen(state === coherence1 && !ramCen.asUInt.orR) {
     // 当这一组没有要写回的块，指针递增
     cohIdx := cohIdx + 1.U
-  }.elsewhen(state === writeback2 && brespFire && io.coherence.valid) {
-    cohIdx := cohIdx + 1.U
   }.otherwise {
     cohIdx := cohIdx
   }
