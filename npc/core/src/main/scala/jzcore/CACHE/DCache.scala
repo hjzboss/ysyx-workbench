@@ -186,7 +186,7 @@ sealed class CohDCache extends DCache {
 
   // -----------------------------------coherence---------------------------------------
   // 逐行检查，逐行写回，最少需要64个cycle完成一次同步
-  (0 to 3).map(i => (dirtyList(i) := metaArray(cohIdx).dirty & metaArray(cohIdx).valid))
+  (0 to 3).map(i => (dirtyList(i) := metaArray(i)(cohIdx).dirty & metaArray(i)(cohIdx).valid))
 
   // 组内块读取固定优先级
   ramCen(0) := dirtyList(0)
