@@ -241,6 +241,7 @@ sealed class CohDCache extends DCache {
     }
   }
 
+  // 计数器溢出时一致性结束
   io.coherence.ready := cohIdx(6)
 
 /*
