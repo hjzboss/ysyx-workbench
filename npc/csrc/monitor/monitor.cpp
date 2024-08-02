@@ -93,20 +93,11 @@ void init_monitor(int argc, char *argv[]) {
   /* Parse arguments. */
   parse_args(argc, argv);
 
-  /* Initialize devices. */
-  //IFDEF(CONFIG_DEVICE, init_device());
-
   IFDEF(CONFIG_FTRACE, init_elf(elf_file));
 
   npc_init_log(log_file);
 
-  /* Perform ISA dependent initialization. */
-  //init_isa();
-  
   long size = init_cpu(img_file);
-
-  /* Load the image to memory. This will overwrite the built-in image. */
-  //long img_size = load_img();
 
   /* Initialize differential testing. */
   IFDEF(CONFIG_DIFFTEST, init_difftest(diff_so_file, size));
@@ -114,12 +105,9 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize the simple debugger. */
   init_sdb();
 
-
   IFDEF(CONFIG_ITRACE, init_disasm("riscv64" "-pc-linux-gnu"));
 
   IFDEF(CONFIG_ITRACE, init_iringbuf());
-
-  
 
   /* Display welcome message. */
   welcome();

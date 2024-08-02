@@ -6,6 +6,7 @@ import utils._
 
 /**
   * axi请求仲裁器，仲裁策略是lsu优先
+  * 一周期req，一周期grant
   */
 class AxiArbiter extends Module {
   val io = IO(new Bundle {
@@ -44,10 +45,11 @@ class AxiArbiter extends Module {
   ifuReqReg := Mux(state === idle, ifuReq, ifuReqReg)
   lsuReqReg := Mux(state === idle, lsuReq, lsuReqReg)
 
-  // 仲裁
+  // 仲裁，当前请求未完成时保持grant对象
   io.grantIfu := (state === grant && ifuReqReg) || (state === idle && ifuReq)
   io.grantLsu := (state === grant && lsuReqReg) || (state === idle && lsuReq)
 
+  // 将核的axi master接给仲裁的master，将另一个master置空
   when(io.grantLsu) {    
     io.master <> io.master1
     io.master0.rvalid := false.B

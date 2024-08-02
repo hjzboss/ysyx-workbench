@@ -37,7 +37,7 @@ class JzCore extends Module {
   val ctrl    = Module(new CTRL)
   val arbiter = Module(new AxiArbiter) // todo:仲裁器
   val icache  = Module(new ICache)
-  val dcache  = Module(new NoCohDCache)
+  val dcache  = Module(new CohDCache)
   val clint   = Module(new Clint)
 
   val idReg   = Module(new ID_REG)
@@ -80,16 +80,16 @@ class JzCore extends Module {
   io.slave.rlast  := false.B
 
   // ram, dataArray
-  icache.io.sram0       <> io.sram0
-  icache.io.sram1       <> io.sram1
-  icache.io.sram2       <> io.sram2
-  icache.io.sram3       <> io.sram3
+  icache.io.sram0     <> io.sram0
+  icache.io.sram1     <> io.sram1
+  icache.io.sram2     <> io.sram2
+  icache.io.sram3     <> io.sram3
 
   // dcache
-  dcache.io.sram4       <> io.sram4
-  dcache.io.sram5       <> io.sram5
-  dcache.io.sram6       <> io.sram6
-  dcache.io.sram7       <> io.sram7
+  dcache.io.sram4     <> io.sram4
+  dcache.io.sram5     <> io.sram5
+  dcache.io.sram6     <> io.sram6
+  dcache.io.sram7     <> io.sram7
 
   ifu.io.out          <> icache.io.cpu2cache
   icache.io.cache2cpu <> idReg.io.in

@@ -18,7 +18,7 @@ object DefaultSettings {
     "core"        -> "normal", // single, fast, normal
     "btb_num"     -> 64, // btb entry num
     "ras_num"     -> 8, // ras entry num
-    "perf"        -> false // 性能采集模块
+    "perf"        -> false // performance unit
   )
 }
 
