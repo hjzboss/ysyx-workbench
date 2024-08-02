@@ -303,7 +303,7 @@ sealed class CohDCache extends DCache {
 
   // 分配时锁存第一次读取的数据（burst）
   val rburstFirstDataReg   = RegInit(0.U(64.W)) 
-  rburstFirstDataReg      := Mux(state === rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg)
+  rburstFirstDataReg      := Mux(state === allocate2 && rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg)
   /*
   rburstFirstDataReg      := MuxLookup(state, rburstFirstDataReg, List(
                               allocate1 -> 0.U,
@@ -711,9 +711,9 @@ class NoCohDCache extends DCache {
 
   val rburstFirstDataReg         = RegInit(0.U(64.W))
   rburstFirstDataReg            := MuxLookup(state, rburstFirstDataReg, List(
-                              allocate1 -> 0.U(64.W),
-                              allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg)
-                            ))
+                                    allocate1 -> 0.U(64.W),
+                                    allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg)
+                                  ))
   val wburst = RegInit(0.U(2.W))
   when(state === tagCompare) {
     wburst := 0.U(2.W)
