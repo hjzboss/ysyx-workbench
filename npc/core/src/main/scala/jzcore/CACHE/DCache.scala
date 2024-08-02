@@ -6,12 +6,26 @@ import utils._
 import top.Settings
 import chisel3.util.experimental.BoringUtils
 
+/*
 class ArbiterIO extends Bundle {
   //val cen   = Output(Vec(len, Bool())) // valid & dirty
   val no    = Output(UInt(2.W))
   val index = Output(UInt(6.W))
   val tag   = Output(UInt(22.W))
 }
+
+// 一致性写回的多路选择器（仲裁）
+class CohArbiter(len: Int) extends Module {
+  val io = IO(new Bundle {
+    val in = Vec(len, Flipped(Decoupled(new ArbiterIO)))
+    val out = Decoupled(new ArbiterIO)
+  })
+
+  val arbiter = Module(new Arbiter(new ArbiterIO, len))
+  arbiter.io.in <> io.in
+  arbiter.io.out <> io.out
+}
+*/
 
 class DCacheIO extends Bundle {
   // cpu
@@ -39,18 +53,6 @@ abstract class DCache extends Module {
   val io = IO(new DCacheIO)
 }
 
-// 一致性写回的多路选择器（仲裁）
-class CohArbiter(len: Int) extends Module {
-  val io = IO(new Bundle {
-    val in = Vec(len, Flipped(Decoupled(new ArbiterIO)))
-    val out = Decoupled(new ArbiterIO)
-  })
-
-  val arbiter = Module(new Arbiter(new ArbiterIO, len))
-  arbiter.io.in <> io.in
-  arbiter.io.out <> io.out
-}
-
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 // 支持一致性的dcache
 sealed class CohDCache extends DCache {
@@ -69,6 +71,13 @@ sealed class CohDCache extends DCache {
   val index              = Wire(UInt(6.W))
   val align              = Wire(Bool())
   val wtag               = RegInit(0.U(22.W)) // dirty block的tag
+
+  // cache一致性
+  val cohIdx             = RegInit(0.U(7.W))
+  val dirtyList          = VecInit(0.U(4.W))
+  val ramCen             = VecInit(List.fill(4)(false.B))
+  val ramCenReg          = RegInit(0.U(4.W))
+  val cohAddrReg         = RegInit(0.U(32.W))
 
   // axi fire
   val raddrFire          = io.master.arvalid && io.master.arready
@@ -96,8 +105,8 @@ sealed class CohDCache extends DCache {
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // write addr
     writeback2  -> Mux(brespFire && (io.master.bresp === okay || io.master.bresp === exokay), Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // read addr 
-    allocate2   -> Mux(rdataFire && io.master.rlast && (io.master.rresp === okay || io.master.rresp === okay), data, allocate2), // data
-    coherence1  -> Mux(coherenceFire, idle, coherence2),
+    allocate2   -> Mux(rdataFire && io.master.rlast, data, allocate2), // data
+    coherence1  -> Mux(coherenceFire, idle, Mux(!ramCen.asUInt.orR, coherence1, coherence2)), // 当本次没有脏块，则递增指针，保持状态
     coherence2  -> writeback1, // data array read
   ))
 
@@ -121,7 +130,7 @@ sealed class CohDCache extends DCache {
 
   victimWay          := Mux(state === tagCompare, randCount, victimWay) // 锁存随机替换索引
 
-  // meta data
+  // meta array
   val metaInit        = Wire(new MetaData)
   metaInit.valid     := false.B
   metaInit.dirty     := false.B
@@ -176,6 +185,65 @@ sealed class CohDCache extends DCache {
   }
 
   // -----------------------------------coherence---------------------------------------
+  // 逐行检查，逐行写回，最少需要64个cycle完成一次同步
+  (0 to 3).map(i => (dirtyList(i) := metaArray(cohIdx).dirty & metaArray(cohIdx).valid))
+
+  // 组内块读取固定优先级
+  ramCen(0) := dirtyList(0)
+  ramCen(1) := !dirtyList(0) & dirtyList(1)
+  ramCen(2) := !dirtyList(0) & !dirtyList(1) & dirtyList(2)
+  ramCen(3) := !dirtyList(0) & !dirtyList(1) & !dirtyList(2) & dirtyList(3)
+
+  // 锁存组号
+  ramCenReg := Mux(state === coherence1, ramCen.asUInt, ramCenReg)
+  // 锁存写回地址
+  when(state === coherence2) {
+    cohAddrReg := cohAddrReg
+    switch(ramCenReg) {
+      is(1.U) cohAddrReg := metaArray(0)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
+      is(2.U) cohAddrReg := metaArray(1)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
+      is(4.U) cohAddrReg := metaArray(2)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
+      is(8.U) cohAddrReg := metaArray(3)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
+    }
+  }
+
+  when((state === idle && io.coherence.valid) || (state === coherence1 && coherenceFire)) {
+    // 初始化指针
+    cohIdx := 0.U
+  }.elsewhen(state === coherence1 && !ramCen.asUInt.orR) {
+    // 当这一组没有要写回的块，指针递增
+    cohIdx := cohIdx + 1.U
+  }.elsewhen(state === writeback2 && brespFire && io.coherence.valid) {
+    cohIdx := cohIdx + 1.U
+  }.otherwise {
+    cohIdx := cohIdx
+  }
+
+  // flush meta array
+  when(state === writeback2 && brespFire && io.coherence.valid) {
+    switch(ramCenReg) {
+      is(1.U) {
+        metaArray(0)(cohIdx).valid := false.B
+        metaArray(0)(cohIdx).dirty := false.B
+      }
+      is(2.U) {
+        metaArray(1)(cohIdx).valid := false.B
+        metaArray(1)(cohIdx).dirty := false.B
+      }
+      is(4.U) {
+        metaArray(2)(cohIdx).valid := false.B
+        metaArray(2)(cohIdx).dirty := false.B
+      }
+      is(8.U) {
+        metaArray(3)(cohIdx).valid := false.B
+        metaArray(3)(cohIdx).dirty := false.B
+      }
+    }
+  }
+
+  io.coherence.ready := cohIdx(6)
+
+/*
   val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
   val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
   for(i <- 0 to 63; j <- 0 to 3) {
@@ -221,6 +289,7 @@ sealed class CohDCache extends DCache {
   val colOver = Wire(Bool()) // coherence over
   colOver := !(arbList64(0).io.out.valid | arbList64(1).io.out.valid | arbList64(2).io.out.valid | arbList64(3).io.out.valid)
   io.coherence.ready := colOver
+*/
 
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
@@ -243,7 +312,8 @@ sealed class CohDCache extends DCache {
                   ))
     }
   }.elsewhen(state === coherence2) {
-    dataBlock := LookupTree(ramCen.asUInt, List(
+    // 锁存一致性脏块
+    dataBlock := LookupTree(ramCenReg, List(
                     0.U   -> dataBlock,
                     1.U   -> io.sram4.rdata,
                     2.U   -> io.sram5.rdata,
@@ -252,28 +322,6 @@ sealed class CohDCache extends DCache {
                   ))
   }.otherwise {
     dataBlock := dataBlock
-  }
-
-  // flush mate array
-  when(state === writeback2 && brespFire && io.coherence.valid) {
-    switch(colNoReg) {
-      is(0.U) {
-        metaArray(0)(colIndexReg).valid := false.B
-        metaArray(0)(colIndexReg).dirty := false.B
-      }
-      is(1.U) {
-        metaArray(1)(colIndexReg).valid := false.B
-        metaArray(1)(colIndexReg).dirty := false.B
-      }
-      is(2.U) {
-        metaArray(2)(colIndexReg).valid := false.B
-        metaArray(2)(colIndexReg).dirty := false.B
-      }
-      is(3.U) {
-        metaArray(3)(colIndexReg).valid := false.B
-        metaArray(3)(colIndexReg).dirty := false.B
-      }
-    }
   }
 
   // ----------------------------write back and allocate--------------------------------
@@ -302,14 +350,8 @@ sealed class CohDCache extends DCache {
   axiDirectReadReg        := Mux(rState === data_trans && rdataFire, io.master.rdata, axiDirectReadReg) // 外设读取时的数据锁存
 
   // 分配时锁存第一次读取的数据（burst）
-  val rburstFirstDataReg   = RegInit(0.U(64.W)) 
+  val rburstFirstDataReg   = RegInit(0.U(64.W))
   rburstFirstDataReg      := Mux(state === allocate2 && rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg)
-  /*
-  rburstFirstDataReg      := MuxLookup(state, rburstFirstDataReg, List(
-                              allocate1 -> 0.U,
-                              allocate2 -> Mux(rdataFire && !io.master.rlast, io.master.rdata, rburstFirstDataReg) // 当burst传输时锁存第一次传输的读数据
-                            ))
-                            */
 
   // 写传输次数统计
   val wburst = RegInit(0.U(2.W))
@@ -325,10 +367,10 @@ sealed class CohDCache extends DCache {
 
   // axi写
   // 写地址与写数据阶段重合
-  val cohAddr             = Cat(colTagReg, colIndexReg, 0.U(4.W)) // 一致性写回的地址
+  //val cohAddr             = Cat(colTagReg, colIndexReg, 0.U(4.W)) // 一致性写回的地址
   val wbAddr              = Cat(wtag, burstAddr(9, 0)) // 普通写回的地址，由dirty tag ++ burstAddr(index+align)合成
   io.master.awvalid      := state === writeback1 || wState === addr_trans
-  io.master.awaddr       := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, cohAddr, wbAddr), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)) // 一致性写回，普通写回，写
+  io.master.awaddr       := Mux(state === writeback1 || state === writeback2, Mux(io.coherence.valid, cohAddrReg, wbAddr), Mux(io.ctrlIO.bits.cacheable, burstAddr, addr)) // 一致性写回，普通写回，写
   // cache块是128位，两次64位的传输；其余情况都只进行一次传输
   io.master.awlen        := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 1.U(8.W), 0.U(8.W))
   io.master.awburst      := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 2.U, 0.U)
@@ -390,13 +432,13 @@ sealed class CohDCache extends DCache {
   io.sram7.wmask  := ~0.U(128.W)
   when(state === coherence1) {
     // coherence read, 读取脏块
-    io.sram4.addr := arb4.io.out.bits.index
+    io.sram4.addr := cohIdx(5, 0)
     io.sram4.cen  := !ramCen(0)
-    io.sram5.addr := arb4.io.out.bits.index
+    io.sram5.addr := cohIdx(5, 0)
     io.sram5.cen  := !ramCen(1)
-    io.sram6.addr := arb4.io.out.bits.index
+    io.sram6.addr := cohIdx(5, 0)
     io.sram6.cen  := !ramCen(2)
-    io.sram7.addr := arb4.io.out.bits.index
+    io.sram7.addr := cohIdx(5, 0)
     io.sram7.cen  := !ramCen(3)
   }.elsewhen(state === idle && ctrlFire && io.ctrlIO.bits.cacheable) {
     // read data，提前向data array发起读请求
@@ -545,7 +587,7 @@ sealed class CohDCache extends DCache {
 }
 
 
-// 不支持一致性的dcache，加快仿真
+// 没有一致性的dcache，加快仿真
 class NoCohDCache extends DCache {
   // random replace count
   val randCount          = RegInit(0.U(2.W))
