@@ -186,7 +186,7 @@ sealed class CohDCache extends DCache {
 
   // -----------------------------------coherence---------------------------------------
   // 逐行检查，逐行写回，最少需要64个cycle完成一次同步
-  (0 to 3).map(i => (dirtyList(i) := metaArray(i)(cohIdx).dirty & metaArray(i)(cohIdx).valid))
+  (0 to 3).map(i => (dirtyList(i) := metaArray(i)(cohIdx(5, 0)).dirty & metaArray(i)(cohIdx(5, 0)).valid))
 
   // 组内块读取固定优先级
   ramCen(0) := dirtyList(0)
@@ -200,10 +200,10 @@ sealed class CohDCache extends DCache {
   when(state === coherence2) {
     cohAddrReg := cohAddrReg
     switch(ramCenReg) {
-      is(1.U) { cohAddrReg := metaArray(0)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
-      is(2.U) { cohAddrReg := metaArray(1)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
-      is(4.U) { cohAddrReg := metaArray(2)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
-      is(8.U) { cohAddrReg := metaArray(3)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(1.U) { cohAddrReg := metaArray(0)(cohIdx(5, 0)).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(2.U) { cohAddrReg := metaArray(1)(cohIdx(5, 0)).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(4.U) { cohAddrReg := metaArray(2)(cohIdx(5, 0)).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(8.U) { cohAddrReg := metaArray(3)(cohIdx(5, 0)).tag ## cohIdx(5, 0) ## 0.U(4.W) }
     }
   }
 
@@ -223,20 +223,20 @@ sealed class CohDCache extends DCache {
   when(state === writeback2 && brespFire && io.coherence.valid) {
     switch(ramCenReg) {
       is(1.U) {
-        metaArray(0)(cohIdx).valid := false.B
-        metaArray(0)(cohIdx).dirty := false.B
+        metaArray(0)(cohIdx(5, 0)).valid := false.B
+        metaArray(0)(cohIdx(5, 0)).dirty := false.B
       }
       is(2.U) {
-        metaArray(1)(cohIdx).valid := false.B
-        metaArray(1)(cohIdx).dirty := false.B
+        metaArray(1)(cohIdx(5, 0)).valid := false.B
+        metaArray(1)(cohIdx(5, 0)).dirty := false.B
       }
       is(4.U) {
-        metaArray(2)(cohIdx).valid := false.B
-        metaArray(2)(cohIdx).dirty := false.B
+        metaArray(2)(cohIdx(5, 0)).valid := false.B
+        metaArray(2)(cohIdx(5, 0)).dirty := false.B
       }
       is(8.U) {
-        metaArray(3)(cohIdx).valid := false.B
-        metaArray(3)(cohIdx).dirty := false.B
+        metaArray(3)(cohIdx(5, 0)).valid := false.B
+        metaArray(3)(cohIdx(5, 0)).dirty := false.B
       }
     }
   }
