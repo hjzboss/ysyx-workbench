@@ -74,7 +74,7 @@ sealed class CohDCache extends DCache {
 
   // cache一致性
   val cohIdx             = RegInit(0.U(7.W))
-  val dirtyList          = VecInit(0.U(4.W))
+  val dirtyList          = VecInit(List.fill(4)(false.B))
   val ramCen             = VecInit(List.fill(4)(false.B))
   val ramCenReg          = RegInit(0.U(4.W))
   val cohAddrReg         = RegInit(0.U(32.W))
