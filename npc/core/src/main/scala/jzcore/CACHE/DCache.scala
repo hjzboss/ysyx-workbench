@@ -55,6 +55,7 @@ abstract class DCache extends Module {
 
 // dataArray = 4KB, 4路组相连, 64个组，一个块16B
 // 支持一致性的dcache
+// 目前不支持axi的错误处理
 sealed class CohDCache extends DCache {
   // random replace count
   val randCount          = RegInit(0.U(2.W))
@@ -103,7 +104,7 @@ sealed class CohDCache extends DCache {
     tagCompare  -> Mux(hit, data, Mux(dirty, writeback1, allocate1)), // 读metaArray，选择dataArray中对应组的cache块，替换块的选择
     data        -> Mux(crdataFire || cwdataFire, idle, data), // 读写cache块，返回数据
     writeback1  -> Mux(waddrFire && io.axiGrant, writeback2, writeback1), // write addr
-    writeback2  -> Mux(brespFire && (io.master.bresp === okay || io.master.bresp === exokay), Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
+    writeback2  -> Mux(brespFire, Mux(io.coherence.valid, coherence1, allocate1), writeback2), // data and resp
     allocate1   -> Mux(raddrFire && io.axiGrant, allocate2, allocate1), // read addr 
     allocate2   -> Mux(rdataFire && io.master.rlast, data, allocate2), // data
     coherence1  -> Mux(coherenceFire, idle, Mux(!ramCen.asUInt.orR, coherence1, coherence2)), // 当本次没有脏块，则递增指针，保持状态
@@ -115,7 +116,7 @@ sealed class CohDCache extends DCache {
   rState := MuxLookup(rState, idle, List(
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && !io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(raddrFire && io.axiGrant, data_trans, addr_trans),
-    data_trans  -> Mux(rdataFire && (io.master.rresp === okay || io.master.rresp === exokay), Mux(crdataFire, idle, ok), data_trans),
+    data_trans  -> Mux(rdataFire, Mux(crdataFire, idle, ok), data_trans),
     ok          -> Mux(crdataFire, idle, ok)
   ))
 
@@ -124,7 +125,7 @@ sealed class CohDCache extends DCache {
     idle        -> Mux(!io.ctrlIO.bits.cacheable && ctrlFire && io.ctrlIO.bits.wen, addr_trans, idle),
     addr_trans  -> Mux(waddrFire && io.axiGrant, Mux(wdataFire, wait_resp, data_trans), addr_trans), // 当axi写数据握手完毕直接进入wait_resp状态进行应答握手
     data_trans  -> Mux(wdataFire, wait_resp, data_trans),
-    wait_resp   -> Mux(brespFire && (io.master.bresp === okay || io.master.bresp === exokay), Mux(cwdataFire, idle, ok), wait_resp),
+    wait_resp   -> Mux(brespFire, Mux(cwdataFire, idle, ok), wait_resp),
     ok          -> Mux(cwdataFire, idle, ok) // 当axi握手完毕但是cpu与cache未握手完毕进入ok状态
   ))
 
@@ -377,7 +378,7 @@ sealed class CohDCache extends DCache {
   io.master.awburst      := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 2.U, 0.U)
   if(Settings.get("sim")) {
     // 非soc的仿真环境，全是64位s
-    io.master.awsize     := 3.U(3.W) // just for fast sram
+    io.master.awsize     := 3.U(3.W) // just for fast simulation
   } else {
     // 接入soc后的size与具体设置有关
     io.master.awsize     := Mux(io.ctrlIO.bits.cacheable || io.coherence.valid, 3.U, io.ctrlIO.bits.size)
@@ -773,7 +774,7 @@ class NoCohDCache extends DCache {
   io.master.awlen        := Mux(io.ctrlIO.bits.cacheable, 1.U(8.W), 0.U(8.W))
 
   if(Settings.get("sim")) {
-    io.master.awsize     := 3.U(3.W) // just for fast sram
+    io.master.awsize     := 3.U(3.W) // just for simulation
   } else {
     io.master.awsize     := Mux(io.ctrlIO.bits.cacheable, 3.U, io.ctrlIO.bits.size)
   }
