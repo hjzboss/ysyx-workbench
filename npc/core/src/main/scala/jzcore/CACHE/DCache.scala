@@ -200,10 +200,10 @@ sealed class CohDCache extends DCache {
   when(state === coherence2) {
     cohAddrReg := cohAddrReg
     switch(ramCenReg) {
-      is(1.U) cohAddrReg := metaArray(0)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
-      is(2.U) cohAddrReg := metaArray(1)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
-      is(4.U) cohAddrReg := metaArray(2)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
-      is(8.U) cohAddrReg := metaArray(3)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W)
+      is(1.U) { cohAddrReg := metaArray(0)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(2.U) { cohAddrReg := metaArray(1)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(4.U) { cohAddrReg := metaArray(2)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
+      is(8.U) { cohAddrReg := metaArray(3)(cohIdx).tag ## cohIdx(5, 0) ## 0.U(4.W) }
     }
   }
 
