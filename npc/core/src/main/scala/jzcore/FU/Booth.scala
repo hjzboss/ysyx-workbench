@@ -5,8 +5,10 @@ import chisel3.util._
 import utils._
 
 // 部分积生成器
-// assign p = ~(~(sel_negative & ~x) & ~(sel_double_negative & ~x_sub) 
-//           & ~(sel_positive & x ) & ~(sel_double_positive &  x_sub));
+/*
+assign p = ~(~(sel_negative & ~x) & ~(sel_double_negative & ~x_sub) 
+           & ~(sel_positive & x ) & ~(sel_double_positive &  x_sub));
+*/
 sealed class PGenerator extends Module {
   val io = IO(new Bundle {
     val yAdd  = Input(Bool())
@@ -20,8 +22,9 @@ sealed class PGenerator extends Module {
   
   val x = io.x ## false.B
 
+  // (-2yi+1 + yi + yi-1)
   val selNegative = io.yAdd & (io.y & ~io.ySub | ~io.y & io.ySub)
-  val selPositive = ~io.yAdd & (io.y & ~io.ySub | ~io.y & io.ySub)
+  val selPositive = ~io.yAdd & (io.y ^ io.ySub)
   val selDoubleNegative = io.yAdd & ~io.y & ~io.ySub
   val selDoublePositive = ~io.yAdd & io.y & io.ySub
 
@@ -29,10 +32,12 @@ sealed class PGenerator extends Module {
 
   (0 to 131).map(i => (p_tmp(i) := ~(~(selNegative & ~x(i+1)) & ~(selDoubleNegative & ~x(i)) & ~(selPositive & x(i+1)) & ~(selDoublePositive & x(i)))))
   io.p := p_tmp.asUInt()
+  // 负数的补码为取反加一
   io.c := selNegative | selDoubleNegative
 } 
 
 // booth2位乘法器
+// 每次乘法完后被乘数左移两位，乘数右移两位
 class Booth extends Mul {
   val outFire = io.out.valid & io.out.ready 
 
@@ -56,6 +61,7 @@ class Booth extends Mul {
   when(state === idle && io.in.valid) {
     result := 0.U
     multiplicand := Mux(io.in.mulSigned === MulType.uu, ZeroExt(io.in.multiplicand, 132), SignExt(io.in.multiplicand, 132))
+    // 乘数需要双符号位，并且最低位要扩充一位0（y的-1次幂）
     multiplier := Mux(io.in.mulSigned === MulType.ss, io.in.multiplier(63) ## io.in.multiplier ## false.B, false.B ## io.in.multiplier ## false.B)
   }.elsewhen(state === busy && !io.out.valid) {
     result := pg.io.p + result + pg.io.c
@@ -67,7 +73,7 @@ class Booth extends Mul {
     multiplier := multiplier
   }
 
-  // 乘数全0就停止
+  // 当乘数全为0时就可以中止乘法
   io.out.valid         := state === busy & !multiplier.orR
   io.out.bits.resultLo := Mux(io.in.mulw, SignExt(result(31, 0), 64), result(63, 0))
   io.out.bits.resultHi := result(127, 64)

@@ -14,11 +14,11 @@ object DefaultSettings {
     "SocResetVector" -> 0x30000000L,
     "mul"         -> "booth", // fast, booth, wallace
     "div"         -> "rest", // fast, rest
-    "sim"         -> true, // true: verilator mode， false: soc mode
+    "sim"         -> false, // true: verilator mode， false: soc mode
     "core"        -> "normal", // single, fast, normal
     "btb_num"     -> 64, // btb entry num
     "ras_num"     -> 8, // ras entry num
-    "perf"        -> false // 性能采集模块
+    "perf"        -> false // performance unit
   )
 }
 

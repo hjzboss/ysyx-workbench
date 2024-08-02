@@ -19,8 +19,6 @@ class GRF extends Module {
 
   val rf = RegInit(VecInit(List.fill(32)(0.U(64.W))))
 
-
-
   if(Settings.getString("core") == "single") {
     // 单周期无需旁路
     io.src1 := rf(io.rs1)

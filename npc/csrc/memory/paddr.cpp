@@ -1,10 +1,10 @@
 #include <cpu/cpu.h>
 #include <memory/paddr.h>
 
-static uint8_t i_cache[100000000] = {};
+static uint8_t dram[100000000] = {};
 
-uint8_t* guest_to_host(uint64_t paddr) { return i_cache + paddr - CONFIG_MBASE; }
-uint64_t host_to_guest(uint8_t *haddr) { return haddr - i_cache + CONFIG_MBASE; }
+uint8_t* guest_to_host(uint64_t paddr) { return dram + paddr - CONFIG_MBASE; }
+uint64_t host_to_guest(uint8_t *haddr) { return haddr - dram + CONFIG_MBASE; }
 
 
 static void out_of_bound(uint64_t addr) {
@@ -119,7 +119,7 @@ long load_img(char *dir) {
   long size = ftell(fp);
 
   fseek(fp, 0, SEEK_SET);
-  int ret = fread(i_cache, size, 1, fp);
+  int ret = fread(dram, size, 1, fp);
   assert(ret == 1);
 
   fclose(fp);
