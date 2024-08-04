@@ -243,54 +243,6 @@ sealed class CohDCache extends DCache {
   // 计数器溢出时一致性结束
   io.coherence.ready := cohIdx(6)
 
-/*
-  val arbList64 = List.fill(4)(Module(new CohArbiter(64)))
-  val dirtyArray = List.fill(4)(VecInit(List.fill(64)(false.B)))
-  for(i <- 0 to 63; j <- 0 to 3) {
-    dirtyArray(j)(i) := metaArray(j)(i).valid & metaArray(j)(i).dirty
-  }
-
-  val arbIOList64 = List.fill(4)(Wire(Vec(64, Decoupled(new ArbiterIO))))
-  for(i <- 0 to 3) {
-    for(j <- 0 to 63) {
-      arbIOList64(i)(j).valid := dirtyArray(i)(j)
-      arbIOList64(i)(j).bits.no := i.U(2.W) // which ram
-      arbIOList64(i)(j).bits.tag := metaArray(i)(j).tag
-      arbIOList64(i)(j).bits.index := j.U(6.W) // which set
-    }
-  }
-  (0 to 3).map(i => (arbList64(i).io.in <> arbIOList64(i)))
-  (0 to 3).map(i => (arbList64(i).io.out.ready := true.B))
-
-  val arb4 = Module(new CohArbiter(4))
-  val arb4IO = Wire(Vec(4, Decoupled(new ArbiterIO)))
-  (0 to 3).map(i => (arb4IO(i) := arbList64(i).io.out))
-  arb4.io.in <> arb4IO
-  arb4.io.out.ready := true.B
-
-  // ram片选信号
-  val ramCenPre = WireDefault(0.U(4.W))
-  ramCenPre := LookupTree(arb4.io.out.bits.no, List(
-    0.U -> 1.U,
-    1.U -> 2.U,
-    2.U -> 4.U,
-    3.U -> 8.U
-  ))
-  val ramCen = VecInit(List.fill(4)(false.B))
-  (0 to 3).map(i => (ramCen(i) := ramCenPre(i) & arb4.io.out.valid))
-
-  val colTagReg = RegInit(0.U(22.W))
-  val colIndexReg = RegInit(0.U(6.W))
-  val colNoReg  = RegInit(0.U(2.W))
-  colTagReg := Mux(state === coherence2, arb4.io.out.bits.tag, colTagReg)
-  colIndexReg := Mux(state === coherence2, arb4.io.out.bits.index, colIndexReg)
-  colNoReg  := Mux(state === coherence2, arb4.io.out.bits.no, colNoReg)
-
-  val colOver = Wire(Bool()) // coherence over
-  colOver := !(arbList64(0).io.out.valid | arbList64(1).io.out.valid | arbList64(2).io.out.valid | arbList64(3).io.out.valid)
-  io.coherence.ready := colOver
-*/
-
   // dataArray lookup
   val dataBlock = RegInit(0.U(128.W))
   when(state === tagCompare) {

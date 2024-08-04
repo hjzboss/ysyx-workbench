@@ -41,7 +41,5 @@ int main() {
 		check(mem[i] == sh_ans[i]);
 	}
 
-	asm volatile("fence.i");
-
 	return 0;
 }
