@@ -20,8 +20,8 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   uint32_t data = (uint32_t)inl(VGACTL_ADDR);
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
-    .height = data >> 16, 
-    .width = data & 0x0000ffff,
+    .width = data >> 16, 
+    .height = data & 0x0000ffff,
     .vmemsz = 0
   };
 }
@@ -42,8 +42,8 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   // 写入显存
   uint32_t *pixels_tmp = (uint32_t *)ctl->pixels;
   fb += width * ctl->y + ctl->x; // 定位屏幕
-  for (int j = 0; j < ctl->h; j++) {
-    for (int i = 0; i < ctl->w; i++) {
+  for (int j = 0; j < ctl->w; j++) {
+    for (int i = 0; i < ctl->h; i++) {
       outl((uintptr_t)fb++, *pixels_tmp++);
     }
     fb += width - ctl->w;
