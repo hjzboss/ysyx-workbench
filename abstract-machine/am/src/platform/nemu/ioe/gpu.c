@@ -21,7 +21,7 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
   *cfg = (AM_GPU_CONFIG_T) {
     .present = true, .has_accel = false,
     .width = data >> 16, 
-    .height = data & 0x0000ffff,
+    .height = data & 0x000fffff,
     .vmemsz = 0
   };
 }
