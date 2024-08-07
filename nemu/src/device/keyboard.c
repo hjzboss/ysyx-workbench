@@ -65,6 +65,7 @@ static uint32_t key_dequeue() {
 }
 
 // 在device_update中进行调用，每次nemu执行一条指令就会调用device_update来更新设备状态，使用SDL读取键盘状态，将按下键盘的键盘码入队
+// KEYDOWN_MASK是按键按下的信息
 void send_key(uint8_t scancode, bool is_keydown) {
   if (nemu_state.state == NEMU_RUNNING && keymap[scancode] != _KEY_NONE) {
     uint32_t am_scancode = keymap[scancode] | (is_keydown ? KEYDOWN_MASK : 0);

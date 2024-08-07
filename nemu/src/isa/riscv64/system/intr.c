@@ -27,7 +27,7 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   mstatus &= ~0x088; // clear mpie and mie
   mstatus |= mpie; // set mpie=mie and mie=0
   cpu.csr[0] = mstatus;
-  cpu.csr[3] = 0xb; // mcause syscall，默认设置为系统调用
+  cpu.csr[3] = NO; // mcause syscall，默认设置为系统调用
   cpu.csr[2] = epc;  // mepc，由软件进行更新
   //printf("nemu: ecall, mstatus=%lx\n", mstatus);
   return cpu.csr[1]; // mtvec

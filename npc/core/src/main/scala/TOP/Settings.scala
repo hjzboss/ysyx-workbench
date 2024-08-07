@@ -14,7 +14,7 @@ object DefaultSettings {
     "SocResetVector" -> 0x30000000L,
     "mul"         -> "booth", // fast, booth, wallace
     "div"         -> "rest", // fast, rest
-    "sim"         -> false, // true: verilator mode， false: soc mode
+    "sim"         -> true, // true: verilator mode， false: soc mode
     "core"        -> "normal", // single, fast, normal
     "btb_num"     -> 64, // btb entry num
     "ras_num"     -> 8, // ras entry num
